@@ -347,7 +347,7 @@ class JoinLinesCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test join lines and undo with oldundo`() {
+  fun `test join lines and undo with ideaoldundo`() {
     configureByText(
       """
       Line 1
@@ -358,7 +358,7 @@ class JoinLinesCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       enterCommand("j")
       assertState(
         """
@@ -378,12 +378,12 @@ class JoinLinesCommandTest : VimTestCase() {
       """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test join range and undo with oldundo`() {
+  fun `test join range and undo with ideaoldundo`() {
     configureByText(
       """
       Line 1
@@ -395,7 +395,7 @@ class JoinLinesCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       enterCommand("2,4j")
       assertState(
         """
@@ -416,12 +416,12 @@ class JoinLinesCommandTest : VimTestCase() {
       """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test join with count and undo with oldundo`() {
+  fun `test join with count and undo with ideaoldundo`() {
     configureByText(
       """
       ${c}Lorem ipsum dolor sit amet,
@@ -432,7 +432,7 @@ class JoinLinesCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       enterCommand("j 3")
       assertState(
         """
@@ -451,7 +451,7 @@ class JoinLinesCommandTest : VimTestCase() {
       """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 }

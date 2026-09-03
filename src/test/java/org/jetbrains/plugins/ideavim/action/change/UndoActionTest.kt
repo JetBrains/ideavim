@@ -40,7 +40,7 @@ class UndoActionTest : VimTestCase() {
   @Test
   @TestFor(issues = ["VIM-696"])
   fun `test undo after selection`() {
-    if (!optionsIjNoEditor().oldundo) {
+    if (!optionsIjNoEditor().ideaoldundo) {
       val keys = listOf("dwv3eld", "u")
       val before = """
                 Lorem Ipsum
@@ -121,7 +121,7 @@ class UndoActionTest : VimTestCase() {
   @Test
   @TestFor(issues = ["VIM-308"])
   fun `test cursor movements do not require additional undo`() {
-    if (!optionsIjNoEditor().oldundo) {
+    if (!optionsIjNoEditor().ideaoldundo) {
       val keys = listOf("a1<Esc>ea2<Esc>ea3<Esc>", "uu")
       val before = """
                 Lorem Ipsum
@@ -149,7 +149,7 @@ class UndoActionTest : VimTestCase() {
   @Test
   @TestFor(issues = ["VIM-547"])
   fun `test typed text requires one undo`() {
-    assumeTrue(!injector.globalIjOptions().oldundo)
+    assumeTrue(!injector.globalIjOptions().ideaoldundo)
     configureByText("Lorem ipsu${c}m")
     typeText("a dolor sit amet,<CR>consectetur adipiscing elit<Esc>")
     assertState("Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit")
@@ -160,7 +160,7 @@ class UndoActionTest : VimTestCase() {
   @Test
   @TestFor(issues = ["VIM-547"])
   fun `test breaking insert sequence`() {
-    assumeTrue(!injector.globalIjOptions().oldundo)
+    assumeTrue(!injector.globalIjOptions().ideaoldundo)
     configureByText("Lorem ipsu${c}m")
     typeText("a dolor sit amet,<CR>consectetur <C-G>uadipiscing elit<Esc>")
     assertState("Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit")
@@ -171,7 +171,7 @@ class UndoActionTest : VimTestCase() {
   @Test
   @TestFor(issues = ["VIM-547"])
   fun `test moving caret breaks insert sequence`() {
-    assumeTrue(!injector.globalIjOptions().oldundo)
+    assumeTrue(!injector.globalIjOptions().ideaoldundo)
     configureByText("Lorem ipsu${c}m")
     typeText("a dolor sit amet,<CR>consectetur  <Left>adipiscing elit<Esc>")
     assertState("Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit ")

@@ -322,7 +322,7 @@ internal class NotificationService(private val project: Project?) : VimNotificat
 
     class StopTracking : DumbAwareAction("Stop Tracking") {
       override fun actionPerformed(e: AnActionEvent) {
-        injector.globalIjOptions().trackactionids = false
+        injector.globalIjOptions().ideatrackactionids = false
         notification?.expire()
       }
     }

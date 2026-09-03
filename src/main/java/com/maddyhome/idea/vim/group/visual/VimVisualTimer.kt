@@ -64,7 +64,7 @@ object VimVisualTimer {
     if (mode == null) mode = currentMode
 
     // Default delay - 100 ms
-    val timer = Timer(injector.globalIjOptions().visualdelay) { timerAction(task) }
+    val timer = Timer(injector.globalIjOptions().ideavisualdelay) { timerAction(task) }
     timer.isRepeats = false
     timer.start()
     swingTimer = timer

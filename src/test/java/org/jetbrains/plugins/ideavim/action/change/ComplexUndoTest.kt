@@ -29,11 +29,11 @@ class ComplexUndoTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo change inside parentheses with cursor movement with oldundo`() {
+  fun `test undo change inside parentheses with cursor movement with ideaoldundo`() {
     // This is the example from the user's request
     configureByText("a${c}bc(xxx)def")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("ci(")
       typeText("yyy")
       typeText("<Esc>")
@@ -41,7 +41,7 @@ class ComplexUndoTest : VimTestCase() {
       typeText("u")
       assertState("abc(yyy${c})def")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -55,16 +55,16 @@ class ComplexUndoTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo delete inside brackets with cursor movement with oldundo`() {
+  fun `test undo delete inside brackets with cursor movement with ideaoldundo`() {
     configureByText("fo${c}o[bar]baz")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("di[")
       assertState("foo[${c}]baz")
       typeText("u")
       assertState("fo${c}o[bar]baz")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -80,10 +80,10 @@ class ComplexUndoTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo change inside quotes with cursor movement with oldundo`() {
+  fun `test undo change inside quotes with cursor movement with ideaoldundo`() {
     configureByText("Say ${c}hello \"world\" today")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("ci\"")
       typeText("universe")
       typeText("<Esc>")
@@ -91,7 +91,7 @@ class ComplexUndoTest : VimTestCase() {
       typeText("u")
       assertState("Say hello \"universe${c}\" today")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -105,16 +105,16 @@ class ComplexUndoTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo delete word with cursor at different position with oldundo`() {
+  fun `test undo delete word with cursor at different position with ideaoldundo`() {
     configureByText("The qu${c}ick brown fox")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("daw")  // Delete a word (including surrounding spaces)
       assertState("The ${c}brown fox")
       typeText("u")
       assertState("The qu${c}ick brown fox")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -156,7 +156,7 @@ class ComplexUndoTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo change paragraph with cursor movement with oldundo`() {
+  fun `test undo change paragraph with cursor movement with ideaoldundo`() {
     configureByText(
       """
       First paragraph.
@@ -168,7 +168,7 @@ class ComplexUndoTest : VimTestCase() {
     """.trimIndent()
     )
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("cip")
       typeText("New content")
       typeText("<Esc>")
@@ -192,7 +192,7 @@ class ComplexUndoTest : VimTestCase() {
     """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -206,16 +206,16 @@ class ComplexUndoTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo delete to search result with oldundo`() {
+  fun `test undo delete to search result with ideaoldundo`() {
     configureByText("abc${c}defghijklmnop")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("d/jkl<CR>")  // Delete to search result
       assertState("abc${c}jklmnop")
       typeText("u")
       assertState("abc${c}defghijklmnop")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -260,7 +260,7 @@ class ComplexUndoTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo change to mark with cursor movement with oldundo`() {
+  fun `test undo change to mark with cursor movement with ideaoldundo`() {
     configureByText(
       """
       Li${c}ne 1
@@ -270,7 +270,7 @@ class ComplexUndoTest : VimTestCase() {
     """.trimIndent()
     )
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("ma")  // Set mark 'a'
       typeText("2j")   // Move down 2 lines
       assertState(
@@ -298,7 +298,7 @@ class ComplexUndoTest : VimTestCase() {
     """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -312,16 +312,16 @@ class ComplexUndoTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo substitute with cursor movement with oldundo`() {
+  fun `test undo substitute with cursor movement with ideaoldundo`() {
     configureByText("${c}Hello world hello")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText(":s/hello/goodbye/gi<CR>")  // Substitute with flags
       assertState("${c}goodbye world goodbye")
       typeText("u")
       assertState("${c}Hello world hello")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -357,10 +357,10 @@ class ComplexUndoTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo multiple operations in sequence with oldundo`() {
+  fun `test undo multiple operations in sequence with ideaoldundo`() {
     configureByText("${c}abc def ghi")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
 
       // First operation: delete word
       typeText("dw")
@@ -388,7 +388,7 @@ class ComplexUndoTest : VimTestCase() {
       typeText("u")
       assertState("xyz${c} ghi")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -402,16 +402,16 @@ class ComplexUndoTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo with text objects and counts with oldundo`() {
+  fun `test undo with text objects and counts with ideaoldundo`() {
     configureByText("function(${c}arg1, arg2, arg3)")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("d2f,")  // Delete to 2nd comma
       assertState("function(${c} arg3)")
       typeText("u")
       assertState("function(${c}arg1, arg2, arg3)")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -425,16 +425,16 @@ class ComplexUndoTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo inner word at end of word with oldundo`() {
+  fun `test undo inner word at end of word with ideaoldundo`() {
     configureByText("The quic${c}k brown fox")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("diw")
       assertState("The ${c} brown fox")
       typeText("u")
       assertState("The quic${c}k brown fox")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -450,10 +450,10 @@ class ComplexUndoTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo change with register and motion with oldundo`() {
+  fun `test undo change with register and motion with ideaoldundo`() {
     configureByText("${c}Hello world")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("\"aciw")  // Change inner word into register 'a'
       typeText("Goodbye")
       typeText("<Esc>")
@@ -461,7 +461,7 @@ class ComplexUndoTest : VimTestCase() {
       typeText("u")
       assertState("Goodbye${c} world")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -495,7 +495,7 @@ class ComplexUndoTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo join with indentation handling with oldundo`() {
+  fun `test undo join with indentation handling with ideaoldundo`() {
     configureByText(
       """
       if (condition) {
@@ -505,7 +505,7 @@ class ComplexUndoTest : VimTestCase() {
     """.trimIndent()
     )
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("J")
       assertState(
         """
@@ -524,7 +524,7 @@ class ComplexUndoTest : VimTestCase() {
     """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -540,10 +540,10 @@ class ComplexUndoTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo replace mode changes with oldundo`() {
+  fun `test undo replace mode changes with ideaoldundo`() {
     configureByText("${c}Hello world")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("R")
       typeText("Goodbye")
       typeText("<Esc>")
@@ -551,7 +551,7 @@ class ComplexUndoTest : VimTestCase() {
       typeText("u")
       assertState("Goodbye${c}orld")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 }

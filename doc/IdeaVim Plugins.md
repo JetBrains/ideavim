@@ -1172,7 +1172,7 @@ its normal behaviour (indentation), so ordinary tabbing is unaffected.
 
 ### Instructions
 
-Enabling the plugin removes `<Tab>` and `<S-Tab>` from the [`lookupkeys`](https://github.com/JetBrains/ideavim/wiki/set-commands)
+Enabling the plugin removes `<Tab>` and `<S-Tab>` from the [`idealookupkeys`](https://github.com/JetBrains/ideavim/wiki/set-commands)
 option so that IdeaVim — rather than the IDE — handles them while the completion popup is open. If
 you want to keep Vim's default insert-mode completion keys as well, they continue to work alongside
 Tab:

@@ -81,7 +81,7 @@ class UndoRedoHelper : VimTimestampBasedUndoService {
     undoManager: UndoManager,
     fileEditor: TextEditor,
   ) {
-    if (injector.globalIjOptions().oldundo) {
+    if (injector.globalIjOptions().ideaoldundo) {
       // TODO refactor me after VIM-308 when restoring selection and caret movement will be ignored by undo
       editor.runWithChangeTracking {
         undoManager.undo(fileEditor)
@@ -158,7 +158,7 @@ class UndoRedoHelper : VimTimestampBasedUndoService {
     fileEditor: TextEditor,
     editor: VimEditor,
   ) {
-    if (injector.globalIjOptions().oldundo) {
+    if (injector.globalIjOptions().ideaoldundo) {
       undoManager.redo(fileEditor)
       CommandProcessor.getInstance().runUndoTransparentAction {
         editor.carets().forEach { it.ij.removeSelection() }

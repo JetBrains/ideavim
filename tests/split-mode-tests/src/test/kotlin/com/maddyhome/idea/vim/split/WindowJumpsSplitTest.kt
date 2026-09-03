@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.split
 import org.junit.jupiter.api.Test
 
 /**
- * Smoke tests for the `'windowjumps'` option in split mode
+ * Smoke tests for the `'ideawindowjumps'` option in split mode
  *
  * The jump list is scoped to a window by composing the project id with an id for the containing `EditorWindow`, resolved
  * through `FileEditorManagerEx`. That only exists on the frontend, and the service handing out the ids is registered in
@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test
  */
 class WindowJumpsSplitTest : IdeaVimStarterTestBase() {
 
-  override fun ideaVimRcContent(): String = "set windowjumps\n"
+  override fun ideaVimRcContent(): String = "set ideawindowjumps\n"
 
   private fun longFile(name: String): String {
     val lines = (1..50).joinToString("\n") { "Line $it of content" }
@@ -41,7 +41,7 @@ class WindowJumpsSplitTest : IdeaVimStarterTestBase() {
     ctrlO()
     pause(500)
     // Reaching the jump means the window's scope was resolved on the frontend and the jump was recorded under it
-    assertCaretBefore(10, "Ctrl-O should jump back to start with 'windowjumps' set")
+    assertCaretBefore(10, "Ctrl-O should jump back to start with 'ideawindowjumps' set")
   }
 
   @Test

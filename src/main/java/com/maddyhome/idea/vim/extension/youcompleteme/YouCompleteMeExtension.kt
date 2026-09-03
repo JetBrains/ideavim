@@ -28,9 +28,9 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
  * When no popup is open, `<Tab>` falls back to its normal insert-mode behaviour (indentation), so ordinary
  * tabbing is not broken.
  *
- * By default `<Tab>` is part of the `lookupkeys` option, which means that while a lookup is open the IDE -
+ * By default `<Tab>` is part of the `idealookupkeys` option, which means that while a lookup is open the IDE -
  * not IdeaVim - receives the key and accepts the current item. To make Tab cycle instead, this extension
- * removes `<Tab>` and `<S-Tab>` from `lookupkeys` so that IdeaVim handles them, and maps them to the same
+ * removes `<Tab>` and `<S-Tab>` from `idealookupkeys` so that IdeaVim handles them, and maps them to the same
  * logic as the native `<C-N>`/`<C-P>` insert-mode completion keys.
  */
 internal class YouCompleteMeExtension : VimExtension {
@@ -57,7 +57,7 @@ internal class YouCompleteMeExtension : VimExtension {
   }
 
   private fun removeFromLookupKeys(vararg keys: String) {
-    val option = IjOptions.lookupkeys
+    val option = IjOptions.idealookupkeys
     val scope = OptionAccessScope.GLOBAL(null)
     var value = injector.optionGroup.getOptionValue(option, scope)
     for (key in keys) {

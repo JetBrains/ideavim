@@ -220,7 +220,7 @@ class DeleteJoinLinesSpacesActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo after join lines with oldundo`() {
+  fun `test undo after join lines with ideaoldundo`() {
     configureByText(
       """
       First line
@@ -229,7 +229,7 @@ class DeleteJoinLinesSpacesActionTest : VimTestCase() {
     """.trimIndent()
     )
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("J")
       assertState(
         """
@@ -246,12 +246,12 @@ class DeleteJoinLinesSpacesActionTest : VimTestCase() {
     """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test undo after join multiple lines with oldundo`() {
+  fun `test undo after join multiple lines with ideaoldundo`() {
     configureByText(
       """
       ${c}Line 1
@@ -261,7 +261,7 @@ class DeleteJoinLinesSpacesActionTest : VimTestCase() {
     """.trimIndent()
     )
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("3J")
       assertState(
         """
@@ -279,12 +279,12 @@ class DeleteJoinLinesSpacesActionTest : VimTestCase() {
     """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test undo after multiple sequential joins with oldundo`() {
+  fun `test undo after multiple sequential joins with ideaoldundo`() {
     configureByText(
       """
       ${c}One
@@ -294,7 +294,7 @@ class DeleteJoinLinesSpacesActionTest : VimTestCase() {
     """.trimIndent()
     )
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("J")
       assertState(
         """
@@ -332,12 +332,12 @@ class DeleteJoinLinesSpacesActionTest : VimTestCase() {
     """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test undo join with special whitespace handling with oldundo`() {
+  fun `test undo join with special whitespace handling with ideaoldundo`() {
     configureByText(
       """
       ${c}foo {
@@ -346,7 +346,7 @@ class DeleteJoinLinesSpacesActionTest : VimTestCase() {
     """.trimIndent()
     )
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("J")
       assertState(
         """
@@ -363,7 +363,7 @@ class DeleteJoinLinesSpacesActionTest : VimTestCase() {
     """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 }

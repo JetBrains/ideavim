@@ -81,7 +81,10 @@ object IjOptions {
     )
   )
 
-  // IntelliJ specific functionality - custom options
+  // IntelliJ specific functionality - custom options.
+  // These options are all prefixed with "idea", to distinguish them from Vim's own options. Some were introduced
+  // without the prefix and have since been renamed - they pass their old name to `addOption` as a deprecated name, so
+  // that existing `~/.ideavimrc` files keep working. See `Options.addOption`.
   val ide: StringOption = addOption(
     StringOption("ide", GLOBAL, "ide", ApplicationNamesInfo.getInstance().fullProductNameWithEdition)
   )
@@ -89,7 +92,18 @@ object IjOptions {
     ToggleOption("ideacopypreprocess", GLOBAL_OR_LOCAL_TO_BUFFER, "ideacopypreprocess", false)
   )
   val ideajoin: ToggleOption = addOption(ToggleOption("ideajoin", GLOBAL_OR_LOCAL_TO_BUFFER, "ideajoin", false))
+  val idealookupkeys: StringListOption = addOption(
+    StringListOption(
+      "idealookupkeys",
+      GLOBAL,
+      "idealookupkeys",
+      "<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>"
+    ),
+    "lookupkeys"
+  )
   val ideamarks: ToggleOption = addOption(ToggleOption("ideamarks", GLOBAL, "ideamarks", true))
+  val ideapythonconsole: ToggleOption =
+    addOption(ToggleOption("ideapythonconsole", GLOBAL, "ideapythonconsole", true), "pythonconsole")
   val idearefactormode: StringOption = addOption(
     StringOption(
       "idearefactormode",
@@ -108,6 +122,8 @@ object IjOptions {
       IjOptionConstants.ideaStatusIconValues
     )
   )
+  val ideatrackactionids: ToggleOption =
+    addOption(ToggleOption("ideatrackactionids", GLOBAL, "tai", false), "trackactionids")
   val ideavimsupport: StringListOption = addOption(
     StringListOption(
       "ideavimsupport",
@@ -117,29 +133,26 @@ object IjOptions {
       IjOptionConstants.ideavimsupportValues
     )
   )
+  val ideavisualdelay: UnsignedNumberOption =
+    addOption(UnsignedNumberOption("ideavisualdelay", GLOBAL, "ideavisualdelay", 100), "visualdelay")
 
   @JvmField
   val ideawrite: StringOption = addOption(
     StringOption("ideawrite", GLOBAL, "ideawrite", "all", IjOptionConstants.ideaWriteValues)
   )
-  val lookupkeys: StringListOption = addOption(
-    StringListOption(
-      "lookupkeys",
-      GLOBAL,
-      "lookupkeys",
-      "<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>"
-    )
-  )
-  val pythonconsole: ToggleOption = addOption(ToggleOption("pythonconsole", GLOBAL, "pythonconsole", true))
-  val trackactionids: ToggleOption = addOption(ToggleOption("trackactionids", GLOBAL, "tai", false))
-  val visualdelay: UnsignedNumberOption = addOption(UnsignedNumberOption("visualdelay", GLOBAL, "visualdelay", 100))
 
   // Temporary feature flags during development, not really intended for external use
-  val closenotebooks: ToggleOption =
-    addOption(ToggleOption("closenotebooks", GLOBAL, "closenotebooks", true, isHidden = true))
-  val oldundo: ToggleOption = addOption(ToggleOption("oldundo", GLOBAL, "oldundo", false, isHidden = true))
-  val unifyjumps: ToggleOption = addOption(ToggleOption("unifyjumps", GLOBAL, "unifyjumps", true, isHidden = true))
+  val ideaclosenotebooks: ToggleOption = addOption(
+    ToggleOption("ideaclosenotebooks", GLOBAL, "ideaclosenotebooks", true, isHidden = true),
+    "closenotebooks"
+  )
+  val ideaoldundo: ToggleOption =
+    addOption(ToggleOption("ideaoldundo", GLOBAL, "ideaoldundo", false, isHidden = true), "oldundo")
+  val ideaunifyjumps: ToggleOption =
+    addOption(ToggleOption("ideaunifyjumps", GLOBAL, "ideaunifyjumps", true, isHidden = true), "unifyjumps")
+
   // This needs to be Option<out VimDataType> so that it can work with derived option types, such as NumberOption, which
   // derives from Option<VimInt>
-  private fun <T : Option<out VimDataType>> addOption(option: T) = option.also { Options.addOption(option) }
+  private fun <T : Option<out VimDataType>> addOption(option: T, vararg deprecatedNames: String) =
+    option.also { Options.addOption(option, *deprecatedNames) }
 }

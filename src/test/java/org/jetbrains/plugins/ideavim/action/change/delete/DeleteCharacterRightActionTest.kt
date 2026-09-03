@@ -126,10 +126,10 @@ class DeleteCharacterRightActionTest : VimTestCase() {
   }
 
   @Test
-  fun `undo after deleting character with oldundo`() {
+  fun `undo after deleting character with ideaoldundo`() {
     configureByText("foo ${c}foo")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("xx")
       assertState("foo ${c}o")
       typeText("u")
@@ -137,7 +137,7 @@ class DeleteCharacterRightActionTest : VimTestCase() {
       typeText("u")
       assertState("foo ${c}foo")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 }

@@ -34,9 +34,9 @@ import kotlin.test.assertNull
  * (the IDE's autocomplete popup) when one is open.
  *
  * This is the foundation that a "Tab cycles completions" plugin (YouCompleteMe / SuperTab style) would
- * build on. Note that `<Tab>` itself is part of the default `lookupkeys` option, so while the popup is
+ * build on. Note that `<Tab>` itself is part of the default `idealookupkeys` option, so while the popup is
  * open the IDE — not IdeaVim — receives Tab (it accepts the current item rather than cycling). Making Tab
- * cycle therefore requires removing `<Tab>` from `lookupkeys` and mapping it to the same down/up logic.
+ * cycle therefore requires removing `<Tab>` from `idealookupkeys` and mapping it to the same down/up logic.
  */
 @TestWithoutNeovim(
   reason = SkipNeovimReason.SEE_DESCRIPTION,

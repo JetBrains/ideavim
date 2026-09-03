@@ -137,21 +137,21 @@ class DeleteEndOfLineActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo after delete to end of line with oldundo`() {
+  fun `test undo after delete to end of line with ideaoldundo`() {
     configureByText("Hello ${c}world and more text")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("D")
       assertState("Hello$c ")
       typeText("u")
       assertState("Hello ${c}world and more text")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test undo after delete to end of line with count with oldundo`() {
+  fun `test undo after delete to end of line with count with ideaoldundo`() {
     configureByText(
       """
       First ${c}line with text
@@ -161,7 +161,7 @@ class DeleteEndOfLineActionTest : VimTestCase() {
     """.trimIndent()
     )
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("2D")
       assertState(
         """
@@ -180,15 +180,15 @@ class DeleteEndOfLineActionTest : VimTestCase() {
     """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test undo after delete to end of line at different positions with oldundo`() {
+  fun `test undo after delete to end of line at different positions with ideaoldundo`() {
     configureByText("abc${c}defghijk")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("D")
       assertState("ab${c}c")
       typeText("u")
@@ -202,12 +202,12 @@ class DeleteEndOfLineActionTest : VimTestCase() {
       typeText("u")
       assertState("${c}abcdefghijk")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test multiple undo after sequential delete to end of line with oldundo`() {
+  fun `test multiple undo after sequential delete to end of line with ideaoldundo`() {
     configureByText(
       """
       ${c}First line
@@ -216,7 +216,7 @@ class DeleteEndOfLineActionTest : VimTestCase() {
     """.trimIndent()
     )
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("D")
       assertState(
         """
@@ -255,7 +255,7 @@ class DeleteEndOfLineActionTest : VimTestCase() {
     """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 }

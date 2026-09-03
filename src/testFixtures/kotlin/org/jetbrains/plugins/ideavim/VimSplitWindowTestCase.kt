@@ -122,7 +122,7 @@ abstract class VimSplitWindowTestCase : VimTestCase() {
    * Runs an Ex command and returns what it printed
    *
    * For assertions that cannot be exact: the platform mirrors IDE navigation into the jump list asynchronously (see
-   * `unifyjumps`), so a list can legitimately carry entries a test never made.
+   * `ideaunifyjumps`), so a list can legitimately carry entries a test never made.
    */
   protected fun commandOutput(command: String): String {
     clearOutputPanel()

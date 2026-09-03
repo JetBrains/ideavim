@@ -22,7 +22,7 @@ import com.intellij.platform.rpc.topics.broadcast
  * The frontend [JumpRemoteTopicListener] receives these events and adds/removes
  * jumps from the active [com.maddyhome.idea.vim.api.VimJumpService].
  *
- * This listener never reads options — the `unifyjumps` check is performed
+ * This listener never reads options — the `ideaunifyjumps` check is performed
  * on the frontend side.
  */
 internal class JumpsListener(val project: Project) : RecentPlacesListener {

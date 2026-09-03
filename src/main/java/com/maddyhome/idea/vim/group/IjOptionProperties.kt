@@ -21,19 +21,19 @@ import com.maddyhome.idea.vim.options.OptionAccessScope
 @Suppress("SpellCheckingInspection")
 open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesBase(scope) {
   var ide: String by optionProperty(IjOptions.ide)
+  val idealookupkeys: StringListOptionValue by optionProperty(IjOptions.idealookupkeys)
   var ideamarks: Boolean by optionProperty(IjOptions.ideamarks)
+  val ideapythonconsole: Boolean by optionProperty(IjOptions.ideapythonconsole)
   var ideastatusicon: String by optionProperty(IjOptions.ideastatusicon)
+  var ideatrackactionids: Boolean by optionProperty(IjOptions.ideatrackactionids)
   val ideavimsupport: StringListOptionValue by optionProperty(IjOptions.ideavimsupport)
+  var ideavisualdelay: Int by optionProperty(IjOptions.ideavisualdelay)
   var ideawrite: String by optionProperty(IjOptions.ideawrite)
-  val pythonconsole: Boolean by optionProperty(IjOptions.pythonconsole)
-  val lookupkeys: StringListOptionValue by optionProperty(IjOptions.lookupkeys)
-  var trackactionids: Boolean by optionProperty(IjOptions.trackactionids)
-  var visualdelay: Int by optionProperty(IjOptions.visualdelay)
 
   // Temporary options to control work-in-progress behaviour
-  var closenotebooks: Boolean by optionProperty(IjOptions.closenotebooks)
-  var oldundo: Boolean by optionProperty(IjOptions.oldundo)
-  var unifyjumps: Boolean by optionProperty(IjOptions.unifyjumps)
+  var ideaclosenotebooks: Boolean by optionProperty(IjOptions.ideaclosenotebooks)
+  var ideaoldundo: Boolean by optionProperty(IjOptions.ideaoldundo)
+  var ideaunifyjumps: Boolean by optionProperty(IjOptions.ideaunifyjumps)
 }
 
 /**

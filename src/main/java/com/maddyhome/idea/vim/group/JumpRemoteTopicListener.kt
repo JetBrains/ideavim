@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.newapi.vim
  * Receives jump events from the backend [JumpsListener] via [JUMP_REMOTE_TOPIC]
  * and applies them to the active [com.maddyhome.idea.vim.api.VimJumpService].
  *
- * Checks the `unifyjumps` option and the event timestamp before recording —
+ * Checks the `ideaunifyjumps` option and the event timestamp before recording —
  * this mirrors the checks that were in `JumpsListener` on master.
  * The timestamp check prevents processing events that were already handled
  * directly by [com.maddyhome.idea.vim.api.VimJumpServiceBase.saveJumpLocation].
@@ -37,7 +37,7 @@ internal class JumpRemoteTopicListener : ProjectRemoteTopicListener<JumpInfo> {
 
   override fun handleEvent(project: Project, event: JumpInfo) {
     initInjector()
-    if (!injector.globalIjOptions().unifyjumps) return
+    if (!injector.globalIjOptions().ideaunifyjumps) return
 
     val jumpService = injector.jumpService
     if (event.timestamp < jumpService.lastJumpTimeStamp) return
@@ -55,7 +55,7 @@ internal class JumpRemoteTopicListener : ProjectRemoteTopicListener<JumpInfo> {
 
   private fun scopeIdFor(project: Project, event: JumpInfo): String {
     val projectId = injector.file.getProjectId(project)
-    if (!injector.globalOptions().windowjumps) return projectId
+    if (!injector.globalOptions().ideawindowjumps) return projectId
 
     val window = windowFor(project, event.filepath) ?: return projectId
     val editor = (window.selectedComposite?.selectedEditor as? TextEditor)?.editor ?: return projectId

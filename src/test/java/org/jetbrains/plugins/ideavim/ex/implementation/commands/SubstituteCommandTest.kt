@@ -1339,7 +1339,7 @@ class SubstituteCommandTest : VimTestCase() {
 
   @Test
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-  fun `test substitute and undo with oldundo`() {
+  fun `test substitute and undo with ideaoldundo`() {
     configureByText(
       """
       |Hello ${c}world
@@ -1349,7 +1349,7 @@ class SubstituteCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText(commandToKeys("s/world/universe/"))
       assertState(
         """
@@ -1368,13 +1368,13 @@ class SubstituteCommandTest : VimTestCase() {
       """.trimMargin()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-  fun `test substitute global and undo with oldundo`() {
+  fun `test substitute global and undo with ideaoldundo`() {
     configureByText(
       """
       |${c}Hello world world world
@@ -1383,7 +1383,7 @@ class SubstituteCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText(commandToKeys("s/world/universe/g"))
       assertState(
         """
@@ -1400,13 +1400,13 @@ class SubstituteCommandTest : VimTestCase() {
       """.trimMargin()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-  fun `test substitute with range and undo with oldundo`() {
+  fun `test substitute with range and undo with ideaoldundo`() {
     configureByText(
       """
       |First line
@@ -1418,7 +1418,7 @@ class SubstituteCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText(commandToKeys("2,4s/world/universe/"))
       assertState(
         """
@@ -1441,13 +1441,13 @@ class SubstituteCommandTest : VimTestCase() {
       """.trimMargin()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-  fun `test substitute all lines and undo with oldundo`() {
+  fun `test substitute all lines and undo with ideaoldundo`() {
     configureByText(
       """
       |${c}Hello world
@@ -1457,7 +1457,7 @@ class SubstituteCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText(commandToKeys("%s/world/universe/"))
       assertState(
         """
@@ -1476,7 +1476,7 @@ class SubstituteCommandTest : VimTestCase() {
       """.trimMargin()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 

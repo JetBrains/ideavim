@@ -245,8 +245,8 @@ object VimListenerManager {
       optionGroup.addGlobalOptionChangeListener(Options.showmode, modeWidgetOptionListener)
       optionGroup.addGlobalOptionChangeListener(Options.showmode, macroWidgetOptionListener)
       optionGroup.addEffectiveOptionValueChangeListener(Options.keymap, KeymapChangeListener)
-      optionGroup.addGlobalOptionChangeListener(Options.windowjumps, WindowJumpsChangeListener)
-      optionGroup.addGlobalOptionChangeListener(IjOptions.pythonconsole, PythonConsoleOptionChangeListener)
+      optionGroup.addGlobalOptionChangeListener(Options.ideawindowjumps, WindowJumpsChangeListener)
+      optionGroup.addGlobalOptionChangeListener(IjOptions.ideapythonconsole, PythonConsoleOptionChangeListener)
 
       // The listeners are registered _after_ ideavimrc has been evaluated, so trigger these listeners to ensure we're
       // up to date
@@ -292,8 +292,8 @@ object VimListenerManager {
       optionGroup.removeGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showmode, modeWidgetOptionListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showmode, macroWidgetOptionListener)
-      optionGroup.removeGlobalOptionChangeListener(Options.windowjumps, WindowJumpsChangeListener)
-      optionGroup.removeGlobalOptionChangeListener(IjOptions.pythonconsole, PythonConsoleOptionChangeListener)
+      optionGroup.removeGlobalOptionChangeListener(Options.ideawindowjumps, WindowJumpsChangeListener)
+      optionGroup.removeGlobalOptionChangeListener(IjOptions.ideapythonconsole, PythonConsoleOptionChangeListener)
 
       BufNewFileTracker.clear()
     }
@@ -706,7 +706,7 @@ object VimListenerManager {
           // Vim copies the jump list into any window created by a split, whichever buffer ends up in the new window -
           // `:vsplit {file}`, `:vnew` and "Open in Right Split" included. The SPLIT scenario above is narrower than
           // that: it only covers a new window showing the *same* document, so it cannot be the condition here
-          if (!isInSameSplit && openingEditor != null && injector.globalOptions().windowjumps) {
+          if (!isInSameSplit && openingEditor != null && injector.globalOptions().ideawindowjumps) {
             injector.jumpService.inheritJumps(openingEditor.editor.vim.jumpListId, editor.vim.jumpListId)
           }
           EditorListeners.add(editor, openingEditor?.editor?.vim ?: injector.fallbackWindow, scenario)

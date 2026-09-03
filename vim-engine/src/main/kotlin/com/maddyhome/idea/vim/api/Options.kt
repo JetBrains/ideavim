@@ -51,14 +51,20 @@ object Options {
    *
    * Note that the generic type is `Option<out VimDataType>` so that it will handle derived types that have a more
    * derived type parameter. E.g. `NumberOption`, which derives from `Option<VimInt>`.
+   *
+   * @param option  The option to register
+   * @param deprecatedNames Names that the option used to be known by, and which are still accepted by `:set` and by
+   * the `&{option}` expression, so that existing `~/.ideavimrc` files keep working. A deprecated name is an alias only
+   * - the option's canonical [Option.name] is always used to store the value and to report it back to the user, and a
+   * deprecated name is never listed by `:set` or `:set all`.
    */
-  fun <T : Option<out VimDataType>> addOption(option: T): T {
+  fun <T : Option<out VimDataType>> addOption(option: T, vararg deprecatedNames: String): T {
     return option.also {
       // This suppresses a variance problem. We need to be generic with an upper bound of `Option<out VimDataType` so
       // that we can both accept and then return a derived type which is generic by a type derived from `VimDataType`.
       // But we don't want the stored option to be covariant everywhere, as it's not a covariant type
       @Suppress("UNCHECKED_CAST")
-      options.put(option.name, option.abbrev, option as Option<VimDataType>)
+      options.put(option.name, option.abbrev, deprecatedNames.asList(), option as Option<VimDataType>)
     }
   }
 
@@ -449,8 +455,6 @@ object Options {
     }
   })
 
-  val windowjumps: ToggleOption =
-    addOption(ToggleOption("windowjumps", GLOBAL, "windowjumps", false, isHidden = true))
   val scrolljump: NumberOption = addOption(object : NumberOption("scrolljump", GLOBAL, "sj", 1) {
     override fun checkIfValueValid(value: VimDataType, token: String) {
       super.checkIfValueValid(value, token)
@@ -522,6 +526,9 @@ object Options {
 
   // IdeaVim specific options. Put any editor or IDE specific options in IjOptionProperties
 
+  val ideawindowjumps: ToggleOption =
+    addOption(ToggleOption("ideawindowjumps", GLOBAL, "ideawindowjumps", false, isHidden = true), "windowjumps")
+
   // Temporary feature flags for work-in-progress behaviour, diagnostic switches, etc. Hidden from the output of `:set all`
   val ideastrictmode: ToggleOption =
     addOption(ToggleOption("ideastrictmode", GLOBAL, "ideastrictmode", false, isHidden = true))
@@ -529,34 +536,36 @@ object Options {
     addOption(ToggleOption("ideatracetime", GLOBAL, "ideatracetime", false, isHidden = true))
 }
 
-private class MultikeyMap(vararg entries: Option<VimDataType>) {
+/**
+ * Stores options by name, by abbreviation and by any deprecated names
+ *
+ * Only [values] (i.e. the options stored by name) is enumerable, so that neither abbreviations nor deprecated names
+ * are ever listed as options in their own right.
+ */
+private class MultikeyMap {
   private val primaryKeyStorage: MutableMap<String, Option<VimDataType>> = mutableMapOf()
   private val secondaryKeyStorage: MutableMap<String, Option<VimDataType>> = mutableMapOf()
+  private val deprecatedKeyStorage: MutableMap<String, Option<VimDataType>> = mutableMapOf()
 
-  init {
-    for (entry in entries) {
-      primaryKeyStorage[entry.name] = entry
-      secondaryKeyStorage[entry.abbrev] = entry
-    }
-  }
-
-  fun put(key1: String, key2: String, value: Option<VimDataType>) {
+  fun put(key1: String, key2: String, deprecatedKeys: Collection<String>, value: Option<VimDataType>) {
     primaryKeyStorage[key1] = value
     secondaryKeyStorage[key2] = value
+    deprecatedKeys.forEach { deprecatedKeyStorage[it] = value }
   }
 
   fun get(key: String): Option<VimDataType>? {
-    return primaryKeyStorage[key] ?: secondaryKeyStorage[key]
+    return primaryKeyStorage[key] ?: secondaryKeyStorage[key] ?: deprecatedKeyStorage[key]
   }
 
   fun remove(key: String) {
-    val option = primaryKeyStorage[key] ?: secondaryKeyStorage[key]
-    primaryKeyStorage.values.remove(option)
-    secondaryKeyStorage.values.remove(option)
+    val option = get(key) ?: return
+    primaryKeyStorage.values.removeAll { it === option }
+    secondaryKeyStorage.values.removeAll { it === option }
+    deprecatedKeyStorage.values.removeAll { it === option }
   }
 
   fun contains(key: String): Boolean {
-    return primaryKeyStorage.containsKey(key) || secondaryKeyStorage.containsKey(key)
+    return get(key) != null
   }
 
   val values get() = primaryKeyStorage.values

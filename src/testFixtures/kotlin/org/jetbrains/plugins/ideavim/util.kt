@@ -59,7 +59,7 @@ annotation class VimBehaviorDiffers(
   val shouldBeFixed: Boolean = true,
 )
 
-// The selection is updated after 'visualdelay' milliseconds. Add an adjustment when we wait for it to be completed.
+// The selection is updated after 'ideavisualdelay' milliseconds. Add an adjustment when we wait for it to be completed.
 // Since we wait for it on the main thread (to avoid reading in-progress state), we can get away with a short adjustment
 private const val visualDelayAdjustment = 200
 
@@ -132,7 +132,7 @@ fun waitAndAssertMode(
   mode: Mode,
   timeInMillis: Int? = null,
 ) {
-  val timeout = timeInMillis ?: (injector.globalIjOptions().visualdelay + visualDelayAdjustment)
+  val timeout = timeInMillis ?: (injector.globalIjOptions().ideavisualdelay + visualDelayAdjustment)
   val currentMode = fixture.editor.vim.mode
   waitAndAssert(timeout) {
     if (fixture.editor.vim.mode == currentMode && fixture.editor.vim.mode != mode) return@waitAndAssert false
@@ -142,7 +142,7 @@ fun waitAndAssertMode(
 }
 
 fun assertModeDoesNotChange(editor: Editor, expectedMode: Mode, timeInMillis: Int? = null) {
-  val timeout = timeInMillis ?: (injector.globalIjOptions().visualdelay + visualDelayAdjustment)
+  val timeout = timeInMillis ?: (injector.globalIjOptions().ideavisualdelay + visualDelayAdjustment)
   val currentMode = editor.vim.mode
   assertEquals(expectedMode, currentMode, "Initial mode is not as expected")
   invokeAndWaitUntil(timeout) { editor.vim.mode != currentMode }
@@ -151,7 +151,7 @@ fun assertModeDoesNotChange(editor: Editor, expectedMode: Mode, timeInMillis: In
 
 // Note that the selection might not update, but we wait long enough to give it chance to change
 fun waitUntilSelectionUpdated(editor: Editor) {
-  val timeout = injector.globalIjOptions().visualdelay + visualDelayAdjustment
+  val timeout = injector.globalIjOptions().ideavisualdelay + visualDelayAdjustment
   val currentMode = editor.vim.mode
   invokeAndWaitUntil(timeout) { editor.vim.mode != currentMode }
 }
