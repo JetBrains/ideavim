@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 
 internal object WindowJumpsChangeListener : GlobalOptionChangeListener {
   override fun onGlobalOptionChanged() {
-    val perWindow = injector.globalOptions().windowjumps
+    val perWindow = injector.globalOptions().ideawindowjumps
     for (project in ProjectManager.getInstance().openProjects) {
       if (project.isDisposed) continue
       if (perWindow) {

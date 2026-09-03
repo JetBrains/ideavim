@@ -326,7 +326,7 @@ class NormalCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test normal command delete and undo with oldundo`() {
+  fun `test normal command delete and undo with ideaoldundo`() {
     configureByText(
       """
       |Line 1
@@ -336,7 +336,7 @@ class NormalCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       enterCommand("normal x")
       assertState(
         """
@@ -355,12 +355,12 @@ class NormalCommandTest : VimTestCase() {
       """.trimMargin()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test normal command with range and undo with oldundo`() {
+  fun `test normal command with range and undo with ideaoldundo`() {
     configureByText(
       """
       |First ${c}line
@@ -371,7 +371,7 @@ class NormalCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       enterCommand("2,3normal A!")
       assertState(
         """
@@ -392,12 +392,12 @@ class NormalCommandTest : VimTestCase() {
       """.trimMargin()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test normal command insert and undo with oldundo`() {
+  fun `test normal command insert and undo with ideaoldundo`() {
     configureByText(
       """
       |${c}Hello world
@@ -405,7 +405,7 @@ class NormalCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       enterCommand("normal iTest ")
       assertState(
         """
@@ -420,12 +420,12 @@ class NormalCommandTest : VimTestCase() {
       """.trimMargin()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test normal command complex operation and undo with oldundo`() {
+  fun `test normal command complex operation and undo with ideaoldundo`() {
     configureByText(
       """
       |Line ${c}1
@@ -435,7 +435,7 @@ class NormalCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       enterCommand("normal ddp")
       assertState(
         """
@@ -454,7 +454,7 @@ class NormalCommandTest : VimTestCase() {
       """.trimMargin()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 

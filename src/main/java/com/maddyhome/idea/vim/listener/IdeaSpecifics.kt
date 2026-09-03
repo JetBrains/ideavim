@@ -117,7 +117,7 @@ internal object IdeaSpecifics {
         val nanoTime = System.nanoTime()
         editor?.vim?.nativeCarets()?.forEach { undoService.endInsertSequence(it, it.offset, nanoTime) }
       }
-      if (!isVimAction && injector.globalIjOptions().trackactionids) {
+      if (!isVimAction && injector.globalIjOptions().ideatrackactionids) {
         if (action !is NotificationService.ActionIdNotifier.CopyActionId && action !is NotificationService.ActionIdNotifier.StopTracking) {
           val id: String? =
             ActionManager.getInstance().getId(action) ?: (action.shortcutSet as? ProxyShortcutSet)?.actionId
@@ -514,12 +514,12 @@ internal object IdeaSpecifics {
 internal class FindActionIdAction : DumbAwareToggleAction() {
   override fun isSelected(e: AnActionEvent): Boolean {
     initInjector()
-    return injector.globalIjOptions().trackactionids
+    return injector.globalIjOptions().ideatrackactionids
   }
 
   override fun setSelected(e: AnActionEvent, state: Boolean) {
     initInjector()
-    injector.globalIjOptions().trackactionids = !injector.globalIjOptions().trackactionids
+    injector.globalIjOptions().ideatrackactionids = !injector.globalIjOptions().ideatrackactionids
   }
 
   override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT

@@ -19,18 +19,18 @@ import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 
 /**
- * Reacts to runtime changes of the `pythonconsole` toggle option and enables or disables Vim in all currently open
+ * Reacts to runtime changes of the `ideapythonconsole` toggle option and enables or disables Vim in all currently open
  * Python console editors without requiring a restart or plugin toggle.
  *
- * When `set pythonconsole`: initialises Vim listeners, shortcuts, and local options for every open Python console
+ * When `set ideapythonconsole`: initialises Vim listeners, shortcuts, and local options for every open Python console
  * editor that has not yet been set up (e.g. consoles that were opened while the option was off).
  *
- * When `set nopythonconsole`: tears down Vim from every open Python console editor and resets the caret shape to the
+ * When `set noideapythonconsole`: tears down Vim from every open Python console editor and resets the caret shape to the
  * IDE default.
  */
 internal object PythonConsoleOptionChangeListener : GlobalOptionChangeListener {
   override fun onGlobalOptionChanged() {
-    val enabled = injector.globalIjOptions().pythonconsole
+    val enabled = injector.globalIjOptions().ideapythonconsole
     for (editor in EditorFactory.getInstance().allEditors) {
       if (editor.isDisposed) continue
       if (!EditorHelper.isPythonConsole(editor)) continue

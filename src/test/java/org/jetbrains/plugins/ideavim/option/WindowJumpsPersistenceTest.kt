@@ -57,7 +57,7 @@ class WindowJumpsPersistenceTest : VimSplitWindowTestCase() {
   }
 
   /**
-   * Feeds an IDE navigation event to the listener that implements the `unifyjumps` sync
+   * Feeds an IDE navigation event to the listener that implements the `ideaunifyjumps` sync
    *
    * The timestamp has to be ahead of [com.maddyhome.idea.vim.api.VimJumpService.lastJumpTimeStamp], which Vim's own
    * jumps push into the future to suppress the platform's echo of them.
@@ -113,7 +113,7 @@ class WindowJumpsPersistenceTest : VimSplitWindowTestCase() {
   @Test
   fun `test IDE navigation is persisted as part of the window list`() {
     val mainWindow = configureMainWindow()
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
     enterSearch("sodden")
     enterSearch("shape")
 
@@ -128,7 +128,7 @@ class WindowJumpsPersistenceTest : VimSplitWindowTestCase() {
   }
 
   @Test
-  fun `test project wide list is persisted when windowjumps is not set`() {
+  fun `test project wide list is persisted when ideawindowjumps is not set`() {
     configureMainWindow()
     enterSearch("sodden")
     enterSearch("shape")
@@ -140,7 +140,7 @@ class WindowJumpsPersistenceTest : VimSplitWindowTestCase() {
   @Test
   fun `test window with no jumps of its own shows the list restored from disk`() {
     val mainWindow = configureMainWindow()
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
 
     // State is read at startup, before any window exists, so it can only be stored per project. A window that has no
     // list of its own has to inherit it - the same way a window inherits the list of the window it was split from
@@ -159,7 +159,7 @@ class WindowJumpsPersistenceTest : VimSplitWindowTestCase() {
   @Test
   fun `test only the most recently used window's list is saved for a project`() {
     val mainWindow = configureMainWindow()
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
     enterSearch("sodden")
     enterSearch("shape")
 
@@ -176,7 +176,7 @@ class WindowJumpsPersistenceTest : VimSplitWindowTestCase() {
   @Test
   fun `test window that jumps before reading its list still inherits the restored one`() {
     val mainWindow = configureMainWindow()
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
     loadSavedState(savedState(mainWindow, 0 to 8, 2 to 29))
 
     // The first thing this window does is jump, without ever reading its list first - which is the normal case after a
@@ -198,7 +198,7 @@ class WindowJumpsPersistenceTest : VimSplitWindowTestCase() {
   @Test
   fun `test clearjumps in a window that has not read its list is not undone by the restored list`() {
     val mainWindow = configureMainWindow()
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
     loadSavedState(savedState(mainWindow, 0 to 8, 2 to 29))
 
     // The window has never read or written its own list, so the only list around is the project's. Clearing has to be
@@ -211,9 +211,9 @@ class WindowJumpsPersistenceTest : VimSplitWindowTestCase() {
   @Test
   fun `test collapsing to the focused window beats the list of a window that was closed`() {
     val mainWindow = configureMainWindow()
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
     // Mirroring of IDE navigation is asynchronous and would add entries of its own, see WindowJumpsTest
-    enterCommand("set nounifyjumps")
+    enterCommand("set noideaunifyjumps")
 
     // The project key exists first, as it does after reading the state from disk
     loadSavedState(savedState(mainWindow, 0 to 8))
@@ -229,7 +229,7 @@ class WindowJumpsPersistenceTest : VimSplitWindowTestCase() {
     closeWindow(splitWindow)
 
     selectWindow(mainWindow)
-    enterCommand("set nowindowjumps")
+    enterCommand("set noideawindowjumps")
 
     // The list of the window that is actually focused has to win, not whichever scope happens to have been written last
     assertEquals(listOf(listOf("0:8", "1:8")), persistedJumps())

@@ -975,7 +975,7 @@ class SortCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test sort and undo with oldundo`() {
+  fun `test sort and undo with ideaoldundo`() {
     configureByText(
       """
       |zebra
@@ -986,7 +986,7 @@ class SortCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText(commandToKeys("sort"))
       assertState(
         """
@@ -1007,12 +1007,12 @@ class SortCommandTest : VimTestCase() {
       """.trimMargin()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test sort with range and undo with oldundo`() {
+  fun `test sort with range and undo with ideaoldundo`() {
     configureByText(
       """
       |header
@@ -1025,7 +1025,7 @@ class SortCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText(commandToKeys("2,5sort"))
       assertState(
         """
@@ -1050,12 +1050,12 @@ class SortCommandTest : VimTestCase() {
       """.trimMargin()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test sort with options and undo with oldundo`() {
+  fun `test sort with options and undo with ideaoldundo`() {
     configureByText(
       """
       |${c}10
@@ -1066,7 +1066,7 @@ class SortCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText(commandToKeys("sort n"))
       assertState(
         """
@@ -1087,12 +1087,12 @@ class SortCommandTest : VimTestCase() {
       """.trimMargin()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test reverse sort and undo with oldundo`() {
+  fun `test reverse sort and undo with ideaoldundo`() {
     configureByText(
       """
       |${c}apple
@@ -1103,7 +1103,7 @@ class SortCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText(commandToKeys("sort!"))
       assertState(
         """
@@ -1124,7 +1124,7 @@ class SortCommandTest : VimTestCase() {
       """.trimMargin()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 }

@@ -30,16 +30,16 @@ class ChangeNumberIncActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo after increment number with oldundo`() {
+  fun `test undo after increment number with ideaoldundo`() {
     configureByText("The answer is ${c}42")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("<C-A>")
       assertState("The answer is 4${c}3")
       typeText("u")
       assertState("The answer is ${c}42")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -53,16 +53,16 @@ class ChangeNumberIncActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo after increment with count with oldundo`() {
+  fun `test undo after increment with count with ideaoldundo`() {
     configureByText("Count: ${c}10")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("5<C-A>")
       assertState("Count: 1${c}5")
       typeText("u")
       assertState("Count: ${c}10")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -76,16 +76,16 @@ class ChangeNumberIncActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo after increment negative number with oldundo`() {
+  fun `test undo after increment negative number with ideaoldundo`() {
     configureByText("Temperature: ${c}-5 degrees")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("<C-A>")
       assertState("Temperature: -${c}4 degrees")
       typeText("u")
       assertState("Temperature: ${c}-5 degrees")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -113,10 +113,10 @@ class ChangeNumberIncActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test multiple undo after sequential increments with oldundo`() {
+  fun `test multiple undo after sequential increments with ideaoldundo`() {
     configureByText("Value: ${c}100")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("<C-A>")
       assertState("Value: 10${c}1")
       typeText("<C-A>")
@@ -136,7 +136,7 @@ class ChangeNumberIncActionTest : VimTestCase() {
       typeText("u")
       assertState("Value: ${c}100")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -168,7 +168,7 @@ class ChangeNumberIncActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo increment with visual selection with oldundo`() {
+  fun `test undo increment with visual selection with ideaoldundo`() {
     configureByText(
       """
       ${c}10
@@ -177,7 +177,7 @@ class ChangeNumberIncActionTest : VimTestCase() {
     """.trimIndent()
     )
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("Vj<C-A>")  // Visual select first two lines and increment
       assertState(
         """
@@ -195,7 +195,7 @@ class ChangeNumberIncActionTest : VimTestCase() {
     """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -210,17 +210,17 @@ class ChangeNumberIncActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo increment octal number with oldundo`() {
+  fun `test undo increment octal number with ideaoldundo`() {
     // OCT is disabled by default
     configureByText("Octal: ${c}0777")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("<C-A>")
       assertState("Octal: 077${c}8")
       typeText("u")
       assertState("Octal: ${c}0777")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -234,16 +234,16 @@ class ChangeNumberIncActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo increment hex number with oldundo`() {
+  fun `test undo increment hex number with ideaoldundo`() {
     configureByText("Hex: ${c}0xff")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("<C-A>")
       assertState("Hex: 0x10${c}0")
       typeText("u")
       assertState("Hex: ${c}0xff")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 }

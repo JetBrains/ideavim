@@ -208,8 +208,11 @@ The local Vim option can always be reset to the global IDE setting value by rese
 ## IdeaVim only options
 
 These options are IdeaVim only, and not supported by Vim.
-They control integration with the host IDE.
+They control integration with the host IDE, and are prefixed with "idea" to distinguish them from Vim's own options.
 Unless otherwise stated, these options do not have abbreviations.
+
+Some of these options were introduced without the "idea" prefix and have since been renamed.
+The old name is deprecated, but still accepted by `:set` and by the `&{option}` expression, so existing `~/.ideavimrc` files keep working.
 
 ```
 'ideacopypreprocess'    boolean (default off)
@@ -230,9 +233,35 @@ Unless otherwise stated, these options do not have abbreviations.
         string literals or if statements. See the wiki for more examples. Not
         all languages support smart join functionality.
 
+'idealookupkeys'        string  (default "<Tab>,<Down>,<Up>,<Enter>,
+                                        <Left>,<Right>,<C-Down>,<C-Up>,
+                                        <PageUp>,<PageDown>, <C-J>,<C-Q>")
+                        global
+        Comma-separated list of keys that should be processed by the IDE while
+        a code completion lookup popup is active. For example, <Tab> and
+        <Enter> are used by the IDE to complete the lookup and insert text,
+        but <C-W> should be passed IdeaVim to continue editing the text.
+
+        This option was previously called 'lookupkeys'. The old name is
+        deprecated, but still accepted.
+
 'ideamarks'             boolean (default on)
                         global
         Maps Vim's global marks to IDE bookmarks.
+
+'ideapythonconsole'     boolean (default on)
+                        global
+        When on, IdeaVim is active in the Python console tool window. The
+        console still intercepts Enter (execute) and the horizontal arrow keys
+        (caret movement within the input line) as normal; Up/Down navigate
+        command history from any Vim mode.
+
+        Set 'noideapythonconsole' to revert to the console's native
+        behaviour with no Vim keybindings. The change takes effect immediately
+        for all open Python console windows.
+
+        This option was previously called 'pythonconsole'. The old name is
+        deprecated, but still accepted.
 
 'idearefactormode'      string  (default "select")
                         global or local to buffer
@@ -253,6 +282,15 @@ Unless otherwise stated, these options do not have abbreviations.
            gray         Show the gray version of the icon
            disabled     Hide the icon
 
+'ideatrackactionids'    boolean (default off)
+                        global
+        When on, IdeaVim will try to track the current IDE action and display
+        the action name in a notification. This action ID can then be used in
+        a mapping to the action in the form <Action>(...).
+
+        This option was previously called 'trackactionids'. The old name is
+        deprecated, but still accepted.
+
 'ideavimsupport'        string  (default "dialog")
                         global
         A comma-separated list of additional buffers or locations where
@@ -263,42 +301,7 @@ Unless otherwise stated, these options do not have abbreviations.
         The IDE's editor component can be used in many places, such as VCS
         commit tool window, or inside dialogs, and even as single line fields.
 
-'ideawrite'             string  (default "all")
-                        global
-        This option defines the behaviour of the :w command:
-           file         Save the current file only
-           all          The :w command works like :wa and invokes the Save All
-                        IDE action. This allows options such as "Prettier on
-                        save" or "ESlint on save" to work with the :w command,
-                        but means all files are saved.
-
-'lookupkeys'            string  (default "<Tab>,<Down>,<Up>,<Enter>,
-                                          <Left>,<Right>,<C-Down>,<C-Up>,
-                                          <PageUp>,<PageDown>, <C-J>,<C-Q>")
-                        global
-        Comma-separated list of keys that should be processed by the IDE while
-        a code completion lookup popup is active. For example, <Tab> and
-        <Enter> are used by the IDE to complete the lookup and insert text,
-        but <C-W> should be passed IdeaVim to continue editing the text.
-
-'pythonconsole'         boolean (default on)
-                        global
-        When on, IdeaVim is active in the Python console tool window. The
-        console still intercepts Enter (execute) and the horizontal arrow keys
-        (caret movement within the input line) as normal; Up/Down navigate
-        command history from any Vim mode.
-
-        Set 'nopythonconsole' to revert to the console's native behaviour with
-        no Vim keybindings. The change takes effect immediately for all open
-        Python console windows.
-
-'trackactionids'        boolean (default off)
-                        global
-        When on, IdeaVim will try to track the current IDE action and display
-        the action name in a notification. This action ID can then be used in
-        a mapping to the action in the form <Action>(...).
-
-'visualdelay'           number  (default 100)
+'ideavisualdelay'       number  (default 100)
                         global
         This option specifies the delay, in milliseconds before converting an
         IDE selection into Visual mode.
@@ -314,7 +317,10 @@ Unless otherwise stated, these options do not have abbreviations.
 
         It is not expected that this value will need to be changed.
 
-'windowjumps'           boolean (default off)
+        This option was previously called 'visualdelay'. The old name is
+        deprecated, but still accepted.
+
+'ideawindowjumps'       boolean (default off)
                         global
         When on, each window (split) has its own jump list, as in Vim. When
         off, a single jump list is shared by every window and tab of the
@@ -332,4 +338,16 @@ Unless otherwise stated, these options do not have abbreviations.
         ids do not survive a restart. The list of the most recently used
         window is the one saved, and a window that has no list of its own -
         after a restart, or when it is the first window - starts from it.
+
+        This option was previously called 'windowjumps'. The old name is
+        deprecated, but still accepted.
+
+'ideawrite'             string  (default "all")
+                        global
+        This option defines the behaviour of the :w command:
+           file         Save the current file only
+           all          The :w command works like :wa and invokes the Save All
+                        IDE action. This allows options such as "Prettier on
+                        save" or "ESlint on save" to work with the :w command,
+                        but means all files are saved.
 ```

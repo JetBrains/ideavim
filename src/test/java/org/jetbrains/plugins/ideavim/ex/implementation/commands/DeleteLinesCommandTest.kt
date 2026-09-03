@@ -550,7 +550,7 @@ class DeleteLinesCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test delete line and undo with oldundo`() {
+  fun `test delete line and undo with ideaoldundo`() {
     configureByText(
       """
       |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -563,7 +563,7 @@ class DeleteLinesCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       enterCommand("d")
       assertState(
         """
@@ -587,12 +587,12 @@ class DeleteLinesCommandTest : VimTestCase() {
       """.trimMargin()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test delete multiple lines with range and undo with oldundo`() {
+  fun `test delete multiple lines with range and undo with ideaoldundo`() {
     configureByText(
       """
       |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -605,7 +605,7 @@ class DeleteLinesCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       enterCommand("2,4d")
       assertState(
         """
@@ -627,12 +627,12 @@ class DeleteLinesCommandTest : VimTestCase() {
       """.trimMargin()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test delete with count and undo with oldundo`() {
+  fun `test delete with count and undo with ideaoldundo`() {
     configureByText(
       """
       |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -645,7 +645,7 @@ class DeleteLinesCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       enterCommand("d 3")
       assertState(
         """
@@ -667,7 +667,7 @@ class DeleteLinesCommandTest : VimTestCase() {
       """.trimMargin()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 }

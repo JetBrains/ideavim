@@ -45,8 +45,8 @@ class TestIjOptionConstants {
     const val ideajoin = "ideajoin"
     const val ideamarks = "ideamarks"
     const val idearefactormode = "idearefactormode"
+    const val ideatrackactionids = "ideatrackactionids"
+    const val ideaunifyjumps = "ideaunifyjumps"
     const val ideavimsupport = "ideavimsupport"
-    const val trackactionids = "trackactionids"
-    const val unifyjumps = "unifyjumps"
   }
 }

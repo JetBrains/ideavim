@@ -172,10 +172,10 @@ class PutTextBeforeCursorActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo after put before cursor with oldundo`() {
+  fun `test undo after put before cursor with ideaoldundo`() {
     configureByText("Hello ${c}world")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("yy")
       typeText("P")
       assertState(
@@ -187,15 +187,15 @@ class PutTextBeforeCursorActionTest : VimTestCase() {
       typeText("u")
       assertState("Hello ${c}world")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test undo after put character before cursor with oldundo`() {
+  fun `test undo after put character before cursor with ideaoldundo`() {
     configureByText("abc${c}def")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("yl")  // Yank 'd'
       typeText("h")   // Move left
       assertState("ab${c}cdef")
@@ -204,15 +204,15 @@ class PutTextBeforeCursorActionTest : VimTestCase() {
       typeText("u")
       assertState("ab${c}cdef")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test undo after put word before cursor with oldundo`() {
+  fun `test undo after put word before cursor with ideaoldundo`() {
     configureByText("The ${c}quick brown fox")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("yiw")  // Yank "quick"
       typeText("w")    // Move to "brown"
       assertState("The quick ${c}brown fox")
@@ -221,15 +221,15 @@ class PutTextBeforeCursorActionTest : VimTestCase() {
       typeText("u")
       assertState("The quick ${c}brown fox")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test multiple undo after sequential puts with oldundo`() {
+  fun `test multiple undo after sequential puts with ideaoldundo`() {
     configureByText("${c}Hello")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("yy")
       typeText("P")
       assertState(
@@ -264,12 +264,12 @@ class PutTextBeforeCursorActionTest : VimTestCase() {
     """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test undo put visual block with oldundo`() {
+  fun `test undo put visual block with ideaoldundo`() {
     configureByText(
       """
       ${c}abc
@@ -278,7 +278,7 @@ class PutTextBeforeCursorActionTest : VimTestCase() {
     """.trimIndent()
     )
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("<C-V>jjl")  // Visual block select first 2 columns of all lines
       typeText("y")
       typeText("$")
@@ -306,7 +306,7 @@ class PutTextBeforeCursorActionTest : VimTestCase() {
     """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 }

@@ -341,11 +341,11 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
   private object LookupKeys {
     fun isEnabledForLookup(keyStroke: KeyStroke): Boolean {
       val parsedLookupKeys =
-        injector.optionGroup.getParsedEffectiveOptionValue(IjOptions.lookupkeys, null, ::parseLookupKeys)
+        injector.optionGroup.getParsedEffectiveOptionValue(IjOptions.idealookupkeys, null, ::parseLookupKeys)
       return keyStroke !in parsedLookupKeys
     }
 
-    private fun parseLookupKeys(keys: VimString) = IjOptions.lookupkeys.split(keys.value)
+    private fun parseLookupKeys(keys: VimString) = IjOptions.idealookupkeys.split(keys.value)
       .map { injector.parser.parseKeys(it) }
       .filter { it.isNotEmpty() }
       .map { it.first() }

@@ -50,38 +50,38 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
   }
 
   @Test
-  fun `test windowjumps is off by default`() {
+  fun `test ideawindowjumps is off by default`() {
     configureMainWindow()
 
-    assertCommandOutput("set windowjumps?", "nowindowjumps")
+    assertCommandOutput("set ideawindowjumps?", "noideawindowjumps")
   }
 
   @Test
-  fun `test windowjumps can be enabled`() {
+  fun `test ideawindowjumps can be enabled`() {
     configureMainWindow()
 
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
 
-    assertCommandOutput("set windowjumps?", "  windowjumps")
+    assertCommandOutput("set ideawindowjumps?", "  ideawindowjumps")
   }
 
   @Test
-  fun `test windowjumps can be disabled again`() {
+  fun `test ideawindowjumps can be disabled again`() {
     configureMainWindow()
 
-    enterCommand("set windowjumps")
-    enterCommand("set nowindowjumps")
+    enterCommand("set ideawindowjumps")
+    enterCommand("set noideawindowjumps")
 
-    assertCommandOutput("set windowjumps?", "nowindowjumps")
+    assertCommandOutput("set ideawindowjumps?", "noideawindowjumps")
   }
 
   @Test
-  fun `test windowjumps is a global option`() {
+  fun `test ideawindowjumps is a global option`() {
     configureMainWindow()
 
-    enterCommand("setlocal windowjumps")
+    enterCommand("setlocal ideawindowjumps")
 
-    assertCommandOutput("setglobal windowjumps?", "  windowjumps")
+    assertCommandOutput("setglobal ideawindowjumps?", "  ideawindowjumps")
   }
 
   @Test
@@ -173,9 +173,9 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
 
   @Test
   @Disabled
-  fun `test jumps recorded in one split do not appear in the other when windowjumps is set`() {
+  fun `test jumps recorded in one split do not appear in the other when ideawindowjumps is set`() {
     val mainWindow = configureMainWindow()
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
     disableIdeNavigationMirroring()
     val splitWindow = openSplitWindow(mainWindow)
 
@@ -189,9 +189,9 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
   }
 
   @Test
-  fun `test jumps recorded in a split stay in that split when windowjumps is set`() {
+  fun `test jumps recorded in a split stay in that split when ideawindowjumps is set`() {
     val mainWindow = configureMainWindow()
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
     disableIdeNavigationMirroring()
     val splitWindow = openSplitWindow(mainWindow)
 
@@ -205,9 +205,9 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
   }
 
   @Test
-  fun `test control-O does not use the other split's history when windowjumps is set`() {
+  fun `test control-O does not use the other split's history when ideawindowjumps is set`() {
     val mainWindow = configureMainWindow()
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
     disableIdeNavigationMirroring()
     val splitWindow = openSplitWindow(mainWindow)
 
@@ -234,9 +234,9 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
   }
 
   @Test
-  fun `test clearjumps only clears the current window when windowjumps is set`() {
+  fun `test clearjumps only clears the current window when ideawindowjumps is set`() {
     val mainWindow = configureMainWindow()
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
     val splitWindow = openSplitWindow(mainWindow)
 
     selectWindow(mainWindow)
@@ -261,9 +261,9 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
   }
 
   @Test
-  fun `test jump list survives switching to another buffer in the same split when windowjumps is set`() {
+  fun `test jump list survives switching to another buffer in the same split when ideawindowjumps is set`() {
     val mainWindow = configureMainWindow()
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
     enterSearch("sodden")
     enterSearch("shape")
 
@@ -284,9 +284,9 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
   }
 
   @Test
-  fun `test control-I returns to the position control-O jumped from when windowjumps is set`() {
+  fun `test control-I returns to the position control-O jumped from when ideawindowjumps is set`() {
     val mainWindow = configureMainWindow()
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
     val splitWindow = openSplitWindow(mainWindow)
 
     selectWindow(splitWindow)
@@ -310,9 +310,9 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
   }
 
   @Test
-  fun `test control-I does not use the other split's history when windowjumps is set`() {
+  fun `test control-I does not use the other split's history when ideawindowjumps is set`() {
     val mainWindow = configureMainWindow()
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
     disableIdeNavigationMirroring()
     val splitWindow = openSplitWindow(mainWindow)
 
@@ -340,9 +340,9 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
   }
 
   @Test
-  fun `test split copies the jump list from the opening window when windowjumps is set`() {
+  fun `test split copies the jump list from the opening window when ideawindowjumps is set`() {
     val mainWindow = configureMainWindow()
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
     enterSearch("sodden")
     enterSearch("shape")
 
@@ -360,9 +360,9 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
   }
 
   @Test
-  fun `test split copies the current jump spot too when windowjumps is set`() {
+  fun `test split copies the current jump spot too when ideawindowjumps is set`() {
     val mainWindow = configureMainWindow()
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
     enterSearch("sodden")
     enterSearch("shape")
     typeText("<C-O>")
@@ -383,9 +383,9 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
   }
 
   @Test
-  fun `test jumps made in the new split do not leak back to the opening window when windowjumps is set`() {
+  fun `test jumps made in the new split do not leak back to the opening window when ideawindowjumps is set`() {
     val mainWindow = configureMainWindow()
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
     enterSearch("sodden")
     enterSearch("shape")
 
@@ -407,9 +407,9 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
   }
 
   @Test
-  fun `test reopened split starts from a fresh copy when windowjumps is set`() {
+  fun `test reopened split starts from a fresh copy when ideawindowjumps is set`() {
     val mainWindow = configureMainWindow()
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
     enterSearch("sodden")
     enterSearch("shape")
 
@@ -436,13 +436,13 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
 
 
   @Test
-  fun `test enabling windowjumps seeds every open window from the shared list`() {
+  fun `test enabling ideawindowjumps seeds every open window from the shared list`() {
     val mainWindow = configureMainWindow()
     enterSearch("sodden")
     enterSearch("shape")
     val splitWindow = openSplitWindow(mainWindow)
 
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
 
     val expected = """ jump line  col file/text
       |   2     1    8 I found it in a legendary land
@@ -458,13 +458,13 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
   }
 
   @Test
-  fun `test windows seeded when enabling windowjumps get independent copies`() {
+  fun `test windows seeded when enabling ideawindowjumps get independent copies`() {
     val mainWindow = configureMainWindow()
     enterSearch("sodden")
     enterSearch("shape")
     val splitWindow = openSplitWindow(mainWindow)
 
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
 
     selectWindow(splitWindow)
     typeText("G")
@@ -483,9 +483,9 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
   }
 
   @Test
-  fun `test disabling windowjumps keeps the focused window's list`() {
+  fun `test disabling ideawindowjumps keeps the focused window's list`() {
     val mainWindow = configureMainWindow()
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
     val splitWindow = openSplitWindow(mainWindow)
 
     selectWindow(splitWindow)
@@ -497,7 +497,7 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
 
     // The split is the focused window when the option goes off, so its list is the one that survives
     selectWindow(splitWindow)
-    enterCommand("set nowindowjumps")
+    enterCommand("set noideawindowjumps")
 
     selectWindow(mainWindow)
 
@@ -513,9 +513,9 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
 
 
   @Test
-  fun `test IDE navigation is recorded in the window showing the file when windowjumps is set`() {
+  fun `test IDE navigation is recorded in the window showing the file when ideawindowjumps is set`() {
     val mainWindow = configureMainWindow()
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
     val splitWindow = openSplitWindow(mainWindow)
 
     selectWindow(splitWindow)
@@ -530,7 +530,7 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
     assertFalse(commandOutput("jumps").contains(recordedJump), "The other window should not see it")
   }
 
-  /** Feeds an IDE navigation event to the listener behind the `unifyjumps` sync */
+  /** Feeds an IDE navigation event to the listener behind the `ideaunifyjumps` sync */
   private fun recordPlatformJump(editor: Editor, line: Int, col: Int) {
     val event = JumpInfo(
       line = line,
@@ -546,9 +546,9 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
   }
 
   @Test
-  fun `test split showing a different file also inherits the jump list when windowjumps is set`() {
+  fun `test split showing a different file also inherits the jump list when ideawindowjumps is set`() {
     val mainWindow = configureMainWindow()
-    enterCommand("set windowjumps")
+    enterCommand("set ideawindowjumps")
     enterSearch("sodden")
     enterSearch("shape")
 
@@ -578,6 +578,6 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
    * would race with it. Mirroring has its own tests.
    */
   private fun disableIdeNavigationMirroring() {
-    enterCommand("set nounifyjumps")
+    enterCommand("set noideaunifyjumps")
   }
 }

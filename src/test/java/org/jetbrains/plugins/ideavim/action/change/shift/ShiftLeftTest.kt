@@ -259,7 +259,7 @@ class ShiftLeftTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo after shift left single line with oldundo`() {
+  fun `test undo after shift left single line with ideaoldundo`() {
     configureByText(
       """
       func main() {
@@ -268,7 +268,7 @@ class ShiftLeftTest : VimTestCase() {
     """.trimIndent()
     )
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("<<")
       assertState(
         """
@@ -286,12 +286,12 @@ class ShiftLeftTest : VimTestCase() {
     """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test undo after shift left with motion with oldundo`() {
+  fun `test undo after shift left with motion with ideaoldundo`() {
     configureByText(
       """
       func main() {
@@ -302,7 +302,7 @@ class ShiftLeftTest : VimTestCase() {
     """.trimIndent()
     )
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("<2j")  // Shift left 3 lines
       assertState(
         """
@@ -324,12 +324,12 @@ class ShiftLeftTest : VimTestCase() {
     """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test undo after shift left visual mode with oldundo`() {
+  fun `test undo after shift left visual mode with ideaoldundo`() {
     configureByText(
       """
       func main() {
@@ -340,7 +340,7 @@ class ShiftLeftTest : VimTestCase() {
     """.trimIndent()
     )
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("Vj<")  // Visual select 2 lines and shift left
       assertState(
         """
@@ -362,12 +362,12 @@ class ShiftLeftTest : VimTestCase() {
     """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test undo shift left in insert mode with oldundo`() {
+  fun `test undo shift left in insert mode with ideaoldundo`() {
     configureByText(
       """
       func main() {
@@ -376,7 +376,7 @@ class ShiftLeftTest : VimTestCase() {
     """.trimIndent()
     )
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("i<C-D>")
       assertState(
         """
@@ -395,7 +395,7 @@ class ShiftLeftTest : VimTestCase() {
     """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 }

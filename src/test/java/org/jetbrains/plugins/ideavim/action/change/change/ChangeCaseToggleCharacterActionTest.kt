@@ -96,16 +96,16 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo after toggle case single character with oldundo`() {
+  fun `test undo after toggle case single character with ideaoldundo`() {
     configureByText("Hello ${c}World")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("~")
       assertState("Hello w${c}orld")
       typeText("u")
       assertState("Hello ${c}World")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -119,16 +119,16 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo after toggle case multiple characters with oldundo`() {
+  fun `test undo after toggle case multiple characters with ideaoldundo`() {
     configureByText("${c}hello WORLD")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("5~")
       assertState("HELLO${c} WORLD")
       typeText("u")
       assertState("${c}hello WORLD")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -156,10 +156,10 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test multiple undo after sequential toggle case with oldundo`() {
+  fun `test multiple undo after sequential toggle case with ideaoldundo`() {
     configureByText("${c}aBc")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("~")
       assertState("A${c}Bc")
       typeText("~")
@@ -179,7 +179,7 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
       typeText("u")
       assertState("${c}aBc")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -193,16 +193,16 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo toggle case motion with oldundo`() {
+  fun `test undo toggle case motion with ideaoldundo`() {
     configureByText("${c}hello world")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("g~w")
       assertState("${c}HELLO world")
       typeText("u")
       assertState("${c}hello world")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -216,16 +216,16 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo uppercase motion with oldundo`() {
+  fun `test undo uppercase motion with ideaoldundo`() {
     configureByText("${c}hello world")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("gUw")
       assertState("${c}HELLO world")
       typeText("u")
       assertState("${c}hello world")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -239,16 +239,16 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo lowercase motion with oldundo`() {
+  fun `test undo lowercase motion with ideaoldundo`() {
     configureByText("${c}HELLO WORLD")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("guw")
       assertState("${c}hello WORLD")
       typeText("u")
       assertState("${c}HELLO WORLD")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -262,16 +262,16 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo toggle case line with oldundo`() {
+  fun `test undo toggle case line with ideaoldundo`() {
     configureByText("${c}Hello World")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("g~~")
       assertState("${c}hELLO wORLD")
       typeText("u")
       assertState("${c}Hello World")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -285,16 +285,16 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo uppercase line with oldundo`() {
+  fun `test undo uppercase line with ideaoldundo`() {
     configureByText("${c}Hello World")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("gUU")
       assertState("${c}HELLO WORLD")
       typeText("u")
       assertState("${c}Hello World")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -308,16 +308,16 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo lowercase line with oldundo`() {
+  fun `test undo lowercase line with ideaoldundo`() {
     configureByText("${c}HELLO WORLD")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("guu")
       assertState("${c}hello world")
       typeText("u")
       assertState("${c}HELLO WORLD")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 

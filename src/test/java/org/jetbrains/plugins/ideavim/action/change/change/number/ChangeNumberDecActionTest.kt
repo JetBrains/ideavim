@@ -58,16 +58,16 @@ class ChangeNumberDecActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test undo after decrement number with oldundo`() {
+  fun `test undo after decrement number with ideaoldundo`() {
     configureByText("The answer is ${c}42")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("<C-X>")
       assertState("The answer is 4${c}1")
       typeText("u")
       assertState("The answer is ${c}42")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -81,16 +81,16 @@ class ChangeNumberDecActionTest : VimTestCase() {
   }
 
   @Test
-fun `test undo after decrement number with caret move with oldundo`() {
+fun `test undo after decrement number with caret move with ideaoldundo`() {
     configureByText("The answer ${c}is 42")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("<C-X>")
       assertState("The answer is 4${c}1")
       typeText("u")
       assertState("The answer ${c}is 42")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -104,16 +104,16 @@ fun `test undo after decrement number with caret move with oldundo`() {
   }
 
   @Test
-  fun `test undo after decrement with count with oldundo`() {
+  fun `test undo after decrement with count with ideaoldundo`() {
     configureByText("Count: ${c}20")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("5<C-X>")
       assertState("Count: 1${c}5")
       typeText("u")
       assertState("Count: ${c}20")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -127,16 +127,16 @@ fun `test undo after decrement number with caret move with oldundo`() {
   }
 
   @Test
-  fun `test undo after decrement negative number with oldundo`() {
+  fun `test undo after decrement negative number with ideaoldundo`() {
     configureByText("Temperature: ${c}-5 degrees")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("<C-X>")
       assertState("Temperature: -${c}6 degrees")
       typeText("u")
       assertState("Temperature: ${c}-5 degrees")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -164,10 +164,10 @@ fun `test undo after decrement number with caret move with oldundo`() {
   }
 
   @Test
-  fun `test multiple undo after sequential decrements with oldundo`() {
+  fun `test multiple undo after sequential decrements with ideaoldundo`() {
     configureByText("Value: ${c}100")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("<C-X>")
       assertState("Value: 9${c}9")
       typeText("<C-X>")
@@ -187,7 +187,7 @@ fun `test undo after decrement number with caret move with oldundo`() {
       typeText("u")
       assertState("Value: ${c}100")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -213,14 +213,14 @@ fun `test undo after decrement number with caret move with oldundo`() {
   }
 
   @Test
-  fun `test undo decrement with visual selection with oldundo`() {
+  fun `test undo decrement with visual selection with ideaoldundo`() {
     configureByText("""
       ${c}10
       20
       30
     """.trimIndent())
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("Vj<C-X>")  // Visual select first two lines and decrement
       assertState("""
         ${c}9
@@ -234,7 +234,7 @@ fun `test undo after decrement number with caret move with oldundo`() {
         30
       """.trimIndent())
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
@@ -262,10 +262,10 @@ fun `test undo after decrement number with caret move with oldundo`() {
   }
 
   @Test
-  fun `test undo increment and decrement combination with oldundo`() {
+  fun `test undo increment and decrement combination with ideaoldundo`() {
     configureByText("Number: ${c}50")
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       typeText("<C-A>")
       assertState("Number: 5${c}1")
       typeText("<C-X>")
@@ -285,7 +285,7 @@ fun `test undo after decrement number with caret move with oldundo`() {
       typeText("u")
       assertState("Number: ${c}50")
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 }

@@ -20,7 +20,7 @@ import org.jetbrains.annotations.TestOnly
  * it in viminfo either.
  *
  * The scope is the same as the jump list's ([VimEditor.jumpListId]): project-wide by default, one per window (split)
- * when the 'windowjumps' option is set. Prefer the [VimEditor]-based extension functions below over passing a scope id
+ * when the 'ideawindowjumps' option is set. Prefer the [VimEditor]-based extension functions below over passing a scope id
  * directly.
  */
 interface VimTagService {

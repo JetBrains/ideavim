@@ -18,7 +18,7 @@ import org.jetbrains.annotations.TestOnly
  * This service manages jump lists, keyed by scope id
  *
  * The scope of a jump list is decided by [VimEditor.jumpListId]: project-wide by default, one per window (split) when
- * the 'windowjumps' option is set. Prefer the [VimEditor]-based extension functions below over passing a scope id
+ * the 'ideawindowjumps' option is set. Prefer the [VimEditor]-based extension functions below over passing a scope id
  * directly.
  */
 interface VimJumpService {

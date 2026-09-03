@@ -304,7 +304,7 @@ class CopyCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test copy line and undo with oldundo`() {
+  fun `test copy line and undo with ideaoldundo`() {
     configureByText(
       """
       Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -314,7 +314,7 @@ class CopyCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       enterCommand("copy .")
       assertState(
         """
@@ -334,12 +334,12 @@ class CopyCommandTest : VimTestCase() {
       """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test copy range and undo with oldundo`() {
+  fun `test copy range and undo with ideaoldundo`() {
     configureByText(
       """
       Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -351,7 +351,7 @@ class CopyCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       enterCommand("2,3copy $")
       assertState(
         """
@@ -376,12 +376,12 @@ class CopyCommandTest : VimTestCase() {
       """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 
   @Test
-  fun `test t command synonym and undo with oldundo`() {
+  fun `test t command synonym and undo with ideaoldundo`() {
     configureByText(
       """
       Line 1
@@ -392,7 +392,7 @@ class CopyCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       enterCommand("t-1")
       assertState(
         """
@@ -414,7 +414,7 @@ class CopyCommandTest : VimTestCase() {
       """.trimIndent()
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 }

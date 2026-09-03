@@ -375,7 +375,7 @@ class MoveCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test move line up and undo with oldundo`() {
+  fun `test move line up and undo with ideaoldundo`() {
     configureByText(
       """
       ====
@@ -387,7 +387,7 @@ class MoveCommandTest : VimTestCase() {
     )
 
     try {
-      enterCommand("set oldundo")
+      enterCommand("set ideaoldundo")
       enterCommand("m 0")
       assertState(
         """
@@ -411,7 +411,7 @@ class MoveCommandTest : VimTestCase() {
       """.trimIndent(),
       )
     } finally {
-      enterCommand("set nooldundo")
+      enterCommand("set noideaoldundo")
     }
   }
 }
