@@ -10,10 +10,22 @@ package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.ide.plugins.DynamicPluginListener
 import com.intellij.ide.plugins.IdeaPluginDescriptor
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.model.commands.IdeaPlug
 
 class IjPluginListener : DynamicPluginListener {
+
+  override fun beforePluginUnload(
+    pluginDescriptor: IdeaPluginDescriptor,
+    isUpdate: Boolean,
+  ) {
+    super.beforePluginUnload(pluginDescriptor, isUpdate)
+    if (pluginDescriptor.pluginId != VimPlugin.getPluginId()) return
+
+    VimPlugin.turnOffPluginBeforeUnload()
+  }
+
   override fun pluginLoaded(pluginDescriptor: IdeaPluginDescriptor) {
     super.pluginLoaded(pluginDescriptor)
     if (!pluginDescriptor.isIdeaVimExtension()) return
