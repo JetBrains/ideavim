@@ -322,6 +322,8 @@ abstract class VimVariableServiceBase : VariableService {
         }
       }
 
+      Boolean::class -> vimDataType.asBoolean()
+
       Double::class -> {
         if (vimDataType is VimFloat) {
           vimDataType.value

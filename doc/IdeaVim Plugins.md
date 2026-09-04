@@ -963,6 +963,53 @@ https://github.com/kana/vim-textobj-entire/blob/master/doc/textobj-entire.txt
 </details>
 
 <details>
+<summary><h2>textobj-line: Adds text objects for selecting the current line</h2></summary>
+
+Original plugin: [vim-textobj-line](https://github.com/kana/vim-textobj-line).
+
+### Summary:
+vim-textobj-line provides two text objects for the current line:
+
+- `al` selects all characters in the current line, without the end of line character. Same as `0v$h`.
+- `il` selects the same, but without the leading and trailing whitespace. Same as `^vg_`.
+
+For example, with the line `  foo bar baz  ` (where `_` would be spaces), `dil` deletes `foo bar baz`
+and keeps the surrounding whitespace, while `dal` deletes the whole line content and leaves an empty line.
+
+Nothing is selected on an empty line, and `il` also selects nothing on a line that contains whitespace
+only, because there is no text to select in the current line.
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'kana/vim-textobj-line'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plugin 'kana/vim-textobj-line'</code>
+      <br/>
+      <code>Plug 'https://github.com/kana/vim-textobj-line'</code>
+      <br/>
+      <code>Plug 'vim-textobj-line'</code>
+      <br/>
+      <code>set textobj-line</code>
+      </details>
+
+To skip the default `al` and `il` mappings, set `g:textobj_line_no_default_key_mappings` before the
+plugin is enabled, and map the `<Plug>` mappings yourself:
+
+```
+let g:textobj_line_no_default_key_mappings = 1
+xmap aL <Plug>(textobj-line-al)
+omap aL <Plug>(textobj-line-al)
+xmap iL <Plug>(textobj-line-il)
+omap iL <Plug>(textobj-line-il)
+```
+
+### Instructions
+
+https://github.com/kana/vim-textobj-line/blob/master/doc/textobj-line.txt
+
+</details>
+
+<details>
 <summary><h2>textobj-user: Framework for defining your own text objects</h2></summary>
 
 Original plugin: [vim-textobj-user](https://github.com/kana/vim-textobj-user).
