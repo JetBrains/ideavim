@@ -375,6 +375,16 @@
       </aliases>
     </vimExtension>
 
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.textobjline.VimTextObjLineExtension"
+                  name="textobj-line">
+      <aliases>
+        <alias name="https://github.com/kana/vim-textobj-line"/>
+        <alias name="kana/vim-textobj-line"/>
+        <alias name="vim-textobj-line"/>
+        <alias name="https://www.vim.org/scripts/script.php?script_id=3886"/>
+      </aliases>
+    </vimExtension>
+
     <vimExtension implementation="com.maddyhome.idea.vim.extension.signature.SignatureExtension"
                   name="signature">
       <aliases>

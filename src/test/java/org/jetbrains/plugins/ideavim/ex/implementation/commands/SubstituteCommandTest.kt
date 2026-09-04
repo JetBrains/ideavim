@@ -1631,4 +1631,46 @@ class SubstituteCommandTest : VimTestCase() {
     enterCommand("%s/zzz/y/n")
     assertStatusLineMessageContains("E486: Pattern not found: zzz")
   }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test g flag replaces all hyphens on every line of visual selection`() {
+    configureByText(
+      "log := fh.log.With(\n" +
+        "    ${c}zap.String(\"foo1-bar1-baz1-buzz1-\", x),\n" +
+        "    zap.String(\"foo2-bar2-baz2-buzz2-\", y),\n" +
+        "    zap.String(\"foo3-bar3-baz3-buzz3-\", z),\n" +
+        ")\n",
+    )
+    typeText("V", "jj", ":'<,'>s/-/_/g<Enter>")
+    assertPluginError(false)
+    assertState(
+      "log := fh.log.With(\n" +
+        "    zap.String(\"foo1_bar1_baz1_buzz1_\", x),\n" +
+        "    zap.String(\"foo2_bar2_baz2_buzz2_\", y),\n" +
+        "    ${c}zap.String(\"foo3_bar3_baz3_buzz3_\", z),\n" +
+        ")\n",
+    )
+  }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test g flag replaces all hyphens on every line of numeric range`() {
+    configureByText(
+      "${c}log := fh.log.With(\n" +
+        "    zap.String(\"foo1-bar1-baz1-buzz1-\", x),\n" +
+        "    zap.String(\"foo2-bar2-baz2-buzz2-\", y),\n" +
+        "    zap.String(\"foo3-bar3-baz3-buzz3-\", z),\n" +
+        ")\n",
+    )
+    enterCommand("2,4s/-/_/g")
+    assertPluginError(false)
+    assertState(
+      "log := fh.log.With(\n" +
+        "    zap.String(\"foo1_bar1_baz1_buzz1_\", x),\n" +
+        "    zap.String(\"foo2_bar2_baz2_buzz2_\", y),\n" +
+        "    ${c}zap.String(\"foo3_bar3_baz3_buzz3_\", z),\n" +
+        ")\n",
+    )
+  }
 }

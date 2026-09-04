@@ -281,13 +281,22 @@ class ConvertToKotlinTypeTest {
   @Test
   fun `test getVariable with unsupported type throws exception`() {
     val vimInt = VimInt(42)
-    val type = typeOf<Boolean>()
+    val type = typeOf<Char>()
 
     val exception = assertFailsWith<IllegalArgumentException> {
       variableService.convertToKotlinType(vimInt, type)
     }
 
-    assertEquals("Unsupported type: Boolean", exception.message)
+    assertEquals("Unsupported type: Char", exception.message)
+  }
+
+  @Test
+  fun `test getVariable with Boolean`() {
+    val type = typeOf<Boolean>()
+
+    assertEquals(true, variableService.convertToKotlinType(VimInt(1), type))
+    assertEquals(true, variableService.convertToKotlinType(VimInt(42), type))
+    assertEquals(false, variableService.convertToKotlinType(VimInt(0), type))
   }
 
   @Test
