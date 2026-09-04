@@ -40,10 +40,12 @@ object MarkUpdater : DocumentListener {
   override fun beforeDocumentChange(event: DocumentEvent) {
     if (VimPlugin.isNotEnabled()) return
     logger.debug { "MarkUpdater before, event = $event" }
-    if (event.oldLength == 0) return
+    if (event.oldLength == 0 && event.newLength == 0) return
     val doc = event.document
     val anEditor = getAnyEditorForDocument(doc) ?: return
-    injector.markService.updateMarksFromDelete(anEditor, event.offset, event.oldLength, event.newLength)
+    injector.markService.updateVisualSelectionMarks(anEditor, event.offset, event.oldLength, event.newFragment)
+    if (event.oldLength == 0) return
+    injector.markService.updateMarksFromDelete(anEditor, event.offset, event.oldLength)
   }
 
   /**
