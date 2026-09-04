@@ -11,7 +11,10 @@ package org.jetbrains.plugins.ideavim
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ComponentManagerEx
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent
+import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.impl.EditorWindow
 import com.intellij.openapi.fileEditor.impl.FileEditorManagerImpl
@@ -43,6 +46,12 @@ import javax.swing.SwingConstants
 abstract class VimSplitWindowTestCase : VimTestCase() {
   protected lateinit var fileEditorManager: FileEditorManagerImpl
 
+  /**
+   * The file editor most recently announced by [FileEditorManagerListener.selectionChanged]. See [selectWindow]
+   */
+  @Volatile
+  private var lastAnnouncedEditor: FileEditor? = null
+
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
@@ -53,6 +62,15 @@ abstract class VimSplitWindowTestCase : VimTestCase() {
       (fixture.project as ComponentManagerEx).getCoroutineScope().childScope(name = javaClass.simpleName),
     )
     fixture.project.replaceService(FileEditorManager::class.java, fileEditorManager, fixture.testRootDisposable)
+
+    fixture.project.messageBus.connect(fixture.testRootDisposable).subscribe(
+      FileEditorManagerListener.FILE_EDITOR_MANAGER,
+      object : FileEditorManagerListener {
+        override fun selectionChanged(event: FileEditorManagerEvent) {
+          lastAnnouncedEditor = event.newEditor
+        }
+      },
+    )
   }
 
   // If we're replacing the test FileEditorManager, then we can't use the default light project descriptor
@@ -156,6 +174,12 @@ abstract class VimSplitWindowTestCase : VimTestCase() {
 
     // Fail loudly rather than silently driving the wrong window
     check(fixture.editor === editor) { "Could not select the requested window. fixture.editor is a different editor" }
+
+    // If the window was already selected, there is nothing to wait for. The announcement of it might have been skipped
+    // (the platform conflates rapid changes and does not announce a selection that ends up where it started), but then
+    // the previous announcement was for this editor already
+    val announced = waitUntil { (lastAnnouncedEditor as? TextEditor)?.editor === editor }
+    check(announced) { "Timed out waiting for the platform to announce the selected window" }
   }
 
   /**
