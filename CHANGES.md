@@ -51,6 +51,8 @@ usual beta standards.
 * [`CTRL-T`](https://vimhelp.org/tagsrch.txt.html#CTRL-T) is no longer a second key for [`CTRL-O`](https://vimhelp.org/motion.txt.html#CTRL-O). It used to step back along the [jump list](https://vimhelp.org/motion.txt.html#jumplist); it now walks back up the [tag stack](https://vimhelp.org/tagsrch.txt.html#tag-stack) as in Vim, and reports `E73: Tag stack empty` when no tag jump has been made. `CTRL-O` is unchanged and remains the way to walk the jump list
 
 ### Merged PRs:
+* [2049](https://github.com/JetBrains/ideavim/pull/2049) by [1grzyb1](https://github.com/1grzyb1): VIM-1974 implement textobj-line extension
+* [2046](https://github.com/JetBrains/ideavim/pull/2046) by [1grzyb1](https://github.com/1grzyb1): VIM-3667 handle vim shortcuts outside editor
 * [2045](https://github.com/JetBrains/ideavim/pull/2045) by [1grzyb1](https://github.com/1grzyb1): VIM-4321 Set configurable key in xml
 * [2044](https://github.com/JetBrains/ideavim/pull/2044) by [1grzyb1](https://github.com/1grzyb1): VIM-4319 turn off plugin before unload
 * [2037](https://github.com/JetBrains/ideavim/pull/2037) by [1grzyb1](https://github.com/1grzyb1): VIM-4314 Expand % signs in commands
