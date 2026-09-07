@@ -8,24 +8,20 @@
 
 package org.jetbrains.plugins.ideavim.action
 
-import com.intellij.codeInsight.CodeInsightSettings
 import com.intellij.codeInsight.lookup.Lookup
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
-import com.intellij.testFramework.fixtures.impl.CodeInsightTestFixtureImpl
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimJavaTestCase
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.test.assertTrue
 
 /**
  * While we are in insert mode the IDE changes the document behind our back, and those changes are recorded in the
@@ -59,33 +55,9 @@ class RepeatWithAutoImportTest : VimJavaTestCase() {
         |}
   """.trimMargin()
 
-  private var originalAddImportsOnTheFly = false
-
-  private var addImportsOnTheFly: Boolean
-    get() = CodeInsightSettings.getInstance().ADD_UNAMBIGIOUS_IMPORTS_ON_THE_FLY
-    set(value) {
-      CodeInsightSettings.getInstance().ADD_UNAMBIGIOUS_IMPORTS_ON_THE_FLY = value
-    }
-
   override fun createFixture(factory: IdeaTestFixtureFactory): CodeInsightTestFixture {
-    // The default light project descriptor has no JDK, so `java.util.List` wouldn't resolve and there would be nothing
-    // to import
-    val descriptor = object : LightProjectDescriptor() {
-      override fun getSdk(): Sdk = JavaSdk.getInstance().createJdk("Test JDK", System.getProperty("java.home"), false)
-    }
-    val fixture = factory.createLightFixtureBuilder(descriptor, "IdeaVim").fixture
+    val fixture = factory.createLightFixtureBuilder(WITH_REAL_JDK, "IdeaVim").fixture
     return factory.createCodeInsightFixture(fixture, LightTempDirTestFixtureImpl(true))
-  }
-
-  @BeforeEach
-  fun enableAddImportsOnTheFly() {
-    originalAddImportsOnTheFly = addImportsOnTheFly
-    addImportsOnTheFly = true
-  }
-
-  @AfterEach
-  fun restoreAddImportsOnTheFly() {
-    addImportsOnTheFly = originalAddImportsOnTheFly
   }
 
   @Test
@@ -94,7 +66,7 @@ class RepeatWithAutoImportTest : VimJavaTestCase() {
 
     // We are still in insert mode when the IDE adds `import java.util.List;` at the top of the file
     typeText("cf>", "List<lt>String>")
-    addUnambiguousImportsOnTheFly()
+    addImportWhileTyping("import java.util.List;")
     typeText("<Esc>")
 
     assertState(
@@ -131,7 +103,7 @@ class RepeatWithAutoImportTest : VimJavaTestCase() {
     // The import lands in the middle of the insert, so the offsets recorded for the rest of it have to survive the
     // text above the caret growing
     typeText("cf;", "List<lt>String> f")
-    addUnambiguousImportsOnTheFly()
+    addImportWhileTyping("import java.util.List;")
     typeText("oo = new HashSet<lt>String>();")
     typeText("<Esc>")
 
@@ -172,10 +144,9 @@ class RepeatWithAutoImportTest : VimJavaTestCase() {
   fun `test repeating a change made with backspaces after an import landed`() {
     configureByJavaText(twoSetLocals)
 
-    // Backspaces and caret motions end up in the strokes next to the typed text. The `<Right>`s take the caret off
-    // the reference, which is what lets the IDE add the import
-    typeText("ea", "<BS><BS><BS>", "List", "<Right><Right><Right>")
-    addUnambiguousImportsOnTheFly()
+    // Backspaces and caret motions end up in the strokes next to the typed text
+    typeText("ea", "<BS><BS><BS>", "List")
+    addImportWhileTyping("import java.util.List;")
     typeText("<Esc>")
 
     assertState(
@@ -186,7 +157,7 @@ class RepeatWithAutoImportTest : VimJavaTestCase() {
         |
         |class Foo {
         |  void test() {
-        |    List<S${c}tring> foo = new HashSet<String>();
+        |    Lis${c}t<String> foo = new HashSet<String>();
         |    Set<String> bar = new HashSet<String>();
         |  }
         |}
@@ -213,44 +184,7 @@ class RepeatWithAutoImportTest : VimJavaTestCase() {
   }
 
   @Test
-  fun `test repeating a change whose import was added by a quick fix does not replay the import`() {
-    addImportsOnTheFly = false
-    configureByJavaText(twoSetFields)
-
-    typeText("cw", "List")
-    importClassWithQuickFix()
-    typeText("<Esc>")
-
-    assertState(
-      """
-        |import java.util.List;
-        |import java.util.Set;
-        |
-        |class Foo {
-        |    Lis${c}t<String> foo;
-        |    Set<String> bar;
-        |}
-      """.trimMargin(),
-    )
-
-    typeText("j", "0", "w", ".")
-
-    assertState(
-      """
-        |import java.util.List;
-        |import java.util.Set;
-        |
-        |class Foo {
-        |    List<String> foo;
-        |    Lis${c}t<String> bar;
-        |}
-      """.trimMargin(),
-    )
-  }
-
-  @Test
   fun `test repeating a change completed from the lookup does not replay the qualified name round trip`() {
-    addImportsOnTheFly = false
     configureByJavaText(twoSetLocals)
 
     // Picking `List` from the popup inserts `java.util.List`, adds the import and then shortens the name back to
@@ -294,23 +228,19 @@ class RepeatWithAutoImportTest : VimJavaTestCase() {
   }
 
   /**
-   * Runs the highlighting passes, which is what adds the unambiguous import. The IDE does this while the user keeps
-   * typing, so we run it without leaving insert mode. `canChangeDocument` has to be true - inserting the import is
-   * exactly the document change the fixture otherwise forbids during highlighting.
+   * Adds the import into its sorted place while we are in insert mode, which is the document change "add unambiguous
+   * imports on the fly" and the Alt+Enter fix both make. We deliberately don't run the highlighting passes to get a
+   * real one: the daemon's caches hold on to the light project through soft references, and the leak checks on CI fail
+   * because of it. The lookup test below covers a genuinely IDE-added import.
    */
-  private fun addUnambiguousImportsOnTheFly() {
+  private fun addImportWhileTyping(importStatement: String) {
     ApplicationManager.getApplication().invokeAndWait {
-      CodeInsightTestFixtureImpl.instantiateAndRun(fixture.file, fixture.editor, IntArray(0), true)
-      PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
-    }
-  }
-
-  /** Invokes the "Import class" quick fix on the reference at the caret, i.e. what the user gets from Alt+Enter. */
-  private fun importClassWithQuickFix() {
-    ApplicationManager.getApplication().invokeAndWait {
-      val intentions = fixture.filterAvailableIntentions("Import class")
-      assertTrue(intentions.isNotEmpty(), "Expected an \"Import class\" quick fix to be available")
-      fixture.launchAction(intentions.first())
+      val document = fixture.editor.document
+      val importLines = document.text.lines().withIndex().filter { it.value.startsWith("import ") }
+      val line = importLines.firstOrNull { it.value > importStatement }?.index ?: (importLines.last().index + 1)
+      WriteCommandAction.runWriteCommandAction(fixture.project) {
+        document.insertString(document.getLineStartOffset(line), "$importStatement\n")
+      }
       PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
     }
   }
@@ -330,6 +260,16 @@ class RepeatWithAutoImportTest : VimJavaTestCase() {
     ApplicationManager.getApplication().invokeAndWait {
       fixture.finishLookup(Lookup.NORMAL_SELECT_CHAR)
       PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+    }
+  }
+
+  companion object {
+    /**
+     * The default light project descriptor has no JDK, so `java.util.List` wouldn't resolve and there would be nothing
+     * to import. Shared between the tests of this class, so they share one light project.
+     */
+    private val WITH_REAL_JDK = object : LightProjectDescriptor() {
+      override fun getSdk(): Sdk = JavaSdk.getInstance().createJdk("Test JDK", System.getProperty("java.home"), false)
     }
   }
 }
