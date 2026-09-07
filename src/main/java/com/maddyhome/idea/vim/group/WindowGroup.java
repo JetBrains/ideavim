@@ -12,6 +12,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileEditorWithTextEditors;
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.fileEditor.impl.EditorComposite;
 import com.intellij.openapi.fileEditor.impl.EditorTabbedContainer;
@@ -41,6 +42,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+import static com.maddyhome.idea.vim.helper.UiHelper.requestFocus;
 
 public class WindowGroup extends WindowGroupBase {
   private static @NotNull List<EditorWindow> findWindowsInRow(@NotNull Caret caret,
@@ -92,10 +94,43 @@ public class WindowGroup extends WindowGroupBase {
     var fem = FileEditorManagerEx.getInstanceEx(project);
     var targets = new ArrayList<NavTarget>();
     for (var w : fem.getWindows()) {
+      var paneTargets = collectEditorPanes(w);
+      if (!paneTargets.isEmpty()) {
+        targets.addAll(paneTargets);
+        continue;
+      }
       var rect = getSplitRectangle(w);
       if (rect != null) {
         targets.add(new NavTarget(rect, () -> w.setAsCurrentWindow(true)));
       }
+    }
+    return targets;
+  }
+
+  /**
+   * A single editor tab can host several editors side by side - a diff view ({@code SimpleDiffPanel}) shows the two
+   * revisions in two independent editors. Vim treats each of them as its own window, so report a target per pane
+   * instead of a single target covering the whole tab.
+   *
+   * @return one target per embedded editor, or an empty list if the tab hosts a single editor (or none of them are
+   * on screen), in which case the caller falls back to the bounds of the whole tab
+   */
+  private static @NotNull List<NavTarget> collectEditorPanes(@NotNull EditorWindow window) {
+    var composite = window.getSelectedComposite();
+    if (composite == null) return List.of();
+    if (!(composite.getSelectedEditor() instanceof FileEditorWithTextEditors editorWithPanes)) return List.of();
+
+    var editors = editorWithPanes.getEmbeddedEditors();
+    if (editors.size() < 2) return List.of();
+
+    var targets = new ArrayList<NavTarget>(editors.size());
+    for (var editor : editors) {
+      var rect = getComponentRectangle(editor.getComponent());
+      if (rect == null) return List.of();
+      targets.add(new NavTarget(rect, () -> {
+        window.setAsCurrentWindow(true);
+        requestFocus(editor.getContentComponent());
+      }));
     }
     return targets;
   }
@@ -107,14 +142,9 @@ public class WindowGroup extends WindowGroupBase {
       var tw = twm.getToolWindow(id);
       if (tw == null || !tw.isVisible()) continue;
       if (tw.getType() == ToolWindowType.FLOATING || tw.getType() == ToolWindowType.WINDOWED) continue;
-      var comp = tw.getComponent();
-      if (!comp.isShowing()) continue;
-      try {
-        var loc = comp.getLocationOnScreen();
-        var size = comp.getSize();
-        targets.add(new NavTarget(new Rectangle(loc, size), () -> tw.activate(null)));
-      }
-      catch (IllegalComponentStateException ignored) {
+      var rect = getComponentRectangle(tw.getComponent());
+      if (rect != null) {
+        targets.add(new NavTarget(rect, () -> tw.activate(null)));
       }
     }
     return targets;
@@ -192,6 +222,26 @@ public class WindowGroup extends WindowGroupBase {
     Point caretScreenLocation = editor.getContentComponent().getLocationOnScreen();
     caretScreenLocation.translate(caretLocation.x, caretLocation.y);
     return caretScreenLocation;
+  }
+
+  private static @Nullable Rectangle getComponentRectangle(@Nullable Component component) {
+    if (component == null || !component.isShowing()) return null;
+    try {
+      return new Rectangle(component.getLocationOnScreen(), component.getSize());
+    }
+    catch (IllegalComponentStateException ignored) {
+      return null;
+    }
+  }
+
+  /**
+   * Screen bounds of the window the caret is in. When the tab hosts several editors (the two sides of a diff, say),
+   * only the caret's own editor counts as the current window - the bounds of the whole tab would intersect every pane
+   * and make navigation between them impossible.
+   */
+  private static @Nullable Rectangle getCurrentWindowRectangle(@NotNull EditorWindow window, @NotNull Caret caret) {
+    var editorRect = getComponentRectangle(caret.getEditor().getComponent());
+    return editorRect != null ? editorRect : getSplitRectangle(window);
   }
 
   private static @Nullable Rectangle getSplitRectangle(@NotNull EditorWindow window) {
@@ -288,7 +338,7 @@ public class WindowGroup extends WindowGroupBase {
     if (isVimEverywhereEnabled()) {
       var project = PlatformDataKeys.PROJECT.getData(dataContext);
       if (project == null) return;
-      var currentBounds = getSplitRectangle(currentWindow);
+      var currentBounds = getCurrentWindowRectangle(currentWindow, ijCaret);
       if (currentBounds == null) return;
       var refPoint = getCaretPoint(ijCaret);
       navigateInDirection(project, refPoint, currentBounds, relativePosition, vertical);
