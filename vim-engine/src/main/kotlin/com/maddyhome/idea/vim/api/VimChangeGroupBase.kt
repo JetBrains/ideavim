@@ -75,6 +75,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   @JvmField
   protected var oldOffset: Int = -1
 
+  private val recordedTexts: MutableList<RecordedText> = ArrayList()
+
   @JvmField
   protected var vimDocumentListener: ChangesListener? = null
 
@@ -377,45 +379,146 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     repeatAppend = false
   }
 
-  protected inner class VimChangesListener : ChangesListener {
-    override fun documentChanged(change: ChangesListener.Change) {
-      val newFragment = change.newFragment
-      val oldFragment = change.oldFragment
-      val newFragmentLength = newFragment.length
-      val oldFragmentLength = oldFragment.length
+  /** Text we have appended to [strokes], remembered so that a change taking it back can cancel the recording. */
+  private class RecordedText(
+    var offset: Int,
+    val chars: CharArray,
+    val firstStrokeIndex: Int,
+    val previousOldOffset: Int,
+  ) {
+    fun isTakenBackBy(change: ChangesListener.Change) =
+      change.offset == offset && change.oldFragment == chars.concatToString()
+  }
 
-      // Repeat buffer limits
-      if (repeatCharsCount > MAX_REPEAT_CHARS_COUNT) {
+  protected inner class VimChangesListener(private val editor: VimEditor) : ChangesListener {
+    override fun documentChanged(change: ChangesListener.Change) {
+      if (isRepeatBufferFull()) return
+
+      if (isMadeBeforeInsert(change)) {
+        followWithoutRecording(change)
         return
       }
+      if (undoLastRecordedText(change)) return
 
+      updateRecordedTexts(change)
+      record(change)
+    }
+
+    private fun isRepeatBufferFull() = repeatCharsCount > MAX_REPEAT_CHARS_COUNT
+
+    /**
+     * We do want most of what the IDE changes while we are in insert mode - that is how auto-inserted brackets and
+     * indents end up being replayed by `.`. But an import added by "add unambiguous imports on the fly" or by an
+     * Alt+Enter fix is not something the user typed. The platform doesn't tell us who made a change, so we go by the
+     * insert region: nothing before the start of the insert can be the typing we are recording. The start is a live
+     * marker ([VimCaret.vimInsertStart]), so it moves with the document.
+     */
+    private fun isMadeBeforeInsert(change: ChangesListener.Change): Boolean {
+      val insertStarts = editor.nativeCarets().map { it.vimInsertStart.startOffset }
+      return insertStarts.isNotEmpty() && insertStarts.all { change.offset < it }
+    }
+
+    /**
+     * Everything after the change has moved, and so must the offsets we remember. Otherwise the next typed character
+     * looks like a jump and we would record caret motions for it.
+     */
+    private fun followWithoutRecording(change: ChangesListener.Change) {
+      if (oldOffset >= 0) {
+        oldOffset += change.lengthDelta
+      }
+      updateRecordedTexts(change)
+    }
+
+    /**
+     * Rolls the strokes back if [change] takes back the text we recorded last, and nothing else. Completing a class
+     * name from the lookup does exactly that: it inserts the fully qualified name, adds the import and then shortens
+     * the name again. Replaying that round trip would leave the caret wherever the round trip ended.
+     */
+    private fun undoLastRecordedText(change: ChangesListener.Change): Boolean {
+      if (!change.isPureDeletion) return false
+      val last = recordedTexts.lastOrNull() ?: return false
+      if (!last.isTakenBackBy(change)) return false
+      // Strokes recorded after that text are real - a backspace over an auto-inserted bracket arrives as two changes -
+      // and dropping them along with the text would break the replay
+      if (strokes.lastOrNull() !== last.chars) return false
+
+      strokes.subList(last.firstStrokeIndex, strokes.size).clear()
+      repeatCharsCount -= last.chars.size
+      oldOffset = last.previousOldOffset
+      recordedTexts.removeAt(recordedTexts.size - 1)
+      return true
+    }
+
+    /** Keeps the remembered offsets usable now that the document has changed, and forgets what the change overwrote. */
+    private fun updateRecordedTexts(change: ChangesListener.Change) {
+      val changeEnd = change.offset + change.oldFragment.length
+      val iterator = recordedTexts.iterator()
+      while (iterator.hasNext()) {
+        val recordedText = iterator.next()
+        when {
+          recordedText.offset >= changeEnd -> recordedText.offset += change.lengthDelta
+          recordedText.offset >= change.offset -> iterator.remove()
+        }
+      }
+    }
+
+    private fun record(change: ChangesListener.Change) {
       // <Enter> is added to strokes as an action during processing in order to indent code properly in the repeat
       // command
-      if (newFragment.startsWith("\n") && newFragment.trim { it <= ' ' }.isEmpty()) {
-        strokes.addAll(getAdjustCaretActions(change))
+      if (isNewLineWithIndent(change)) {
+        recordCaretAdjustment(change)
         oldOffset = -1
         return
       }
 
       // Ignore multi-character indents as they should be inserted automatically while repeating <Enter> actions
-      if (newFragmentLength > 1 && newFragment.trim { it <= ' ' }.isEmpty()) {
-        return
-      }
-      strokes.addAll(getAdjustCaretActions(change))
-      if (oldFragmentLength > 0) {
-        val editorDelete = injector.nativeActionManager.deleteAction
-        if (editorDelete != null) {
-          repeat(oldFragmentLength) {
-            strokes.add(editorDelete)
-          }
-        }
-      }
-      if (newFragmentLength > 0) {
-        strokes.add(newFragment.toCharArray())
-      }
-      repeatCharsCount += newFragmentLength
-      oldOffset = change.offset + newFragmentLength
+      if (isMultiCharacterIndent(change)) return
+
+      val firstStrokeIndex = strokes.size
+      val previousOldOffset = oldOffset
+      recordCaretAdjustment(change)
+      recordDeletions(change.oldFragment.length)
+      recordText(change, firstStrokeIndex, previousOldOffset)
+
+      repeatCharsCount += change.newFragment.length
+      oldOffset = change.offset + change.newFragment.length
     }
+
+    private fun recordCaretAdjustment(change: ChangesListener.Change) {
+      strokes.addAll(getAdjustCaretActions(change))
+    }
+
+    private fun recordDeletions(count: Int) {
+      val deleteAction = injector.nativeActionManager.deleteAction ?: return
+      repeat(count) {
+        strokes.add(deleteAction)
+      }
+    }
+
+    private fun recordText(change: ChangesListener.Change, firstStrokeIndex: Int, previousOldOffset: Int) {
+      if (change.newFragment.isEmpty()) return
+
+      val chars = change.newFragment.toCharArray()
+      strokes.add(chars)
+      recordedTexts.add(RecordedText(change.offset, chars, firstStrokeIndex, previousOldOffset))
+      if (recordedTexts.size > MAX_RECORDED_TEXTS) {
+        recordedTexts.removeAt(0)
+      }
+    }
+
+    private fun isNewLineWithIndent(change: ChangesListener.Change) =
+      change.newFragment.startsWith("\n") && isWhitespaceOnly(change.newFragment)
+
+    private fun isMultiCharacterIndent(change: ChangesListener.Change) =
+      change.newFragment.length > 1 && isWhitespaceOnly(change.newFragment)
+
+    private fun isWhitespaceOnly(fragment: String) = fragment.trim { it <= ' ' }.isEmpty()
+
+    private val ChangesListener.Change.lengthDelta: Int
+      get() = newFragment.length - oldFragment.length
+
+    private val ChangesListener.Change.isPureDeletion: Boolean
+      get() = oldFragment.isNotEmpty() && newFragment.isEmpty()
 
     private fun getAdjustCaretActions(change: ChangesListener.Change): List<EditorActionHandlerBase> {
       val delta: Int = change.offset - oldOffset
@@ -525,14 +628,13 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       editor.mode = Mode.NORMAL()
     } else {
       lastInsert = cmd
-      strokes.clear()
-      repeatCharsCount = 0
+      clearRecordedStrokes()
       val myVimDocument = vimDocument
       if (myVimDocument != null && vimDocumentListener != null) {
         myVimDocument.removeChangeListener(vimDocumentListener!!)
       }
       vimDocument = editor.document
-      val myChangeListener = VimChangesListener()
+      val myChangeListener = VimChangesListener(editor)
       vimDocumentListener = myChangeListener
       vimDocument!!.addChangeListener(myChangeListener)
       injector.application.runReadAction {
@@ -1173,11 +1275,16 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param editor The editor to clear strokes from.
    */
   protected fun clearStrokes(editor: VimEditor) {
-    strokes.clear()
-    repeatCharsCount = 0
+    clearRecordedStrokes()
     for (caret in editor.nativeCarets()) {
       caret.vimInsertStart = editor.createLiveMarker(caret.offset, caret.offset)
     }
+  }
+
+  private fun clearRecordedStrokes() {
+    strokes.clear()
+    recordedTexts.clear()
+    repeatCharsCount = 0
   }
 
   /**
@@ -2213,8 +2320,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   }
 
   override fun reset() {
-    strokes.clear()
-    repeatCharsCount = 0
+    clearRecordedStrokes()
     if (lastStrokes != null) {
       lastStrokes!!.clear()
     }
@@ -2232,6 +2338,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
 
   companion object {
     private const val MAX_REPEAT_CHARS_COUNT = 10000
+    private const val MAX_RECORDED_TEXTS = 32
     private val logger = vimLogger<VimChangeGroupBase>()
 
     /**
