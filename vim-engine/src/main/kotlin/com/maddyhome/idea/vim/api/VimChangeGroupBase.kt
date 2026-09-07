@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.ChangesListener
+import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -76,6 +77,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   protected var oldOffset: Int = -1
 
   private val recordedTexts: MutableList<RecordedText> = ArrayList()
+
+  private var insertStarts: List<LiveRange> = emptyList()
 
   @JvmField
   protected var vimDocumentListener: ChangesListener? = null
@@ -390,7 +393,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       change.offset == offset && change.oldFragment == chars.concatToString()
   }
 
-  protected inner class VimChangesListener(private val editor: VimEditor) : ChangesListener {
+  protected inner class VimChangesListener : ChangesListener {
     override fun documentChanged(change: ChangesListener.Change) {
       if (isRepeatBufferFull()) return
 
@@ -410,12 +413,10 @@ abstract class VimChangeGroupBase : VimChangeGroup {
      * We do want most of what the IDE changes while we are in insert mode - that is how auto-inserted brackets and
      * indents end up being replayed by `.`. But an import added by "add unambiguous imports on the fly" or by an
      * Alt+Enter fix is not something the user typed. The platform doesn't tell us who made a change, so we go by the
-     * insert region: nothing before the start of the insert can be the typing we are recording. The start is a live
-     * marker ([VimCaret.vimInsertStart]), so it moves with the document.
+     * insert region: nothing before the start of the insert can be the typing we are recording.
      */
     private fun isMadeBeforeInsert(change: ChangesListener.Change): Boolean {
-      val insertStarts = editor.nativeCarets().map { it.vimInsertStart.startOffset }
-      return insertStarts.isNotEmpty() && insertStarts.all { change.offset < it }
+      return insertStarts.isNotEmpty() && insertStarts.all { change.offset < it.startOffset }
     }
 
     /**
@@ -609,9 +610,11 @@ abstract class VimChangeGroupBase : VimChangeGroup {
 
     val state = injector.vimState
     injector.application.runReadAction {
-      for (caret in editor.nativeCarets()) {
-        caret.vimInsertStart = editor.createLiveMarker(caret.offset, caret.offset)
+      insertStarts = editor.nativeCarets().map { caret ->
+        val insertStart = editor.createLiveMarker(caret.offset, caret.offset)
+        caret.vimInsertStart = insertStart
         injector.markService.setMark(caret, MARK_CHANGE_START, caret.offset)
+        insertStart
       }
     }
     val cmd = state.executingCommand
@@ -634,7 +637,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         myVimDocument.removeChangeListener(vimDocumentListener!!)
       }
       vimDocument = editor.document
-      val myChangeListener = VimChangesListener(editor)
+      val myChangeListener = VimChangesListener()
       vimDocumentListener = myChangeListener
       vimDocument!!.addChangeListener(myChangeListener)
       injector.application.runReadAction {
@@ -730,6 +733,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         vimDocument!!.removeChangeListener(vimDocumentListener!!)
         vimDocumentListener = null
       }
+      insertStarts = emptyList()
       lastStrokes = ArrayList(strokes)
       if (context != null) {
         injector.changeGroup.repeatInsert(editor, context, repeatCount0, true)
@@ -1276,8 +1280,10 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   protected fun clearStrokes(editor: VimEditor) {
     clearRecordedStrokes()
-    for (caret in editor.nativeCarets()) {
-      caret.vimInsertStart = editor.createLiveMarker(caret.offset, caret.offset)
+    insertStarts = editor.nativeCarets().map { caret ->
+      val insertStart = editor.createLiveMarker(caret.offset, caret.offset)
+      caret.vimInsertStart = insertStart
+      insertStart
     }
   }
 
@@ -2321,6 +2327,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
 
   override fun reset() {
     clearRecordedStrokes()
+    insertStarts = emptyList()
     if (lastStrokes != null) {
       lastStrokes!!.clear()
     }

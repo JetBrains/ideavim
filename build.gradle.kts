@@ -229,7 +229,7 @@ tasks {
     // Set teamcity env variable locally to run additional tests for leaks.
     println("Project leak checks: If you experience project leaks on TeamCity that doesn't reproduce locally")
     println("Uncomment the following line in build.gradle to enable leak checks (see build.gradle config)")
-//      environment("TEAMCITY_VERSION" to "X")
+    environment("TEAMCITY_VERSION" to "X")
 
     systemProperty("ideavim.nvim.test", System.getProperty("nvim") ?: false)
 
