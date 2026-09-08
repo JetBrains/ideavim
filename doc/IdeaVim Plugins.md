@@ -1133,6 +1133,35 @@ component has focus.
 </details>
 
 <details>
+<summary><h2>visual-star-search: Makes * and # search for the selected text</h2></summary>
+
+Original plugin: [vim-visual-star-search](https://github.com/bronson/vim-visual-star-search).
+
+### Summary:
+In visual mode, `*` and `#` search forwards and backwards for the selected text instead of the word
+under the caret. The selection is searched for literally, without word boundaries, so it also matches
+inside longer words. `n` and `N` repeat the search as usual, and `gv` reselects the text you searched for.
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'bronson/vim-visual-star-search'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plugin 'bronson/vim-visual-star-search'</code>
+      <br/>
+      <code>Plug 'https://github.com/bronson/vim-visual-star-search'</code>
+      <br/>
+      <code>Plug 'vim-visual-star-search'</code>
+      <br/>
+      <code>set visual-star-search</code>
+      </details>
+
+### Instructions
+
+https://github.com/bronson/vim-visual-star-search#vim-visual-star-search
+
+</details>
+
+<details>
 <summary><h2>Which-Key: Displays available keybindings in popup</h2></summary>
 
 Original plugin: [vim-which-key](https://github.com/liuchengxu/vim-which-key).
