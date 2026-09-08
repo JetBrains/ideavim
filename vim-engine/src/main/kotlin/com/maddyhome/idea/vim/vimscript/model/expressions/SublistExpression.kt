@@ -29,8 +29,11 @@ data class SublistExpression(val from: Expression?, val to: Expression?, val exp
     return when (expressionValue) {
       is VimDictionary -> throw exExceptionMessage("E719")
       is VimFuncref -> throw exExceptionMessage("E695")
-      is VimList -> expressionValue.slice(start, endInclusive + 1)
-      else -> expressionValue.toVimString().substring(start, endInclusive + 1)
+      is VimList -> expressionValue.slice(start, toEndExclusive(endInclusive, expressionValue.size))
+      else -> {
+        val string = expressionValue.toVimString()
+        string.substring(start, toEndExclusive(endInclusive, string.value.length))
+      }
     }
   }
 
@@ -85,4 +88,13 @@ data class SublistExpression(val from: Expression?, val to: Expression?, val exp
       else -> throw exExceptionMessage("E689", listValue.typeName, assignmentTextForErrors)
     }
   }
+
+  /**
+   * Converts Vim's inclusive sublist end index into the resolved exclusive end index used by [VimList.slice]
+   *
+   * A negative index counts from the end of the collection, and is resolved before being made exclusive, so that the
+   * default end index of `-1` becomes an exclusive end index of [size] rather than zero, which would be empty.
+   */
+  private fun toEndExclusive(endInclusive: Int, size: Int) =
+    (if (endInclusive < 0) endInclusive + size else endInclusive) + 1
 }
