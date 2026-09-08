@@ -579,4 +579,180 @@ class VisualStarSearchTest : VimTestCase() {
       Mode.NORMAL(),
     )
   }
+
+  // -------------------------------------------------------------------------- 'ignorecase' and 'smartcase'
+
+  // The plugin searches with a plain `/`, without a `\c` or `\C` prefix, so the search honours 'ignorecase'. This is
+  // unlike the built-in `*`, which always searches case sensitively.
+  @Test
+  fun `test ignorecase makes the search case insensitive`() {
+    configureByText(
+      """
+        ${c}foo
+        FOO
+        end
+      """.trimIndent(),
+    )
+    enterCommand("set ignorecase")
+    typeText("ve*")
+    assertState(
+      """
+        foo
+        ${c}FOO
+        end
+      """.trimIndent(),
+    )
+    assertState(Mode.NORMAL())
+  }
+
+  @Test
+  fun `test search is case sensitive without ignorecase`() {
+    configureByText(
+      """
+        ${c}foo
+        FOO
+        end
+      """.trimIndent(),
+    )
+    enterCommand("set noignorecase")
+    typeText("ve*")
+    assertState(
+      """
+        ${c}foo
+        FOO
+        end
+      """.trimIndent(),
+    )
+    assertState(Mode.NORMAL())
+  }
+
+  // The pattern is "typed" into the search command, so 'smartcase' applies too. Again unlike the built-in `*`, which
+  // never uses 'smartcase'.
+  @Test
+  fun `test smartcase makes an upper case selection case sensitive`() {
+    configureByText(
+      """
+        ${c}Foo
+        foo
+        Foo
+        end
+      """.trimIndent(),
+    )
+    enterCommand("set ignorecase smartcase")
+    typeText("ve*")
+    assertState(
+      """
+        Foo
+        foo
+        ${c}Foo
+        end
+      """.trimIndent(),
+    )
+    assertState(Mode.NORMAL())
+  }
+
+  @Test
+  fun `test smartcase does not affect a lower case selection`() {
+    configureByText(
+      """
+        ${c}foo
+        FOO
+        end
+      """.trimIndent(),
+    )
+    enterCommand("set ignorecase smartcase")
+    typeText("ve*")
+    assertState(
+      """
+        foo
+        ${c}FOO
+        end
+      """.trimIndent(),
+    )
+    assertState(Mode.NORMAL())
+  }
+
+  @Test
+  fun `test ignorecase applies to the backward search`() {
+    configureByText(
+      """
+        FOO
+        bar
+        ${c}foo
+        end
+      """.trimIndent(),
+    )
+    enterCommand("set ignorecase")
+    typeText("ve#")
+    assertState(
+      """
+        ${c}FOO
+        bar
+        foo
+        end
+      """.trimIndent(),
+    )
+    assertState(Mode.NORMAL())
+  }
+
+  @Test
+  fun `test ignorecase applies to n`() {
+    configureByText(
+      """
+        ${c}foo
+        FOO
+        x
+        FOo
+      """.trimIndent(),
+    )
+    enterCommand("set ignorecase")
+    typeText("ve*n")
+    assertState(
+      """
+        foo
+        FOO
+        x
+        ${c}FOo
+      """.trimIndent(),
+    )
+    assertState(Mode.NORMAL())
+  }
+
+  // The delimiter is escaped as a decimal character code, and that code is greedy, so a digit directly after the
+  // delimiter must not be swallowed by the number
+  @Test
+  fun `test question mark followed by a digit does not break the backward search`() {
+    doTest(
+      "v3l#",
+      """
+        a?7b
+        ax7b
+        ${c}a?7b
+      """.trimIndent(),
+      """
+        ${c}a?7b
+        ax7b
+        a?7b
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `test slash followed by a digit does not break the forward search`() {
+    doTest(
+      "v3l*",
+      """
+        ${c}a/7b
+        ax7b
+        a/7b
+      """.trimIndent(),
+      """
+        a/7b
+        ax7b
+        ${c}a/7b
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
 }
