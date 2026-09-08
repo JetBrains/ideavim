@@ -11,9 +11,17 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimEditorReplaceMask
+import com.maddyhome.idea.vim.group.visual.VimBlockSelection
+import com.maddyhome.idea.vim.group.visual.VimSelection
+import com.maddyhome.idea.vim.group.visual.VimSimpleSelection
+import com.maddyhome.idea.vim.group.visual.VisualOperation
 import com.maddyhome.idea.vim.helper.VimLockLabel
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
+import com.maddyhome.idea.vim.state.mode.inBlockSelection
+import com.maddyhome.idea.vim.state.mode.inVisualMode
+import com.maddyhome.idea.vim.state.mode.selectionType
 
 /**
  * Every line in [VimEditor] ends with a new line TODO <- this is probably not true already
@@ -79,6 +87,58 @@ interface VimEditor {
    * of the document. For example, the search helpers call this function repeatedly.
    */
   fun text(): CharSequence
+
+  fun collectSelections(): Map<VimCaret, VimSelection>? {
+    return when {
+      !this.inVisualMode && injector.vimState.isDotRepeatInProgress -> {
+        if (this.vimLastSelectionType == SelectionType.BLOCK_WISE) {
+          val primaryCaret = primaryCaret()
+          val range = primaryCaret.vimLastVisualOperatorRange ?: return null
+          val end = VisualOperation.calculateRange(this, range, 1, primaryCaret)
+          mapOf(
+            primaryCaret to VimBlockSelection(
+              primaryCaret.offset,
+              end,
+              this,
+              range.columns >= VimMotionGroupBase.LAST_COLUMN,
+            ),
+          )
+        } else {
+          val carets = mutableMapOf<VimCaret, VimSelection>()
+          this.nativeCarets().forEach { caret ->
+            val range = caret.vimLastVisualOperatorRange ?: return@forEach
+            val end = VisualOperation.calculateRange(this, range, 1, caret)
+            carets += caret to VimSelection.create(caret.offset, end, range.type, this)
+          }
+          carets.toMap()
+        }
+      }
+
+      this.inBlockSelection -> {
+        val primaryCaret = primaryCaret()
+        mapOf(
+          primaryCaret to VimBlockSelection(
+            primaryCaret.vimSelectionStart,
+            primaryCaret.offset,
+            this,
+            primaryCaret.vimLastColumn >= VimMotionGroupBase.LAST_COLUMN,
+          ),
+        )
+      }
+
+      else -> this.nativeCarets().associateWith { caret ->
+        val mode = this.mode
+        VimSimpleSelection.createWithNative(
+          caret.vimSelectionStart,
+          caret.offset,
+          caret.selectionStart,
+          caret.selectionEnd,
+          mode.selectionType ?: CHARACTER_WISE,
+          this,
+        )
+      }
+    }
+  }
 
   /**
    * Vim has always at least one line. When we need to understand that there are no lines, it has a flag "ML_EMPTY"

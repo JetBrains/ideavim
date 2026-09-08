@@ -8,6 +8,7 @@
 package com.maddyhome.idea.vim.extension.visualstarsearch
 
 import com.intellij.vim.api.VimInitApi
+import com.jetbrains.rd.util.first
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getText
@@ -15,7 +16,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.Direction
-import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
@@ -52,15 +52,13 @@ internal class VisualStarSearchExtension : VimExtension {
   private class VisualStarSearchMappingHandler(val direction: Direction) : ExtensionHandler {
 
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      val selectionStart = editor.primaryCaret().selectionStart
-      val selectionEnd = editor.primaryCaret().selectionEnd
-      val textRange = TextRange(selectionStart, selectionEnd)
-      val pattern = editor.getText(textRange)
+      val selection = editor.collectSelections()?.first() ?: return
+      val pattern = editor.getText(selection.value.toVimTextRange())
       val position = injector.searchGroup.searchWord(
         makePattern(pattern),
         direction,
         editor,
-        textRange,
+        selection.value.toVimTextRange(),
         operatorArguments.count1
       )
       editor.exitVisualMode()

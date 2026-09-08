@@ -391,4 +391,192 @@ class VisualStarSearchTest : VimTestCase() {
       Mode.NORMAL(),
     )
   }
+
+  // ------------------------------------------------------------------- linewise selection (`V`)
+
+  // The plugin yanks the selection with `gvy`, so a linewise selection yields the whole line plus its trailing new
+  // line character. The pattern therefore only matches text that ends a line - the mid-line "foo" is skipped.
+  @Test
+  fun `test V searches for the whole line including the trailing new line`() {
+    doTest(
+      "V*",
+      """
+        ${c}foo
+        foo bar
+        foo
+        end
+      """.trimIndent(),
+      """
+        foo
+        foo bar
+        ${c}foo
+        end
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `test V includes the line indent in the pattern`() {
+    doTest(
+      "V*",
+      """
+        ${c}..foo
+        foo
+        ..foo
+        end
+      """.trimIndent().dotToSpace(),
+      """
+        ..foo
+        foo
+        ${c}..foo
+        end
+      """.trimIndent().dotToSpace(),
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `test V over two lines searches for both lines`() {
+    doTest(
+      "Vj*",
+      """
+        ${c}aa
+        bb
+        cc
+        aa
+        bb
+      """.trimIndent(),
+      """
+        aa
+        bb
+        cc
+        ${c}aa
+        bb
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `test hash searches backwards for the selected line`() {
+    doTest(
+      "V#",
+      """
+        foo
+        bar
+        ${c}foo
+        end
+      """.trimIndent(),
+      """
+        ${c}foo
+        bar
+        foo
+        end
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `test n repeats the linewise search`() {
+    doTest(
+      "V*n",
+      """
+        ${c}foo
+        x
+        foo
+        y
+        foo
+      """.trimIndent(),
+      """
+        foo
+        x
+        foo
+        y
+        ${c}foo
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
+
+  // The last line has no trailing new line character in the document, but Vim still matches it
+  @Test
+  fun `test V matches the last line of the file`() {
+    doTest(
+      "V*",
+      """
+        ${c}foo
+        bar
+        foo
+      """.trimIndent(),
+      """
+        foo
+        bar
+        ${c}foo
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `test V does not move the caret when the selected line is the only match`() {
+    doTest(
+      "V*",
+      """
+        ${c}foo
+        bar
+        baz
+      """.trimIndent(),
+      """
+        ${c}foo
+        bar
+        baz
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
+
+  // ------------------------------------------------------------------ blockwise selection (`<C-V>`)
+
+  @Test
+  fun `test blockwise selection of a single line behaves like a charwise selection`() {
+    doTest(
+      "l<C-V>ll*",
+      """
+        ${c}xfoo
+        yfoo
+        zfoo
+      """.trimIndent(),
+      """
+        xfoo
+        y${c}foo
+        zfoo
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
+
+  // `gvy` on a blockwise selection yields the block rows joined by new line characters, so the pattern matches where
+  // one line ends with the first row and the next line starts with the second row. Text outside the block (the "y" of
+  // "yar") is not part of the pattern.
+  @Test
+  fun `test blockwise selection joins the block rows with new lines`() {
+    doTest(
+      "l<C-V>jl*",
+      """
+        ${c}xoo
+        yar
+        zoo
+        arq
+      """.trimIndent(),
+      """
+        xoo
+        yar
+        z${c}oo
+        arq
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
 }

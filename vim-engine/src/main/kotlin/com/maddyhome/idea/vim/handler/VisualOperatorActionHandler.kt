@@ -12,23 +12,16 @@ import com.maddyhome.idea.vim.action.change.VimRepeater
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.group.visual.VimBlockSelection
 import com.maddyhome.idea.vim.group.visual.VimSelection
-import com.maddyhome.idea.vim.group.visual.VimSimpleSelection
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.VisualOperation
 import com.maddyhome.idea.vim.helper.exitVisualMode
-import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
-import com.maddyhome.idea.vim.state.mode.inBlockSelection
 import com.maddyhome.idea.vim.state.mode.inVisualMode
-import com.maddyhome.idea.vim.state.mode.selectionType
 
 /**
  * @author Alex Plate
@@ -172,58 +165,6 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
     }
 
     return res[0]
-  }
-
-  private fun VimEditor.collectSelections(): Map<VimCaret, VimSelection>? {
-    return when {
-      !this.inVisualMode && injector.vimState.isDotRepeatInProgress -> {
-        if (this.vimLastSelectionType == SelectionType.BLOCK_WISE) {
-          val primaryCaret = primaryCaret()
-          val range = primaryCaret.vimLastVisualOperatorRange ?: return null
-          val end = VisualOperation.calculateRange(this, range, 1, primaryCaret)
-          mapOf(
-            primaryCaret to VimBlockSelection(
-              primaryCaret.offset,
-              end,
-              this,
-              range.columns >= VimMotionGroupBase.LAST_COLUMN,
-            ),
-          )
-        } else {
-          val carets = mutableMapOf<VimCaret, VimSelection>()
-          this.nativeCarets().forEach { caret ->
-            val range = caret.vimLastVisualOperatorRange ?: return@forEach
-            val end = VisualOperation.calculateRange(this, range, 1, caret)
-            carets += caret to VimSelection.create(caret.offset, end, range.type, this)
-          }
-          carets.toMap()
-        }
-      }
-
-      this.inBlockSelection -> {
-        val primaryCaret = primaryCaret()
-        mapOf(
-          primaryCaret to VimBlockSelection(
-            primaryCaret.vimSelectionStart,
-            primaryCaret.offset,
-            this,
-            primaryCaret.vimLastColumn >= VimMotionGroupBase.LAST_COLUMN,
-          ),
-        )
-      }
-
-      else -> this.nativeCarets().associateWith { caret ->
-        val mode = this.mode
-        VimSimpleSelection.createWithNative(
-          caret.vimSelectionStart,
-          caret.offset,
-          caret.selectionStart,
-          caret.selectionEnd,
-          mode.selectionType ?: CHARACTER_WISE,
-          this,
-        )
-      }
-    }
   }
 
   private class VisualStartFinishWrapper(
