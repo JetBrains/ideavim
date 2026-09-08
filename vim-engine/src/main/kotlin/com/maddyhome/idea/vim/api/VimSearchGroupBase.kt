@@ -458,6 +458,16 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     val end = range.endOffset
     val pattern: String = if (whole) "\\<${editor.getText(start, end)}\\>" else editor.getText(start, end)
 
+    return searchWord(pattern, dir, editor, range, count)
+  }
+
+  override fun searchWord(
+    pattern: String,
+    dir: Direction,
+    editor: VimEditor,
+    range: TextRange,
+    count: Int,
+  ): Int {
     // Updates last pattern, ready for findItOffset
     // Direction is always saved
     // IgnoreSmartCase is always set to true
