@@ -755,4 +755,81 @@ class VisualStarSearchTest : VimTestCase() {
       Mode.NORMAL(),
     )
   }
+
+  // --------------------------------------------------------------------------------------------------- jump list
+
+  // The plugin searches with `/`, which is a jump command, so the position before the search is added to the jump
+  // list. Note that the saved position is the start of the selection - the plugin yanks with `gvy`, which leaves the
+  // caret there - and not the caret position inside the visual selection
+  @Test
+  fun `test star adds the position before the search to the jump list`() {
+    doTest(
+      "ve*<C-O>",
+      """
+        ${c}foo bar
+        foobar
+        foo
+      """.trimIndent(),
+      """
+        ${c}foo bar
+        foobar
+        foo
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `test hash adds the position before the search to the jump list`() {
+    doTest(
+      "ve#<C-O>",
+      """
+        foo
+        bar
+        ${c}foo
+      """.trimIndent(),
+      """
+        foo
+        bar
+        ${c}foo
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `test jump back and forward returns to the search result`() {
+    doTest(
+      "ve*<C-O><C-I>",
+      """
+        ${c}foo bar
+        foobar
+        foo
+      """.trimIndent(),
+      """
+        foo bar
+        ${c}foobar
+        foo
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `test star sets the previous context mark`() {
+    doTest(
+      "ve*''",
+      """
+        ${c}foo bar
+        foobar
+        foo
+      """.trimIndent(),
+      """
+        ${c}foo bar
+        foobar
+        foo
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
 }
