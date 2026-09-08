@@ -8,7 +8,7 @@
 package com.maddyhome.idea.vim.extension.visualstarsearch
 
 import com.intellij.vim.api.VimInitApi
-import com.jetbrains.rd.util.first
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getText
@@ -44,13 +44,25 @@ internal class VisualStarSearchExtension : VimExtension {
   private class VisualStarSearchMappingHandler(val direction: Direction) : ExtensionHandler {
 
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      val selection = editor.collectSelections()?.first() ?: return
-      val pattern = editor.getText(selection.value.toVimTextRange())
-      val offsetAndMotion = injector.searchGroup.processSearchCommand(
-        editor, makePattern(pattern), selection.value.vimStart, operatorArguments.count1, direction
-      )
+      val selection = editor.collectSelections()?.get(editor.primaryCaret()) ?: return
+      val range = selection.toVimTextRange()
+      val pattern = makePattern(editor.getText(range))
+
       editor.exitVisualMode()
-      if (offsetAndMotion == null) return
+      editor.primaryCaret().moveToOffset(range.startOffset)
+      injector.jumpService.saveJumpLocation(editor)
+
+      KeyHandler.getInstance().reset(editor)
+
+      val offsetAndMotion =
+        injector.searchGroup.processSearchCommand(
+          editor,
+          pattern,
+          range.startOffset,
+          operatorArguments.count1,
+          direction
+        )
+          ?: return
       editor.primaryCaret().moveToOffset(offsetAndMotion.first)
     }
 
