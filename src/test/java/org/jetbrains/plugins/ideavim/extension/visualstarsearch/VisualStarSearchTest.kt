@@ -9,6 +9,8 @@
 package org.jetbrains.plugins.ideavim.extension.visualstarsearch
 
 import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -828,6 +830,196 @@ class VisualStarSearchTest : VimTestCase() {
         ${c}foo bar
         foobar
         foo
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
+
+  // ----------------------------------------------------------------------------------------------------------- gv
+
+  // The plugin leaves visual mode with `:<C-u>`, which keeps the `'<` and `'>` marks, so `gv` reselects the text that
+  // was searched for, with the caret back at the end of the selection
+  @Test
+  fun `test gv reselects the selection after star`() {
+    doTest(
+      "ve*gv",
+      """
+        ${c}foo bar
+        foobar
+        foo
+      """.trimIndent(),
+      """
+        ${s}fo${c}o${se} bar
+        foobar
+        foo
+      """.trimIndent(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test gv reselects the lines after a linewise star`() {
+    doTest(
+      "V*gv",
+      """
+        ${c}foo
+        x
+        foo
+        y
+      """.trimIndent(),
+      """
+        ${s}${c}foo
+        ${se}x
+        foo
+        y
+      """.trimIndent(),
+      Mode.VISUAL(SelectionType.LINE_WISE),
+    )
+  }
+
+  @Test
+  fun `test gv reselects the block after a blockwise star`() {
+    doTest(
+      "l<C-V>ll*gv",
+      """
+        ${c}xfoo
+        yfoo
+        zfoo
+      """.trimIndent(),
+      """
+        x${s}fo${c}o${se}
+        yfoo
+        zfoo
+      """.trimIndent(),
+      Mode.VISUAL(SelectionType.BLOCK_WISE),
+    )
+  }
+
+  @Test
+  fun `test gv can operate on the original selection after star`() {
+    doTest(
+      "ve*gvd",
+      """
+        ${c}foo bar
+        foobar
+        foo
+      """.trimIndent(),
+      """
+        ${c} bar
+        foobar
+        foo
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `test gv can operate on the original lines after a linewise star`() {
+    doTest(
+      "V*gvd",
+      """
+        ${c}foo
+        x
+        foo
+        y
+      """.trimIndent(),
+      """
+        ${c}x
+        foo
+        y
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
+
+  // -------------------------------------------------------------------------------------------------------- count
+
+  @VimBehaviorDiffers(
+    originalVimAfter = """
+        foo
+        ${c}foo
+        foo
+        foo
+        foo
+    """,
+    shouldBeFixed = false,
+    description = "The plugin maps `*` to a command line starting with `:<C-u>`, which wipes out the count, so Vim " +
+      "loses a count typed before `*`. IdeaVim implements the mapping natively and applies the count, for " +
+      "consistency with the built-in `*` and with `n`.",
+  )
+  @Test
+  fun `test count before star finds the nth occurrence`() {
+    doTest(
+      "ve3*",
+      """
+        ${c}foo
+        foo
+        foo
+        foo
+        foo
+      """.trimIndent(),
+      """
+        foo
+        foo
+        foo
+        ${c}foo
+        foo
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
+
+  @VimBehaviorDiffers(
+    originalVimAfter = """
+        foo
+        foo
+        foo
+        ${c}foo
+        foo
+    """,
+    shouldBeFixed = false,
+    description = "See `test count before star finds the nth occurrence`",
+  )
+  @Test
+  fun `test count before hash finds the nth previous occurrence`() {
+    doTest(
+      "ve2#",
+      """
+        foo
+        foo
+        foo
+        foo
+        ${c}foo
+      """.trimIndent(),
+      """
+        foo
+        foo
+        ${c}foo
+        foo
+        foo
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
+
+  // The count is not lost for `n`, which is an ordinary search repeat
+  @Test
+  fun `test count applies to n after the search`() {
+    doTest(
+      "ve*3n",
+      """
+        ${c}foo
+        foo
+        foo
+        foo
+        foo
+      """.trimIndent(),
+      """
+        foo
+        foo
+        foo
+        foo
+        ${c}foo
       """.trimIndent(),
       Mode.NORMAL(),
     )
