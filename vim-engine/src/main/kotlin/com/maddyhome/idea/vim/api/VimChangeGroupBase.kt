@@ -95,6 +95,13 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   @JvmField
   protected var processingEscape = false
 
+  @JvmField
+  protected var didAutoIndent: Boolean = false
+
+  override fun setDidAutoIndent(autoIndent: Boolean) {
+    didAutoIndent = autoIndent
+  }
+
   override fun setInsertRepeat(lines: Int, column: Int, append: Boolean) {
     repeatLines = lines
     repeatColumn = column
@@ -741,12 +748,60 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       if (editor.mode is Mode.INSERT) {
         updateLastInsertedTextRegister()
       }
+      if (didAutoIndent) {
+        removeAutoIndent(editor)
+      }
 
       // The change pos '.' mark is the offset AFTER processing escape, and after switching to overtype
       markGroup.setMark(editor, MARK_CHANGE_POS)
       editor.mode = Mode.NORMAL()
+      didAutoIndent = false
     }
   }
+
+  /**
+   * Removes the indent that was inserted automatically for `cc`, `S`, `o`, `O` or Enter in Insert mode.
+   *
+   * Vim remembers such an indent in `did_ai` and, when Insert mode is left without anything being typed, deletes the
+   * white space at the end of the line again, leaving the line completely empty. Typing a character clears the flag, so
+   * white space typed by the user is never touched. See `stop_insert()` in Vim's edit.c and `:help 'autoindent'`.
+   *
+   * Like Vim, this only applies when the insert ended at the end of the line. `i<CR><Esc>` in the middle of a line keeps
+   * the indent of the new line, because the text after the caret is not white space.
+   */
+  private fun removeAutoIndent(editor: VimEditor) {
+    val ranges = injector.application.runReadAction {
+      val text = editor.text()
+      editor.nativeCarets().mapNotNull { caret -> getAutoIndentRange(editor, text, caret.offset) }
+    }
+    if (ranges.isEmpty()) return
+    injector.application.runWriteAction {
+      // Delete from the end of the document, so that the offsets of the remaining ranges stay valid
+      ranges.distinct().sortedByDescending { it.startOffset }.forEach { editor.deleteString(it) }
+    }
+  }
+
+  /**
+   * The white space to delete for a caret that is leaving Insert mode, or null if there is nothing to delete.
+   *
+   * Vim looks at the character the insert ended on, stepping back one if that is the end of the line, and then deletes
+   * white space until it hits something else. This means the run of white space around that character is removed, and
+   * that a non-blank character at the insert position stops the whole thing.
+   */
+  private fun getAutoIndentRange(editor: VimEditor, text: CharSequence, offset: Int): TextRange? {
+    val lineStart = editor.getLineStartForOffset(offset)
+    val lineEnd = editor.getLineEndForOffset(offset)
+    var position = offset.coerceAtMost(lineEnd)
+    if (position == lineEnd) position--
+    if (position < lineStart || !isWhiteSpace(text[position])) return null
+    var start = position
+    while (start > lineStart && isWhiteSpace(text[start - 1])) start--
+    var end = position + 1
+    while (end < lineEnd && isWhiteSpace(text[end])) end++
+    return TextRange(start, end)
+  }
+
+  private fun isWhiteSpace(char: Char) = char == ' ' || char == '\t'
 
   // processing escape might be entered from multiple places at once but we don't wont to repeat it.
   // For example, it might be called from standard esc processing and
@@ -797,6 +852,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       editor.insertMode = false
       editor.replaceMask?.recordLineBreakAtCaret()
     }
+    didAutoIndent = true
   }
 
   /**
@@ -933,6 +989,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       editor.replaceMask?.recordTypedCharacterAtCaret()
       processResultBuilder.addExecutionStep { _, e, c ->
         type(e, c, key.keyChar)
+        didAutoIndent = false
       }
       return true
     } else if (key.keyCode == injector.parser.plugKeyStroke.keyCode || key.keyCode == injector.parser.actionKeyStroke.keyCode) {
@@ -940,6 +997,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       // Insert or Select mode, we need to replace it with the name of the key as text.
       processResultBuilder.addExecutionStep { _, e, c ->
         type(e, c, injector.parser.toKeyNotation(key))
+        didAutoIndent = false
       }
       return true
     }
@@ -949,6 +1007,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       editor.replaceMask?.recordTypedCharacterAtCaret()
       processResultBuilder.addExecutionStep { _, e, c ->
         type(e, c, ' ')
+        didAutoIndent = false
       }
       return true
     }
@@ -1547,8 +1606,10 @@ abstract class VimChangeGroupBase : VimChangeGroup {
           insertBeforeCaret(editor, context)
         } else if (after && !editor.endsWithNewLine()) {
           insertNewLineBelow(editor, updatedCaret, lp.column)
+          didAutoIndent = true
         } else {
           insertNewLineAbove(editor, updatedCaret, lp.column)
+          didAutoIndent = true
         }
       } else {
         if (type === SelectionType.BLOCK_WISE) {

@@ -186,4 +186,123 @@ class ChangeLineActionTest : VimTestCase() {
       Mode.INSERT,
     )
   }
+
+  // The indent kept by `cc`/`S` is auto-indent (Vim's `did_ai`). If nothing is typed before leaving Insert mode, Vim
+  // deletes it again, leaving a completely empty line. See `:help 'autoindent'` and `stop_insert()` in Vim's edit.c
+  @Test
+  fun `test auto indent is removed when nothing is typed`() {
+    doTest(
+      "cc<Esc>",
+      """
+            fun main() {
+                ${c}println("hi")
+            }
+      """.trimIndent(),
+      """
+            fun main() {
+            $c
+            }
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun `test auto indent is removed when nothing is typed with S`() {
+    doTest(
+      "S<Esc>",
+      """
+            fun main() {
+                ${c}println("hi")
+            }
+      """.trimIndent(),
+      """
+            fun main() {
+            $c
+            }
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun `test auto indent is removed when nothing is typed with count`() {
+    doTest(
+      "2cc<Esc>",
+      """
+            fun main() {
+                ${c}println("hi")
+                println("there")
+            }
+      """.trimIndent(),
+      """
+            fun main() {
+            $c
+            }
+      """.trimIndent(),
+    )
+  }
+
+  // Typing a character clears `did_ai`, so whitespace typed by the user is kept as-is
+  @Test
+  fun `test trailing whitespace typed by user is not removed`() {
+    doTest(
+      "ccfoo   <Esc>",
+      """
+            fun main() {
+                ${c}println("hi")
+            }
+      """.trimIndent(),
+      """
+            fun main() {
+            ....foo..${c}.
+            }
+      """.trimIndent().dotToSpace(),
+    )
+  }
+
+  // `did_ai` is cleared by typing, not by the resulting text: erasing the typed text again does not bring back the
+  // auto-indent removal
+  @Test
+  fun `test auto indent is not removed when typed text is deleted again`() {
+    doTest(
+      "ccfoo<BS><BS><BS><Esc>",
+      """
+            fun main() {
+                ${c}println("hi")
+            }
+      """.trimIndent(),
+      """
+            fun main() {
+            ...${c}.
+            }
+      """.trimIndent().dotToSpace(),
+    )
+  }
+
+  // Removing the auto-indent is part of the change, not a separate edit: a single undo restores the original line
+  @Test
+  fun `test undo after cc and immediate escape`() {
+    configureByText(
+      """
+            fun main() {
+                ${c}println("hi")
+            }
+      """.trimIndent(),
+    )
+    typeText("cc<Esc>")
+    assertState(
+      """
+            fun main() {
+            $c
+            }
+      """.trimIndent(),
+    )
+    typeText("u")
+    assertState(
+      """
+            fun main() {
+                ${c}println("hi")
+            }
+      """.trimIndent(),
+    )
+  }
 }
