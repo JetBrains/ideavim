@@ -110,6 +110,11 @@ object Options {
    */
 
   // Simple options, sorted by name
+
+  // Default differs from Vim (which uses off), and matches Neovim. IdeaVim has always kept the indent of the changed
+  // line for `cc` and `S`, and indented the new line for `o`, `O` and Enter in Insert mode, so 'autoindent' on keeps
+  // the existing behaviour
+  val autoindent: ToggleOption = addOption(ToggleOption("autoindent", LOCAL_TO_BUFFER, "ai", true))
   val comments: StringListOption = addOption(
     StringListOption(
       "comments",

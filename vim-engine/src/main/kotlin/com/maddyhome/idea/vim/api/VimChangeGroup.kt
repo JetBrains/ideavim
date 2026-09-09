@@ -23,8 +23,6 @@ import javax.swing.KeyStroke
 interface VimChangeGroup {
   fun setInsertRepeat(lines: Int, column: Int, append: Boolean)
 
-  fun setDidAutoIndent(autoIndent: Boolean)
-
   fun insertBeforeCaret(editor: VimEditor, context: ExecutionContext)
 
   fun insertBeforeFirstNonBlank(editor: VimEditor, context: ExecutionContext)
