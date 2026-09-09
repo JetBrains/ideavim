@@ -18,6 +18,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.ChangesListener
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.common.VimEditorReplaceMask
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ranges.LineRange
@@ -647,6 +648,17 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       injector.vimState.ctrlXCompletionMode = CtrlXCompletionMode.NONE
       editor.mode = mode
     }
+  }
+
+  /**
+   * Begin Replace mode
+   *
+   * @param editor  The editor to replace in
+   * @param context The data context
+   */
+  override fun changeReplace(editor: VimEditor, context: ExecutionContext) {
+    initInsert(editor, context, Mode.REPLACE)
+    editor.replaceMask = VimEditorReplaceMask(editor)
   }
 
   override fun runEnterAction(editor: VimEditor, context: ExecutionContext) {
