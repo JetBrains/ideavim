@@ -74,6 +74,7 @@ open class GlobalOptions(scope: OptionAccessScope) : OptionsPropertiesBase(scope
  */
 @Suppress("unused")
 open class EffectiveOptions(scope: OptionAccessScope.EFFECTIVE) : GlobalOptions(scope) {
+  var autoindent: Boolean by optionProperty(Options.autoindent)
   val iskeyword: StringListOptionValue by optionProperty(Options.iskeyword)
   val matchpairs: StringListOptionValue by optionProperty(Options.matchpairs)
   val nrformats: StringListOptionValue by optionProperty(Options.nrformats)

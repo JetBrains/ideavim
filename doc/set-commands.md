@@ -8,6 +8,11 @@ Every effort is made to make these options compatible with Vim behaviour.
 However, some differences are inevitable.
 
 ```
+'autoindent'    'ai'    Copy indent from current line when starting a new line
+        Unlike Vim, this option is on by default, which matches Neovim. With
+        the option on, the indent is removed again if you leave Insert mode
+        without typing anything.
+
 'clipboard'     'cb'    Defines clipboard behavior
         A comma-separated list of words to control clipboard behaviour:
            unnamed      The clipboard register '*' is used instead of the
