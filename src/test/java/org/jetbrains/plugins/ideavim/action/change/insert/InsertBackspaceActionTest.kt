@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
+import com.intellij.ide.highlighter.HtmlFileType
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -198,6 +199,41 @@ class InsertBackspaceActionTest : VimTestCase() {
       "${c}grzyb",
       "mu${c}shb",
       Mode.REPLACE,
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NEOVIM_RPC_SPECIAL_KEYS_INSERT_MODE)
+  @Test
+  fun `test backspace inside html tag updates second one also`() {
+    doTest(
+      listOf("i", "<BS>"),
+      "<tag${c}></tag>",
+      "<ta${c}></ta>",
+      Mode.INSERT,
+      HtmlFileType.INSTANCE,
+
+      )
+  }
+
+  @Test
+  fun `test insert inside html tag updates second one also`() {
+    doTest(
+      listOf("i", "s"),
+      "<tag${c}></tag>",
+      "<tags${c}></tags>",
+      Mode.INSERT,
+      HtmlFileType.INSTANCE,
+    )
+  }
+
+  @Test
+  fun `test replace inside html tag updates second one also`() {
+    doTest(
+      listOf("r", "s"),
+      "<ta${c}g></tag>",
+      "<ta${c}s></tas>",
+      Mode.NORMAL(),
+      HtmlFileType.INSTANCE,
     )
   }
 }

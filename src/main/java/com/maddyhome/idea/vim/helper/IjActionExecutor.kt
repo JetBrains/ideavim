@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.newapi.IjNativeAction
+import com.maddyhome.idea.vim.newapi.IjVimDocument
 import com.maddyhome.idea.vim.newapi.ij
 import org.jetbrains.annotations.NonNls
 import java.awt.Component
@@ -136,8 +137,7 @@ class IjActionExecutor : VimActionExecutor {
       }
 
       fun AnAction.getId(): String? {
-        return actionManager.getId(this)
-          ?: (shortcutSet as? ProxyShortcutSet)?.actionId
+        return actionManager.getId(this) ?: (shortcutSet as? ProxyShortcutSet)?.actionId
       }
 
       for (action in listOfActions) {
@@ -156,7 +156,8 @@ class IjActionExecutor : VimActionExecutor {
     name: @NlsContexts.Command String?,
     groupId: Any?,
   ) {
-    CommandProcessor.getInstance().executeCommand(editor?.ij?.project, runnable, name, groupId)
+    CommandProcessor.getInstance()
+      .executeCommand(editor?.ij?.project, runnable, name, groupId, (editor?.document as IjVimDocument).document)
   }
 
   override fun executeEsc(editor: VimEditor, context: ExecutionContext): Boolean {
@@ -175,8 +176,7 @@ class IjActionExecutor : VimActionExecutor {
       cmd.execute(editor, context, operatorArguments)
       return
     }
-    CommandProcessor.getInstance()
-      .executeCommand(
+    CommandProcessor.getInstance().executeCommand(
         editor.ij.project,
         { cmd.execute(editor, context, operatorArguments) },
         cmd.id,
