@@ -115,6 +115,7 @@
   "sor[t]": "com.maddyhome.idea.vim.vimscript.model.commands.SortCommand",
   "sp[lit]": "com.maddyhome.idea.vim.vimscript.model.commands.SplitCommand",
   "star[tinsert]": "com.maddyhome.idea.vim.vimscript.model.commands.StartInsertCommand",
+  "startr[eplace]": "com.maddyhome.idea.vim.vimscript.model.commands.StartReplaceCommand",
   "stopi[nsert]": "com.maddyhome.idea.vim.vimscript.model.commands.StopInsertCommand",
   "sunm[ap]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.UnMapCommand",
   "t": "com.maddyhome.idea.vim.vimscript.model.commands.CopyTextCommand",

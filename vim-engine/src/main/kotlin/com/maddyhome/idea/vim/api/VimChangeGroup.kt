@@ -43,6 +43,11 @@ interface VimChangeGroup {
   fun initInsert(editor: VimEditor, context: ExecutionContext, mode: Mode)
 
   /**
+   * Enter Replace mode, setting up the replace mask so that `<BS>` can restore the overwritten characters.
+   */
+  fun changeReplace(editor: VimEditor, context: ExecutionContext)
+
+  /**
    * Enter Insert mode for block selection.
    *
    * Given a [TextRange] representing a block selection, position the primary caret either at the start column of the
