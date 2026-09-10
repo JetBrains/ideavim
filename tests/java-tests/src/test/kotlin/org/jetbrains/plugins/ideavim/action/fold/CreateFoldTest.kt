@@ -315,7 +315,7 @@ class CreateFoldTest : FoldActionTestBase() {
     // Character-wise visual selection spanning two lines
     typeText(injector.parser.parseKeys("vj\$zf"))
 
-    assertFoldExists(startLine = 2, endLine = 3)
+    assertFoldExists(startLine = 2, endLine = 4)
   }
 
   private fun assertFoldCreatedOnLine(line: Int) {

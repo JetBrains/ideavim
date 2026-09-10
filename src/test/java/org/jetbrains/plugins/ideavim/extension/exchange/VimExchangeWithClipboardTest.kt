@@ -195,15 +195,16 @@ class VimExchangeWithClipboardTest : VimTestCase() {
   fun `test exchange to the line end`() {
     doTest(
       listOf("v$", "X", "jj^ve", "X"),
-      """The quick
-         brown ${c}fox
-         catch over
-         the lazy dog
+      """
+        The quick
+        brown ${c}fox
+        catch over
+        the lazy dog
       """.trimIndent(),
-      """The quick
-         brown the
-         catch over
-         fox lazy dog
+      """
+        The quick
+        brown thecatch over
+        fox lazy dog
       """.trimIndent(),
       Mode.NORMAL(),
     ) {

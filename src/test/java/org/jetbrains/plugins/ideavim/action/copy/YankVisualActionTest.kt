@@ -40,7 +40,6 @@ class YankVisualActionTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers("\n")
   @Test
   fun `test yank empty line`() {
     doTest(
@@ -53,12 +52,11 @@ class YankVisualActionTest : VimTestCase() {
                             where it was settled on some sodden sand
                             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      "",
+      "\n",
       SelectionType.CHARACTER_WISE,
     )
   }
 
-  @VimBehaviorDiffers("land\n")
   @Test
   fun `test yank to the end`() {
     doTest(
@@ -71,7 +69,7 @@ class YankVisualActionTest : VimTestCase() {
                             where it was settled on some sodden sand
                             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      "land",
+      "land\n",
       SelectionType.CHARACTER_WISE,
     )
   }
