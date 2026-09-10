@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.thinapi.editor.caret
 
 import com.intellij.vim.api.VimApi
+import com.intellij.vim.api.models.Line
 import com.intellij.vim.api.models.Range
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
@@ -1624,5 +1625,244 @@ class CaretTransactionTest : VimTestCase() {
     // The block replaces the character at position 5
     val actualText = fixture.editor.document.text
     assertTrue(actualText.contains("X"), "Expected text to contain X after block replacement")
+  }
+
+  // ==================== replaceText across lines Tests ====================
+
+  /**
+   * `determineSelectionType` used to classify every range spanning more than one line as
+   * line-wise, so `replaceText` expanded the range to whole lines and silently discarded the
+   * text before [startOffset] on the first line and after [endOffset] on the last one.
+   */
+  @Test
+  fun `test replaceText across lines keeps the text outside the range`() {
+    val text = "one two three\nfour five six\nseven eight"
+    configureByText(text)
+
+    executeAction {
+      myVimApi.editor {
+        change {
+          withPrimaryCaret {
+            // Offsets 8..18 cover "three\nfour" - from the middle of line 0 to the middle of line 1
+            replaceText(8, 18, "XXX")
+          }
+        }
+      }
+    }
+
+    assertEquals("one two XXX five six\nseven eight", fixture.editor.document.text)
+  }
+
+  @Test
+  fun `test replaceText from mid line to end of next line keeps the line prefix`() {
+    val text = "one two three\nfour five six\nseven eight"
+    configureByText(text)
+
+    executeAction {
+      myVimApi.editor {
+        change {
+          withPrimaryCaret {
+            // Offsets 8..27 cover "three\nfour five six" - ends flush with line 1
+            replaceText(8, 27, "XXX")
+          }
+        }
+      }
+    }
+
+    assertEquals("one two XXX\nseven eight", fixture.editor.document.text)
+  }
+
+  /**
+   * A range that covers whole lines stays line-wise, which is what `ReplaceWithRegister`'s
+   * `2grr` relies on.
+   */
+  @Test
+  fun `test replaceText over whole lines replaces them line-wise`() {
+    val text = "one two three\nfour five six\nseven eight"
+    configureByText(text)
+
+    executeAction {
+      myVimApi.editor {
+        change {
+          withPrimaryCaret {
+            // Offsets 0..27 cover lines 0 and 1 completely
+            replaceText(0, 27, "XXX")
+          }
+        }
+      }
+    }
+
+    assertEquals("XXX\nseven eight", fixture.editor.document.text)
+  }
+
+  @Test
+  fun `test replaceText over whole lines ending at next line start replaces them line-wise`() {
+    val text = "one two three\nfour five six\nseven eight"
+    configureByText(text)
+
+    executeAction {
+      myVimApi.editor {
+        change {
+          withPrimaryCaret {
+            // Offsets 0..28 cover lines 0 and 1 including the trailing line break
+            replaceText(0, 28, "XXX")
+          }
+        }
+      }
+    }
+
+    assertEquals("XXX\nseven eight", fixture.editor.document.text)
+  }
+
+  // ==================== EditorAccessor line offsets Tests ====================
+
+  /**
+   * `CaretTransactionImpl` used to override `getLineEndOffset` and drop the `allowEnd` argument,
+   * so it always behaved as `allowEnd = true`. With `allowEnd = false` the offset of the line
+   * break must not be returned - the last character of the line is the maximum.
+   */
+  @Test
+  fun `test getLineEndOffset with allowEnd false excludes the line break`() {
+    val text = """
+            ${c}one two three
+            four five six
+    """.trimIndent()
+    configureByText(text)
+
+    var lineEnd = -1
+    executeAction {
+      myVimApi.editor {
+        change {
+          withPrimaryCaret {
+            lineEnd = getLineEndOffset(0, allowEnd = false)
+          }
+        }
+      }
+    }
+
+    // "one two three" occupies offsets 0..12, offset 13 is the line break
+    assertEquals(12, lineEnd)
+  }
+
+  @Test
+  fun `test getLineEndOffset with allowEnd true includes the line break offset`() {
+    val text = """
+            ${c}one two three
+            four five six
+    """.trimIndent()
+    configureByText(text)
+
+    var lineEnd = -1
+    executeAction {
+      myVimApi.editor {
+        change {
+          withPrimaryCaret {
+            lineEnd = getLineEndOffset(0, allowEnd = true)
+          }
+        }
+      }
+    }
+
+    assertEquals(13, lineEnd)
+  }
+
+  /**
+   * An empty line has no characters to step back onto, so both values must be the line start.
+   */
+  @Test
+  fun `test getLineEndOffset on empty line is not affected by allowEnd`() {
+    val text = "one\n\ntwo"
+    configureByText(text)
+
+    var allowed = -1
+    var notAllowed = -1
+    executeAction {
+      myVimApi.editor {
+        change {
+          withPrimaryCaret {
+            allowed = getLineEndOffset(1, allowEnd = true)
+            notAllowed = getLineEndOffset(1, allowEnd = false)
+          }
+        }
+      }
+    }
+
+    assertEquals(4, allowed)
+    assertEquals(4, notAllowed)
+  }
+
+  /**
+   * The same [com.intellij.vim.api.scopes.editor.EditorAccessor] functions are available in the
+   * transaction scope and in the per-caret scope nested inside it. They must not disagree.
+   */
+  @Test
+  fun `test getLineEndOffset is consistent between transaction and caret scopes`() {
+    val text = """
+            ${c}one two three
+            four five six
+    """.trimIndent()
+    configureByText(text)
+
+    var fromTransaction = -1
+    var fromCaret = -1
+    executeAction {
+      myVimApi.editor {
+        change {
+          fromTransaction = getLineEndOffset(0, allowEnd = false)
+          withPrimaryCaret {
+            fromCaret = getLineEndOffset(0, allowEnd = false)
+          }
+        }
+      }
+    }
+
+    assertEquals(fromTransaction, fromCaret)
+  }
+
+  @Test
+  fun `test getLineStartOffset returns the offset of the first character of the line`() {
+    val text = """
+            ${c}one two three
+            four five six
+    """.trimIndent()
+    configureByText(text)
+
+    var firstLineStart = -1
+    var secondLineStart = -1
+    executeAction {
+      myVimApi.editor {
+        change {
+          withPrimaryCaret {
+            firstLineStart = getLineStartOffset(0)
+            secondLineStart = getLineStartOffset(1)
+          }
+        }
+      }
+    }
+
+    assertEquals(0, firstLineStart)
+    assertEquals(14, secondLineStart)
+  }
+
+  @Test
+  fun `test getLine returns the line containing the offset`() {
+    val text = """
+            ${c}one two three
+            four five six
+    """.trimIndent()
+    configureByText(text)
+
+    var line: Line? = null
+    executeAction {
+      myVimApi.editor {
+        change {
+          withPrimaryCaret {
+            line = getLine(16)
+          }
+        }
+      }
+    }
+
+    assertEquals(Line(number = 1, text = "four five six", start = 14, end = 27), line)
   }
 }
