@@ -710,6 +710,11 @@
     "modes": "N"
   },
   {
+    "keys": "<C-W>q",
+    "class": "com.maddyhome.idea.vim.action.window.CloseWindowAction",
+    "modes": "N"
+  },
+  {
     "keys": "<C-W>s",
     "class": "com.maddyhome.idea.vim.action.window.HorizontalSplitAction",
     "modes": "N"

@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 /**
  * @author rasendubi
  */
-@CommandOrMotion(keys = ["<C-W>c"], modes = [Mode.NORMAL])
+@CommandOrMotion(keys = ["<C-W>c", "<C-W>q"], modes = [Mode.NORMAL])
 class CloseWindowAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
