@@ -19,6 +19,7 @@ import java.io.IOException
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
+import kotlin.io.path.createDirectories
 import kotlin.io.path.createFile
 import kotlin.io.path.exists
 import kotlin.io.path.writeText
@@ -76,6 +77,26 @@ object VimRcService {
       }
     }
 
+    val configuredFile = injector.vimrcPathService.resolveVimrcPath()
+    if (configuredFile != null) {
+      if (configuredFile.exists()) {
+        logger.debug { "Found ideavimrc file: $configuredFile" }
+        return configuredFile
+      }
+      logger.info("Configured ideavimrc file does not exist, falling back to the default locations: $configuredFile")
+    }
+
+    return findDefaultIdeaVimRc(homeVimrcPaths, xdgVimrcPath)
+  }
+
+  /**
+   * Searches only the default locations (`~/.ideavimrc`, `~/_ideavimrc`, `$XDG_CONFIG_HOME/ideavim/ideavimrc`),
+   * ignoring the `IDEA_VIM_CUSTOM_VIMRC` environment variable and the path configured in the settings.
+   */
+  @JvmStatic
+  fun findDefaultIdeaVimRc(): Path? = findDefaultIdeaVimRc(HOME_VIMRC_PATHS, XDG_VIMRC_PATH)
+
+  private fun findDefaultIdeaVimRc(homeVimrcPaths: Array<String>, xdgVimrcPath: String): Path? {
     // Check whether file exists in home dir
     val homeDirName = System.getProperty("user.home")
     if (homeDirName != null) {
@@ -101,7 +122,15 @@ object VimRcService {
   }
 
   /**
-   * The base XDG config directory: `$XDG_CONFIG_HOME` if set (with a leading `~` expanded), otherwise `~/.config`.
+   * The location of the ideavimrc file in the form shown to the user in notifications and actions: the path configured
+   * in the settings when there is one, otherwise `~/.ideavimrc`.
+   */
+  @JvmStatic
+  fun ideaVimRcDisplayName(): String = injector.vimrcPathService.vimrcPath.ifEmpty { "~/.$VIMRC_FILE_NAME" }
+
+  /**
+   * The base XDG config directory: `$XDG_CONFIG_HOME` if set (with `~` and environment variables expanded),
+   * otherwise `~/.config`.
    * IdeaVim's own config lives under `<this>/ideavim/` — e.g. the ideavimrc (`ideavim/ideavimrc`) and keymap files
    * (`ideavim/keymap/<name>.vim`). Returns null if the home directory can't be resolved.
    */
@@ -116,12 +145,7 @@ object VimRcService {
     return if (xdgConfigHomeProperty.isNullOrEmpty()) {
       if (homeDirName != null) Path(homeDirName, ".config") else null
     } else {
-      val configHome = if (xdgConfigHomeProperty.startsWith("~/") || xdgConfigHomeProperty.startsWith("~\\")) {
-        homeDirName + xdgConfigHomeProperty.substring(1)
-      } else {
-        xdgConfigHomeProperty
-      }
-      Path(configHome)
+      Path(injector.pathExpansion.expandPath(xdgConfigHomeProperty))
     }
   }
 
@@ -163,29 +187,46 @@ object VimRcService {
 
   """.trimMargin()
 
+  /**
+   * Returns the ideavimrc file, creating it from a template when it does not exist yet. A new file is created at the
+   * path configured in the settings, or as `~/.ideavimrc` (falling back to `~/_ideavimrc`) when no path is configured.
+   */
   fun findOrCreateIdeaVimRc(): Path? {
     val found = findIdeaVimRc()
     if (found != null) return found
 
     val homeDirName = System.getProperty("user.home")
     val vimrc = sourceVimrc(homeDirName)
+
+    val configuredFile = injector.vimrcPathService.resolveVimrcPath()
+    if (configuredFile != null) {
+      return createIdeaVimRc(configuredFile, vimrc)
+    }
+
     if (homeDirName != null) {
       for (fileName in HOME_VIMRC_PATHS) {
-        try {
-          val file = Path(homeDirName, fileName)
-          file.createFile()
-          file.writeText(getNewIdeaVimRcTemplate(vimrc))
-          injector.vimrcFileState.filePath = file.absolutePathString()
-          return file
-        } catch (ignored: IOException) {
-          // Try to create one of two files
-        }
+        // Try to create one of two files
+        createIdeaVimRc(Path(homeDirName, fileName), vimrc)?.let { return it }
       }
     }
     return null
   }
 
-  private fun sourceVimrc(homeDirName: String): String {
+  private fun createIdeaVimRc(file: Path, vimrc: String): Path? {
+    return try {
+      file.parent?.createDirectories()
+      file.createFile()
+      file.writeText(getNewIdeaVimRcTemplate(vimrc))
+      injector.vimrcFileState.filePath = file.absolutePathString()
+      file
+    } catch (e: IOException) {
+      logger.info("Cannot create ideavimrc file $file: ${e.message}")
+      null
+    }
+  }
+
+  private fun sourceVimrc(homeDirName: String?): String {
+    if (homeDirName == null) return ""
     if (Path(homeDirName, ".vimrc").exists()) {
       return """
         |" Source your .vimrc

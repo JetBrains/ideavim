@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.thinapi.VimPluginService
 import com.maddyhome.idea.vim.undo.LineChange
 import com.maddyhome.idea.vim.undo.VimUndoRedo
 import com.maddyhome.idea.vim.vimscript.services.VariableService
+import com.maddyhome.idea.vim.vimscript.services.VimrcPathService
 import com.maddyhome.idea.vim.yank.VimYankGroup
 import org.jetbrains.annotations.ApiStatus
 
@@ -145,6 +146,8 @@ interface VimInjector {
   val vimscriptParser: VimscriptParser
 
   val variableService: VariableService
+
+  val vimrcPathService: VimrcPathService
 
   val modalInput: VimModalInputService
   val commandLine: VimCommandLineService

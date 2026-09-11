@@ -330,7 +330,7 @@ internal class NotificationService(private val project: Project?) : VimNotificat
 
   @Suppress("DialogTitleCapitalization")
   class OpenIdeaVimRcAction(private val notification: Notification?) : DumbAwareAction(
-    if (VimRcService.findIdeaVimRc() != null) "Open ~/.ideavimrc" else "Create ~/.ideavimrc",
+    openOrCreateActionText(),
   )/*, LightEditCompatible*/ {
     override fun actionPerformed(e: AnActionEvent) {
       val eventProject = e.project
@@ -344,15 +344,14 @@ internal class NotificationService(private val project: Project?) : VimNotificat
       }
       notification?.expire()
       createIdeaVimRcManually(
-        "Cannot create configuration file.<br/>Please create <code>~/.ideavimrc</code> manually",
+        "Cannot create configuration file.<br/>Please create <code>${VimRcService.ideaVimRcDisplayName()}</code> manually",
         eventProject,
       )
     }
 
     override fun update(e: AnActionEvent) {
       super.update(e)
-      val actionText = if (VimRcService.findIdeaVimRc() != null) "Open ~/.ideavimrc" else "Create ~/.ideavimrc"
-      e.presentation.text = actionText
+      e.presentation.text = openOrCreateActionText()
     }
 
     override fun getActionUpdateThread() = ActionUpdateThread.BGT
@@ -364,7 +363,7 @@ internal class NotificationService(private val project: Project?) : VimNotificat
     val appendableText: String,
     val optionName: String,
     val enableOption: () -> Unit,
-  ) : AnAction("Append to ~/.ideavimrc") {
+  ) : AnAction("Append to ${VimRcService.ideaVimRcDisplayName()}") {
     override fun actionPerformed(e: AnActionEvent) {
       val eventProject = e.project
       enableOption()
@@ -386,7 +385,7 @@ internal class NotificationService(private val project: Project?) : VimNotificat
       }
       notification.expire()
       createIdeaVimRcManually(
-        "Option is enabled, but the file is not modified<br/>Please modify <code>~/.ideavimrc</code> manually",
+        "Option is enabled, but the file is not modified<br/>Please modify <code>${VimRcService.ideaVimRcDisplayName()}</code> manually",
         project,
       )
     }
@@ -407,18 +406,29 @@ internal class NotificationService(private val project: Project?) : VimNotificat
 
     private val LOG = logger<NotificationService>()
 
+    private fun openOrCreateActionText(): String {
+      val verb = if (VimRcService.findIdeaVimRc() != null) "Open" else "Create"
+      return "$verb ${VimRcService.ideaVimRcDisplayName()}"
+    }
+
     private fun createIdeaVimRcManually(message: String, project: Project?) {
       val notification =
         Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, message, NotificationType.WARNING)
+      // Reveal the directory the file should be created in: the parent of the configured path, or the home directory
+      val configuredDir = injector.vimrcPathService.resolveVimrcPath()?.parent
+      val (targetDir, targetName) = if (configuredDir != null) {
+        configuredDir to configuredDir.fileName?.toString().orEmpty().ifEmpty { configuredDir.toString() }
+      } else {
+        Path(System.getProperty("user.home")) to "Home"
+      }
       var actionName =
-        if (SystemInfo.isMac) "Reveal Home in Finder" else "Show Home in " + RevealFileAction.getFileManagerName()
-      if (!Path(System.getProperty("user.home")).exists()) {
+        if (SystemInfo.isMac) "Reveal $targetName in Finder" else "Show $targetName in " + RevealFileAction.getFileManagerName()
+      if (!targetDir.exists()) {
         actionName = ""
       }
       notification.addAction(object : AnAction(actionName) {
         override fun actionPerformed(e: AnActionEvent) {
-          val homeDir = Path(System.getProperty("user.home"))
-          RevealFileAction.openDirectory(homeDir.toFile())
+          RevealFileAction.openDirectory(targetDir.toFile())
           notification.expire()
         }
       })

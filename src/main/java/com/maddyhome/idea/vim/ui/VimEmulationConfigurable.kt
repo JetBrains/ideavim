@@ -16,13 +16,16 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.ui.ComboBoxTableRenderer
 import com.intellij.openapi.ui.StripeTable
+import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.wm.IdeFocusManager
+import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.IdeBorderFactory
 import com.intellij.ui.JBColor
@@ -30,6 +33,7 @@ import com.intellij.ui.TableUtil
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
+import com.intellij.ui.components.JBTextField
 import com.intellij.ui.components.panels.HorizontalLayout
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.ui.JBUI
@@ -43,20 +47,24 @@ import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo.AllModes
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo.PerMode
+import com.maddyhome.idea.vim.vimscript.services.VimRcService
 import org.jetbrains.annotations.Nls
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.util.*
+import javax.swing.BoxLayout
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTable
 import javax.swing.KeyStroke
 import javax.swing.SwingConstants
 import javax.swing.border.LineBorder
+import javax.swing.event.DocumentEvent
 import javax.swing.table.AbstractTableModel
 import javax.swing.table.TableCellEditor
 import javax.swing.table.TableCellRenderer
 import javax.swing.table.TableColumn
+import kotlin.io.path.exists
 
 /**
  * @author vlan
@@ -80,16 +88,29 @@ internal class VimEmulationConfigurable : Configurable {
 
   override fun isModified(): Boolean {
     val checkBox = settingsPanel.keyRepeatCheckBox
-    return settingsPanel.model.isModified || (checkBox != null && checkBox.isSelected != savedKeyRepeat)
+    return settingsPanel.model.isModified || (checkBox != null && checkBox.isSelected != savedKeyRepeat) ||
+      settingsPanel.vimrcPath != injector.vimrcPathService.vimrcPath
   }
 
   override fun apply() {
     settingsPanel.model.apply()
     applyKeyRepeat()
+    applyVimrcPath()
+  }
+
+  private fun applyVimrcPath() {
+    val service = injector.vimrcPathService
+    if (settingsPanel.vimrcPath == service.vimrcPath) return
+    service.vimrcPath = settingsPanel.vimrcPath
+    // The file is executed from a different location now, so replace the loaded configuration with the new one
+    reloadIdeaVimRc()
+    settingsPanel.updateVimrcPathHints()
   }
 
   override fun reset() {
     settingsPanel.model.reset()
+    settingsPanel.vimrcPath = injector.vimrcPathService.vimrcPath
+    settingsPanel.updateVimrcPathHints()
     val checkBox = settingsPanel.keyRepeatCheckBox ?: return
     savedKeyRepeat = MacKeyRepeat.isEnabled ?: false
     checkBox.isSelected = savedKeyRepeat
@@ -124,6 +145,40 @@ internal class VimEmulationConfigurable : Configurable {
 
     val keyRepeatCheckBox: JBCheckBox? = if (SystemInfo.isMac) createKeyRepeatCheckBox() else null
 
+    private val vimrcPathField = createVimrcPathField()
+    private val vimrcPathWarning = createVimrcPathWarning()
+
+    /**
+     * The path to the configuration file, as entered by the user and without the surrounding whitespace. An empty
+     * string means that the default locations are searched.
+     */
+    var vimrcPath: String
+      get() = vimrcPathField.text.trim()
+      set(value) {
+        vimrcPathField.text = value
+      }
+
+    /**
+     * Refreshes the placeholder that names the file found in the default locations, and the warning shown when the
+     * entered path does not point to an existing file.
+     */
+    fun updateVimrcPathHints() {
+      (vimrcPathField.textField as? JBTextField)?.emptyText?.text = defaultVimrcPathHint()
+      val resolved = injector.vimrcPathService.resolvePath(vimrcPath)
+      val missing = resolved != null && !resolved.exists()
+      vimrcPathWarning.text = if (missing) MessageHelper.message("configurable.label.vimrc.path.not.found", resolved) else ""
+      vimrcPathWarning.isVisible = missing
+    }
+
+    private fun defaultVimrcPathHint(): String {
+      val default = VimRcService.findDefaultIdeaVimRc()
+      return if (default != null) {
+        MessageHelper.message("configurable.label.vimrc.path.default.found", default)
+      } else {
+        MessageHelper.message("configurable.label.vimrc.path.default.not.found")
+      }
+    }
+
     init {
       val shortcutConflictsTable = VimShortcutConflictsTable(model)
       val rowsToBeChangedOnToggleAllHandlers = getRowsToBeToggled()
@@ -146,7 +201,12 @@ internal class VimEmulationConfigurable : Configurable {
       val title = MessageHelper.message("configurable.border.title.shortcut.conflicts.for.active.keymap")
       conflictsPanel.border = IdeBorderFactory.createTitledBorder(title, false)
       conflictsPanel.add(scrollPane)
-      keyRepeatCheckBox?.let { add(createKeyRepeatPanel(it), BorderLayout.NORTH) }
+      val headerPanel = JPanel().apply {
+        layout = BoxLayout(this, BoxLayout.Y_AXIS)
+        keyRepeatCheckBox?.let { add(alignLeft(createKeyRepeatPanel(it))) }
+        add(alignLeft(createVimrcPathPanel()))
+      }
+      add(headerPanel, BorderLayout.NORTH)
       add(conflictsPanel, BorderLayout.CENTER)
       addHelpLine(model)
     }
@@ -167,6 +227,63 @@ internal class VimEmulationConfigurable : Configurable {
       panel.border = JBUI.Borders.emptyBottom(8)
       return panel
     }
+
+    private fun createVimrcPathField(): TextFieldWithBrowseButton {
+      val field = TextFieldWithBrowseButton()
+      field.textField.columns = 40
+      field.text = injector.vimrcPathService.vimrcPath
+      // TextFieldWithBrowseButton does not forward the tooltip to its children, and the wrapper itself is fully
+      // covered by the text field and the button, so the tooltip has to be set on the text field directly
+      field.textField.toolTipText = vimrcPathTooltip
+      // The default file is a dotfile, which the chooser hides unless told otherwise
+      val descriptor = FileChooserDescriptorFactory.singleFile()
+        .withShowHiddenFiles(true)
+        .withTitle(MessageHelper.message("configurable.vimrc.path.chooser.title"))
+      field.addBrowseFolderListener(null, descriptor)
+      field.textField.document.addDocumentListener(object : DocumentAdapter() {
+        override fun textChanged(e: DocumentEvent) = updateVimrcPathHints()
+      })
+      return field
+    }
+
+    private fun createVimrcPathWarning(): JBLabel {
+      val warning = JBLabel("", AllIcons.General.Warning, SwingConstants.LEADING)
+      warning.isVisible = false
+      return warning
+    }
+
+    private fun createVimrcPathPanel(): JPanel {
+      val label = JBLabel(MessageHelper.message("configurable.label.vimrc.path"))
+      label.labelFor = vimrcPathField.textField
+      label.toolTipText = vimrcPathTooltip
+
+      val fieldRow = JPanel(HorizontalLayout(UIUtil.DEFAULT_HGAP, SwingConstants.CENTER))
+      fieldRow.add(label)
+      fieldRow.add(vimrcPathField)
+
+      val comment = JBLabel(MessageHelper.message("configurable.label.vimrc.path.comment"))
+      comment.foreground = UIUtil.getInactiveTextColor()
+
+      val hints = JPanel().apply {
+        layout = BoxLayout(this, BoxLayout.Y_AXIS)
+        border = JBUI.Borders.emptyLeft(label.preferredSize.width + UIUtil.DEFAULT_HGAP)
+        // BoxLayout centres children of different widths unless they are all aligned the same way
+        add(comment.apply { alignmentX = LEFT_ALIGNMENT })
+        add(vimrcPathWarning.apply { alignmentX = LEFT_ALIGNMENT })
+      }
+
+      val panel = JPanel(BorderLayout())
+      panel.add(fieldRow, BorderLayout.NORTH)
+      panel.add(hints, BorderLayout.CENTER)
+      panel.border = JBUI.Borders.emptyBottom(8)
+      updateVimrcPathHints()
+      return panel
+    }
+
+    private fun alignLeft(panel: JPanel): JPanel = panel.apply { alignmentX = LEFT_ALIGNMENT }
+
+    private val vimrcPathTooltip: String
+      get() = MessageHelper.message("configurable.label.vimrc.path.tooltip")
 
     private fun getRowsToBeToggled(): MutableList<Int> {
       val rowsToChange = mutableListOf<Int>()
