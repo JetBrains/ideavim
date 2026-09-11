@@ -89,6 +89,7 @@ import com.maddyhome.idea.vim.thinapi.VimPluginService
 import com.maddyhome.idea.vim.undo.LineChange
 import com.maddyhome.idea.vim.undo.VimUndoRedo
 import com.maddyhome.idea.vim.vimscript.services.VariableService
+import com.maddyhome.idea.vim.vimscript.services.VimrcPathService
 import com.maddyhome.idea.vim.yank.VimYankGroup
 import javax.swing.JTextArea
 
@@ -211,6 +212,7 @@ internal class IjVimInjector : VimInjectorBase() {
     get() = service()
   override val vimscriptExecutor: VimscriptExecutor
     get() = service()
+  override val vimrcPathService: VimrcPathService get() = service()
   override val vimscriptParser: VimscriptParser
     get() = com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
   override val commandLine: VimCommandLineService

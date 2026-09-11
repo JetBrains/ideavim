@@ -111,6 +111,29 @@ internal object VimRcFileState : VimrcFileState {
   }
 }
 
+/**
+ * Drops the state that the previous execution of the ideavimrc file left behind, so that a reload does not
+ * accumulate mappings and problems from the old configuration.
+ */
+internal fun clearIdeaVimRcState() {
+  injector.keyGroup.removeKeyMapping(MappingOwner.IdeaVim.InitScript)
+  Troubleshooter.getInstance().removeByType("old-action-notation-in-mappings")
+}
+
+/**
+ * Re-reads the ideavimrc file from disk and executes it against the fallback window, the same way the file is
+ * executed on startup. Used when the location of the file changes.
+ */
+internal fun reloadIdeaVimRc() {
+  clearIdeaVimRcState()
+  try {
+    injector.optionGroup.startInitVimRc()
+    VimRcService.executeIdeaVimRc(injector.fallbackWindow)
+  } finally {
+    injector.optionGroup.endInitVimRc()
+  }
+}
+
 internal class ReloadVimRc : DumbAwareAction() {
   override fun update(e: AnActionEvent) {
     val editor = e.getData(PlatformDataKeys.EDITOR) ?: run {
@@ -151,8 +174,7 @@ internal class ReloadVimRc : DumbAwareAction() {
 
   override fun actionPerformed(e: AnActionEvent) {
     val editor = e.getData(PlatformDataKeys.EDITOR) ?: return
-    injector.keyGroup.removeKeyMapping(MappingOwner.IdeaVim.InitScript)
-    Troubleshooter.getInstance().removeByType("old-action-notation-in-mappings")
+    clearIdeaVimRcState()
 
     val ideaVimRc = VimRcService.findIdeaVimRc() ?: return
 
