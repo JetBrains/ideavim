@@ -255,6 +255,9 @@ That's it.
 
 https://github.com/tpope/vim-commentary/blob/master/doc/commentary.txt
 
+Unlike vim-commentary, IdeaVim uses a block comment when the range is not linewise, so `gciw` can
+comment out a single argument. Set `let g:commentary_block_comments = 0` to always comment whole lines.
+
 </details>
 
 <details>
