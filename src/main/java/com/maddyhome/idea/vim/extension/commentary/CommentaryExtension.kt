@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.extension.commentary
 import com.intellij.openapi.editor.impl.editorId
 import com.intellij.vim.api.VimInitApi
 import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -46,13 +47,13 @@ internal class CommentaryExtension : VimExtension {
       selectionType: SelectionType,
       resetCaret: Boolean = true,
     ): Boolean {
-      val mode = editor.mode
       val ijEditor = editor.ij
       val document = ijEditor.document
 
       val editorId = ijEditor.editorId()
       val caretOffset = if (resetCaret) range.startOffset else -1
-      if (selectionType === SelectionType.LINE_WISE) {
+      val blockCommentEnabled = areBlockCommentsEnabled()
+      if (selectionType === SelectionType.LINE_WISE || !blockCommentEnabled) {
         val startLine = document.getLineNumber(range.startOffset)
         var endLine = document.getLineNumber(range.endOffset)
         // Adjust endLine if the range ends at the start of a line (don't include that line)
@@ -70,6 +71,12 @@ internal class CommentaryExtension : VimExtension {
         }
       }
       return true
+    }
+
+    private fun areBlockCommentsEnabled(): Boolean {
+      val value =
+        VimPlugin.getVariableService().getGlobalVariableValue("commentary_block_comments")?.toVimNumber()?.booleanValue
+      return value == null || value
     }
   }
 
