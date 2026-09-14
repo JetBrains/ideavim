@@ -16,6 +16,9 @@ class IjOptionConstants {
     const val idearefactormode_select: String = "select"
     const val idearefactormode_visual: String = "visual"
 
+    const val ideaeditor_python: String = "python"
+    const val ideaeditor_debug: String = "debug"
+
     const val ideastatusicon_enabled: String = "enabled"
     const val ideastatusicon_gray: String = "gray"
     const val ideastatusicon_disabled: String = "disabled"
@@ -27,6 +30,7 @@ class IjOptionConstants {
     const val ideawrite_all: String = "all"
     const val ideawrite_file: String = "file"
 
+    val ideaEditorValues: Set<String> = setOf(ideaeditor_python, ideaeditor_debug)
     val ideaStatusIconValues: Set<String> = setOf(ideastatusicon_enabled, ideastatusicon_gray, ideastatusicon_disabled)
     val ideaRefactorModeValues: Set<String> =
       setOf(idearefactormode_keep, idearefactormode_select, idearefactormode_visual)

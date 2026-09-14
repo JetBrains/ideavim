@@ -238,6 +238,26 @@ The old name is deprecated, but still accepted by `:set` and by the `&{option}` 
         string literals or if statements. See the wiki for more examples. Not
         all languages support smart join functionality.
 
+'ideaeditor'            string  (default "python,debug")
+                        global
+        Comma-separated list of non-file editors that IdeaVim is active in, in
+        addition to the regular editors it always supports:
+           python       The Python console tool window. The console still
+                        intercepts Enter (execute) and the horizontal arrow
+                        keys (caret movement within the input line) as normal;
+                        Up/Down navigate command history from any Vim mode.
+           debug        The console of a run or debug configuration, e.g. the
+                        console of a debugged Spring Boot application. It is
+                        focused in Normal mode, so the first <Esc> leaves
+                        Insert or Visual mode and the next one defocuses the
+                        tool window.
+
+        Remove a value to revert that editor to its native behaviour with no
+        Vim keybindings. The change takes effect immediately for all open
+        console windows.
+
+        This option replaces 'ideapythonconsole', which has been removed.
+
 'idealookupkeys'        string  (default "<Tab>,<Down>,<Up>,<Enter>,
                                         <Left>,<Right>,<C-Down>,<C-Up>,
                                         <PageUp>,<PageDown>, <C-J>,<C-Q>")
@@ -253,20 +273,6 @@ The old name is deprecated, but still accepted by `:set` and by the `&{option}` 
 'ideamarks'             boolean (default on)
                         global
         Maps Vim's global marks to IDE bookmarks.
-
-'ideapythonconsole'     boolean (default on)
-                        global
-        When on, IdeaVim is active in the Python console tool window. The
-        console still intercepts Enter (execute) and the horizontal arrow keys
-        (caret movement within the input line) as normal; Up/Down navigate
-        command history from any Vim mode.
-
-        Set 'noideapythonconsole' to revert to the console's native
-        behaviour with no Vim keybindings. The change takes effect immediately
-        for all open Python console windows.
-
-        This option was previously called 'pythonconsole'. The old name is
-        deprecated, but still accepted.
 
 'idearefactormode'      string  (default "select")
                         global or local to buffer

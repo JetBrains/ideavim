@@ -62,8 +62,8 @@ internal val Editor.isIdeaVimDisabledHere: Boolean
  * AI Chat – VIM-3786
  * Debug evaluate console – VIM-3929
  *
- * We do want to support Vim actions in some windows, such as the commit window, diff windows, decompiled Java
- * files, the Python console, and the run/debug configuration console. Note that the Python console still needs special
+ * We do want to support Vim actions in some windows, such as the commit window, diff windows and decompiled Java
+ * files. The consoles are opt-out via the 'ideaeditor' option. Note that the Python console still needs special
  * handling so it doesn't lose the Enter and arrow keys (see KeyGroup and ToolWindowNavEverywhere).
  *
  * VIM-3929 was about the debugger's expression editors, which stay disabled. The run/debug configuration console is
@@ -75,8 +75,16 @@ private fun Editor.isAllowedFileEditor(): Boolean {
     || EditorHelper.isDiffEditor(this)
     || EditorHelper.isFileEditor(this)
     || EditorHelper.isCommandHistoryWindow(this)
-    || EditorHelper.isRunConsole(this)
-    || (EditorHelper.isPythonConsole(this) && injector.globalIjOptions().ideapythonconsole)
+    || isEnabledConsole()
+}
+
+/**
+ * Checks if this editor is a console that the user has enabled via the 'ideaeditor' option.
+ */
+internal fun Editor.isEnabledConsole(): Boolean {
+  val enabledEditors = injector.globalIjOptions().ideaeditor
+  return (EditorHelper.isPythonConsole(this) && enabledEditors.contains(IjOptionConstants.ideaeditor_python))
+    || (EditorHelper.isRunConsole(this) && enabledEditors.contains(IjOptionConstants.ideaeditor_debug))
 }
 
 private fun ideaVimDisabledInDialog(ideaVimSupportValue: StringListOptionValue): Boolean {
