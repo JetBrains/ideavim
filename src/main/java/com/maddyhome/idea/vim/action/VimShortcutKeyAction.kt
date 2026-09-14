@@ -284,13 +284,17 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
   }
 
   private fun isEnabledForEscape(editor: Editor): Boolean {
-    val ideaVimSupportDialog =
-      injector.globalIjOptions().ideavimsupport.contains(IjOptionConstants.ideavimsupport_dialog)
-    return editor.isPrimaryEditor() ||
-      EditorHelper.isFileEditor(editor) && !editor.vim.mode.inNormalMode ||
-      // The Python console has full Vim support, so Escape must leave Insert/Visual mode instead of defocusing it.
-      EditorHelper.isPythonConsole(editor) && !editor.vim.mode.inNormalMode ||
-      ideaVimSupportDialog && !editor.vim.mode.inNormalMode
+    if (editor.isPrimaryEditor()) return true
+    // Outside the main editing area, Escape is Vim's only while there is a mode to leave. In Normal mode we hand it
+    // back to the platform, which closes the popup or defocuses the tool window hosting the editor.
+    return !editor.vim.mode.inNormalMode && escapeIsHandledByVim(editor)
+  }
+
+  private fun escapeIsHandledByVim(editor: Editor): Boolean {
+    return EditorHelper.isFileEditor(editor)
+      || EditorHelper.isPythonConsole(editor)
+      || EditorHelper.isRunConsole(editor)
+      || injector.globalIjOptions().ideavimsupport.contains(IjOptionConstants.ideavimsupport_dialog)
   }
 
   private fun isShortcutConflict(keyStroke: KeyStroke): Boolean {

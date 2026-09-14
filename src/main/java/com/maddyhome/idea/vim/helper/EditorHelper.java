@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.helper;
 
+import com.intellij.execution.console.LanguageConsoleView;
+import com.intellij.execution.impl.ConsoleViewImpl;
 import com.intellij.injected.editor.VirtualFileWindow;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
@@ -725,6 +727,17 @@ public class EditorHelper {
    */
   public static boolean isDiffEditor(@NotNull Editor editor) {
     return editor.getEditorKind() == EditorKind.DIFF;
+  }
+
+  /**
+   * Checks if the editor hosts the console of a run or debug configuration, e.g. the console of a debugged Spring Boot
+   * application.
+   * <p>
+   * Language consoles also extend {@code ConsoleViewImpl}, but have their own handling - see {@link #isPythonConsole}.
+   */
+  public static boolean isRunConsole(@NotNull Editor editor) {
+    final ConsoleViewImpl consoleView = editor.getUserData(ConsoleViewImpl.CONSOLE_VIEW_IN_EDITOR_VIEW);
+    return consoleView != null && !(consoleView instanceof LanguageConsoleView);
   }
 
   /**

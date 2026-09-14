@@ -611,21 +611,15 @@ object VimListenerManager {
     /**
      * Retries initialisation for editors that can only be recognised as supported after they've been created.
      *
-     * The Python console's input editor is created inside `LanguageConsoleImpl`'s constructor, before
-     * `PythonConsoleView` marks the console's virtual file with `PYDEV_CONSOLE_KEY`. Consoles started by
-     * "Run file in Python Console" are named after the run configuration rather than "Python Console" (see
-     * `PydevConsoleRunnerFactory.createConsoleRunnerWithFile`), so at [editorCreated] time there is nothing to identify
-     * them by and [vimDisabled] rejects them. The console is fully constructed within a single EDT runnable, so
-     * re-checking in `invokeLater` sees the marker.
-     *
-     * Only light Python files are considered, to keep this from queueing work for every unsupported editor. Anything
-     * that still isn't supported on the second look (e.g. a Python code fragment in the debugger's evaluate window) is
-     * dropped, exactly as before.
+     * Consoles mark themselves only after creating their editor: `PythonConsoleView` sets `PYDEV_CONSOLE_KEY` on the
+     * virtual file after `LanguageConsoleImpl`'s constructor has created the input editor, and
+     * `ConsoleViewImpl.createConsoleEditor` sets `CONSOLE_VIEW_IN_EDITOR_VIEW` after `EditorFactory.createViewer` - the
+     * very call that triggers [editorCreated]. Both are fully constructed within a single EDT runnable, so re-checking
+     * in `invokeLater` sees the markers. Anything still unsupported on the second look is dropped, as before.
      */
     private fun scheduleDeferredInitialisation(editor: Editor) {
       if (editor.isDisposed) return
-      val file = EditorHelper.getVirtualFile(editor) ?: return
-      if (file !is LightVirtualFile || file.extension != PYTHON_EXTENSION) return
+      if (!mayBecomeSupported(editor)) return
 
       // Capture the opening editor now rather than in the callback - by then the selected editor might have changed
       val openingEditor = getOpeningEditor(editor)
@@ -634,6 +628,16 @@ object VimListenerManager {
         if (editor.isDisposed || vimDisabled(editor)) return@invokeLater
         initialiseFromOpeningEditor(editor, openingEditor?.takeUnless { it.isDisposed })
       }
+    }
+
+    /**
+     * Keeps [scheduleDeferredInitialisation] from queueing work for every unsupported editor. Consoles have no virtual
+     * file to recognise them by at creation time, so [EditorKind.CONSOLE] is all we have to go on here.
+     */
+    private fun mayBecomeSupported(editor: Editor): Boolean {
+      if (editor.editorKind == EditorKind.CONSOLE) return true
+      val file = EditorHelper.getVirtualFile(editor) ?: return false
+      return file is LightVirtualFile && file.extension == PYTHON_EXTENSION
     }
 
     override fun editorReleased(event: EditorFactoryEvent) {
