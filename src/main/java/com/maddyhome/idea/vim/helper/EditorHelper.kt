@@ -63,8 +63,11 @@ internal val Editor.isIdeaVimDisabledHere: Boolean
  * Debug evaluate console – VIM-3929
  *
  * We do want to support Vim actions in some windows, such as the commit window, diff windows, decompiled Java
- * files, and the Python console. Note that the Python console still needs special handling so it doesn't lose the
- * Enter and arrow keys (see KeyGroup and ToolWindowNavEverywhere).
+ * files, the Python console, and the run/debug configuration console. Note that the Python console still needs special
+ * handling so it doesn't lose the Enter and arrow keys (see KeyGroup and ToolWindowNavEverywhere).
+ *
+ * VIM-3929 was about the debugger's expression editors, which stay disabled. The run/debug configuration console is
+ * allowed again, because blocking every non-file editor also took Vim away from the process console.
  */
 private fun Editor.isAllowedFileEditor(): Boolean {
   return EditorHelper.isCommitWindowEditor(this)
@@ -72,6 +75,7 @@ private fun Editor.isAllowedFileEditor(): Boolean {
     || EditorHelper.isDiffEditor(this)
     || EditorHelper.isFileEditor(this)
     || EditorHelper.isCommandHistoryWindow(this)
+    || EditorHelper.isRunConsole(this)
     || (EditorHelper.isPythonConsole(this) && injector.globalIjOptions().ideapythonconsole)
 }
 

@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.listener
 
-import com.intellij.execution.impl.ConsoleViewImpl
 import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.LastUsedEditorInfo
@@ -28,6 +27,8 @@ import com.maddyhome.idea.vim.state.mode.Mode
  * However, in IJ we would like to start editing in some editors in INSERT mode (e.g., consoles)
  * It is different to we had previously. Now we go to INSERT mode not only when we focus on the console the first time, but every time.
  * Going to INSERT on every focus is easier to implement and more consistent (behavior is always the same, you don't have to remember if you are focusing a console the first time or not)
+ *
+ * The run/debug configuration console is the exception - see [enterNormalModeInRunConsole].
  */
 class IJEditorFocusListener : EditorListener {
   override fun focusGained(editor: VimEditor) {
@@ -75,17 +76,30 @@ class IJEditorFocusListener : EditorListener {
         else -> {}
       }
     }
-    ApplicationManager.getApplication().invokeLater {
-      if (ijEditor.isDisposed) return@invokeLater
-      // The Python console keeps the user's current Vim mode on focus, so don't force Insert mode here either.
-      if (EditorHelper.isPythonConsole(ijEditor)) return@invokeLater
-      val consoleView: ConsoleViewImpl? = ijEditor.getUserData(ConsoleViewImpl.CONSOLE_VIEW_IN_EDITOR_VIEW)
-      if (consoleView != null && consoleView.isRunning && !ijEditor.inInsertMode) {
-        // Switch to Insert mode, but make sure we reset the editor to actually make it apply
-        switchToInsertMode.run()
-        KeyHandler.getInstance().reset(editor)
-      }
-    }
+    enterNormalModeInRunConsole(editor)
     KeyHandler.getInstance().reset(editor)
+  }
+
+  /**
+   * The run/debug configuration console is entered in NORMAL mode, so that Vim navigation works as soon as it is
+   * focused, and so that Escape defocuses the tool window in two steps - the first Escape leaves Insert or Visual mode,
+   * the next one falls through to the platform (see `VimShortcutKeyAction.isEnabledForEscape`). Typing into the
+   * process' stdin is an explicit `i`/`a`.
+   *
+   * The mode is switched asynchronously because the console view this check relies on is only put into the editor's
+   * user data once the editor has finished initialising.
+   */
+  private fun enterNormalModeInRunConsole(editor: VimEditor) {
+    ApplicationManager.getApplication().invokeLater {
+      val ijEditor = editor.ij
+      if (ijEditor.isDisposed || !ijEditor.inInsertMode) return@invokeLater
+      if (!EditorHelper.isRunConsole(ijEditor)) return@invokeLater
+
+      val context: ExecutionContext = injector.executionContextManager.getEditorExecutionContext(editor)
+      editor.exitInsertMode(context)
+      KeyHandler.getInstance().lastUsedEditorInfo = LastUsedEditorInfo(ijEditor.hashCode(), false)
+      // Reset the key handler to make leaving Insert mode actually apply
+      KeyHandler.getInstance().reset(editor)
+    }
   }
 }
