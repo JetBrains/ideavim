@@ -21,9 +21,9 @@ import com.maddyhome.idea.vim.options.OptionAccessScope
 @Suppress("SpellCheckingInspection")
 open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesBase(scope) {
   var ide: String by optionProperty(IjOptions.ide)
+  val ideaeditor: StringListOptionValue by optionProperty(IjOptions.ideaeditor)
   val idealookupkeys: StringListOptionValue by optionProperty(IjOptions.idealookupkeys)
   var ideamarks: Boolean by optionProperty(IjOptions.ideamarks)
-  val ideapythonconsole: Boolean by optionProperty(IjOptions.ideapythonconsole)
   var ideastatusicon: String by optionProperty(IjOptions.ideastatusicon)
   var ideatrackactionids: Boolean by optionProperty(IjOptions.ideatrackactionids)
   val ideavimsupport: StringListOptionValue by optionProperty(IjOptions.ideavimsupport)

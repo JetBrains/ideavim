@@ -91,6 +91,18 @@ object IjOptions {
   val ideacopypreprocess: ToggleOption = addOption(
     ToggleOption("ideacopypreprocess", GLOBAL_OR_LOCAL_TO_BUFFER, "ideacopypreprocess", false)
   )
+  /**
+   * Which non-file editors get Vim support. See `EditorHelper.isAllowedFileEditor`.
+   */
+  val ideaeditor: StringListOption = addOption(
+    StringListOption(
+      "ideaeditor",
+      GLOBAL,
+      "ideaeditor",
+      "python,debug",
+      IjOptionConstants.ideaEditorValues
+    )
+  )
   val ideajoin: ToggleOption = addOption(ToggleOption("ideajoin", GLOBAL_OR_LOCAL_TO_BUFFER, "ideajoin", false))
   val idealookupkeys: StringListOption = addOption(
     StringListOption(
@@ -102,8 +114,7 @@ object IjOptions {
     "lookupkeys"
   )
   val ideamarks: ToggleOption = addOption(ToggleOption("ideamarks", GLOBAL, "ideamarks", true))
-  val ideapythonconsole: ToggleOption =
-    addOption(ToggleOption("ideapythonconsole", GLOBAL, "ideapythonconsole", true), "pythonconsole")
+
   val idearefactormode: StringOption = addOption(
     StringOption(
       "idearefactormode",

@@ -8,33 +8,31 @@
 
 package com.maddyhome.idea.vim.group
 
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
 import com.maddyhome.idea.vim.api.LocalOptionInitialisationScenario
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.isEnabledConsole
 import com.maddyhome.idea.vim.helper.removeCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.listener.VimListenerManager
-import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 
 /**
- * Reacts to runtime changes of the `ideapythonconsole` toggle option and enables or disables Vim in all currently open
- * Python console editors without requiring a restart or plugin toggle.
+ * Reacts to runtime changes of the 'ideaeditor' option and enables or disables Vim in all currently open console
+ * editors without requiring a restart or plugin toggle.
  *
- * When `set ideapythonconsole`: initialises Vim listeners, shortcuts, and local options for every open Python console
- * editor that has not yet been set up (e.g. consoles that were opened while the option was off).
- *
- * When `set noideapythonconsole`: tears down Vim from every open Python console editor and resets the caret shape to the
- * IDE default.
+ * Enabling initialises Vim listeners, shortcuts and local options for every open console editor that has not yet been
+ * set up, e.g. consoles that were opened while the option didn't list them. Disabling tears Vim down again and resets
+ * the caret shape to the IDE default.
  */
-internal object PythonConsoleOptionChangeListener : GlobalOptionChangeListener {
+internal object ConsoleOptionChangeListener : GlobalOptionChangeListener {
   override fun onGlobalOptionChanged() {
-    val enabled = injector.globalIjOptions().ideapythonconsole
     for (editor in EditorFactory.getInstance().allEditors) {
       if (editor.isDisposed) continue
-      if (!EditorHelper.isPythonConsole(editor)) continue
-      if (enabled) {
+      if (!editor.isConsole()) continue
+      if (editor.isEnabledConsole()) {
         VimListenerManager.EditorListeners.add(editor, injector.fallbackWindow, LocalOptionInitialisationScenario.NEW)
         editor.updateCaretsVisualAttributes()
       } else {
@@ -43,4 +41,6 @@ internal object PythonConsoleOptionChangeListener : GlobalOptionChangeListener {
       }
     }
   }
+
+  private fun Editor.isConsole() = EditorHelper.isPythonConsole(this) || EditorHelper.isRunConsole(this)
 }

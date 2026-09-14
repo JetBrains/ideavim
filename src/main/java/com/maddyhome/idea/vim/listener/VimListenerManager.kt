@@ -85,6 +85,7 @@ import com.maddyhome.idea.vim.autocmd.IjFileTypeMapping
 import com.maddyhome.idea.vim.common.ModeChangeListener
 import com.maddyhome.idea.vim.common.ModeWillChangeListener
 import com.maddyhome.idea.vim.group.CommentsOptionInitializer
+import com.maddyhome.idea.vim.group.ConsoleOptionChangeListener
 import com.maddyhome.idea.vim.group.ControlCharsEditorHighlighter
 import com.maddyhome.idea.vim.group.FileGroupHelper
 import com.maddyhome.idea.vim.group.IjOptions
@@ -94,7 +95,6 @@ import com.maddyhome.idea.vim.group.MarkUpdater
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.NumberChangeListener
 import com.maddyhome.idea.vim.group.OptionGroup
-import com.maddyhome.idea.vim.group.PythonConsoleOptionChangeListener
 import com.maddyhome.idea.vim.group.ScrollOptionsChangeListener
 import com.maddyhome.idea.vim.group.WindowJumpsChangeListener
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
@@ -248,7 +248,7 @@ object VimListenerManager {
       optionGroup.addGlobalOptionChangeListener(Options.showmode, macroWidgetOptionListener)
       optionGroup.addEffectiveOptionValueChangeListener(Options.keymap, KeymapChangeListener)
       optionGroup.addGlobalOptionChangeListener(Options.ideawindowjumps, WindowJumpsChangeListener)
-      optionGroup.addGlobalOptionChangeListener(IjOptions.ideapythonconsole, PythonConsoleOptionChangeListener)
+      optionGroup.addGlobalOptionChangeListener(IjOptions.ideaeditor, ConsoleOptionChangeListener)
 
       // The listeners are registered _after_ ideavimrc has been evaluated, so trigger these listeners to ensure we're
       // up to date
@@ -298,7 +298,7 @@ object VimListenerManager {
       optionGroup.removeGlobalOptionChangeListener(Options.showmode, modeWidgetOptionListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showmode, macroWidgetOptionListener)
       optionGroup.removeGlobalOptionChangeListener(Options.ideawindowjumps, WindowJumpsChangeListener)
-      optionGroup.removeGlobalOptionChangeListener(IjOptions.ideapythonconsole, PythonConsoleOptionChangeListener)
+      optionGroup.removeGlobalOptionChangeListener(IjOptions.ideaeditor, ConsoleOptionChangeListener)
 
       BufNewFileTracker.clear()
     }
