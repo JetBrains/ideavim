@@ -43,6 +43,6 @@ internal class IjVimrcPathService :
     // IDE macros must be expanded first: they use the `$NAME$` syntax, and the Vim expansion would otherwise treat
     // `$USER_HOME` as an unknown environment variable and replace it with an empty string
     val withMacrosExpanded = PathMacroManager.getInstance(ApplicationManager.getApplication()).expandPath(trimmed)
-    return Path(injector.pathExpansion.expandPath(withMacrosExpanded))
+    return Path(injector.pathExpansion.expandPath(withMacrosExpanded ?: trimmed))
   }
 }
