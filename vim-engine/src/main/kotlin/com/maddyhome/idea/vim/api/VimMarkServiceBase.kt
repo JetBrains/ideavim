@@ -447,22 +447,39 @@ abstract class VimMarkServiceBase : VimMarkService {
     newFragment: CharSequence,
   ) {
     val changeEndOffset = changeOffset + oldLength
-    val changeStartLine = editor.offsetToBufferPosition(changeOffset).line
-    val oldEndLine = editor.offsetToBufferPosition(changeEndOffset).line
-    val newEndLine = changeStartLine + newFragment.count { it == '\n' }
-    if (oldEndLine == newEndLine) return
+    val changeStart = editor.offsetToBufferPosition(changeOffset)
+    val changeEnd = editor.offsetToBufferPosition(changeEndOffset)
+    val newLineCount = newFragment.count { it == '\n' }
+    val newEndLine = changeStart.line + newLineCount
+    // A change that leaves the line structure alone (e.g. replacing or inserting text within one line) does not move
+    // the Visual marks - Vim only adjusts them when lines are added or removed
+    if (changeEnd.line == newEndLine) return
+    // The column that the text following the change ends up in. A single line replacement pushes it along the same
+    // line, a multi line one moves it to the end of the fragment's last line.
+    val tailStartColumn = if (newLineCount == 0) {
+      changeStart.column + newFragment.length
+    } else {
+      newFragment.length - newFragment.lastIndexOf('\n') - 1
+    }
+    // Whether anything is left of the change's last line. If the change swallows it whole (e.g. deleting entire lines)
+    // nothing is merged in behind the new text, and columns stay where they are
+    val tailSurvives = changeEndOffset < editor.getLineEndOffset(changeEnd.line)
 
     for (caret in editor.carets()) {
       val selectionInfo = caret.lastSelectionInfo
 
       val startPosition = selectionInfo.start
       val newStartPosition = startPosition?.let {
-        adjustVisualMark(editor, it, changeOffset, changeEndOffset, oldEndLine, newEndLine)
+        adjustVisualMark(
+          editor, it, changeOffset, changeEndOffset, changeEnd, newEndLine, tailStartColumn, tailSurvives,
+        )
       }
 
       val endPosition = selectionInfo.end
       val newEndPosition = endPosition?.let {
-        adjustVisualMark(editor, it, changeOffset, changeEndOffset, oldEndLine, newEndLine)
+        adjustVisualMark(
+          editor, it, changeOffset, changeEndOffset, changeEnd, newEndLine, tailStartColumn, tailSurvives,
+        )
       }
 
       if (newStartPosition != startPosition || newEndPosition != endPosition) {
@@ -478,21 +495,41 @@ abstract class VimMarkServiceBase : VimMarkService {
     position: BufferPosition,
     changeOffset: Int,
     changeEndOffset: Int,
-    oldEndLine: Int,
+    changeEnd: BufferPosition,
     newEndLine: Int,
+    tailStartColumn: Int,
+    tailSurvives: Boolean,
   ): BufferPosition {
     val offset = editor.bufferPositionToOffset(position)
     return when {
       offset < changeOffset -> position
       // Note that text inserted at the mark (an empty range, i.e. changeOffset == changeEndOffset) pushes the mark
       // down, while text replacing a range that starts at the mark leaves the mark at the start of the new text
-      offset >= changeEndOffset -> BufferPosition(
-        position.line + (newEndLine - oldEndLine),
-        position.column,
+      offset >= changeEndOffset -> if (position.line == changeEnd.line) {
+        // The mark sits on the change's last line, so it moves with that line's tail onto the line the new text ends
+        // on, keeping its distance from the end of the change
+        BufferPosition(
+          newEndLine,
+          tailStartColumn + (position.column - changeEnd.column),
+          position.leansForward,
+        )
+      } else {
+        BufferPosition(
+          position.line + (newEndLine - changeEnd.line),
+          position.column,
+          position.leansForward,
+        )
+      }
+
+      // Inside the replaced range Vim keeps the mark, but a line that no longer exists collapses onto the line the
+      // new text ends on. The column only moves if the rest of that line survives and is merged in behind the new
+      // text - if the whole line went away, there is nothing to merge into and the column is kept
+      position.line > newEndLine -> BufferPosition(
+        newEndLine,
+        if (position.line == changeEnd.line && tailSurvives) tailStartColumn + position.column else position.column,
         position.leansForward,
       )
 
-      position.line > newEndLine -> BufferPosition(newEndLine, position.column, position.leansForward)
       else -> position
     }
   }
