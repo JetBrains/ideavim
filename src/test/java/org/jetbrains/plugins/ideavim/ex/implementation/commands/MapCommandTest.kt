@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.api.keys
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.ExceptionHandler
 import org.jetbrains.plugins.ideavim.OnlyThrowLoggedErrorProcessor
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -325,6 +326,44 @@ class MapCommandTest : VimTestCase() {
         |v  visual+select   foo
       """.trimMargin()
     )
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.SELECT_MODE)
+  @Test
+  fun `test mapping for Visual mode is executed in Select mode as if Visual mode was used`() {
+    // See `:help Select-mode-mapping`. A mapping defined for Visual mode (`:map`, `:vmap`) also applies in Select
+    // mode, but its right-hand side is executed as if Visual mode was used. Select mode is restored afterwards.
+    // The right-hand side must NOT be treated as printable characters replacing the selection.
+    configureByText("Lorem ${c}ipsum dolor ipsum amet")
+    enterCommand("noremap j nzz")
+    enterSearch("ipsum")  // Set the last search pattern, so `n` has something to jump to
+    typeText("0w")
+
+    typeText("ve", "<C-G>")
+    assertState("Lorem ${s}ipsum$se$c dolor ipsum amet")
+    assertMode(Mode.SELECT(SelectionType.CHARACTER_WISE))
+
+    // `n` is executed as a Visual mode motion, extending the selection to the start of the next match. `zz` scrolls.
+    // Select mode is restored afterwards.
+    typeText("j")
+    assertState("Lorem ${s}ipsum dolor i$se${c}psum amet")
+    assertMode(Mode.SELECT(SelectionType.CHARACTER_WISE))
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.SELECT_MODE)
+  @Test
+  fun `test mapping that ends the selection in Select mode returns to Normal mode`() {
+    // The right-hand side is executed as a Visual mode command, so `d` deletes the selection. Because the selection is
+    // gone, Select mode is not restored. See `:help Select-mode-mapping`
+    configureByText("Lorem ${c}ipsum dolor ipsum amet")
+    enterCommand("noremap j d")
+
+    typeText("ve", "<C-G>")
+    assertMode(Mode.SELECT(SelectionType.CHARACTER_WISE))
+
+    typeText("j")
+    assertState("Lorem $c dolor ipsum amet")
+    assertMode(Mode.NORMAL())
   }
 
   @Test
