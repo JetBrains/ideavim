@@ -30,16 +30,16 @@ class VimList(val values: MutableList<VimDataType>) : VimDataType("list") {
   /**
    * Returns a sublist of the current list based on the specified range.
    *
-   * The [start] and [endExclusive] indices are zero-based, and can be negative to count from the end of the list. Note
-   * that since the end index is exclusive, a value of zero represents the last element in the list.
-   *
-   * @param start the start index (inclusive). If negative, it counts from the end of the list.
-   * @param endExclusive the end index (exclusive). If zero or negative, it counts from the end of the list.
-   * @return a new [VimList] containing the elements in the specified range.
+   * @param start the zero-based start index (inclusive). If negative, it counts from the end of the list.
+   * @param endExclusive the zero-based end index (exclusive), as an already resolved absolute index. Because the index
+   *   is exclusive, a value of zero always means an empty list, so a negative value cannot also mean "count from the
+   *   end of the list". Callers must therefore resolve Vim's negative end indices themselves - see
+   *   `SublistExpression` and `SliceFunctionHandler`. Values greater than the list size are clamped to the size.
+   * @return a new [VimList] containing the elements in the specified range. Out of range indices give an empty list.
    */
   fun slice(start: Int, endExclusive: Int): VimList {
     val s = if (start < 0) start + size else start
-    val e = (if (endExclusive <= 0) endExclusive + size else endExclusive).coerceAtMost(size)
+    val e = endExclusive.coerceAtMost(size)
     return if (s < 0 || e < 0 || e < s) {
       VimList(mutableListOf())
     }

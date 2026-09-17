@@ -29,12 +29,16 @@ data class VimString(val value: String) : VimDataType("string") {
   /**
    * Returns a substring of the current string based on the specified range.
    *
-   * The [start] and [endExclusive] indices are zero-based, and can be negative to count from the end of the string.
-   * Note that since the end index is exclusive, a value of zero represents the last character in the string.
+   * @param start the zero-based start index (inclusive). If negative, it counts from the end of the string.
+   * @param endExclusive the zero-based end index (exclusive), as an already resolved absolute index. Because the index
+   *   is exclusive, a value of zero always means an empty string, so a negative value cannot also mean "count from the
+   *   end of the string". Callers must therefore resolve Vim's negative end indices themselves - see
+   *   `SublistExpression` and `SliceFunctionHandler`. Values greater than the string length are clamped to the length.
+   * @return the substring in the specified range. Out of range indices give an empty string.
    */
   fun substring(start: Int, endExclusive: Int): VimString {
     val s = if (start < 0) start + value.length else start
-    val e = (if (endExclusive <= 0) endExclusive + value.length else endExclusive).coerceAtMost(value.length)
+    val e = endExclusive.coerceAtMost(value.length)
     return if (s < 0 || e < 0 || e < s) {
       EMPTY
     }
