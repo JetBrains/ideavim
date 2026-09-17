@@ -195,6 +195,26 @@ class CommandHistoryWindowActionTest : VimTestCase() {
     assertEquals("E1292: Command-line window is already open", injector.messages.getStatusBarMessage())
   }
 
+  // The cmdwin editor was not recognised while it was being created (its virtual file is not attached to the editor
+  // yet at that point), so it was treated as a non-Vim editor and never had its local options initialised. Search
+  // count and search highlights are computed for every open editor, so searching for a pattern with `\<` asked the
+  // cmdwin buffer for its local 'iskeyword' and threw "Unexpected uninitialised buffer local value: iskeyword"
+  @Test
+  fun `search with a word boundary pattern while the cmdwin is open does not crash`() {
+    configureByText("${c}alpha bravo charlie\n")
+    enterSearch("alpha") // give the search history a line, so `q?` has something to show
+
+    typeText("q?")
+    openedCmdwin() // the cmdwin is now the selected editor, and search count is computed against it
+
+    // Search in the original editor while the cmdwin split is still open
+    ApplicationManager.getApplication().invokeAndWait {
+      VimTestCase.typeText(injector.parser.parseKeys("/\\<bravo<CR>"), fixture.editor, fixture.project)
+    }
+
+    assertOffset("alpha bravo charlie".indexOf("bravo"))
+  }
+
   @Test
   fun `qa still starts macro recording`() {
     typeText("qa")
