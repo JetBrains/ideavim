@@ -56,8 +56,8 @@ class MotionEndActionTest : VimTestCase() {
     val after = """
             Lorem Ipsum
 
-            I found it in a ${s}legendary land${c}${se}
-            consectetur adipiscing elit
+            I found it in a ${s}legendary land${c}
+            ${se}consectetur adipiscing elit
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
     """.trimIndent()

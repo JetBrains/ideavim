@@ -1824,13 +1824,6 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       if (offset > 0 && chars[offset] != '\n') start = offset + 1
     }
 
-    // TODO: Remove this when IdeaVim supports selecting the new line character
-    // A selection with start == end is perfectly valid, and will select a single character. However, IdeaVim
-    // unnecessarily prevents selecting the new line character at the end of a line. If the selection is just that new
-    // line character, then nothing is selected (we end up with a selection with range start==endInclusive, rather than
-    // start==endExclusive). This little hack makes sure that `viw` will (mostly) work on a single empty line
-    if (start == end && chars[start] == '\n') end++
-
     // Text range's end offset is exclusive
     return TextRange(start, end + 1)
   }

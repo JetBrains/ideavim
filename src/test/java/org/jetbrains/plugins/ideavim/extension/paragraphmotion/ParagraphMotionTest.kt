@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.extension.paragraphmotion
 
+import com.github.weisj.jsvg.cI
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -50,9 +51,9 @@ class ParagraphMotionTest : VimTestCase() {
     """.trimMargin().dotToSpace()
     val after = """Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
-        |$c....
+        |....
         |Sed in orci mauris.
-        |Cras id tellus in ex imperdiet egestas.
+        |Cras id tellus in ex imperdiet egestas${c}.
     """.trimMargin().dotToSpace()
     doTest("}", before, after, Mode.NORMAL())
   }
@@ -67,9 +68,9 @@ class ParagraphMotionTest : VimTestCase() {
     """.trimMargin().dotToSpace()
     val after = """Lorem ipsum dolor sit amet,
         |${s}consectetur adipiscing elit
-        |$c.$se...
+        |....
         |Sed in orci mauris.
-        |Cras id tellus in ex imperdiet egestas.
+        |Cras id tellus in ex imperdiet egestas${c}.${se}
     """.trimMargin().dotToSpace()
     doTest("v}", before, after, Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
@@ -82,12 +83,7 @@ class ParagraphMotionTest : VimTestCase() {
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
-    val after = """Lorem ipsum dolor sit amet,
-        |$c
-        |....
-        |Sed in orci mauris.
-        |Cras id tellus in ex imperdiet egestas.
-    """.trimMargin().dotToSpace()
+    val after = """${c}Lorem ipsum dolor sit amet,"""
     doTest("d}", before, after, Mode.NORMAL())
   }
 
@@ -116,9 +112,9 @@ class ParagraphMotionTest : VimTestCase() {
         |${c}Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
-    val after = """Lorem ipsum dolor sit amet,
+    val after = """${c}Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
-        |$c....
+        |....
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
@@ -133,9 +129,9 @@ class ParagraphMotionTest : VimTestCase() {
         |${c}where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.
     """.trimMargin().dotToSpace()
-    val after = """I found it in a legendary land
+    val after = """${s}${c}I found it in a legendary land
         |all rocks and lavender and tufted grass,
-        |${s}$c....
+        |....
         |w${se}here it was settled on some sodden sand
         |hard by the torrent of a mountain pass.
     """.trimMargin().dotToSpace()
@@ -150,10 +146,8 @@ class ParagraphMotionTest : VimTestCase() {
         |${c}Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
-    val after = """Lorem ipsum dolor sit amet,
-        |consectetur adipiscing elit
-        |$c
-        |Sed in orci mauris.
+    val after = """
+        |${c}Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
     doTest("d{", before, after, Mode.NORMAL())
