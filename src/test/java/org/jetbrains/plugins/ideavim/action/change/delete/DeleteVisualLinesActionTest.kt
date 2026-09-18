@@ -54,6 +54,25 @@ class DeleteVisualLinesActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test remove line in char visual mode up to end`() {
+    doTest(
+      "v\$x",
+      """
+                Lorem ipsum dolor sit amet,
+                consect${c}etur adipiscing elit
+                Sed in orci mauris.
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
+      """
+                Lorem ipsum dolor sit amet,
+                consect${c}eSed in orci mauris.
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
   fun `test remove line in line visual mode`() {
     doTest(
       "VX",
