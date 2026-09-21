@@ -106,7 +106,7 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
     }
     for (vimEditor in vimEditors) {
       val editor = vimEditor.ij
-      if (editor.vimSearchHighlights.hasHighlights) {
+      if (editor.vimSearchHighlights.hasMatches()) {
         return true
       }
     }
