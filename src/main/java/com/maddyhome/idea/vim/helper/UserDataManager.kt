@@ -15,7 +15,6 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.RangeMarker
 import com.intellij.openapi.editor.VisualPosition
-import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
 import com.maddyhome.idea.vim.api.CaretRegisterStorageBase
@@ -107,13 +106,18 @@ var Editor.vimInitialised: Boolean by userDataOr { false }
 fun unInitializeEditor(editor: Editor) {
   editor.vimLastSelectionType = null
   editor.vimMorePanel = null
-  editor.vimLastHighlighters = null
+  editor.vimSearchHighlights.clear()
   editor.vimInitialised = false
 }
 
 var Editor.vimLastSearch: String? by userData()
-var Editor.vimLastHighlighters: MutableCollection<RangeHighlighter>? by userData()
 var Editor.vimIncsearchCurrentMatchOffset: Int? by userData()
+
+/**
+ * The editor's search highlights. Created on first use - see [SearchHighlights], which owns every search highlighter
+ * in this editor.
+ */
+internal var Editor.vimSearchHighlights: SearchHighlights by userDataOr { SearchHighlights(this as Editor) }
 
 /***
  * @see :help visualmode()

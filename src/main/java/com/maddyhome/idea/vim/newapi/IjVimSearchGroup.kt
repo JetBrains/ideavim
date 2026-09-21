@@ -29,13 +29,11 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.group.XMLGroup
 import com.maddyhome.idea.vim.helper.addSubstitutionConfirmationHighlight
-import com.maddyhome.idea.vim.helper.highlightSearchResults
-import com.maddyhome.idea.vim.helper.shouldIgnoreCase
 import com.maddyhome.idea.vim.helper.clearCurrentSearchMatchHighlight
 import com.maddyhome.idea.vim.helper.updateSearchCount
 import com.maddyhome.idea.vim.helper.updateSearchHighlights
 import com.maddyhome.idea.vim.helper.vimIncsearchCurrentMatchOffset
-import com.maddyhome.idea.vim.helper.vimLastHighlighters
+import com.maddyhome.idea.vim.helper.vimSearchHighlights
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import org.jdom.Element
 import org.jetbrains.annotations.Contract
@@ -68,21 +66,6 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
   }
 
   private var showSearchHighlight: Boolean = injector.globalOptions().hlsearch
-
-  override fun highlightSearchLines(
-    editor: VimEditor,
-    startLine: Int,
-    endLine: Int,
-  ) {
-    val pattern = getLastUsedPattern()
-    if (pattern != null) {
-      val results = injector.searchHelper.findAll(
-        editor, pattern, startLine, endLine,
-        shouldIgnoreCase(pattern, lastIgnoreSmartCase)
-      )
-      highlightSearchResults(editor.ij, pattern, results)
-    }
-  }
 
   override fun updateSearchHighlights(force: Boolean) {
     updateSearchHighlights(getLastUsedPattern(), lastIgnoreSmartCase, showSearchHighlight, force)
@@ -123,7 +106,7 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
     }
     for (vimEditor in vimEditors) {
       val editor = vimEditor.ij
-      if (editor.vimLastHighlighters != null) {
+      if (editor.vimSearchHighlights.hasHighlights) {
         return true
       }
     }
@@ -132,9 +115,8 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
 
   override fun getCurrentIncsearchResultRange(editor: VimEditor): TextRange? {
     val ijEditor = editor.ij
-    val incsearchHighlighters = ijEditor.vimLastHighlighters ?: return null
     val currentOffset = ijEditor.vimIncsearchCurrentMatchOffset ?: return null
-    val currentHighlighter = incsearchHighlighters.find { it.startOffset == currentOffset }
+    val currentHighlighter = ijEditor.vimSearchHighlights.activeHighlighters.find { it.startOffset == currentOffset }
     return currentHighlighter?.textRange?.vim
   }
 
@@ -254,7 +236,7 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
 
 
   /**
-   * Removes and adds highlights for current search pattern when the document is edited
+   * Rebuilds the search highlights of the changed document, since the edit may have created or destroyed matches
    */
   class DocumentSearchListener @Contract(pure = true) private constructor() : DocumentListener {
     override fun documentChanged(event: DocumentEvent) {
@@ -262,52 +244,15 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
       // Note that the change may have come from a remote guest in Code With Me scenarios (in which case
       // ClientId.current will be a guest ID), but we don't care - we still need to add/remove highlights for the
       // changed text. Make sure we only update local editors, though.
-      val document = event.document
-      for (vimEditor in injector.editorGroup.getEditors(IjVimDocument(document))) {
+      for (vimEditor in injector.editorGroup.getEditors(IjVimDocument(event.document))) {
         val editor = vimEditor.ij
-        var existingHighlighters = editor.vimLastHighlighters ?: continue
+        if (!editor.vimSearchHighlights.isActive) continue
 
-        if (logger.isDebug()) {
-          logger.debug("hls=$existingHighlighters")
-          logger.debug("event=$event")
-        }
+        editor.vimSearchHighlights.refreshAfterDocumentChange()
 
-        // We can only re-highlight whole lines, so clear any highlights in the affected lines.
-        // If we're deleting lines, this will clear + re-highlight the new current line, which hasn't been modified.
-        // However, we still want to re-highlight this line in case any highlights cross the line boundaries.
-        // If we're adding lines, this will clear + re-highlight all new lines.
-        val startPosition = editor.offsetToLogicalPosition(event.offset)
-        val endPosition = editor.offsetToLogicalPosition(event.offset + event.newLength)
-        val startLineOffset = document.getLineStartOffset(startPosition.line)
-        val endLineOffset = document.getLineEndOffset(endPosition.line)
-
-        // Remove any highlights that have already been deleted, and remove + clear those that intersect with the change
-        val iter = existingHighlighters.iterator()
-        while (iter.hasNext()) {
-          val highlighter = iter.next()
-          if (!highlighter.isValid) {
-            iter.remove()
-          } else if (highlighter.textRange.intersects(startLineOffset, endLineOffset)) {
-            iter.remove()
-            editor.markupModel.removeHighlighter(highlighter)
-          }
-        }
-
-        (injector.searchGroup as VimSearchGroupBase).highlightSearchLines(
-          editor.vim,
-          startPosition.line,
-          endPosition.line
-        )
-
-        // The re-highlighted lines are all added as normal matches. An edit never makes a match current - only an
-        // in-progress 'incsearch' has one, and this puts its highlight back if the edit removed it
+        // The rebuilt highlights are all normal matches. An edit never makes a match current - only an in-progress
+        // 'incsearch' has one, and this puts its highlight back if the rebuild removed it
         clearCurrentSearchMatchHighlight(editor)
-
-        if (logger.isDebug()) {
-          existingHighlighters = editor.vimLastHighlighters!!
-          logger.debug("sl=" + startPosition.line + ", el=" + endPosition.line)
-          logger.debug("hls=$existingHighlighters")
-        }
       }
     }
 
