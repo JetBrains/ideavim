@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.api.LocalMarkStorage
 import com.maddyhome.idea.vim.api.SelectionInfo
 import com.maddyhome.idea.vim.api.VimOutputPanel
 import com.maddyhome.idea.vim.common.InsertSequence
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimEditorReplaceMask
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
@@ -111,7 +112,9 @@ fun unInitializeEditor(editor: Editor) {
 }
 
 var Editor.vimLastSearch: String? by userData()
-var Editor.vimIncsearchCurrentMatchOffset: Int? by userData()
+
+/** The match the in-progress `'incsearch'` preview is showing, or null when there is no search in progress. */
+var Editor.vimIncsearchCurrentMatch: TextRange? by userData()
 
 /**
  * The editor's search highlights. Created on first use - see [SearchHighlights], which owns every search highlighter

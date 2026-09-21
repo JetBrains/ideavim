@@ -10,9 +10,13 @@ package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
+import com.intellij.openapi.editor.ex.RangeHighlighterEx
+import com.intellij.openapi.editor.markup.EffectType
 import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
+import com.intellij.openapi.editor.markup.TextAttributes
+import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.newapi.vim
@@ -56,6 +60,15 @@ internal class SearchHighlights(private val editor: Editor) {
   /** The part of the document [highlighters] actually covers. Null when nothing has been realized. */
   private var realized: IjTextRange? = null
 
+  /**
+   * The start offset of the match styled as Vim's `hl-CurSearch`, or -1 for none.
+   *
+   * The layer renders the current match but does not decide which one it is - see [setCurrentMatch]. It has to be
+   * remembered here rather than only applied to a highlighter, because a rebuild throws every highlighter away and
+   * the style has to be put back on the new one.
+   */
+  private var currentMatchOffset = -1
+
   /** True if the editor is showing at least one search highlight, i.e. `v:hlsearch` should report 1. */
   val hasHighlights: Boolean
     get() = highlighters.isNotEmpty()
@@ -63,19 +76,6 @@ internal class SearchHighlights(private val editor: Editor) {
   /** True if a pattern is being tracked, even if it currently has no matches to show for it. */
   val isActive: Boolean
     get() = mode != Mode.NONE
-
-  /**
-   * The highlighters currently in the markup model.
-   *
-   * Exposed so that the current match can be restyled in place. Callers must not add to or remove from the markup
-   * model themselves.
-   */
-  val activeHighlighters: List<RangeHighlighter>
-    get() = highlighters
-
-  /** The ranges currently highlighted, skipping any that the document has since invalidated. */
-  fun matches(): List<TextRange> =
-    highlighters.filter { it.isValid }.map { TextRange(it.startOffset, it.endOffset) }
 
   /**
    * Highlight every match of [pattern] between [searchStartLine] and [searchEndLine] (-1 for the end of the
@@ -105,6 +105,19 @@ internal class SearchHighlights(private val editor: Editor) {
     this.pattern = pattern
     realized = null
     highlighters.add(createSearchMatchHighlighter(editor, range.startOffset, range.endOffset, pattern))
+    applyCurrentMatch()
+  }
+
+  /**
+   * Style the match starting at [offset] as Vim's `hl-CurSearch`, or pass -1 to style every match the same.
+   *
+   * Restyles in place, so it does not repeat the search, and does nothing when the current match hasn't moved. If
+   * the offset isn't one of the highlighted matches - the caller searched the whole file but the highlights are
+   * limited to a `:1,5s/foo` range, say - then nothing is styled, which is what Vim shows too.
+   */
+  fun setCurrentMatch(offset: Int) {
+    currentMatchOffset = offset
+    applyCurrentMatch()
   }
 
   /** The document changed underneath the highlights, so what was realized no longer describes the editor. */
@@ -127,6 +140,7 @@ internal class SearchHighlights(private val editor: Editor) {
     searchStartLine = 0
     searchEndLine = -1
     realized = null
+    currentMatchOffset = -1
   }
 
   private fun rebuild(
@@ -145,10 +159,28 @@ internal class SearchHighlights(private val editor: Editor) {
     this.searchEndLine = searchEndLine
     this.realized = desired
 
-    val lines = linesToSearch(desired) ?: return
-    injector.searchHelper.findAll(editor.vim, pattern, lines.first, lines.last, ignoreCase).forEach {
-      highlighters.add(createSearchMatchHighlighter(editor, it.startOffset, it.endOffset, pattern))
+    val lines = linesToSearch(desired)
+    if (lines != null) {
+      injector.searchHelper.findAll(editor.vim, pattern, lines.first, lines.last, ignoreCase).forEach {
+        highlighters.add(createSearchMatchHighlighter(editor, it.startOffset, it.endOffset, pattern))
+      }
     }
+
+    // Every highlighter is new, so the current match has lost its style and has to be given it again
+    applyCurrentMatch()
+  }
+
+  private fun applyCurrentMatch() {
+    val previous = highlighters.firstOrNull { it.isVimCurrentSearchMatch }
+    val current = if (currentMatchOffset == -1) {
+      null
+    } else {
+      highlighters.firstOrNull { it.startOffset == currentMatchOffset }
+    }
+    if (previous === current) return
+
+    previous?.clearVimCurrentSearchMatch()
+    current?.setAsVimCurrentSearchMatch(editor)
   }
 
   /**
@@ -202,4 +234,39 @@ internal fun createSearchMatchHighlighter(editor: Editor, start: Int, end: Int, 
   )
   highlighter.errorStripeTooltip = tooltip
   return highlighter
+}
+
+/** True if this highlighter is for the current match, i.e. it is styled as Vim's `hl-CurSearch`. */
+val RangeHighlighter.isVimCurrentSearchMatch: Boolean
+  get() = getUserData(CURRENT_SEARCH_MATCH) == true
+
+/** Marks the highlighter of the current match, so we can find and restyle it as the caret moves. */
+private val CURRENT_SEARCH_MATCH = Key.create<Boolean>("ideavim.search.currentMatch")
+
+/** Apply the current match style - Vim's `hl-CurSearch`, as opposed to `hl-Search` for the other matches. */
+private fun RangeHighlighter.setAsVimCurrentSearchMatch(editor: Editor) {
+  val highlighter = this as? RangeHighlighterEx ?: return
+  highlighter.setTextAttributes(currentSearchMatchAttributes(editor))
+  putUserData(CURRENT_SEARCH_MATCH, true)
+}
+
+/** Remove the current match style, falling back to the text attribute key the highlighter was created with. */
+private fun RangeHighlighter.clearVimCurrentSearchMatch() {
+  val highlighter = this as? RangeHighlighterEx ?: return
+  highlighter.setTextAttributes(null)
+  putUserData(CURRENT_SEARCH_MATCH, null)
+}
+
+/**
+ * The attributes of the current match - Vim's `hl-CurSearch`. These are the same modifications that the Find live
+ * preview makes to the search result attributes.
+ *
+ * There is no text attribute key for the current match, so unlike the other matches, it won't follow a change to the
+ * editor's colour scheme until it's restyled by the next caret move or search.
+ */
+private fun currentSearchMatchAttributes(editor: Editor): TextAttributes {
+  return editor.colorsScheme.getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES).clone().apply {
+    effectType = EffectType.ROUNDED_BOX
+    effectColor = editor.colorsScheme.getColor(EditorColors.CARET_COLOR)
+  }
 }
