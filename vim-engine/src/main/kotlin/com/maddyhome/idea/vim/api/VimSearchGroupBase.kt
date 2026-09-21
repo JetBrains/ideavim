@@ -105,19 +105,6 @@ abstract class VimSearchGroupBase : VimSearchGroup {
   }
 
   /**
-   * Highlights lines startLine to endLine (inclusive), using the last used pattern.
-   *
-   * @param editor    The editor to highlight.
-   * @param startLine The number of the line where to start highlighting (inclusive)
-   * @param endLine   The number of the line where to stop highlighting (inclusive)
-   */
-  abstract fun highlightSearchLines(
-    editor: VimEditor,
-    startLine: Int,
-    endLine: Int,
-  )
-
-  /**
    * Updates the current search highlights.
    *
    * @param force Whether to force this update.
