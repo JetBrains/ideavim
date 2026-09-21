@@ -34,7 +34,10 @@ import com.intellij.openapi.editor.event.EditorMouseListener
 import com.intellij.openapi.editor.event.EditorMouseMotionListener
 import com.intellij.openapi.editor.event.SelectionEvent
 import com.intellij.openapi.editor.event.SelectionListener
+import com.intellij.openapi.editor.event.VisibleAreaEvent
+import com.intellij.openapi.editor.event.VisibleAreaListener
 import com.intellij.openapi.editor.ex.DocumentEx
+import com.intellij.openapi.editor.ex.FoldingListener
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.FocusChangeListener
 import com.intellij.openapi.editor.impl.EditorComponentImpl
@@ -62,6 +65,7 @@ import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileCreateEvent
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.testFramework.LightVirtualFile
+import com.intellij.util.Alarm
 import com.intellij.util.ExceptionUtil
 import com.intellij.util.SlowOperations
 import com.maddyhome.idea.vim.EventFacade
@@ -117,6 +121,7 @@ import com.maddyhome.idea.vim.helper.resetVimLastColumn
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.vimDisabled
 import com.maddyhome.idea.vim.helper.vimInitialised
+import com.maddyhome.idea.vim.helper.vimSearchHighlights
 import com.maddyhome.idea.vim.key.noteCaretMoveInInsertSession
 import com.maddyhome.idea.vim.key.resetAbbreviationSession
 import com.maddyhome.idea.vim.listener.VimListenerManager.VimEditorFactoryListener.editorCreated
@@ -386,6 +391,13 @@ object VimListenerManager {
       eventFacade.addEditorSelectionListener(editor, EditorSelectionHandler, perEditorDisposable)
       eventFacade.addComponentMouseListener(editor.contentComponent, ComponentMouseListener, perEditorDisposable)
       eventFacade.addCaretListener(editor, EditorCaretHandler, perEditorDisposable)
+
+      // Search highlights only cover the part of the document that is on screen, so they have to follow it. Scrolling
+      // and resizing both arrive as a visible area change; collapsing a fold does not, unless it happens to move the
+      // scrollbar, but it does change which offsets are under those pixels
+      val searchHighlightsViewportHandler = SearchHighlightsViewportHandler(editor, perEditorDisposable)
+      eventFacade.addVisibleAreaListener(editor, searchHighlightsViewportHandler, perEditorDisposable)
+      eventFacade.addFoldingListener(editor, searchHighlightsViewportHandler, perEditorDisposable)
 
       injector.editorGroup.editorCreated(IjVimEditor(editor))
       VimPlugin.getChange().editorCreated(IjVimEditor(editor), perEditorDisposable)
@@ -1076,6 +1088,59 @@ object VimListenerManager {
         // TODO: Modify this to support 'selection' set to "exclusive"
         2 -> moveCaretOneCharLeftFromSelectionEnd(editor, predictedMode)
       }
+    }
+  }
+
+  /**
+   * Keeps the viewport-scoped search highlights in step with what the editor is actually showing.
+   *
+   * Both events are per editor and both arrive on the EDT, which is what reading the visible area and writing to the
+   * markup model need.
+   */
+  private class SearchHighlightsViewportHandler(
+    private val editor: Editor,
+    parentDisposable: Disposable,
+  ) : VisibleAreaListener, FoldingListener {
+
+    private val alarm = Alarm(Alarm.ThreadToUse.SWING_THREAD, parentDisposable)
+
+    override fun visibleAreaChanged(event: VisibleAreaEvent) {
+      // The viewport fires this for horizontal scrolling too, which doesn't change which lines are on screen.
+      // Width is part of the test because with soft wrap it does: a narrower editor wraps more, so fewer buffer
+      // lines fit on screen
+      val old = event.oldRectangle
+      val new = event.newRectangle
+      if (old != null && old.y == new.y && old.height == new.height && old.width == new.width) return
+      scheduleRefresh()
+    }
+
+    override fun onFoldProcessingEnd() {
+      scheduleRefresh()
+    }
+
+    /**
+     * VisibleAreaEvent comes straight from the viewport's own Swing ChangeListener, synchronously on the EDT - once
+     * per frame of an animated scroll, once per trackpad tick. Rebuilding the highlights inside that dispatch is
+     * what makes the scrollbar stick, so the work is coalesced instead. This is what the platform does for its own
+     * viewport-driven work in EditorMarkupModelImpl.
+     *
+     * The delay costs nothing visible: the highlights already extend a screen beyond the viewport, so you would have
+     * to scroll further than that within the delay to see unhighlighted text.
+     */
+    private fun scheduleRefresh() {
+      if (injector.application.isUnitTest()) {
+        // Tests assert the markup model directly after typing, and an alarm firing afterwards would be a race
+        editor.vimSearchHighlights.refreshForViewport()
+        return
+      }
+      alarm.cancelAllRequests()
+      alarm.addRequest({
+        if (!editor.isDisposed) editor.vimSearchHighlights.refreshForViewport()
+      }, COALESCE_DELAY_MS)
+    }
+
+    private companion object {
+      private const val COALESCE_DELAY_MS = 50
     }
   }
 

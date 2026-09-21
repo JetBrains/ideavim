@@ -16,6 +16,8 @@ import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.actionSystem.TypedAction;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.editor.event.*;
+import com.intellij.openapi.editor.ex.EditorEx;
+import com.intellij.openapi.editor.ex.FoldingListener;
 import com.intellij.openapi.util.Disposer;
 import com.maddyhome.idea.vim.helper.HandlerInjector;
 import org.jetbrains.annotations.NotNull;
@@ -87,6 +89,18 @@ public class EventFacade {
                                @NotNull CaretListener listener,
                                @NotNull Disposable disposable) {
     editor.getCaretModel().addCaretListener(listener, disposable);
+  }
+
+  public void addVisibleAreaListener(@NotNull Editor editor,
+                                     @NotNull VisibleAreaListener listener,
+                                     @NotNull Disposable disposable) {
+    editor.getScrollingModel().addVisibleAreaListener(listener, disposable);
+  }
+
+  public void addFoldingListener(@NotNull Editor editor,
+                                 @NotNull FoldingListener listener,
+                                 @NotNull Disposable disposable) {
+    ((EditorEx)editor).getFoldingModel().addListener(listener, disposable);
   }
 
   public void addEditorMouseListener(@NotNull Editor editor,

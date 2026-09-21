@@ -167,6 +167,7 @@ private fun updateSearchHighlights(
       null
     }
     val currentMatchOffset = currentMatch?.startOffset ?: -1
+    editor.vimSearchHighlights.setCurrentMatch(currentMatch)
 
     if (shouldAddAllSearchHighlights(pattern, showHighlights)) {
       // hlsearch (+ incsearch/noincsearch)
@@ -180,8 +181,6 @@ private fun updateSearchHighlights(
         editor.vimSearchHighlights.showSingleMatch(pattern, currentMatch)
       }
     }
-
-    editor.vimSearchHighlights.setCurrentMatch(currentMatchOffset)
 
     // Remember the incsearch match, so that `c_CTRL-R_CTRL-W` can insert the word after it
     editor.vimIncsearchCurrentMatch = currentMatch
@@ -362,7 +361,7 @@ private fun shouldAddAllSearchHighlights(newPattern: String?, hlSearch: Boolean)
  */
 fun clearCurrentSearchMatchHighlight(editor: Editor) {
   if (editor.isDisposed) return
-  editor.vimSearchHighlights.setCurrentMatch(editor.vimIncsearchCurrentMatch?.startOffset ?: -1)
+  editor.vimSearchHighlights.setCurrentMatch(editor.vimIncsearchCurrentMatch)
 }
 
 /**

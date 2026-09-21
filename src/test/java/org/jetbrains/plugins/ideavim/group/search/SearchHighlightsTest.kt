@@ -8,8 +8,13 @@
 
 package org.jetbrains.plugins.ideavim.group.search
 
+import com.intellij.openapi.application.ApplicationManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 /**
  * Search highlights are asserted as `«…»` for a normal match ([com.intellij.openapi.editor.colors.EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES])
@@ -649,5 +654,56 @@ class SearchHighlightsTest : VimTestCase() {
     typeText("<CR>")
 
     assertSearchHighlights(pattern, "«lorem» ipsum «lorem» ipsum")
+  }
+
+  /**
+   * Vim computes 'hlsearch' during redraw, per screen cell, and keeps no highlight objects at all. IdeaVim has to
+   * materialise a RangeHighlighter per match, so it only materialises the ones that could be on screen - see
+   * [com.maddyhome.idea.vim.helper.SearchHighlights].
+   *
+   * The viewport is [screenWidth] x [screenHeight] characters in the test fixture, so 200 lines is several screens.
+   */
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `test search highlights do not cover matches far off screen`() {
+    configureByLines(200, "lorem ipsum dolor sit amet,")
+    enterCommand("set hlsearch")
+    enterSearch("lorem")
+
+    val highlightedLines = highlightedLines()
+    assertTrue(0 in highlightedLines, "The top of the file is on screen, so its match should be highlighted")
+    assertFalse(
+      199 in highlightedLines,
+      "The last line is several screens away and should not be highlighted, but lines $highlightedLines are",
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `test scrolling highlights the matches that come into view`() {
+    configureByLines(200, "lorem ipsum dolor sit amet,")
+    enterCommand("set hlsearch")
+    enterSearch("lorem")
+    assertFalse(199 in highlightedLines(), "The last line starts off screen")
+
+    // Scroll to the end of the file, putting line 180 at the top of the screen
+    typeText("181Gzt")
+    assertTrue(199 in highlightedLines(), "The last line is now on screen, so its match should be highlighted")
+
+    // ...and back to the top
+    typeText("1G")
+    assertTrue(0 in highlightedLines(), "The first line is on screen again, so its match should be highlighted")
+  }
+
+  /** The lines that have a search highlight on them, as the markup model actually has it. */
+  private fun highlightedLines(): Set<Int> {
+    lateinit var lines: Set<Int>
+    ApplicationManager.getApplication().invokeAndWait {
+      val editor = fixture.editor
+      lines = editor.markupModel.allHighlighters
+        .map { editor.offsetToLogicalPosition(it.startOffset).line }
+        .toSet()
+    }
+    return lines
   }
 }
