@@ -32,7 +32,7 @@ import com.maddyhome.idea.vim.helper.addSubstitutionConfirmationHighlight
 import com.maddyhome.idea.vim.helper.clearCurrentSearchMatchHighlight
 import com.maddyhome.idea.vim.helper.updateSearchCount
 import com.maddyhome.idea.vim.helper.updateSearchHighlights
-import com.maddyhome.idea.vim.helper.vimIncsearchCurrentMatchOffset
+import com.maddyhome.idea.vim.helper.vimIncsearchCurrentMatch
 import com.maddyhome.idea.vim.helper.vimSearchHighlights
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import org.jdom.Element
@@ -113,12 +113,7 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
     return false
   }
 
-  override fun getCurrentIncsearchResultRange(editor: VimEditor): TextRange? {
-    val ijEditor = editor.ij
-    val currentOffset = ijEditor.vimIncsearchCurrentMatchOffset ?: return null
-    val currentHighlighter = ijEditor.vimSearchHighlights.activeHighlighters.find { it.startOffset == currentOffset }
-    return currentHighlighter?.textRange?.vim
-  }
+  override fun getCurrentIncsearchResultRange(editor: VimEditor): TextRange? = editor.ij.vimIncsearchCurrentMatch
 
   override fun setShouldShowSearchHighlights() {
     showSearchHighlight = injector.globalOptions().hlsearch
