@@ -34,6 +34,9 @@ dependencies {
     create(ideaType, ideaVersion) { this.useInstaller = false }
     testFramework(TestFrameworkType.Platform)
     testFramework(TestFrameworkType.JUnit5)
+    // Provides the BenchmarkTestInfo implementation that PlatformTestUtil.newBenchmark() loads via ServiceLoader.
+    // Without it, the benchmark tests fail with "No implementations of BenchmarkTestInfo found".
+    testFramework(TestFrameworkType.Metrics)
   }
 }
 
