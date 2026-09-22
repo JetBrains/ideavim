@@ -198,13 +198,6 @@ private object VimActionsPopup {
         null,
       ),
     )
-    actionGroup.add(
-      HelpLink(
-        "Take Survey ↗",
-        "https://jb.gg/axootm",
-        AllIcons.Actions.IntentionBulb,
-      ),
-    )
     actionGroup.add(WhatsNewIdeaVimAction())
     actionGroup.addSeparator(MessageHelper.message("widget.vim.actions.popup.eap.choice.active.text"))
 

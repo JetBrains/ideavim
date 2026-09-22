@@ -8,11 +8,6 @@
 
 package com.maddyhome.idea.vim
 
-import com.intellij.ide.BrowserUtil
-import com.intellij.ide.plugins.IdeaPluginDescriptor
-import com.intellij.ide.plugins.InstalledPluginsState
-import com.intellij.ide.plugins.PluginStateListener
-import com.intellij.ide.plugins.PluginStateManager
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.project.Project
@@ -52,21 +47,5 @@ internal class PluginStartup : ProjectActivity/*, LightEditCompatible*/ {
     VimPlugin.getInstance().initialize()
 
     (injector.enabler as IjVimEnabler).ideOpened()
-
-    // Uninstall survey. Should be registered once for all projects
-    PluginStateManager.addStateListener(object : PluginStateListener {
-      override fun install(p0: IdeaPluginDescriptor) {/*Nothing*/
-      }
-
-      override fun uninstall(descriptor: IdeaPluginDescriptor) {
-        val pluginId = VimPlugin.getPluginId()
-        // This event is called for both uninstall and update. There is no proper way to distinguish these two events.
-        // In order not to show the form for the update, we check if the new version is available. If so,
-        //   this may be an update (and may not), and we don't show the form.
-        if (descriptor.pluginId == pluginId && !InstalledPluginsState.getInstance().hasNewerVersion(pluginId)) {
-          BrowserUtil.open("https://jb.gg/z6c7db")
-        }
-      }
-    })
   }
 }
