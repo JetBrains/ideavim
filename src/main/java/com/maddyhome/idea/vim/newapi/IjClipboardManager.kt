@@ -26,12 +26,14 @@ import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.OwnedPrimaryContent
 import com.maddyhome.idea.vim.api.VimClipboardManager
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimCopiedText
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.state.mode.selectionType
@@ -145,6 +147,7 @@ internal class IjClipboardManager : VimClipboardManager, Disposable {
   private fun shouldRepublishVisualSelection(editor: VimEditor): Boolean {
     if (!editor.inVisualMode) return false
     if (injector.vimState.executingCommand?.type in OPERATORS_SKIPPING_PRIMARY_PUSH) return false
+    if (!injector.globalOptions().clipboard.contains(OptionConstants.clipboard_autoselect)) return false
     return injector.registerGroup.isPrimaryRegisterSupported()
   }
 

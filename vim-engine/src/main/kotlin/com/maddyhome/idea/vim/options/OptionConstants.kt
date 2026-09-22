@@ -13,6 +13,7 @@ class OptionConstants {
     const val clipboard_ideaput: String = "ideaput"
     const val clipboard_unnamed: String = "unnamed"
     const val clipboard_unnamedplus: String = "unnamedplus"
+    const val clipboard_autoselect: String = "autoselect"
 
     const val keymodel_startsel: String = "startsel"
     const val keymodel_stopsel: String = "stopsel"
