@@ -13,8 +13,11 @@ import com.intellij.util.ui.tree.TreeUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import javax.swing.JTree
 import javax.swing.KeyStroke
 import javax.swing.tree.TreeNode
+import kotlin.math.max
+import kotlin.math.min
 
 fun MutableMap<List<KeyStroke>, NerdTreeAction>.register(
   variable: String,
@@ -61,6 +64,12 @@ val navigationMappings: Map<List<KeyStroke>, NerdTreeAction> = mutableMapOf<List
   register("j", NerdTreeAction.swing("selectNext"))
   register("G", NerdTreeAction.swing("selectLast"))
   register("gg", NerdTreeAction.swing("selectFirst"))
+  register("<C-D>", NerdTreeAction { _, tree ->
+    navigateHalfPage(tree, ScrollDirection.DOWN)
+  })
+  register("<C-U>", NerdTreeAction { _, tree ->
+    navigateHalfPage(tree, ScrollDirection.UP)
+  })
 
   // FIXME lazy loaded tree nodes are not expanded
   register("NERDTreeMapOpenRecursively", "O", NerdTreeAction.ij("FullyExpandTreeNode"))
@@ -141,3 +150,16 @@ val navigationMappings: Map<List<KeyStroke>, NerdTreeAction> = mutableMapOf<List
   })
   register("<ESC>", NerdTreeAction { _, _ -> })
 }
+
+private fun navigateHalfPage(tree: JTree, direction: ScrollDirection) {
+  val visible = TreeUtil.getVisibleRowCount(tree)
+  val first = tree.getClosestRowForLocation(tree.visibleRect.x, tree.visibleRect.y)
+  val selectedRow = tree.selectionRows?.firstOrNull() ?: first
+  val delta = visible / 2 * direction.sign
+  val row = min(max(selectedRow - delta, 0), tree.rowCount - 1)
+  val top = min(first - delta, tree.rowCount - 1)
+  val bottom = top + visible - 1
+  TreeUtil.showAndSelect(tree, top, bottom, row, -1)
+}
+
+private enum class ScrollDirection(val sign: Int) { UP(1), DOWN(-1) }

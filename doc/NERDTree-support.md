@@ -59,6 +59,8 @@ Plug 'nerdtree'
 | `J`     | Jump down inside directories at the current tree depth | `g:NERDTreeMapJumpLastChild`   |
 | `<C-J>` | Jump down to next sibling of the current directory     | `g:NERDTreeMapJumpNextSibling` |
 | `<C-K>` | Jump up to previous sibling of the current directory   | `g:NERDTreeMapJumpPrevSibling` |
+| `<C-D>` | Move the selection half a page down                    | -                              |
+| `<C-U>` | Move the selection half a page up                      | -                              |
 | `r`     | Recursively refresh the current directory              | `g:NERDTreeMapRefresh`         |
 | `R`     | Recursively refresh the current root                   | `g:NERDTreeMapRefreshRoot`     |
 | `m`     | Display the NERDTree menu                              | `g:NERDTreeMapMenu`            |
