@@ -1,0 +1,156 @@
+name: Claude run post-mortem
+description: >
+  Unpacks the execution log that claude-code-action writes, so a failed run shows the
+  real cause instead of just "Claude result reported subtype success with is_error:true".
+
+inputs:
+  execution_file:
+    description: The execution_file output of the claude-code-action step.
+    required: true
+  label:
+    description: Shown in the log/summary to identify which Claude step this belongs to.
+    required: false
+    default: Claude run
+
+outputs:
+  verdict:
+    description: One of ok, credentials, quota, timeout, tool_error, unknown, no_log.
+    value: ${{ steps.postmortem.outputs.verdict }}
+  detail:
+    description: One-line human-readable explanation of the verdict.
+    value: ${{ steps.postmortem.outputs.detail }}
+
+runs:
+  using: composite
+  steps:
+    - id: postmortem
+      shell: bash
+      env:
+        EXEC_FILE: ${{ inputs.execution_file }}
+        LABEL: ${{ inputs.label }}
+      run: |
+        set -uo pipefail
+
+        VERDICT="unknown"
+        DETAIL=""
+
+        if [ -z "$EXEC_FILE" ] || [ ! -f "$EXEC_FILE" ]; then
+          # No log at all means the CLI died before the first turn - usually auth or a
+          # bad base URL, because a quota error still produces a session log.
+          echo "::warning title=No Claude execution log::claude-code-action produced no execution_file; the CLI failed before it started a session (bad base URL or rejected credentials are the usual causes)."
+          VERDICT="no_log"
+          DETAIL="no execution log was produced - the CLI never started a session"
+          {
+            echo "### $LABEL post-mortem"
+            echo ""
+            echo "- Verdict: \`no_log\`"
+            echo "- $DETAIL"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "verdict=$VERDICT"
+            echo "detail=$DETAIL"
+          } >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+
+        echo "::group::$LABEL - result entry"
+        # The log is a JSON array of session entries; the last `result` entry is the verdict.
+        RESULT=$(jq -c '[.[] | select(.type == "result")] | last // {}' "$EXEC_FILE" 2>/dev/null || echo '{}')
+        jq -r '
+          "subtype:        \(.subtype // "<none>")",
+          "is_error:       \(.is_error // false)",
+          "num_turns:      \(.num_turns // "<none>")",
+          "duration_ms:    \(.duration_ms // "<none>")",
+          "total_cost_usd: \(.total_cost_usd // "<none>")",
+          "usage:          \(.usage // {} | tojson)",
+          "denials:        \((.permission_denials // []) | map(.tool_name) | unique | join(", "))"
+        ' <<<"$RESULT"
+        echo "::endgroup::"
+
+        echo "::group::$LABEL - result text"
+        RESULT_TEXT=$(jq -r '.result // .error // ""' <<<"$RESULT")
+        echo "${RESULT_TEXT:-<empty>}"
+        echo "::endgroup::"
+
+        # Anything in the whole transcript that looks like an API-level failure. The API
+        # error that killed the run is usually in an assistant/system entry, not the result.
+        echo "::group::$LABEL - API error lines in the transcript"
+        # Walk every string in the log rather than regexing the raw JSON: API errors
+        # arrive as JSON embedded in a string, so their quotes are escaped.
+        API_ERRORS=$(jq -r '[.. | strings] | .[]' "$EXEC_FILE" 2>/dev/null \
+          | grep -iE 'rate.?limit|quota|credit balance|insufficient|authenticat|unauthori|forbidden|expired|revoked|invalid.?(api.?key|x-api-key|token|bearer)|overloaded|api error|\b(401|402|403|429|500|502|503|529)\b' \
+          | cut -c1-300 | sort -u | head -20 || true)
+        echo "${API_ERRORS:-<none found>}"
+        echo "::endgroup::"
+
+        HAYSTACK=$(printf '%s\n%s' "$RESULT_TEXT" "$API_ERRORS" | tr '[:upper:]' '[:lower:]')
+        IS_ERROR=$(jq -r '.is_error // false' <<<"$RESULT")
+        SUBTYPE=$(jq -r '.subtype // ""' <<<"$RESULT")
+
+        case "$HAYSTACK" in
+          *authentication_error*|*unauthorized*|*"401"*|*"invalid api key"*|*"invalid x-api-key"*|*"token has expired"*|*"jwt expired"*)
+            VERDICT="credentials"
+            DETAIL="the transcript contains an authentication failure - the token is expired or revoked"
+            ;;
+          *rate_limit_error*|*"rate limit"*|*quota*|*"credit balance"*|*"insufficient"*|*"429"*|*"402"*)
+            VERDICT="quota"
+            DETAIL="the transcript contains a rate-limit/quota failure"
+            ;;
+          *permission_error*|*forbidden*|*"403"*)
+            VERDICT="credentials"
+            DETAIL="the transcript contains a 403 - the token is not authorized for this model/service"
+            ;;
+          *overloaded*|*"500"*|*"502"*|*"503"*|*"529"*)
+            VERDICT="proxy"
+            DETAIL="the transcript contains upstream 5xx/overloaded errors"
+            ;;
+          *)
+            if [ "$SUBTYPE" = "error_max_turns" ]; then
+              VERDICT="timeout"
+              DETAIL="the run hit the max-turns limit"
+            elif [ "$IS_ERROR" = "true" ]; then
+              VERDICT="tool_error"
+              DETAIL="Claude finished with is_error=true but no API-level error - the prompt or a tool failed, see the result text above"
+            else
+              VERDICT="ok"
+              DETAIL="the run completed without an error result"
+            fi
+            ;;
+        esac
+
+        echo "$LABEL post-mortem verdict: $(printf '%s' "$VERDICT" | tr '[:lower:]' '[:upper:]') - $DETAIL"
+
+        {
+          echo "### $LABEL post-mortem"
+          echo ""
+          echo "- Verdict: \`$VERDICT\`"
+          echo "- \`subtype\`: \`${SUBTYPE:-<none>}\`, \`is_error\`: \`$IS_ERROR\`"
+          echo "- Detail: $DETAIL"
+          if [ -n "$RESULT_TEXT" ]; then
+            echo ""
+            echo "<details><summary>Result text</summary>"
+            echo ""
+            echo '```'
+            printf '%s\n' "$RESULT_TEXT" | head -c 4000
+            echo '```'
+            echo ""
+            echo "</details>"
+          fi
+          if [ -n "$API_ERRORS" ]; then
+            echo ""
+            echo "<details><summary>API error lines</summary>"
+            echo ""
+            echo '```'
+            printf '%s\n' "$API_ERRORS" | head -c 4000
+            echo '```'
+            echo ""
+            echo "</details>"
+          fi
+          echo ""
+        } >> "$GITHUB_STEP_SUMMARY"
+
+        {
+          echo "verdict=$VERDICT"
+          echo "detail=$DETAIL"
+        } >> "$GITHUB_OUTPUT"

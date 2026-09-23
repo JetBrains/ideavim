@@ -21,6 +21,16 @@ jobs:
         with:
           fetch-depth: 0  # Full history so the changelog can be analyzed and the PR branch pushed
 
+      # Tells apart "the JWT expired" from "the quota is gone" BEFORE Claude runs -
+      # claude-code-action reports both as a bare `result is_error:true`.
+      - name: Check Claude credentials and quota
+        id: preflight
+        uses: ./.github/actions/claude-preflight
+        with:
+          base_url: ${{ secrets.PROXY_URL }}
+          jwt: ${{ secrets.ANTHROPIC_API_KEY }}
+          label: pre-flight
+
       - name: Run Claude Code to update the changelog and prepare the What's New page
         id: claude
         uses: anthropics/claude-code-action@v1
@@ -112,6 +122,34 @@ jobs:
 
           # Changelog needs the skill + git/gh/web; the page generation needs file read/write.
           claude_args: '--allowed-tools "Skill,Read,Write,Edit,Glob,Grep,Bash(git:*),Bash(gh:*),WebSearch,WebFetch(domain:plugins.jetbrains.com),WebFetch(domain:youtrack.jetbrains.com),WebFetch(domain:github.com)"'
+
+      # Decodes the session log that the action writes but never prints.
+      - name: Claude run post-mortem
+        if: ${{ always() }}
+        id: postmortem
+        uses: ./.github/actions/claude-postmortem
+        with:
+          execution_file: ${{ steps.claude.outputs.execution_file }}
+          label: Prepare What's New
+
+      # Re-probe after a failure: a pre-flight that was OK plus a post-flight that is not
+      # means the quota ran out during this very run.
+      - name: Re-check Claude credentials and quota after a failure
+        if: ${{ failure() }}
+        uses: ./.github/actions/claude-preflight
+        with:
+          base_url: ${{ secrets.PROXY_URL }}
+          jwt: ${{ secrets.ANTHROPIC_API_KEY }}
+          label: post-failure
+
+      - name: Upload the Claude execution log
+        if: ${{ always() && steps.claude.outputs.execution_file != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: claude-execution-log
+          path: ${{ steps.claude.outputs.execution_file }}
+          if-no-files-found: ignore
+          retention-days: 14
 
       - name: Comment rendered preview link on the PR
         if: ${{ always() }}
