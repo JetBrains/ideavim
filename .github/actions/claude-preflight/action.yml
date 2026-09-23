@@ -1,0 +1,240 @@
+name: Claude pre-flight check
+description: >
+  Probes the Claude proxy before (or after) running claude-code-action and tells you
+  whether the credentials are dead or the quota is gone. claude-code-action only ever
+  reports "result is_error:true", which hides the actual HTTP failure.
+
+inputs:
+  base_url:
+    description: Proxy base URL (the value passed as ANTHROPIC_BASE_URL, i.e. secrets.PROXY_URL).
+    required: true
+  jwt:
+    description: The Grazie JWT / API key (secrets.ANTHROPIC_API_KEY).
+    required: true
+  model:
+    description: Model id used for the probe request. Must be a model the proxy accepts.
+    required: false
+    default: claude-haiku-3-5-20241022
+  label:
+    description: Shown in the log/summary so a "before" and an "after" probe can be told apart.
+    required: false
+    default: pre-flight
+  fail_on_error:
+    description: Fail the step when the probe does not come back healthy. Diagnostics only by default.
+    required: false
+    default: 'false'
+
+outputs:
+  verdict:
+    description: One of ok, credentials, quota, proxy, network, unknown.
+    value: ${{ steps.probe.outputs.verdict }}
+  http_status:
+    description: HTTP status returned by the proxy (000 when the request never completed).
+    value: ${{ steps.probe.outputs.http_status }}
+  detail:
+    description: One-line human-readable explanation of the verdict.
+    value: ${{ steps.probe.outputs.detail }}
+
+runs:
+  using: composite
+  steps:
+    - id: probe
+      shell: bash
+      env:
+        BASE_URL: ${{ inputs.base_url }}
+        JWT: ${{ inputs.jwt }}
+        MODEL: ${{ inputs.model }}
+        LABEL: ${{ inputs.label }}
+        FAIL_ON_ERROR: ${{ inputs.fail_on_error }}
+      run: |
+        set -uo pipefail
+        # The secret is masked by Actions already, but this step is also used with
+        # values that did not come from `secrets.` in every caller.
+        [ -n "$JWT" ] && echo "::add-mask::$JWT"
+
+        echo "::group::Claude $LABEL check"
+
+        VERDICT="unknown"
+        DETAIL=""
+        HTTP_STATUS="000"
+        JWT_EXPIRED="false"
+
+        # ---------------------------------------------------------------
+        # 1. Are the inputs even present?
+        # ---------------------------------------------------------------
+        if [ -z "$BASE_URL" ]; then
+          echo "ANTHROPIC_BASE_URL / PROXY_URL is EMPTY - the secret is missing or not exposed to this workflow."
+          VERDICT="credentials"
+          DETAIL="PROXY_URL secret is empty"
+        fi
+        if [ -z "$JWT" ]; then
+          echo "ANTHROPIC_API_KEY is EMPTY - the secret is missing or not exposed to this workflow."
+          VERDICT="credentials"
+          DETAIL="ANTHROPIC_API_KEY secret is empty"
+        fi
+        echo "Base URL host: $(printf '%s' "$BASE_URL" | sed -E 's#^[a-z]+://([^/]+).*#\1#')"
+        echo "Token length:  ${#JWT} chars"
+
+        # ---------------------------------------------------------------
+        # 2. If the token is a JWT, has it simply expired?
+        #    Only timestamps and claim NAMES are printed - never claim values,
+        #    which may carry user identity.
+        # ---------------------------------------------------------------
+        NOW=$(date -u +%s)
+        # GNU date on the runner, BSD date when this is run locally.
+        fmt_ts() { date -u -d "@$1" '+%Y-%m-%d %H:%M:%S UTC' 2>/dev/null || date -u -r "$1" '+%Y-%m-%d %H:%M:%S UTC' 2>/dev/null || printf 'epoch %s' "$1"; }
+        if [ "$(printf '%s' "$JWT" | awk -F. '{print NF}')" -eq 3 ]; then
+          PAYLOAD=$(printf '%s' "$JWT" | cut -d. -f2)
+          PAD=$(( (4 - ${#PAYLOAD} % 4) % 4 ))
+          [ "$PAD" -gt 0 ] && PAYLOAD="${PAYLOAD}$(printf '=%.0s' $(seq 1 "$PAD"))"
+          CLAIMS=$(printf '%s' "$PAYLOAD" | tr '_-' '/+' | base64 -d 2>/dev/null || true)
+          if printf '%s' "$CLAIMS" | jq -e . >/dev/null 2>&1; then
+            echo "Token is a JWT. Claims present: $(printf '%s' "$CLAIMS" | jq -r 'keys | join(", ")')"
+            IAT=$(printf '%s' "$CLAIMS" | jq -r '.iat // empty')
+            EXP=$(printf '%s' "$CLAIMS" | jq -r '.exp // empty')
+            [ -n "$IAT" ] && echo "  issued at:  $(fmt_ts "$IAT")"
+            if [ -n "$EXP" ]; then
+              echo "  expires at: $(fmt_ts "$EXP")"
+              if [ "$EXP" -le "$NOW" ]; then
+                echo "  >>> TOKEN IS EXPIRED (by $(( (NOW - EXP) / 86400 )) day(s)). Rotate the ANTHROPIC_API_KEY secret."
+                VERDICT="credentials"
+                DETAIL="JWT expired $(( (NOW - EXP) / 86400 )) day(s) ago"
+                JWT_EXPIRED="true"
+              else
+                echo "  valid for another $(( (EXP - NOW) / 86400 )) day(s)."
+              fi
+            else
+              echo "  no exp claim - the token does not expire on its own."
+            fi
+          else
+            echo "Token has three dot-separated parts but the payload is not JSON; treating it as an opaque key."
+          fi
+        else
+          echo "Token is not a JWT (no exp claim to inspect); relying on the live probe below."
+        fi
+
+        # ---------------------------------------------------------------
+        # 3. Live probe: one 1-token request through the same proxy and the
+        #    same headers claude-code-action uses. The HTTP status is the
+        #    answer the action swallows.
+        # ---------------------------------------------------------------
+        URL="${BASE_URL%/}/v1/messages"
+        BODY_FILE="$RUNNER_TEMP/claude-probe-body.json"
+        HDR_FILE="$RUNNER_TEMP/claude-probe-headers.txt"
+
+        if [ -n "$BASE_URL" ] && [ -n "$JWT" ]; then
+          HTTP_STATUS=$(curl -sS --max-time 60 -o "$BODY_FILE" -D "$HDR_FILE" -w '%{http_code}' \
+            -X POST "$URL" \
+            -H 'content-type: application/json' \
+            -H 'anthropic-version: 2023-06-01' \
+            -H "x-api-key: $JWT" \
+            -H "authorization: Bearer $JWT" \
+            -H "Grazie-Authenticate-JWT: $JWT" \
+            -H 'Grazie-Agent: {"name":"ideavim-claude-code-action","version":"github-actions-preflight"}' \
+            -d "{\"model\":\"$MODEL\",\"max_tokens\":1,\"messages\":[{\"role\":\"user\",\"content\":\"ping\"}]}" \
+            2>"$RUNNER_TEMP/claude-probe-curl.err") || true
+          # A curl that never connected prints nothing usable; normalise it to 000.
+          case "$HTTP_STATUS" in [0-9][0-9][0-9]) ;; *) HTTP_STATUS="000" ;; esac
+
+          echo "Probe: POST \$BASE_URL/v1/messages (model $MODEL) -> HTTP $HTTP_STATUS"
+          [ -s "$RUNNER_TEMP/claude-probe-curl.err" ] && sed 's/^/  curl: /' "$RUNNER_TEMP/claude-probe-curl.err"
+
+          # Rate-limit and retry headers say "quota" far more clearly than the body does.
+          grep -iE '^(retry-after|anthropic-ratelimit|x-ratelimit|x-should-retry|grazie-)' "$HDR_FILE" \
+            | sed 's/^/  header: /' || true
+
+          ERR_TYPE=$(jq -r '.error.type // .type // empty' "$BODY_FILE" 2>/dev/null || true)
+          ERR_MSG=$(jq -r '.error.message // .message // empty' "$BODY_FILE" 2>/dev/null || true)
+          if [ -n "$ERR_TYPE$ERR_MSG" ]; then
+            echo "  error.type:    ${ERR_TYPE:-<none>}"
+            echo "  error.message: ${ERR_MSG:-<none>}"
+          else
+            # Not an Anthropic-shaped error - the proxy answered in its own format.
+            echo "  raw response (first 400 chars): $(head -c 400 "$BODY_FILE" | tr -d '\n')"
+          fi
+
+          LOWER=$(printf '%s %s' "$ERR_TYPE" "$ERR_MSG" | tr '[:upper:]' '[:lower:]')
+          case "$HTTP_STATUS" in
+            200|201)
+              VERDICT="ok"
+              DETAIL="proxy accepted a live request"
+              ;;
+            401)
+              VERDICT="credentials"
+              DETAIL="HTTP 401 - the token is rejected (expired or revoked)"
+              ;;
+            403)
+              # Grazie returns 403 both for a revoked grant and for an exhausted licence quota.
+              case "$LOWER" in
+                *quota*|*limit*|*balance*|*credit*)
+                  VERDICT="quota"
+                  DETAIL="HTTP 403 mentioning quota/limit - the licence quota is exhausted"
+                  ;;
+                *)
+                  VERDICT="credentials"
+                  DETAIL="HTTP 403 - the token is valid but no longer authorized for this model/service"
+                  ;;
+              esac
+              ;;
+            402)
+              VERDICT="quota"
+              DETAIL="HTTP 402 - billing/credit balance exhausted"
+              ;;
+            429)
+              VERDICT="quota"
+              DETAIL="HTTP 429 - rate limit or quota exhausted"
+              ;;
+            400|404|405|422)
+              VERDICT="proxy"
+              DETAIL="HTTP $HTTP_STATUS - request rejected by the proxy (likely an unsupported model id: $MODEL)"
+              ;;
+            5*)
+              VERDICT="proxy"
+              DETAIL="HTTP $HTTP_STATUS - the proxy or upstream is failing"
+              ;;
+            000)
+              VERDICT="network"
+              DETAIL="the request never completed (DNS, TLS or timeout)"
+              ;;
+            *)
+              VERDICT="unknown"
+              DETAIL="unexpected HTTP $HTTP_STATUS"
+              ;;
+          esac
+        fi
+
+        # A live 200 outranks the local exp claim (the proxy may not enforce it), but the
+        # stale token still deserves to show up in the verdict line.
+        if [ "$VERDICT" = "ok" ] && [ "$JWT_EXPIRED" = "true" ]; then
+          DETAIL="$DETAIL (note: the JWT's own exp claim is in the past)"
+        fi
+
+        echo "::endgroup::"
+
+        case "$VERDICT" in
+          ok)          ICON="OK" ;;
+          credentials) ICON="CREDENTIALS" ;;
+          quota)       ICON="QUOTA" ;;
+          *)           ICON="$(printf '%s' "$VERDICT" | tr '[:lower:]' '[:upper:]')" ;;
+        esac
+        echo "Claude $LABEL verdict: $ICON - $DETAIL"
+
+        {
+          echo "### Claude $LABEL check"
+          echo ""
+          echo "- Verdict: \`$VERDICT\`"
+          echo "- HTTP status: \`$HTTP_STATUS\`"
+          echo "- Detail: $DETAIL"
+          echo ""
+        } >> "$GITHUB_STEP_SUMMARY"
+
+        {
+          echo "verdict=$VERDICT"
+          echo "http_status=$HTTP_STATUS"
+          echo "detail=$DETAIL"
+        } >> "$GITHUB_OUTPUT"
+
+        if [ "$FAIL_ON_ERROR" = "true" ] && [ "$VERDICT" != "ok" ]; then
+          echo "::error title=Claude $LABEL check failed::$DETAIL"
+          exit 1
+        fi
