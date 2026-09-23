@@ -528,6 +528,8 @@ The matchit plugin extends this in several ways...
 
 ### Instructions
 
+Your own pairs can be defined in the `b:match_words` buffer variable, e.g. `let b:match_words = 'begin:end,if:elsif:else:end'`.
+
 https://github.com/adelarsq/vim-matchit/blob/master/doc/matchit.txt
 
 </details>
