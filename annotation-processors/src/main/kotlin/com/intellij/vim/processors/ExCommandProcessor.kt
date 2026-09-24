@@ -45,7 +45,7 @@ class ExCommandProcessor(private val environment: SymbolProcessorEnvironment) : 
     return emptyList()
   }
 
-  private inner class EXCommandVisitor : KSVisitorVoid(enableNewFeatures = true) {
+  private inner class EXCommandVisitor : KSVisitorVoid() {
     @OptIn(KspExperimental::class)
     override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
       // The annotation is repeatable, so that one class can declare different bar handling for different names
