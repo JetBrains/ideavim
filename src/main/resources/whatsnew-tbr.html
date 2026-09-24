@@ -397,6 +397,30 @@
         through the jump list. <code>gd</code> and <code>gD</code> leave the stack alone.</p>
     </div>
 
+    <!-- ideavimrc path -->
+    <div class="section">
+      <p class="kicker">settings · ideavimrc</p>
+      <h2>Pick your ideavimrc</h2>
+      <p>You can now choose where the ideavimrc file lives in <strong>Settings | Editor | Vim</strong>. The path
+        can use <code>~</code>, environment variables such as <code>$VAR</code> and IDE path macros, so every IDE
+        can have a config of its own:</p>
+      <pre><span class="str">$APPLICATION_CONFIG_DIR$/ideavim/ideavimrc</span></pre>
+      <p class="note">Leave the field empty to keep using the default locations. They are also used while the
+        file you picked doesn't exist yet.</p>
+    </div>
+
+    <!-- search highlight performance -->
+    <div class="section">
+      <p class="kicker">performance · search</p>
+      <h2>Fast typing, even with thousands of matches</h2>
+      <p>With <code>'hlsearch'</code> on, a pattern that matched all over a large file used to slow down typing
+        and scrolling, because every single match was highlighted, including the ones far off screen. IdeaVim now
+        highlights only the matches in and around the visible part of the editor and adds more as you scroll, so
+        big files stay smooth.</p>
+      <p class="note">Nothing changes in how search works: <kbd>n</kbd> and <kbd>N</kbd> still find every match
+        in the file.</p>
+    </div>
+
     <!-- vim-signature -->
     <div class="section">
       <p class="kicker">new plugin · marks</p>
@@ -437,7 +461,7 @@
     <!-- % expansion -->
     <div class="section">
       <p class="kicker">ex commands · file names</p>
-      <h2><code>%</code> means the current file, everywhere</h2>
+      <h2><code>%</code> means the current file, everywhere — and <code>#</code> the alternate one</h2>
       <p><code>%</code> and its file name modifiers now work when a command runs, not only when <kbd>Tab</kbd>
         completes it. <code>:w</code>, <code>:!</code>, <code>:source</code>, <code>:split</code> and
         <code>:read</code> all accept it, and the modifiers chain from left to right as they do in Vim.</p>
@@ -446,6 +470,9 @@
 :e %:h/<span class="key">&lt;Tab&gt;</span>                <span class="cm">" complete the files in the same directory</span>
 
 <span class="cm">" :p full path · :h directory · :t file name · :r drop extension · :e extension</span></pre>
+      <p>Next to <code>"%</code>, there's now a <code>"#</code> register that holds the alternate file, the one
+        <kbd>&lt;C-^&gt;</kbd> jumps back to. <code>"#p</code> pastes its name, <code>@#</code> reads it in an
+        expression, and it shows up in <code>:registers</code>.</p>
     </div>
 
     <!-- per-window jump lists -->
@@ -494,12 +521,6 @@
             So <code>dil</code> deletes the code and keeps the indent.</p>
         </div>
         <div class="mini">
-          <h3>The <code>"#</code> register</h3>
-          <p>This register holds the alternate file, the one <kbd>&lt;C-^&gt;</kbd> jumps back to.
-            <code>"#p</code> pastes its name, <code>@#</code> reads it in an expression, and it shows up in
-            <code>:registers</code>.</p>
-        </div>
-        <div class="mini">
           <h3><code>'wildmenu'</code></h3>
           <p><code>set nowildmenu</code> turns off the completion popup on the <kbd>:</kbd> command line.
             <kbd>Tab</kbd> still cycles through the matches one at a time.</p>
@@ -511,21 +532,22 @@
             empty line, as in Vim.</p>
         </div>
         <div class="mini">
-          <h3>Pick your ideavimrc</h3>
-          <p>You can now set where the ideavimrc file lives in Settings | Editor | Vim. The path can use
-            <code>~</code>, <code>$VAR</code> and IDE macros, so
-            <code>$APPLICATION_CONFIG_DIR$/ideavim/ideavimrc</code> gives each IDE its own config.</p>
+          <h3>All options start with <code>idea</code></h3>
+          <p>Every IdeaVim-only option now has the <code>idea</code> prefix, so it's clear which options are
+            IdeaVim's. <code>'lookupkeys'</code>, <code>'trackactionids'</code> and <code>'visualdelay'</code>
+            are now <code>'idealookupkeys'</code>, <code>'ideatrackactionids'</code> and
+            <code>'ideavisualdelay'</code>. The old names still work.</p>
         </div>
         <div class="mini">
           <h3>matchit <code>b:match_words</code></h3>
-          <p>Teach <kbd>%</kbd> your own word pairs:
-            <code>let b:match_words = 'begin:end,if:elsif:else:end'</code> makes it cycle through
-            <code>if</code>, <code>elsif</code>, <code>else</code> and <code>end</code>.</p>
+          <p>Teach <kbd>%</kbd> your own word pairs: set <code>b:match_words</code> to
+            <code>'if:elsif:else:end'</code> and it cycles through <code>if</code>, <code>elsif</code>,
+            <code>else</code> and <code>end</code>.</p>
         </div>
         <div class="mini">
           <h3>Line comments in commentary</h3>
-          <p>Set <code>let g:commentary_block_comments = 0</code> to always comment out whole lines, as the
-            original plugin does, instead of using a block comment for <code>gciw</code>.</p>
+          <p>Set <code>g:commentary_block_comments</code> to <code>0</code> to always comment out whole lines, as
+            the original plugin does, instead of using a block comment for <code>gciw</code>.</p>
         </div>
         <div class="mini">
           <h3>Small additions</h3>
@@ -543,10 +565,6 @@
           <code>map &lt;leader&gt;sf &lt;Action&gt;(GotoFile)</code> now works when every editor tab is closed and
           the focus is on something like the Project tool window. Counts, <code>'timeout'</code> and
           <kbd>Esc</kbd> behave as they do in an editor.
-        </li>
-        <li><strong>Smooth typing with many search matches</strong> — with <code>'hlsearch'</code> on, only
-          the matches in and around the visible part of the editor are highlighted, so large files no longer slow
-          down typing and scrolling.
         </li>
         <li><strong>No leftover box after a search</strong> — the box around the current match now only appears
           while <code>'incsearch'</code> is previewing the pattern you are typing, as in a stock Vim.
