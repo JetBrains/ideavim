@@ -23,7 +23,7 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## To Be Released
+## 2.47.0, 2026-09-24
 
 ### Features:
 * [VIM-3058](https://youtrack.jetbrains.com/issue/VIM-3058) Added the [`"#` register](https://vimhelp.org/change.txt.html#quote_%23), which holds the name of the alternate file — the file you last switched away from, the one [`CTRL-^`](https://vimhelp.org/editing.txt.html#CTRL-%5E) jumps back to. `"#p` puts it into the text, `@#` reads it in an expression, and `:registers` lists it under `%`. Like `%`, it reports the path relative to the content root, since IdeaVim has no current directory, and it is read only — `:let @# = 'other.txt'` reports `E354: Invalid register name: '#'`
