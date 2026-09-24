@@ -25,7 +25,7 @@ import java.util.*
  * see "h :sort"
  */
 // todo make it multicaret
-@ExCommand(command = "sor[t]")
+@ExCommand(command = "sor[t]", delimitedSections = 1)
 data class SortCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

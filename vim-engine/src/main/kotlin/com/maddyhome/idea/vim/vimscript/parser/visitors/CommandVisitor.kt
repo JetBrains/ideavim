@@ -59,6 +59,8 @@ import kotlin.reflect.full.createType
 import kotlin.reflect.full.primaryConstructor
 
 object CommandVisitor : VimscriptBaseVisitor<Command>() {
+  
+  private const val CTRL_V = '\u0016'
 
   private val logger = vimLogger<CommandVisitor>()
   private val expressionVisitor: ExpressionVisitor = ExpressionVisitor
@@ -244,9 +246,10 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     range: Range,
     commandName: String,
     modifier: CommandModifier,
-    argument: String,
+    commandLine: String,
     ctx: ParserRuleContext,
   ): Command {
+    val (argument, nextCommand) = splitOffNextCommand(commandName, commandLine)
     val command = when (getCommandByName(commandName)) {
       LoadKeymapCommand::class -> LoadKeymapCommand(range, commandName, modifier, argument)
       MapCommand::class -> MapCommand(range, commandName, modifier, argument)
@@ -275,8 +278,101 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
       SubstituteCommand::class -> SubstituteCommand(range, argument, commandName)
       else -> getCommandByName(commandName).primaryConstructor!!.call(range, modifier, argument)
     }
+    command.nextCommand = nextCommand
     command.rangeInScript = ctx.getTextRange()
     return command
+  }
+  
+  /**
+   * Split a command line into the argument of its first command and the rest of the line. See [Command.nextCommand]
+   *
+   * Each command declares how a `|` in its argument is treated in its `@ExCommand` annotation, which reaches us
+   * through the generated command table - the job Vim's `TRLBAR` flag does. A command the table does not know is a
+   * user defined one, and takes the `|` as part of its argument, as `:command` supports no `-bar`.
+   */
+  private fun splitOffNextCommand(commandName: String, commandLine: String): Pair<String, String> {
+    val exCommand = injector.vimscriptParser.exCommands.getCommand(commandName)
+    val delimitedSections = exCommand?.delimitedSections ?: 0
+    
+    val endOfArgument = when {
+      delimitedSections > 0 -> findEndOfDelimitedSections(commandLine, delimitedSections)
+      exCommand?.barSeparates == true -> 0
+      else -> commandLine.length
+    }
+    
+    val separator = indexOfCommandSeparator(commandLine, endOfArgument)
+    if (separator == -1) return commandLine to ""
+    return commandLine.substring(0, separator) to commandLine.substring(separator + 1)
+  }
+  
+  /**
+   * Find the index just after the [count] delimiter-wrapped sections of [commandLine], such as the pattern and the
+   * replacement of `:s/pat/sub/flags`, or the single pattern of `:sort /pat/ u`
+   *
+   * An unescaped `|` inside a section belongs to the argument, so the result is the first index at which a `|` can
+   * separate commands. The delimiter is whatever character the user chose, and it need not come first: `:sort u /pat/`
+   * is as valid as `:sort /pat/ u`, and `:s` can be given flags with no pattern at all.
+   */
+  private fun findEndOfDelimitedSections(commandLine: String, count: Int): Int {
+    var i = indexAfterFlagsAndCount(commandLine)
+    if (i == commandLine.length || commandLine[i] == '|' || commandLine[i] == '"') return i
+    
+    val delimiter: Char
+    if (commandLine[i] == '\\') {
+      // Undocumented vi feature: `\/` and `\?` reuse the last search pattern and `\&` the last substitute pattern, so
+      // the command holds one section fewer and the delimiter is the second character
+      val escaped = commandLine.getOrNull(i + 1)
+      if (escaped == null || escaped !in "/?&") return i
+      delimiter = escaped
+      i += 2
+    } else {
+      delimiter = commandLine[i]
+      i = injector.searchGroup.findEndOfPattern(commandLine, delimiter, i + 1)
+      if (i == commandLine.length) return commandLine.length
+      i++
+    }
+    
+    repeat(count - 1) { i = indexAfterSection(commandLine, delimiter, i) }
+    return i
+  }
+  
+  /** The index of the first character of [commandLine] that is neither a flag nor a count, and so may be a delimiter */
+  private fun indexAfterFlagsAndCount(commandLine: String): Int {
+    var i = 0
+    while (i < commandLine.length && (commandLine[i].isLetterOrDigit() || commandLine[i].isWhitespace())) i++
+    return i
+  }
+  
+  /**
+   * The index just after the [delimiter] that closes a plain text section, or the end of [commandLine] if it is never
+   * closed. A `\` escapes the next character, as in Vim's own scan of a replacement
+   */
+  private fun indexAfterSection(commandLine: String, delimiter: Char, startIndex: Int): Int {
+    var i = startIndex
+    while (i < commandLine.length) {
+      when {
+        commandLine[i] == delimiter -> return i + 1
+        commandLine[i] == '\\' && i + 1 < commandLine.length -> i += 2
+        else -> i++
+      }
+    }
+    return commandLine.length
+  }
+  
+  /**
+   * Find the first `|` at or after [startIndex] that separates commands, or `-1` if there is none
+   *
+   * A `|` is escaped, and part of the argument, when the character right before it is a `\` or a CTRL-V - the test
+   * Vim makes in `separate_nextcmd`, and the one the lexer's `ESCAPED_BAR` token makes. The escape is not itself
+   * escapable: in `\\|` it is the second `\` that escapes the bar, as in `:set langmap=\\|a`.
+   */
+  private fun indexOfCommandSeparator(commandLine: String, startIndex: Int): Int {
+    for (i in startIndex until commandLine.length) {
+      if (commandLine[i] != '|') continue
+      val escape = commandLine.getOrNull(i - 1)
+      if (escape != '\\' && escape != CTRL_V) return i
+    }
+    return -1
   }
 
   override fun visitShiftLeftCommand(ctx: VimscriptParser.ShiftLeftCommandContext): ShiftLeftCommand {
@@ -330,19 +426,7 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     val range: Range = parseRange(ctx.range())
     val name = ctx.commandName().text
     val modifier = if (ctx.bangModifier == null) CommandModifier.NONE else CommandModifier.BANG
-    val argument = ctx.commandArgumentWithBars()?.text ?: ""
-
-    // Special case for `:k{mark}`, with no whitespace between command and argument. The `:k` command (shorthand for
-    // `:mark`) is already recognised and handled as a command. That parser rule allows optional whitespace, so
-    // `:k{mark}` should work. However, the catch-all "other" rule is greedier and accepts a command name starting with
-    // `k` and containing alpha marks. This is the only command that starts with `k`, so we can handle it here, passing
-    // the rest of the command name as an argument. (Note that the whitespace between end of command name and what the
-    // parser thinks of as the argument isn't necessarily correct, but this is an error anyway)
-    if (name.startsWith("k")) {
-      val command = MarkCommand(range, CommandModifier.NONE, name.substring(1) + " " + argument)
-      command.rangeInScript = ctx.getTextRange()
-      return command
-    }
+    val commandLine = ctx.commandArgumentWithBars()?.text ?: ""
 
     // A bang is part of the parsed command name, not `bangModifier` - `commandName` is left-recursive over BANG, and
     // ANTLR's left recursion is greedy, so it always wins. That is what user-defined aliases need, because they are
@@ -356,10 +440,27 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
       commandConstructor = findCommandConstructor(name.dropLast(1))
       commandModifier = CommandModifier.BANG
     }
+    
+    // Special case for `:k{mark}`, with no whitespace between command and argument. The `:k` command (shorthand for
+    // `:mark`) is already recognised and handled as a command. That parser rule allows optional whitespace, so
+    // `:k{mark}` should work. However, the catch-all "other" rule is greedier and accepts a command name starting with
+    // `k` and containing alpha marks. This is the only command that starts with `k`, so we can handle it here, passing
+    // the rest of the command name as an argument. (Note that the whitespace between end of command name and what the
+    // parser thinks of as the argument isn't necessarily correct, but this is an error anyway)
+    val isMarkCommand = name.startsWith("k")
+    
+    // The command table is keyed by command name alone, so `:k{mark}` is looked up as `:k` and the bang comes off
+    val lookupName = if (isMarkCommand) "k" else name.removeSuffix("!")
+    val (argument, nextCommand) = splitOffNextCommand(lookupName, commandLine)
 
     // Note that the fallback keeps the original name and modifier, so alias resolution still sees the bang
-    val command = commandConstructor?.call(range, commandModifier, argument)
-      ?: UnknownCommand(range, name, modifier, argument)
+    val command = if (isMarkCommand) {
+      MarkCommand(range, CommandModifier.NONE, name.substring(1) + " " + argument)
+    } else {
+      commandConstructor?.call(range, commandModifier, argument)
+        ?: UnknownCommand(range, name, modifier, argument)
+    }
+    command.nextCommand = nextCommand
     command.rangeInScript = ctx.getTextRange()
     return command
   }

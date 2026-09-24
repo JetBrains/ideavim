@@ -10,7 +10,13 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 
 import kotlin.reflect.KClass
 
-class LazyExCommandInstance(private val className: String, private val classLoader: ClassLoader) {
+/** [barSeparates] and [delimitedSections] are the command's `@ExCommand` values, unchanged */
+class LazyExCommandInstance(
+  private val className: String,
+  private val classLoader: ClassLoader,
+  val barSeparates: Boolean = true,
+  val delimitedSections: Int = 0,
+) {
   fun getKClass(): KClass<out Command> {
     @Suppress("UNCHECKED_CAST")
     return classLoader.loadClass(className).kotlin as KClass<out Command>

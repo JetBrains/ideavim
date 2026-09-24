@@ -19,7 +19,8 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :substitute"
  */
-@ExCommand(command = "~,&,s[ubstitute]")
+@ExCommand(command = "~,&")
+@ExCommand(command = "s[ubstitute]", delimitedSections = 2)
 data class SubstituteCommand(val range: Range, val argument: String, val command: String) :
   Command.SingleExecution(range, CommandModifier.NONE, argument) {
 

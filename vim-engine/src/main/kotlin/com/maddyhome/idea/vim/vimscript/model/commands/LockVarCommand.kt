@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 /**
  * see :h lockvar
  */
-@ExCommand(command = "lockv[ar]")
+@ExCommand(command = "lockv[ar]", barSeparates = false)
 class LockVarCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 
@@ -44,7 +44,7 @@ class LockVarCommand(val range: Range, val modifier: CommandModifier, val argume
 /**
  * see :h unlockvar
  */
-@ExCommand(command = "unlo[ckvar]")
+@ExCommand(command = "unlo[ckvar]", barSeparates = false)
 class UnlockVarCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 
