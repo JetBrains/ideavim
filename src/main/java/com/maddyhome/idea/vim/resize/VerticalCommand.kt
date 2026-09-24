@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
  *
  * see "h :vertical" / "h :vertical-resize"
  */
-@ExCommand(command = "vert[ical]")
+@ExCommand(command = "vert[ical]", barSeparates = false)
 internal data class VerticalCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

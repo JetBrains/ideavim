@@ -18,18 +18,28 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.intellij.vim.annotations.ExCommand
+import kotlinx.serialization.Serializable
+
+/** One entry of the generated ex-command table, read back by `ExCommandProvider` */
+@Serializable
+internal data class ExCommandEntry(
+  val className: String,
+  val barSeparates: Boolean = true,
+  val delimitedSections: Int = 0,
+)
 
 class ExCommandProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
   private val visitor = EXCommandVisitor()
-  private val commandToClass = mutableMapOf<String, String>()
+  private val commandToClass = mutableMapOf<String, ExCommandEntry>()
   private val fileWriter = JsonFileWriter(environment)
 
   override fun process(resolver: Resolver): List<KSAnnotated> {
     val exCommandsFile = environment.options["ex_commands_file"] ?: return emptyList()
 
     resolver.getAllFiles().forEach { it.accept(visitor, Unit) }
-
-    val sortedCommandToClass = commandToClass.toList().sortedWith(compareBy({ it.first }, { it.second })).toMap()
+    
+    val sortedCommandToClass =
+      commandToClass.toList().sortedWith(compareBy({ it.first }, { it.second.className })).toMap()
     fileWriter.write(exCommandsFile, sortedCommandToClass)
 
     return emptyList()
@@ -38,10 +48,15 @@ class ExCommandProcessor(private val environment: SymbolProcessorEnvironment) : 
   private inner class EXCommandVisitor : KSVisitorVoid() {
     @OptIn(KspExperimental::class)
     override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
-      val exCommandAnnotation = classDeclaration.getAnnotationsByType(ExCommand::class).firstOrNull() ?: return
-      val commands = exCommandAnnotation.command.split(",")
-      for (command in commands) {
-        commandToClass[command] = classDeclaration.qualifiedName!!.asString()
+      // The annotation is repeatable, so that one class can declare different bar handling for different names
+      for (exCommandAnnotation in classDeclaration.getAnnotationsByType(ExCommand::class)) {
+        for (command in exCommandAnnotation.command.split(",")) {
+          commandToClass[command] = ExCommandEntry(
+            classDeclaration.qualifiedName!!.asString(),
+            exCommandAnnotation.barSeparates,
+            exCommandAnnotation.delimitedSections,
+          )
+        }
       }
     }
 

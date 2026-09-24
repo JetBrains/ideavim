@@ -23,7 +23,7 @@ import java.net.URLEncoder
  * @author vlan
  * see "h :help"
  */
-@ExCommand(command = "h[elp]")
+@ExCommand(command = "h[elp]", barSeparates = false)
 internal data class HelpCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

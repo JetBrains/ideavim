@@ -7,6 +7,11 @@
  */
 
 pluginManagement {
+  val kspVersion: String by settings
+  plugins {
+    id("com.google.devtools.ksp") version kspVersion
+  }
+
   repositories {
     maven {
       url = uri("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2")

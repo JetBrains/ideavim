@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 // todo make it for each caret
-@ExCommand(command = "norm[al]")
+@ExCommand(command = "norm[al]", barSeparates = false)
 data class NormalCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * @author Elliot Courant
  * see "h :command"
  */
-@ExCommand(command = "com[mand]")
+@ExCommand(command = "com[mand]", barSeparates = false)
 data class CmdCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier) {
 

@@ -141,7 +141,6 @@ command:
         | HISTORY
         | J_LOWERCASE | JOIN | JUMPS
         | K_LOWERCASE
-        | LOCKVAR
         | M_LOWERCASE | MARK | MARKS | MOVE_TEXT
         | N_LOWERCASE | N_UPPERCASE | NEXT_FILE | NOHLSEARCH
         | ONLY
@@ -150,7 +149,7 @@ command:
         | R_LOWERCASE | REDO
         | SET | SELECT_LAST_FILE | SELECT_FIRST_FILE | SELECT_FILE | SETGLOBAL | SETHANDLER | SETLOCAL | SHELL | SCRIPT_ENCODING | SOURCE | SPLIT | SYMBOL
         | T_LOWERCASE | TABCLOSE | TABMOVE | TABNEXT | TABONLY | TABPREVIOUS
-        | U_LOWERCASE | UNDO | UNLOCKVAR
+        | U_LOWERCASE | UNDO
         | VSPLIT
         | W_LOWERCASE | WRITE | WRITE_ALL | WRITE_NEXT | WRITE_PREVIOUS | WRITE_QUIT
         | X_LOWERCASE
@@ -162,12 +161,8 @@ command:
 
     (WS | COLON)* range? (WS | COLON)*
       name = (
-          CMD
-        | H_LOWERCASE | HELP
-        | MAP | MAP_CLEAR
-        | NORMAL
+          MAP | MAP_CLEAR
         | REGISTERS
-        | SORT
         | UNMAP
         | ABBREV
         | UNABBREV
@@ -177,12 +172,19 @@ command:
     WS* commandArgumentWithoutBars? (NEW_LINE | BAR)+
     #CommandWithoutComments|
 
+    // Commands whose argument can hold a '|', so the parser must not split them. Whether one still separates them,
+    // and where, comes from their `@ExCommand` annotation - see CommandVisitor.splitOffNextCommand
     (WS | COLON)* range? (WS | COLON)*
       name = (
           AMPERSAND
         | BANG
+        | CMD
         | G_LOWERCASE | GLOBAL
+        | H_LOWERCASE | HELP
+        | LOCKVAR | UNLOCKVAR
+        | NORMAL
         | R_LOWERCASE | READ
+        | SORT
         | V_LOWERCASE | VGLOBAL
         | S_LOWERCASE | SUBSTITUTE
         | TILDE

@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :!"
  */
-@ExCommand(command = "!")
+@ExCommand(command = "!", barSeparates = false)
 internal data class CmdFilterCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier) {
 

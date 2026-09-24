@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :global" / "h :vglobal"
  */
 // FIXME: I'm such a mess, please refactor me, responsible developer
-@ExCommand(command = "g[lobal],v[global]")
+@ExCommand(command = "g[lobal],v[global]", barSeparates = false)
 data class GlobalCommand(val range: Range, val modifier: CommandModifier, val argument: String, val invert: Boolean) :
   Command.SingleExecution(range, modifier, argument) {
 
@@ -64,7 +64,7 @@ data class GlobalCommand(val range: Range, val modifier: CommandModifier, val ar
     // When nesting the command works on one line.  This allows for
     // ":g/found/v/notfound/command".
     if (globalBusy && (range.startLine != 0 || range.endLine != editor.lineCount() - 1)) {
-      messages.showStatusBarMessage(null, messages.message("E147"))
+      messages.showMessage(editor, messages.message("E147"))
       messages.indicateError()
       return false
     }
@@ -120,16 +120,16 @@ data class GlobalCommand(val range: Range, val modifier: CommandModifier, val ar
       }
 
       if (gotInt) {
-        messages.showStatusBarMessage(null, messages.message("command.global.interrupted"))
+        messages.showMessage(editor, messages.message("command.global.interrupted"))
       } else if (marks.isEmpty()) {
         if (invert) {
-          messages.showStatusBarMessage(
-            null,
+          messages.showMessage(
+            editor,
             messages.message("command.global.pattern.found.in.every.line", globalCommandArguments.pattern.toString())
           )
         } else {
-          messages.showStatusBarMessage(
-            null,
+          messages.showMessage(
+            editor,
             messages.message("command.global.pattern.not.found", globalCommandArguments.pattern.toString())
           )
         }

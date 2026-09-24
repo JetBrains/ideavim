@@ -45,6 +45,9 @@ sealed class Command(
   protected abstract val argFlags: CommandHandlerFlags
 
   protected var defaultRange: String = "."
+  
+  /** The rest of the command line, set by the parser. See CommandVisitor.splitOffNextCommand */
+  var nextCommand: String = ""
 
   private var nextArgumentTokenOffset = 0
   private val logger = vimLogger<Command>()
@@ -106,8 +109,21 @@ sealed class Command(
     }
 
     val operatorArguments = OperatorArguments(0, editor.mode)
-
-    return runCommand(editor, context, operatorArguments)
+    
+    val result = runCommand(editor, context, operatorArguments)
+    
+    // Like Vim, a failure abandons the rest of the command line
+    if (result is ExecutionResult.Success && nextCommand.isNotEmpty()) {
+      return injector.vimscriptExecutor.execute(
+        nextCommand,
+        editor,
+        context,
+        skipHistory = true,
+        indicateErrors = true,
+        if (this::vimContext.isInitialized) vimContext else null,
+      )
+    }
+    return result
   }
 
   private fun runCommand(

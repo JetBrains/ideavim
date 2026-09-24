@@ -52,7 +52,7 @@ plugins {
 
   id("org.jetbrains.changelog") version "2.5.0"
   id("com.dorongold.task-tree") version "4.0.2"
-  id("com.google.devtools.ksp") version "2.3.7"
+  id("com.google.devtools.ksp")
 }
 
 val moduleSources by configurations.registering

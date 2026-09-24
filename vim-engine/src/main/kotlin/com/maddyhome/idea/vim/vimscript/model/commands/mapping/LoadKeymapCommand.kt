@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.Command.SingleExecution
 import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 
-@ExCommand(command = "loadk[eymap]")
+@ExCommand(command = "loadk[eymap]", barSeparates = false)
 data class LoadKeymapCommand(val range: Range, val cmd: String, val modifier: CommandModifier, val argument: String) :
 
   SingleExecution(range, modifier, argument) {
