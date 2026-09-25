@@ -65,6 +65,23 @@ class SliceFunctionTest : VimTestCase("\n") {
   }
 
   @Test
+  fun `test slice on List with end index of zero returns empty List`() {
+    // Unlike the sublist expression `expr[start : end]`, slice() treats the end index as exclusive, so an end index of
+    // zero means "up to but not including the first item", i.e. an empty List
+    assertCommandOutput("echo string(slice([1, 2, 3, 4, 5], 0, 0))", "[]")
+  }
+
+  @Test
+  fun `test slice on List with negative end index resolving to zero returns empty List`() {
+    assertCommandOutput("echo string(slice([1, 2, 3, 4, 5], 0, -5))", "[]")
+  }
+
+  @Test
+  fun `test slice on List with out of range negative end index returns empty List`() {
+    assertCommandOutput("echo string(slice([1, 2, 3, 4, 5], 0, -10))", "[]")
+  }
+
+  @Test
   fun `test slice on List called as method`() {
     assertCommandOutput("echo [1, 2, 3, 4, 5]->slice(2,4)", "[3, 4]")
   }
@@ -107,6 +124,21 @@ class SliceFunctionTest : VimTestCase("\n") {
   @Test
   fun `test slice on String with negative end index returns substring from start to end offset`() {
     assertCommandOutput("echo string(slice('abcdef', 1, -2))", "'bcd'")
+  }
+
+  @Test
+  fun `test slice on String with end index of zero returns empty String`() {
+    assertCommandOutput("echo string(slice('abcdef', 0, 0))", "''")
+  }
+
+  @Test
+  fun `test slice on String with negative end index resolving to zero returns empty String`() {
+    assertCommandOutput("echo string(slice('abcdef', 0, -6))", "''")
+  }
+
+  @Test
+  fun `test slice on String with out of range negative end index returns empty String`() {
+    assertCommandOutput("echo string(slice('abcdef', 0, -10))", "''")
   }
 
   @Test

@@ -77,6 +77,28 @@ class SublistExpressionTest : VimTestCase("\n") {
   }
 
   @Test
+  fun `test sublist with end index of minus one includes last item in List`() {
+    // The end index of a sublist expression is inclusive, so -1 is the last item. This is the same as omitting it
+    assertCommandOutput("echo [1,2,3,4,5][1:-1]", "[2, 3, 4, 5]")
+  }
+
+  @Test
+  fun `test sublist with end index of minus one includes last character in String`() {
+    @Suppress("SpellCheckingInspection")
+    assertCommandOutput("echo 'abcde'[1:-1]", "bcde")
+  }
+
+  @Test
+  fun `test sublist with negative end index of minus length includes only first item in List`() {
+    assertCommandOutput("echo [1,2,3,4,5][:-5]", "[1]")
+  }
+
+  @Test
+  fun `test sublist with negative end index one past length returns empty List`() {
+    assertCommandOutput("echo [1,2,3,4,5][:-6]", "[]")
+  }
+
+  @Test
   fun `test sublist with end index larger than List length treated as List item count`() {
     assertCommandOutput("echo [1,2,3,4,5][1:10]", "[2, 3, 4, 5]")
   }
