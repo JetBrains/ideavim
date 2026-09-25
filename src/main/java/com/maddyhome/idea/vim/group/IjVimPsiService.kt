@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.group
 
 import com.intellij.lang.CodeDocumentationAwareCommenter
 import com.intellij.lang.LanguageCommenters
+import com.intellij.lang.LanguageFormatting
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
@@ -26,6 +27,13 @@ import com.maddyhome.idea.vim.newapi.vim
 
 
 class IjVimPsiService : VimPsiService {
+  override fun hasLanguageIndentSupport(editor: VimEditor): Boolean {
+    val psiFile = PsiHelper.getFile(editor.ij) ?: return false
+    // A formatter is what lets the Platform work the indent out from the code. Without one, the new line action can
+    // only repeat the indent of the previous line, which is exactly what 'autoindent' does
+    return LanguageFormatting.INSTANCE.forContext(psiFile) != null
+  }
+
   override fun getCommentAtPos(editor: VimEditor, pos: Int): Pair<TextRange, Pair<String, String>?>? {
     val psiFile = PsiHelper.getFile(editor.ij) ?: return null
     val psiElement = psiFile.findElementAt(pos) ?: return null
