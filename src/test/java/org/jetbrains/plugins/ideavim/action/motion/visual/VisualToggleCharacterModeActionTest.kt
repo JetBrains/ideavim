@@ -192,8 +192,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
       """
                     A Discovery
 
-                    I ${s}found it in a legendary land${c}${se}
-                    all rocks and lavender and tufted grass,
+                    I ${s}found it in a legendary land${c}
+                    ${se}all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
@@ -312,8 +312,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
       """
                     A Discovery
 
-                    I ${s}it in a legendary land${c}${se}
-                    all rocks and lavender and tufted grass,
+                    I ${s}it in a legendary land${c}
+                    ${se}all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
@@ -390,7 +390,6 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(description = "Different caret postion")
   @Test
   fun `test enter visual with count with dollar motion`() {
     doTest(
@@ -406,24 +405,14 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
       """
                     A Discovery
 
-                    I
-                    ${s}all rocks and lavender and tufted grass,${c}${se}
-                    where it was settled on some sodden sand
-                    hard by the torrent of a mountain pass.
+                    Iall rocks and lavender and tufted grass,
+                    w${s}here it was settled on some sodden sand${c}
+                    ${se}hard by the torrent of a mountain pass.
       """.trimIndent(),
-      // Correct vim behaviour:
-      /*"""
-                  A Discovery
-
-                  Iall rocks and lavender and tufted grass,
-                  w${s}here it was settled on some sodden sand${c}${se}
-                  hard by the torrent of a mountain pass.
-              """.trimIndent(),*/
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
-  @VimBehaviorDiffers(description = "Different caret position")
   @Test
   fun `test enter visual with count with dollar motion and down movement`() {
     // expect to see switches v, $, d, v.
@@ -438,22 +427,12 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
       """
-                    A Discovery
+                     A Discovery
 
-                    I
-                    ${s}all rocks and lavender and tufted grass,
-                    where it was settled on some sodden sand[long line]${c}${se}
-                    hard by the torrent of a mountain pass.
+                     Iall rocks and lavender and tufted grass,
+                     w${s}here it was settled on some sodden sand[long line]
+                     hard by the torrent of a mountain pass.${c}${se}
       """.trimIndent(),
-      // Correct vim behaviour:
-      /* """
-                   A Discovery
-
-                   I
-                   all rocks and lavender and tufted grass,
-                   w${s}here it was settled on some sodden sand[long line]
-                   hard by the torrent of a mountain pass.${c}${se}
-               """.trimIndent(),*/
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
