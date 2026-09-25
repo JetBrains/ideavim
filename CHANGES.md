@@ -23,6 +23,14 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## To Be Released
+
+### Features:
+* [VIM-748](https://youtrack.jetbrains.com/issue/VIM-748) [`|`](https://vimhelp.org/cmdline.txt.html#%3Abar) now separates Ex commands that take a pattern or free-form argument, such as [`:s`](https://vimhelp.org/change.txt.html#%3As) and [`:sort`](https://vimhelp.org/change.txt.html#%3Asort), so `:%s/foo/bar/|%s/baz/qux/` runs both substitutions and `:%sort u|1d` sorts and then deletes the first line. A `\|` inside the pattern or replacement is still regex alternation or a literal `|`, and a `|` inside a `:sort` pattern such as `:%sort /a|b/` stays part of it. As in Vim, [`:global`](https://vimhelp.org/repeat.txt.html#%3Aglobal), [`:vglobal`](https://vimhelp.org/repeat.txt.html#%3Avglobal), [`:normal`](https://vimhelp.org/various.txt.html#%3Anormal) and `:!` take the `|` as part of their argument
+
+### Merged PRs:
+* [2082](https://github.com/JetBrains/ideavim/pull/2082) by [1grzyb1](https://github.com/1grzyb1): VIM-748 changing multiple commands with |
+
 ## 2.47.0, 2026-09-24
 
 ### Features:
