@@ -41,4 +41,13 @@ interface VimPsiService {
    * @return a [TextRange] covering the full comment block (line-wise), or null if the cursor is not on a comment line.
    */
   fun getCommentBlockRange(editor: VimEditor, cursorLine: Int): TextRange? = null
+
+  /**
+   * Whether the language of the file can indent a new line on its own.
+   *
+   * This is the counterpart of Vim's ['indentexpr'] and ['cindent'] - an indent that is computed from the syntax of the
+   * language rather than copied from the previous line. A file the IDE has no formatter for can only copy, which is
+   * what ['autoindent'] does, so the option applies to such a file and not to one that indents by itself.
+   */
+  fun hasLanguageIndentSupport(editor: VimEditor): Boolean = false
 }

@@ -9,9 +9,13 @@ However, some differences are inevitable.
 
 ```
 'autoindent'    'ai'    Copy indent from current line when starting a new line
-        Unlike Vim, this option is on by default, which matches Neovim. With
-        the option on, the indent is removed again if you leave Insert mode
-        without typing anything.
+        On by default, unlike Vim, matching Neovim. Only the copying is
+        controlled: the indent the IDE works out from the code is the
+        counterpart of 'indentexpr' and stays either way, so 'noautoindent'
+        gives column 0 only in a file the IDE has no formatter for.
+        Unlike Vim, a line opened by 'o', 'O' or Enter keeps its indent when
+        you leave Insert mode without typing. 'cc' and 'S' clear it, unless
+        "Keep indents on empty lines" (Editor | Code Style) is on.
 
 'clipboard'     'cb'    Defines clipboard behavior
         A comma-separated list of words to control clipboard behaviour:

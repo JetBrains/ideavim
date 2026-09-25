@@ -23,6 +23,44 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## To Be Released
+
+### Features:
+
+* [VIM-748](https://youtrack.jetbrains.com/issue/VIM-748) [`|`](https://vimhelp.org/cmdline.txt.html#%3Abar) now
+  separates Ex commands that take a pattern or free-form argument, such as [
+  `:s`](https://vimhelp.org/change.txt.html#%3As) and [`:sort`](https://vimhelp.org/change.txt.html#%3Asort), so
+  `:%s/foo/bar/|%s/baz/qux/` runs both substitutions and `:%sort u|1d` sorts and then deletes the first line. A `\|`
+  inside the pattern or replacement is still regex alternation or a literal `|`, and a `|` inside a `:sort` pattern such
+  as `:%sort /a|b/` stays part of it. As in Vim, [`:global`](https://vimhelp.org/repeat.txt.html#%3Aglobal), [
+  `:vglobal`](https://vimhelp.org/repeat.txt.html#%3Avglobal), [
+  `:normal`](https://vimhelp.org/various.txt.html#%3Anormal) and `:!` take the `|` as part of their argument
+
+### Fixes:
+
+* [VIM-2478](https://youtrack.jetbrains.com/issue/VIM-2478) [
+  `:set noautoindent`](https://vimhelp.org/options.txt.html#%27autoindent%27) no longer removes the indent the IDE works
+  out from your code. The option only copies the indent of the current line, and in Vim an indent from [
+  `'indentexpr'`](https://vimhelp.org/options.txt.html#%27indentexpr%27) or [
+  `'cindent'`](https://vimhelp.org/options.txt.html#%27cindent%27) is added whatever `'autoindent'` is set to, so `o`,
+  `O` and `<CR>` in Insert mode now keep the indent of the new line in a file of a language the IDE has a formatter for,
+  as Neovim does with its default `filetype indent on`. The caret still goes to column 0 where the IDE cannot work an
+  indent out on its own, such as in a plain text file, and the indent is still removed again if you leave Insert mode
+  without typing anything
+
+### Changes:
+
+* A new line opened with `o`, `O` or `<CR>` now keeps its indent when you leave Insert mode without typing anything. Vim
+  deletes such an indent, so that `o<Esc>` leaves a completely empty line, but in the IDE a line you have just opened is
+  expected to stay where it is. `cc` and `S` still follow Vim and leave the line they empty without any indent
+* IdeaVim now respects "Keep indents on empty lines" in Settings | Editor | Code Style. With it on, the line that `cc`
+  or `S` empties keeps its indent instead of being left completely empty. The setting is off by default
+
+### Merged PRs:
+
+* [2082](https://github.com/JetBrains/ideavim/pull/2082) by [1grzyb1](https://github.com/1grzyb1): VIM-748 changing
+  multiple commands with |
+
 ## 2.47.0, 2026-09-24
 
 ### Features:

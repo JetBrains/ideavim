@@ -12,13 +12,19 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
 /**
- * Tests for the 'autoindent' option.
+ * Tests for the 'autoindent' option in a file with no language aware indent.
  *
  * The option is on by default, which matches the Neovim default ('autoindent' is off in Vim, see
- * `runtime/doc/vim_diff.txt`). With 'autoindent' off, `cc`, `S`, `o`, `O` and Enter in Insert mode do not indent the new
- * line at all - Vim puts the caret in column 0 (`beginline(0)` in `op_delete()`, ops.c) instead of keeping the indent.
+ * `runtime/doc/vim_diff.txt`). It copies the indent of the current line, and that is the only way a plain text file
+ * can be indented, because the IDE has no formatter to work an indent out with. With the option off, `cc`, `S`, `o`,
+ * `O` and Enter in Insert mode therefore do not indent the new line at all, and Vim puts the caret in column 0
+ * (`beginline(0)` in `op_delete()`, ops.c).
  *
- * The expected results below were captured from `nvim --clean` with `set noautoindent`.
+ * A file of a language the IDE does have a formatter for is indented the way 'indentexpr' and 'cindent' indent in Vim,
+ * which 'autoindent' has no say over. Those cases are in [AutoIndentOptionJavaTest] in the java-tests module.
+ *
+ * The expected results below were captured from `nvim --clean` with `set noautoindent` on a buffer with no file name,
+ * so that no indent script is loaded and 'indentexpr' stays empty.
  */
 class AutoIndentOptionTest : VimTestCase() {
   @Test
