@@ -19,6 +19,8 @@ class IndentConfig private constructor(indentOptions: IndentOptions) : VimIndent
   private val tabSize = indentOptions.TAB_SIZE
   private val isUseTabs = indentOptions.USE_TAB_CHARACTER
 
+  override val keepIndentsOnEmptyLines = indentOptions.KEEP_INDENTS_ON_EMPTY_LINES
+
   override fun getIndentSize(depth: Int): Int = indentSize * depth
   override fun createIndentByDepth(depth: Int): String = createIndentBySize(getIndentSize(depth))
 
