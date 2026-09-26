@@ -42,7 +42,7 @@ usual beta standards.
 
 ### Changes:
 
-* A new line opened with `o`, `O` or `<CR>` now keeps its indent when you leave Insert mode without typing anything. Vim
+* [VIM-4331](https://youtrack.jetbrains.com/issue/VIM-4331) A new line opened with `o`, `O` or `<CR>` now keeps its indent when you leave Insert mode without typing anything. Vim
   deletes such an indent, so that `o<Esc>` leaves a completely empty line, but in the IDE a line you have just opened is
   expected to stay where it is. `cc` and `S` still follow Vim and leave the line they empty without any indent
 * IdeaVim now respects "Keep indents on empty lines" in Settings | Editor | Code Style. With it on, the line that `cc`
@@ -50,6 +50,7 @@ usual beta standards.
 
 ### Merged PRs:
 * [2082](https://github.com/JetBrains/ideavim/pull/2082) by [1grzyb1](https://github.com/1grzyb1): VIM-748 changing multiple commands with |
+* [2084](https://github.com/JetBrains/ideavim/pull/2084) by [1grzyb1](https://github.com/1grzyb1): VIM-4331 keep the indent of a new line when leaving Insert mode
 
 ## 2.47.0, 2026-09-24
 
