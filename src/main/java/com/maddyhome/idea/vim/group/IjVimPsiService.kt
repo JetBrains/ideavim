@@ -12,6 +12,7 @@ import com.intellij.lang.CodeDocumentationAwareCommenter
 import com.intellij.lang.LanguageCommenters
 import com.intellij.lang.LanguageFormatting
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -66,13 +67,31 @@ class IjVimPsiService : VimPsiService {
   }
 
   override fun getDoubleQuotedString(editor: VimEditor, pos: Int, isInner: Boolean): TextRange? {
-    // TODO[ideavim] It wasn't implemented before, but implementing it will significantly improve % motion
-    return getDoubleQuotesRangeNoPSI(editor.text(), pos, isInner)
+    val range = getDoubleQuotesRangeNoPSI(editor.text(), pos, isInner) ?: return null
+    return if (isQuotedRangeConfirmedByPsi(editor, range, isInner)) range else null
   }
 
   override fun getSingleQuotedString(editor: VimEditor, pos: Int, isInner: Boolean): TextRange? {
-    // TODO[ideavim] It wasn't implemented before, but implementing it will significantly improve % motion
-    return getSingleQuotesRangeNoPSI(editor.text(), pos, isInner)
+    val range = getSingleQuotesRangeNoPSI(editor.text(), pos, isInner) ?: return null
+    return if (isQuotedRangeConfirmedByPsi(editor, range, isInner)) range else null
+  }
+
+  /**
+   * The text-based search treats any two quote characters on a line as a string. This is wrong for languages where
+   * quotes can be a part of other tokens, e.g., identifiers with primes like `f'` in Haskell-like languages.
+   * If PSI is available, we check that the opening quote starts a token and the closing quote ends a token.
+   * Quotes in plain text and comments are not tokenized, so we keep the text-based behaviour there.
+   */
+  private fun isQuotedRangeConfirmedByPsi(editor: VimEditor, range: TextRange, isInner: Boolean): Boolean {
+    val psiFile = PsiHelper.getFile(editor.ij) ?: return true
+    if (psiFile.language == PlainTextLanguage.INSTANCE) return true
+
+    val openQuote = if (isInner) range.startOffset - 1 else range.startOffset
+    val closeQuote = if (isInner) range.endOffset else range.endOffset - 1
+    val openElement = psiFile.findElementAt(openQuote) ?: return true
+    if (PsiTreeUtil.getParentOfType(openElement, PsiComment::class.java, false) != null) return true
+    val closeElement = psiFile.findElementAt(closeQuote) ?: return true
+    return openElement.textRange.startOffset == openQuote && closeElement.textRange.endOffset == closeQuote + 1
   }
 
   override fun getCommentBlockRange(editor: VimEditor, cursorLine: Int): TextRange? {
