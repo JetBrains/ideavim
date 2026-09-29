@@ -69,6 +69,8 @@ data class TagsCommand(val range: Range, val modifier: CommandModifier, val argu
    */
   private fun renderJumpedFrom(editor: VimEditor, entry: TagStackEntry): String {
     if (editor.getVirtualFile()?.path != entry.filepath) return entry.filepath
+    // Entries are not moved when the text is edited, so the line may have been deleted since the jump
+    if (entry.line >= editor.lineCount()) return ""
     return toPrintableText(editor.getLineText(entry.line))
   }
 
