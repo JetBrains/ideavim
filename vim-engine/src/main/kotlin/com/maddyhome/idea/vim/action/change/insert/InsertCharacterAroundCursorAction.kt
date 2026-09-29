@@ -9,6 +9,7 @@ package com.maddyhome.idea.vim.action.change.insert
 
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
+import com.maddyhome.idea.vim.action.change.VimRedoBuffer
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.MutableVimEditor
 import com.maddyhome.idea.vim.api.VimCaret
@@ -35,6 +36,8 @@ class InsertCharacterAboveCursorAction : ChangeEditorActionHandler.SingleExecuti
   ): Boolean {
     val activeLookup = injector.lookupManager.getActiveLookup(editor)
     if (activeLookup != null) {
+      // The completion records the keys that produce its text, so `.` must not replay this key as well
+      VimRedoBuffer.dropLastKey()
       activeLookup.accept(editor.primaryCaret(), context)
       return true
     }
@@ -62,13 +65,11 @@ class InsertCharacterBelowCursorAction : ChangeEditorActionHandler.ForEachCaret(
   ): Boolean {
     val activeLookup = injector.lookupManager.getActiveLookup(editor)
     if (activeLookup != null) {
+      // Closing the popup changes no text, so there is nothing for `.` to repeat
+      VimRedoBuffer.dropLastKey()
       return activeLookup.close(caret, context).let { true }
     }
-    return if (editor.isOneLineMode()) {
-      false
-    } else {
-      insertCharacterAroundCursor(editor, caret, 1)
-    }
+    return !editor.isOneLineMode() && insertCharacterAroundCursor(editor, caret, 1)
   }
 }
 

@@ -501,7 +501,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
 
   protected fun setText(text: String) {
     WriteAction.runAndWait<RuntimeException> {
-      fixture.editor.document.text = text
+      fixture.editor.document.setText(text)
     }
   }
 

@@ -65,6 +65,17 @@ object VimRedoBuffer {
     if (!isReplaying) recording.drop(key)
   }
 
+  /**
+   * Drops the key being handled right now, for a key whose effect `.` must not replay.
+   *
+   * `<C-Y>` accepting a completion is recorded as the keys that produced the text (see [recordSynthesizedKeys]), so
+   * replaying the key as well would apply it twice - and with no popup open it does something else entirely, inserting
+   * the character above the caret (`:help i_CTRL-Y`). `<C-E>` closing the popup leaves nothing to replay at all.
+   */
+  fun dropLastKey() {
+    if (!isReplaying) recording.dropLast()
+  }
+
   /** Called from [VimRepeater.saveLastChange], where IdeaVim already decides what the last change was. */
   fun onChange(command: Command) {
     if (!isReplaying) recording.changeMade(command)
@@ -208,7 +219,11 @@ private class Recording {
   }
 
   fun drop(key: KeyStroke) {
-    if (!isLastAdded(key)) return
+    if (isLastAdded(key)) dropLast()
+  }
+
+  fun dropLast() {
+    if (keys.isEmpty()) return
     countIndices.remove(keys.lastIndex)
     registerIndices.remove(keys.lastIndex)
     keys.removeAt(keys.lastIndex)

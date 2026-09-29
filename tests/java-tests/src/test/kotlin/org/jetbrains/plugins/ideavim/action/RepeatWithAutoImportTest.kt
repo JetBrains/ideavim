@@ -11,9 +11,6 @@ package org.jetbrains.plugins.ideavim.action
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.WriteCommandAction
-import com.intellij.openapi.projectRoots.JavaSdk
-import com.intellij.openapi.projectRoots.Sdk
-import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
@@ -269,16 +266,6 @@ class RepeatWithAutoImportTest : VimJavaTestCase() {
     ApplicationManager.getApplication().invokeAndWait {
       fixture.performEditorAction(IdeActions.ACTION_CHOOSE_LOOKUP_ITEM)
       PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
-    }
-  }
-
-  companion object {
-    /**
-     * The default light project descriptor has no JDK, so `java.util.List` wouldn't resolve and there would be nothing
-     * to import. Shared between the tests of this class, so they share one light project.
-     */
-    private val WITH_REAL_JDK = object : LightProjectDescriptor() {
-      override fun getSdk(): Sdk = JavaSdk.getInstance().createJdk("Test JDK", System.getProperty("java.home"), false)
     }
   }
 }
