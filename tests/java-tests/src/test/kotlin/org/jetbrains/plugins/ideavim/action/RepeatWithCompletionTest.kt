@@ -332,6 +332,90 @@ class RepeatWithCompletionTest : VimJavaTestCase() {
     )
   }
 
+  @Test
+  fun `test dot replays a completion that was cycled to with Ctrl-N`() {
+    // `<C-N>` only moves around the popup, so there is nothing for `.` to repeat for it. Replaying it would be worse
+    // than useless: with no popup open `LookupDownAction` falls through to whatever the IDE keymap binds to Ctrl+N,
+    // which moved the caret to another line and made the recorded backspaces eat the text there
+    configureByJavaText(twoStatements)
+    typeText("cw", "foo")
+    completeBasic()
+    typeText("<C-N>")
+    acceptThroughActionSystem()
+    typeText("<Esc>")
+    typeText("j", "0", "w", ".")
+
+    assertState(
+      """
+        |class Foo {
+        |  void fooBar() {}
+        |  void fooBaz() {}
+        |  void fooLong() {}
+        |
+        |  void test() {
+        |    fooBaz();
+        |    fooBaz(${c});
+        |  }
+        |}
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test dot replays a completion that was cycled to with Ctrl-P`() {
+    // `<C-P>` is `<C-N>`'s twin in `LookupUpAction`, with the same harmful fallback
+    configureByJavaText(twoStatements)
+    typeText("cw", "foo")
+    completeBasic()
+    typeText("<C-P>")
+    acceptThroughActionSystem()
+    typeText("<Esc>")
+    typeText("j", "0", "w", ".")
+
+    assertState(
+      """
+        |class Foo {
+        |  void fooBar() {}
+        |  void fooBaz() {}
+        |  void fooLong() {}
+        |
+        |  void test() {
+        |    fooLong();
+        |    fooLong(${c});
+        |  }
+        |}
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test dot replays a whole-line completion`() {
+    // `<C-X><C-L>` (`:help i_CTRL-X_CTRL-L`) builds a lookup of IdeaVim's own, through `showCustomLookup`. Accepting
+    // it goes through the same action, so the same keys are recorded: here the change inserts "result", and repeating
+    // it appends that to the next line
+    configureByText(
+      """
+        |return result
+        |return value
+        |return ${c}
+        |zz
+      """.trimMargin(),
+    )
+    typeText("A", "<C-X><C-L>")
+    acceptThroughActionSystem()
+    typeText("<Esc>")
+    typeText("j", "0", ".")
+
+    assertState(
+      """
+        |return result
+        |return value
+        |return result
+        |zzresul${c}t
+      """.trimMargin(),
+    )
+  }
+
   /** `cw` on the first `xx`, complete [prefix], accept, leave Insert, then repeat on the second `xx`. */
   private fun changeWordCompletingTo(prefix: String, acceptWith: () -> Unit) {
     typeText("cw", prefix)

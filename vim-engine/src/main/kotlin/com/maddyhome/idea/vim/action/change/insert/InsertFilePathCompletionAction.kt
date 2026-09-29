@@ -9,6 +9,7 @@ package com.maddyhome.idea.vim.action.change.insert
 
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
+import com.maddyhome.idea.vim.action.change.VimRedoBuffer
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getText
@@ -34,6 +35,9 @@ class InsertFilePathCompletionAction : VimActionHandler.SingleExecution() {
 
     val lookup = injector.lookupManager.getActiveLookup(editor)
     if (lookup != null) {
+      // Moving around the popup changes no text, so `.` has nothing to repeat for this key - and replaying it
+      // with no popup open would run whatever the IDE has bound to it instead
+      VimRedoBuffer.dropLastKey()
       lookup.down(editor.primaryCaret(), context)
       return true
     }
