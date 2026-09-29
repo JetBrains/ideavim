@@ -277,14 +277,14 @@ class CommandBuilder private constructor(
   /**
    * Process a keystroke, matching an action if available
    *
-   * If the given keystroke matches an action, the [processor] is invoked with the action instance. Typically, the
+   * If the given keystroke matches an action, the [processor] is invoked with the matched command. Typically, the
    * caller will end up passing the action back to [addAction], but there are more housekeeping steps that stop us
    * encapsulating it completely.
    *
    * If the given keystroke does not yet match an action, the internal state is updated to track the current command
    * part node.
    */
-  fun processKey(key: KeyStroke, processor: (EditorActionHandlerBase) -> Unit): Boolean {
+  fun processKey(key: KeyStroke, processor: (LazyVimCommand) -> Unit): Boolean {
     commandKeyStrokes.add(key)
     val node = keyStrokeTrie.getTrieNode(commandKeyStrokes)
     if (node == null) {
@@ -316,7 +316,7 @@ class CommandBuilder private constructor(
       logger.trace { "Found command ${command.instance} for ${injector.parser.toPrintableString(commandKeyStrokes)} - ${node.debugString}" }
       commandKeyStrokes.clear()
     }
-    processor(command.instance)
+    processor(command)
     return true
   }
 

@@ -30,13 +30,37 @@ interface CommandProvider {
   fun getCommands(): Collection<LazyVimCommand> {
     val classLoader = this.javaClass.classLoader
     val commands: List<CommandBean> = Json.decodeFromStream(getFile())
-    return commands
+    val (lookupCommands, normalCommands) = commands
       .groupBy { it.`class` }
-      .map {
-        val keys = it.value.map { bean -> injector.parser.parseKeys(bean.keys) }.toSet()
-        val modes = it.value.first().modes.map { mode -> MappingMode.parseModeChar(mode) }.toSet()
-        LazyVimCommand(keys, modes, it.key, classLoader)
+      .map { (className, beans) ->
+        val keys = beans.map { bean -> injector.parser.parseKeys(bean.keys) }.toSet()
+        val modes = beans.first().modes.map { mode -> MappingMode.parseModeChar(mode) }.toSet()
+        LazyVimCommand(keys, modes, className, classLoader, beans.first().lookup)
       }
+      .partition { it.isLookupAction }
+    return pairUpLookupVariants(normalCommands, lookupCommands)
+  }
+
+  /**
+   * Hangs each `@CommandOrMotion(lookup = true)` handler off the normal command it shares its keys with, and returns
+   * only the normal ones.
+   *
+   * One key sequence resolves to one trie node, so the pair has to travel as a single entry - see
+   * [LazyVimCommand.lookupVariant]. A lookup handler with no counterpart is registered on its own, which is what
+   * happens for a key that does nothing at all without a popup.
+   */
+  private fun pairUpLookupVariants(
+    normalCommands: List<LazyVimCommand>,
+    lookupCommands: List<LazyVimCommand>,
+  ): Collection<LazyVimCommand> {
+    if (lookupCommands.isEmpty()) return normalCommands
+    val unpaired = lookupCommands.toMutableList()
+    for (command in normalCommands) {
+      val variant = unpaired.firstOrNull { it.keys == command.keys && it.modes == command.modes } ?: continue
+      command.lookupVariant = variant
+      unpaired.remove(variant)
+    }
+    return normalCommands + unpaired
   }
 
   private fun getFile(): InputStream {
@@ -46,4 +70,4 @@ interface CommandProvider {
 }
 
 @Serializable
-data class CommandBean(val keys: String, val `class`: String, val modes: String)
+data class CommandBean(val keys: String, val `class`: String, val modes: String, val lookup: Boolean = false)

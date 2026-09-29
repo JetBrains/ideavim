@@ -90,7 +90,11 @@ internal class CommandKeyConsumer : KeyConsumer {
       if (editor.mode is Mode.OP_PENDING) commandBuilder.convertDuplicateOperatorKeyStrokeToMotion(key) else key
     logger.trace { "Original keystroke: $key, substituted keystroke: $keystroke" }
 
-    return commandBuilder.processKey(keystroke) { handleAction(it, keyProcessResultBuilder) }
+    return commandBuilder.processKey(keystroke) { command ->
+      // `<C-Y>` and friends register two handlers for one key - see `@CommandOrMotion(lookup = true)`
+      val hasActiveLookup = injector.lookupManager.getActiveLookup(editor) != null
+      handleAction(command.resolve(hasActiveLookup).instance, keyProcessResultBuilder)
+    }
   }
 
   private fun handleAction(action: EditorActionHandlerBase, processBuilder: KeyProcessResult.KeyProcessResultBuilder) {

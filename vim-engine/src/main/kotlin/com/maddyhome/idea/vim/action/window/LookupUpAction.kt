@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.action.window
 
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
-import com.maddyhome.idea.vim.action.change.VimRedoBuffer
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -34,18 +33,10 @@ class LookupUpAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val activeLookup = injector.lookupManager.getActiveLookup(editor)
-    if (activeLookup != null) {
-      // Moving around the popup changes no text, so `.` has nothing to repeat for this key - and replaying it
-      // with no popup open would run whatever the IDE has bound to it instead
-      VimRedoBuffer.dropLastKey()
-      activeLookup.up(editor.primaryCaret(), context)
-    } else {
-      val keyStroke = keySet.first().first()
-      val actions = injector.keyGroup.getKeymapConflicts(keyStroke)
-      for (action in actions) {
-        if (injector.actionExecutor.executeAction(editor, action, context)) break
-      }
+    val keyStroke = keySet.first().first()
+    val actions = injector.keyGroup.getKeymapConflicts(keyStroke)
+    for (action in actions) {
+      if (injector.actionExecutor.executeAction(editor, action, context)) break
     }
     return true
   }
