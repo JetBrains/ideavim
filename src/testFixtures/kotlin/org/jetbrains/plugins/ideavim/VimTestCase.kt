@@ -50,6 +50,7 @@ import com.intellij.util.ui.EmptyClipboardOwner
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
+import com.maddyhome.idea.vim.action.change.VimRedoBuffer
 import com.maddyhome.idea.vim.api.EffectiveOptions
 import com.maddyhome.idea.vim.api.GlobalOptions
 import com.maddyhome.idea.vim.api.Options
@@ -248,6 +249,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
       ?.reset()
     injector.historyGroup.resetHistory()
     VimPlugin.getChange().resetRepeat()
+    VimRedoBuffer.resetAll()
     VimPlugin.getKey().savedShortcutConflicts.clear()
     assertTrue(KeyHandler.getInstance().keyStack.isEmpty())
     injector.outputPanel.getCurrentOutputPanel()?.close()

@@ -14,7 +14,12 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupEvent
 import com.intellij.codeInsight.lookup.LookupListener
 import com.intellij.codeInsight.lookup.LookupManager
+import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.ActionPlaces
+import com.intellij.openapi.actionSystem.ActionUiKind
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.IdeActions
+import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -72,7 +77,8 @@ class IjLookup(val lookup: Lookup) : IdeLookup {
     caret: ImmutableVimCaret,
     context: ExecutionContext,
   ) {
-    EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_CHOOSE_LOOKUP_ITEM)
-      .execute(caret.editor.ij, caret.ij, context.ij)
+    val action = ActionManager.getInstance().getAction(IdeActions.ACTION_CHOOSE_LOOKUP_ITEM) ?: return
+    val event = AnActionEvent.createEvent(action, context.ij, null, ActionPlaces.UNKNOWN, ActionUiKind.NONE, null)
+    ActionUtil.performAction(action, event)
   }
 }

@@ -11,4 +11,4 @@ package com.intellij.vim.processors
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CommandBean(val keys: String, val `class`: String, val modes: String)
+data class CommandBean(val keys: String, val `class`: String, val modes: String, val lookup: Boolean = false)

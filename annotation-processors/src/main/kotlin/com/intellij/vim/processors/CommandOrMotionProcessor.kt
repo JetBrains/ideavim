@@ -41,7 +41,12 @@ class CommandOrMotionProcessor(private val environment: SymbolProcessorEnvironme
       val commandAnnotation = classDeclaration.getAnnotationsByType(CommandOrMotion::class).firstOrNull() ?: return
       for (key in commandAnnotation.keys) {
         commands.add(
-          CommandBean(key, classDeclaration.qualifiedName!!.asString(), commandAnnotation.modes.map { it.abbrev }.joinToString(separator = ""))
+          CommandBean(
+            key,
+            classDeclaration.qualifiedName!!.asString(),
+            commandAnnotation.modes.map { it.abbrev }.joinToString(separator = ""),
+            commandAnnotation.lookup,
+          )
         )
       }
     }

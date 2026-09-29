@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.key.consumers
 
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.KeyProcessResult
+import com.maddyhome.idea.vim.action.change.VimRedoBuffer
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -48,6 +49,7 @@ internal class SelectRegisterConsumer : KeyConsumer {
 
     val commandBuilder = keyProcessResultBuilder.state.commandBuilder
     commandBuilder.addTypedKeyStroke(key)
+    VimRedoBuffer.markRegisterKey(key)
 
     val chKey = if (key.keyChar == KeyEvent.CHAR_UNDEFINED) 0.toChar() else key.keyChar
     handleSelectRegister(chKey, keyProcessResultBuilder)

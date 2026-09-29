@@ -32,11 +32,6 @@ class InsertLineCompletionAction : VimActionHandler.SingleExecution() {
     }
     injector.vimState.ctrlXCompletionMode = CtrlXCompletionMode.WHOLE_LINE
 
-    val lookup = injector.lookupManager.getActiveLookup(editor)
-    if (lookup != null) {
-      lookup.down(editor.primaryCaret(), context)
-      return true
-    }
 
     val currentLine = editor.getLineText(editor.currentCaret().getLine()).trim()
     val line = getLineToMatch(editor)

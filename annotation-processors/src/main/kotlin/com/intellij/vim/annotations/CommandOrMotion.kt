@@ -17,7 +17,19 @@ package com.intellij.vim.annotations
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
-annotation class CommandOrMotion(val keys: Array<String>, vararg val modes: Mode)
+annotation class CommandOrMotion(
+  val keys: Array<String>,
+  vararg val modes: Mode,
+  /**
+   * Registers this handler for the same keys as its normal counterpart, to be used only while a completion popup is
+   * open.
+   *
+   * `<C-Y>` accepts the selected item with a popup open and inserts the character above the caret without one. Those
+   * are two commands sharing a keystroke, so they are two handlers: `AcceptLookupAction` declares `lookup = true` and
+   * `InsertCharacterAboveCursorAction` does not. Exactly one of each pair may exist for a given key and mode.
+   */
+  val lookup: Boolean = false,
+)
 
 annotation class TextObject(val keys: String)
 

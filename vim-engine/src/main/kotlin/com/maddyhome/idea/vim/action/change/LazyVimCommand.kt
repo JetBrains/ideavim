@@ -18,8 +18,23 @@ open class LazyVimCommand(
   val modes: Set<MappingMode>,
   className: String,
   classLoader: ClassLoader,
+  /** Declared with `@CommandOrMotion(lookup = true)`: the variant for when a completion popup is open. */
+  val isLookupAction: Boolean = false,
 ) : LazyInstance<EditorActionHandlerBase>(className, classLoader) {
   val actionId: String = EditorActionHandlerBase.getActionId(className)
+
+  /**
+   * The handler to use instead of this one while a completion popup is open, paired up by [CommandProvider].
+   *
+   * Only the normal command of a pair is registered in the keystroke trie - one key resolves to one node - and it
+   * points here for the other half.
+   */
+  var lookupVariant: LazyVimCommand? = null
+    internal set
+
+  /** This command, or its [lookupVariant] when one is declared and [hasActiveLookup]. */
+  fun resolve(hasActiveLookup: Boolean): LazyVimCommand =
+    if (hasActiveLookup) lookupVariant ?: this else this
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

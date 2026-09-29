@@ -8,12 +8,9 @@
 
 package org.jetbrains.plugins.ideavim.action
 
-import com.intellij.codeInsight.lookup.Lookup
+import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.WriteCommandAction
-import com.intellij.openapi.projectRoots.JavaSdk
-import com.intellij.openapi.projectRoots.Sdk
-import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
@@ -24,9 +21,13 @@ import org.jetbrains.plugins.ideavim.VimJavaTestCase
 import org.junit.jupiter.api.Test
 
 /**
- * While we are in insert mode the IDE changes the document behind our back, and those changes are recorded in the
- * strokes that `.` replays. Adding an import is such a change - the daemon, an Alt+Enter fix and the completion lookup
- * all do it - and `.` has to replay only what the user typed, not the import.
+ * While we are in insert mode the IDE changes the document behind our back. Adding an import is such a change - the
+ * daemon, an Alt+Enter fix and the completion lookup all do it - and `.` must not repeat it as an edit of its own.
+ *
+ * `.` replays the keys of the change, so an import the IDE added is simply never recorded, and the caret offsets the
+ * user's own keys land on are worked out again where the repeat happens. The completion lookup is the exception: the
+ * text it inserts is not something the user typed, so IdeaVim records the keys that would have produced it - the same
+ * hook that lets a macro replay a completion.
  */
 @TestWithoutNeovim(
   reason = SkipNeovimReason.SEE_DESCRIPTION,
@@ -90,7 +91,7 @@ class RepeatWithAutoImportTest : VimJavaTestCase() {
         |
         |class Foo {
         |    List<String> foo;
-        |    List<Strin${c}g> bar;
+        |    List<String${c}> bar;
         |}
       """.trimMargin(),
     )
@@ -100,8 +101,7 @@ class RepeatWithAutoImportTest : VimJavaTestCase() {
   fun `test repeating a change whose import landed while the user kept typing`() {
     configureByJavaText(twoSetLocals)
 
-    // The import lands in the middle of the insert, so the offsets recorded for the rest of it have to survive the
-    // text above the caret growing
+    // The import lands in the middle of the insert, which used to shift every offset recorded for the rest of it
     typeText("cf;", "List<lt>String> f")
     addImportWhileTyping("import java.util.List;")
     typeText("oo = new HashSet<lt>String>();")
@@ -144,7 +144,7 @@ class RepeatWithAutoImportTest : VimJavaTestCase() {
   fun `test repeating a change made with backspaces after an import landed`() {
     configureByJavaText(twoSetLocals)
 
-    // Backspaces and caret motions end up in the strokes next to the typed text
+    // The backspaces are recorded next to the typed text, and have to delete the same characters on replay
     typeText("ea", "<BS><BS><BS>", "List")
     addImportWhileTyping("import java.util.List;")
     typeText("<Esc>")
@@ -188,7 +188,7 @@ class RepeatWithAutoImportTest : VimJavaTestCase() {
     configureByJavaText(twoSetLocals)
 
     // Picking `List` from the popup inserts `java.util.List`, adds the import and then shortens the name back to
-    // `List` - all of it while we are recording strokes
+    // `List`. None of that is typed, so `.` replays the keys IdeaVim records in its place
     typeText("cw", "Lis")
     completeBasic()
     finishLookup()
@@ -253,23 +253,19 @@ class RepeatWithAutoImportTest : VimJavaTestCase() {
   }
 
   /**
-   * Accepts the selected lookup item the way pressing Enter does. We must not send `<C-Y>` instead: that is a Vim
-   * command of its own (insert the character above the caret), and it would become the command `.` repeats.
+   * Accepts the selected lookup item the way pressing Enter does.
+   *
+   * It has to go through the action, not `fixture.finishLookup`: IdeaVim records the keys that stand in for the
+   * completion from an [com.intellij.codeInsight.lookup.impl.actions.ChooseItemAction] listener, and calling the
+   * lookup directly never fires it, so `.` would replay only the prefix the user typed.
+   *
+   * We must not send `<C-Y>` either: that is a Vim command of its own (insert the character above the caret), and it
+   * would become the command `.` repeats.
    */
   private fun finishLookup() {
     ApplicationManager.getApplication().invokeAndWait {
-      fixture.finishLookup(Lookup.NORMAL_SELECT_CHAR)
+      fixture.performEditorAction(IdeActions.ACTION_CHOOSE_LOOKUP_ITEM)
       PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
-    }
-  }
-
-  companion object {
-    /**
-     * The default light project descriptor has no JDK, so `java.util.List` wouldn't resolve and there would be nothing
-     * to import. Shared between the tests of this class, so they share one light project.
-     */
-    private val WITH_REAL_JDK = object : LightProjectDescriptor() {
-      override fun getSdk(): Sdk = JavaSdk.getInstance().createJdk("Test JDK", System.getProperty("java.home"), false)
     }
   }
 }

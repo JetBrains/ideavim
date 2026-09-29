@@ -211,6 +211,12 @@
   },
   {
     "keys": "<C-E>",
+    "class": "com.maddyhome.idea.vim.action.lookup.CloseLookupAction",
+    "modes": "I",
+    "lookup": true
+  },
+  {
+    "keys": "<C-E>",
     "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLineDownAction",
     "modes": "NXO"
   },
@@ -228,6 +234,12 @@
     "keys": "<C-F>",
     "class": "com.maddyhome.idea.vim.action.change.insert.InsertFilePathCompletionAction",
     "modes": "I"
+  },
+  {
+    "keys": "<C-F>",
+    "class": "com.maddyhome.idea.vim.action.lookup.CycleFilePathCompletionLookupAction",
+    "modes": "I",
+    "lookup": true
   },
   {
     "keys": "<C-F>",
@@ -325,6 +337,12 @@
     "modes": "I"
   },
   {
+    "keys": "<C-L>",
+    "class": "com.maddyhome.idea.vim.action.lookup.CycleLineCompletionLookupAction",
+    "modes": "I",
+    "lookup": true
+  },
+  {
     "keys": "<C-Left>",
     "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToPreviousBigWordAction",
     "modes": "C"
@@ -371,6 +389,12 @@
   },
   {
     "keys": "<C-N>",
+    "class": "com.maddyhome.idea.vim.action.lookup.CycleLookupDownAction",
+    "modes": "I",
+    "lookup": true
+  },
+  {
+    "keys": "<C-N>",
     "class": "com.maddyhome.idea.vim.action.motion.updown.MotionDownCtrlNAction",
     "modes": "NXO"
   },
@@ -398,6 +422,12 @@
     "keys": "<C-P>",
     "class": "com.maddyhome.idea.vim.action.ex.SelectOlderHistoryAction",
     "modes": "C"
+  },
+  {
+    "keys": "<C-P>",
+    "class": "com.maddyhome.idea.vim.action.lookup.CycleLookupUpAction",
+    "modes": "I",
+    "lookup": true
   },
   {
     "keys": "<C-P>",
@@ -753,6 +783,12 @@
     "keys": "<C-Y>",
     "class": "com.maddyhome.idea.vim.action.ex.CopyModelessSelectionAction",
     "modes": "C"
+  },
+  {
+    "keys": "<C-Y>",
+    "class": "com.maddyhome.idea.vim.action.lookup.AcceptLookupAction",
+    "modes": "I",
+    "lookup": true
   },
   {
     "keys": "<C-Y>",

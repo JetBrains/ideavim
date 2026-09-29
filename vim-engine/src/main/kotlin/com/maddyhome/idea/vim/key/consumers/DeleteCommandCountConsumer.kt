@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.key.consumers
 
 import com.maddyhome.idea.vim.KeyProcessResult
+import com.maddyhome.idea.vim.action.change.VimRedoBuffer
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -46,6 +47,7 @@ internal class DeleteCommandCountConsumer : KeyConsumer {
   ): Boolean {
     logger.trace { "Entered DeleteCommandConsumer" }
     keyProcessResultBuilder.state.commandBuilder.deleteCountCharacter()
+    VimRedoBuffer.dropKey(key)
     return true
   }
 

@@ -21,5 +21,6 @@ object VimRepeater {
   fun saveLastChange(command: Command) {
     lastChangeCommand = command
     lastChangeRegister = injector.registerGroup.currentRegister
+    VimRedoBuffer.onChange(command)
   }
 }

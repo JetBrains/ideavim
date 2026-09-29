@@ -32,11 +32,6 @@ class InsertFilePathCompletionAction : VimActionHandler.SingleExecution() {
     }
     injector.vimState.ctrlXCompletionMode = CtrlXCompletionMode.FILE_PATH
 
-    val lookup = injector.lookupManager.getActiveLookup(editor)
-    if (lookup != null) {
-      lookup.down(editor.primaryCaret(), context)
-      return true
-    }
 
     val line = getLineToMatch(editor)
     val lines = getMatchingLines(context, line)

@@ -33,11 +33,6 @@ class InsertCharacterAboveCursorAction : ChangeEditorActionHandler.SingleExecuti
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val activeLookup = injector.lookupManager.getActiveLookup(editor)
-    if (activeLookup != null) {
-      activeLookup.accept(editor.primaryCaret(), context)
-      return true
-    }
     return if (editor.isOneLineMode()) {
       false
     } else {
@@ -60,15 +55,7 @@ class InsertCharacterBelowCursorAction : ChangeEditorActionHandler.ForEachCaret(
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val activeLookup = injector.lookupManager.getActiveLookup(editor)
-    if (activeLookup != null) {
-      return activeLookup.close(caret, context).let { true }
-    }
-    return if (editor.isOneLineMode()) {
-      false
-    } else {
-      insertCharacterAroundCursor(editor, caret, 1)
-    }
+    return !editor.isOneLineMode() && insertCharacterAroundCursor(editor, caret, 1)
   }
 }
 
