@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.key.consumers
 
 import com.maddyhome.idea.vim.KeyProcessResult
+import com.maddyhome.idea.vim.action.change.VimRedoBuffer
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.trace
@@ -48,6 +49,7 @@ internal class CommandCountConsumer : KeyConsumer {
   ): Boolean {
     logger.trace { "Entered CommandCountConsumer" }
     keyProcessResultBuilder.state.commandBuilder.addCountCharacter(key)
+    VimRedoBuffer.markCountKey(key)
     return true
   }
 

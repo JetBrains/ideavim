@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.key.consumers
 
 import com.maddyhome.idea.vim.KeyProcessResult
+import com.maddyhome.idea.vim.action.change.VimRedoBuffer
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandBuilder
@@ -47,6 +48,7 @@ internal class StartSelectRegisterConsumer : KeyConsumer {
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     logger.trace { "Entered StartSelectRegisterConsumer" }
+    VimRedoBuffer.markRegisterKey(key)
     keyProcessResultBuilder.addExecutionStep { ks, _, _ ->
       ks.commandBuilder.startWaitingForRegister(key)
     }
@@ -55,15 +57,12 @@ internal class StartSelectRegisterConsumer : KeyConsumer {
 
   private fun isSelectRegister(key: KeyStroke, keyState: KeyHandlerState): Boolean {
     val vimState = injector.vimState
-    if (vimState.mode !is Mode.NORMAL && vimState.mode !is Mode.VISUAL) {
-      return false
-    }
+    return !(vimState.mode !is Mode.NORMAL && vimState.mode !is Mode.VISUAL) && (key.keyChar == '"'
+      && !keyState.commandBuilder.isRegisterPending
+      && !keyState.commandBuilder.isAwaitingArgument
+      && !keyState.commandBuilder.isBuildingMultiKeyCommand())
 
     // Accept a `"` char, but not when we're already waiting for a register, and not when we're building a multi-key
     // command such as `vi"`
-    return key.keyChar == '"'
-      && !keyState.commandBuilder.isRegisterPending
-      && !keyState.commandBuilder.isAwaitingArgument
-      && !keyState.commandBuilder.isBuildingMultiKeyCommand()
   }
 }

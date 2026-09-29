@@ -42,6 +42,7 @@ import com.intellij.openapi.util.TextRange
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
+import com.maddyhome.idea.vim.action.change.VimRedoBuffer
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimKeyGroupBase
 import com.maddyhome.idea.vim.api.injector
@@ -60,7 +61,6 @@ import com.maddyhome.idea.vim.ide.isRider
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
@@ -145,7 +145,7 @@ internal object IdeaSpecifics {
         }
       }
 
-      if (hostEditor != null && action is ChooseItemAction && injector.registerGroup.isRecording) {
+      if (hostEditor != null && action is ChooseItemAction) {
         val lookup = LookupManager.getActiveLookup(hostEditor)
         val lookupItem = lookup?.currentItem
         if (lookup is LookupImpl && lookupItem != null) {
@@ -155,13 +155,9 @@ internal object IdeaSpecifics {
           val documentLength = hostEditor.document.textLength
           val charsToRemove = caretOffset - completionStartOffset
 
-          val register = VimPlugin.getRegister()
-
           if (charsToRemove > 0) {
             val backSpaceKey = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
-            repeat(charsToRemove) {
-              register.recordKeyStroke(backSpaceKey)
-            }
+            recordSynthesizedKeys(List(charsToRemove) { backSpaceKey })
           }
 
           val completionStartMarker = hostEditor.document.createRangeMarker(
@@ -189,8 +185,8 @@ internal object IdeaSpecifics {
       if (VimPlugin.isNotEnabled()) return
 
       val editor = editor
-      if (editor != null && action is ChooseItemAction && injector.registerGroup.isRecording) {
-        completionData?.recordCompletion(editor, VimPlugin.getRegister())
+      if (editor != null && action is ChooseItemAction) {
+        completionData?.recordCompletion(editor)
       }
 
       //region Enter insert mode after surround with if
@@ -265,7 +261,7 @@ internal object IdeaSpecifics {
       val originalCaretOffset: Int,
       val originalDocumentLength: Int,
     ) {
-      fun recordCompletion(editor: Editor, register: VimRegisterGroup) {
+      fun recordCompletion(editor: Editor) {
         if (!completionStartMarker.isValid) {
           return
         }
@@ -283,14 +279,12 @@ internal object IdeaSpecifics {
           )
         )
 
-        register.recordText(completedText)
+        recordSynthesizedKeys(injector.parser.stringToKeys(completedText))
 
         val caretShift = completedCharCount - (caretOffset - completionStartOffset)
         if (caretShift > 0) {
           val leftArrowKey = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)
-          repeat(caretShift) {
-            register.recordKeyStroke(leftArrowKey)
-          }
+          recordSynthesizedKeys(List(caretShift) { leftArrowKey })
         }
       }
 
@@ -525,3 +519,15 @@ internal class FindActionIdAction : DumbAwareToggleAction() {
   override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 }
 //endregion
+
+/**
+ * Records keys that stand in for something the IDE did rather than something the user typed.
+ *
+ * Accepting a completion item is an IDE action, not a Vim command, so both a macro and `.` would otherwise replay
+ * only the typed prefix. Both are given the keys that would have produced the same text instead.
+ */
+private fun recordSynthesizedKeys(keys: List<KeyStroke>) {
+  val register = injector.registerGroup
+  if (register.isRecording) keys.forEach { register.recordKeyStroke(it) }
+  VimRedoBuffer.recordSynthesizedKeys(keys)
+}
