@@ -255,6 +255,11 @@ The old name is deprecated, but still accepted by `:set` and by the `&{option}` 
                         focused in Normal mode, so the first <Esc> leaves
                         Insert or Visual mode and the next one defocuses the
                         tool window.
+           main         Tabs in the main editor area that are not backed by
+                        a regular file, e.g. editors opened by third-party
+                        plugins for in-memory or decrypted content. Not
+                        enabled by default. Enable with
+                        `:set ideaeditor+=main`.
 
         Remove a value to revert that editor to its native behaviour with no
         Vim keybindings. The change takes effect immediately for all open
