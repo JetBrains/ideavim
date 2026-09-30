@@ -13,6 +13,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler
 import com.intellij.openapi.editor.event.EditorMouseEvent
 import com.intellij.openapi.editor.event.EditorMouseListener
@@ -197,16 +198,23 @@ class ChangeGroup : VimChangeGroupBase() {
     carets: List<VimCaret>,
   ) {
     val ijEditor = (editor as IjVimEditor).editor
-    rpc(ijEditor.project) {
-      FormatRemoteApi.getInstance().format(
-        ijEditor.editorId(),
-        ranges.map { it.startOffset },
-        ranges.map { it.endOffset },
-      )
+    // Bottom-to-top, so that indenting a range doesn't shift the ranges above it
+    val orderedRanges = ranges.sortedByDescending { it.startOffset }
+
+    // Each range is a separate backend command, so they need an explicit mark to stay a single `u`
+    // (a no-op in monolith mode, where the platform groups them anyway).
+    withVimUndoGroup(editor, "Vim Auto Indent") {
+      orderedRanges.forEach { autoIndent(ijEditor, it) }
     }
 
     for ((caret, range) in carets.zip(ranges)) {
       moveCaretToFirstNonBlank(editor, range, caret)
+    }
+  }
+
+  private fun autoIndent(ijEditor: Editor, range: TextRange) {
+    rpc(ijEditor.project) {
+      FormatRemoteApi.getInstance().format(ijEditor.editorId(), range.startOffset, range.endOffset)
     }
   }
 
