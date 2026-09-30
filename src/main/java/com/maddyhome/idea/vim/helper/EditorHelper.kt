@@ -69,6 +69,8 @@ internal val Editor.isIdeaVimDisabledHere: Boolean
  *
  * VIM-3929 was about the debugger's expression editors, which stay disabled. The run/debug configuration console is
  * allowed again, because blocking every non-file editor also took Vim away from the process console.
+ *
+ * AI chat prompt inputs  are opt-in via the `chat` value of 'ideaeditor'.
  */
 private fun Editor.isAllowedFileEditor(): Boolean {
   return EditorHelper.isCommitWindowEditor(this)
@@ -78,6 +80,7 @@ private fun Editor.isAllowedFileEditor(): Boolean {
     || EditorHelper.isCommandHistoryWindow(this)
     || isEnabledConsole()
     || isEnabledMainEditor()
+    || isEnabledChatInput()
 }
 
 /**
@@ -98,6 +101,15 @@ internal fun Editor.isEnabledMainEditor(): Boolean {
   return enabledEditors.contains(IjOptionConstants.ideaeditor_main)
     && editorKind == EditorKind.MAIN_EDITOR
     && isPrimaryEditor()
+}
+
+/**
+ * Checks if this editor is an AI chat prompt input (see [EditorHelper.isChatInput]) that the user has enabled via the
+ * 'ideaeditor' option.
+ */
+internal fun Editor.isEnabledChatInput(): Boolean {
+  return injector.globalIjOptions().ideaeditor.contains(IjOptionConstants.ideaeditor_chat)
+    && EditorHelper.isChatInput(this)
 }
 
 private fun ideaVimDisabledInDialog(ideaVimSupportValue: StringListOptionValue): Boolean {

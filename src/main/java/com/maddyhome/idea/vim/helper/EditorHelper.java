@@ -23,6 +23,7 @@ import com.intellij.openapi.fileEditor.impl.EditorWindow;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.SystemInfo;
+import com.intellij.openapi.util.UserDataHolder;
 import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileUtil;
@@ -57,6 +58,10 @@ public class EditorHelper {
   public static final String PYTHON_CONSOLE_FILE_NAME = "Python Console.py";
   public static final String PYTHON_CONSOLE_TOOL_WINDOW_ID = "Python Console";
   private static final String PYDEV_CONSOLE_KEY_NAME = "PYDEV_CONSOLE_KEY";
+  private static final String AIR_PROMPT_DOCUMENT_KEY_NAME = "AIR_PROMPT_INPUT_DOCUMENT";
+  private static final String AIR_PROMPT_FILE_NAME_PREFIX = "AirPrompt-";
+  private static final String AI_ASSISTANT_INPUT_EDITOR_KEY_NAME = "AI_ASSISTANT_INPUT_EDITOR";
+  private static final String AI_ASSISTANT_INPUT_FILE_NAME_PREFIX = "AIAssistantInput-";
 
   private static final int BLOCK_INLAY_MAX_LINE_HEIGHT = 3;
 
@@ -775,6 +780,32 @@ public class EditorHelper {
   private static boolean isMarkedAsPythonConsole(@NotNull VirtualFile file) {
     @SuppressWarnings("deprecation") Key<?> consoleKey = Key.findKeyByName(PYDEV_CONSOLE_KEY_NAME);
     return consoleKey != null && Boolean.TRUE.equals(file.getUserData(consoleKey));
+  }
+
+  /**
+   * Checks if the editor is the prompt input of an AI chat: JetBrains AI Assistant (which also hosts Junie) or AIR.
+   * <p>
+   * Neither plugin exposes a public marker, so we look for their internal ones. AIR marks the prompt document with
+   * {@code AIR_PROMPT_INPUT_DOCUMENT} and names its light file {@code AirPrompt-<uuid>}. AI Assistant puts
+   * {@code AI_ASSISTANT_INPUT_EDITOR} on the editor and names the input's light file {@code AIAssistantInput-<uuid>}.
+   * The AI Assistant key is only set after the editor is created, and not by every input variant (e.g. the in-code
+   * generation popup), so the file name is what recognises it when the editor is created.
+   * <p>
+   * Viewers are excluded, so code snippets rendered in chat answers keep their native behaviour.
+   */
+  public static boolean isChatInput(@NotNull Editor editor) {
+    if (editor.isViewer()) return false;
+    if (hasUserDataFlag(editor.getDocument(), AIR_PROMPT_DOCUMENT_KEY_NAME)) return true;
+    if (hasUserDataFlag(editor, AI_ASSISTANT_INPUT_EDITOR_KEY_NAME)) return true;
+    var file = getVirtualFile(editor);
+    if (file == null) return false;
+    var name = file.getName();
+    return name.startsWith(AI_ASSISTANT_INPUT_FILE_NAME_PREFIX) || name.startsWith(AIR_PROMPT_FILE_NAME_PREFIX);
+  }
+
+  private static boolean hasUserDataFlag(@NotNull UserDataHolder holder, @NotNull String keyName) {
+    @SuppressWarnings("deprecation") Key<?> key = Key.findKeyByName(keyName);
+    return key != null && Boolean.TRUE.equals(holder.getUserData(key));
   }
 
   /**
