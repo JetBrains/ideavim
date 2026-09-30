@@ -39,6 +39,10 @@ usual beta standards.
   as Neovim does with its default `filetype indent on`. The caret still goes to column 0 where the IDE cannot work an
   indent out on its own, such as in a plain text file, and the indent is still removed again if you leave Insert mode
   without typing anything
+* [VIM-1153](https://youtrack.jetbrains.com/issue/VIM-1153) [`.`](https://vimhelp.org/repeat.txt.html#.) now replays
+  the keys you typed, as Vim does, instead of the recorded edits. Repeating a tag rename such as `cwdiv<Esc>` on
+  another HTML tag now renames its closing tag too, and a completion accepted with `<C-Y>` or a mapping, or
+  picked with `<C-N>`/`<C-P>`, is repeated with the completed text
 
 ### Changes:
 
@@ -51,6 +55,7 @@ usual beta standards.
 ### Merged PRs:
 * [2082](https://github.com/JetBrains/ideavim/pull/2082) by [1grzyb1](https://github.com/1grzyb1): VIM-748 changing multiple commands with |
 * [2084](https://github.com/JetBrains/ideavim/pull/2084) by [1grzyb1](https://github.com/1grzyb1): VIM-4331 keep the indent of a new line when leaving Insert mode
+* [2088](https://github.com/JetBrains/ideavim/pull/2088) by [1grzyb1](https://github.com/1grzyb1): VIM-1153 replay all keystrokes during .
 
 ## 2.47.0, 2026-09-24
 
