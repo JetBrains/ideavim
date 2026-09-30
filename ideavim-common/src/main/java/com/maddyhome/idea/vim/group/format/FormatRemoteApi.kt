@@ -18,7 +18,11 @@ import org.jetbrains.annotations.ApiStatus
 @Rpc
 @ApiStatus.Internal
 interface FormatRemoteApi : RemoteApi<Unit> {
-  suspend fun format(editorId: EditorId, startOffsets: List<Int>, endOffsets: List<Int>)
+  /**
+   * Auto-indents the lines covered by [startOffset]..[endOffset]. Several ranges mean several calls,
+   * which the caller must issue bottom-to-top so that one range doesn't shift the ranges above it.
+   */
+  suspend fun format(editorId: EditorId, startOffset: Int, endOffset: Int)
 
   companion object {
     @JvmStatic
