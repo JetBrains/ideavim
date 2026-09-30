@@ -13,6 +13,7 @@ package com.maddyhome.idea.vim.helper
 import com.intellij.codeWithMe.ClientId
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.EditorKind
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.util.ui.table.JBTableRowEditor
@@ -68,6 +69,8 @@ internal val Editor.isIdeaVimDisabledHere: Boolean
  *
  * VIM-3929 was about the debugger's expression editors, which stay disabled. The run/debug configuration console is
  * allowed again, because blocking every non-file editor also took Vim away from the process console.
+ *
+ * AI chat prompt inputs  are opt-in via the `chat` value of 'ideaeditor'.
  */
 private fun Editor.isAllowedFileEditor(): Boolean {
   return EditorHelper.isCommitWindowEditor(this)
@@ -76,6 +79,8 @@ private fun Editor.isAllowedFileEditor(): Boolean {
     || EditorHelper.isFileEditor(this)
     || EditorHelper.isCommandHistoryWindow(this)
     || isEnabledConsole()
+    || isEnabledMainEditor()
+    || isEnabledChatInput()
 }
 
 /**
@@ -85,6 +90,26 @@ internal fun Editor.isEnabledConsole(): Boolean {
   val enabledEditors = injector.globalIjOptions().ideaeditor
   return (EditorHelper.isPythonConsole(this) && enabledEditors.contains(IjOptionConstants.ideaeditor_python))
     || (EditorHelper.isRunConsole(this) && enabledEditors.contains(IjOptionConstants.ideaeditor_debug))
+}
+
+/**
+ * Checks if this is a non-file editor opened as a tab in the main editor area (e.g. a plugin's `LightVirtualFile`)
+ * that the user has enabled via the 'ideaeditor' option.
+ */
+internal fun Editor.isEnabledMainEditor(): Boolean {
+  val enabledEditors = injector.globalIjOptions().ideaeditor
+  return enabledEditors.contains(IjOptionConstants.ideaeditor_main)
+    && editorKind == EditorKind.MAIN_EDITOR
+    && isPrimaryEditor()
+}
+
+/**
+ * Checks if this editor is an AI chat prompt input (see [EditorHelper.isChatInput]) that the user has enabled via the
+ * 'ideaeditor' option.
+ */
+internal fun Editor.isEnabledChatInput(): Boolean {
+  return injector.globalIjOptions().ideaeditor.contains(IjOptionConstants.ideaeditor_chat)
+    && EditorHelper.isChatInput(this)
 }
 
 private fun ideaVimDisabledInDialog(ideaVimSupportValue: StringListOptionValue): Boolean {

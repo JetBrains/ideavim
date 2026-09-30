@@ -255,10 +255,21 @@ The old name is deprecated, but still accepted by `:set` and by the `&{option}` 
                         focused in Normal mode, so the first <Esc> leaves
                         Insert or Visual mode and the next one defocuses the
                         tool window.
+           main         Tabs in the main editor area that are not backed by
+                        a regular file, e.g. editors opened by third-party
+                        plugins for in-memory or decrypted content. Not
+                        enabled by default. Enable with
+                        `:set ideaeditor+=main`.
+           chat         The prompt input of AI chats: JetBrains AI Assistant
+                        (including Junie in AI Assistant) and AIR. The input
+                        is focused in Insert mode, so <Enter> still sends the
+                        message; in Normal mode <Enter> is a Vim motion. Chat
+                        answers are not affected. Not enabled by default.
+                        Enable with `:set ideaeditor+=chat`.
 
         Remove a value to revert that editor to its native behaviour with no
         Vim keybindings. The change takes effect immediately for all open
-        console windows.
+        console and chat input windows.
 
         This option replaces 'ideapythonconsole', which has been removed.
 

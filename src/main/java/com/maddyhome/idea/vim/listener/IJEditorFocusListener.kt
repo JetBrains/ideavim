@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.listener
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.EditorKind
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.LastUsedEditorInfo
 import com.maddyhome.idea.vim.VimPlugin
@@ -18,6 +19,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.EditorListener
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inInsertMode
+import com.maddyhome.idea.vim.helper.isPrimaryEditor
 import com.maddyhome.idea.vim.helper.isTerminalEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -66,7 +68,7 @@ class IJEditorFocusListener : EditorListener {
       VimPlugin.getChange().insertBeforeCaret(editor, context)
       KeyHandler.getInstance().lastUsedEditorInfo = LastUsedEditorInfo(currentEditorHashCode, true)
     }
-    if (isCurrentEditorTerminal && !ijEditor.inInsertMode) {
+    if (isCurrentEditorTerminal && !ijEditor.inInsertMode && !(ijEditor.editorKind == EditorKind.MAIN_EDITOR && ijEditor.isPrimaryEditor())) {
       switchToInsertMode.run()
     } else if (ijEditor.isInsertMode && (oldEditorInfo.isInsertModeForced || !ijEditor.document.isWritable)) {
       val context: ExecutionContext = injector.executionContextManager.getEditorExecutionContext(editor)
