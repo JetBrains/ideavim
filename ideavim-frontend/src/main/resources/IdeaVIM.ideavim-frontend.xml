@@ -280,6 +280,10 @@
     <editorFactoryDocumentListener
         implementation="com.maddyhome.idea.vim.listener.VimListenerManager$VimDocumentListener"/>
 
+    <!-- Pasting with the IDE paste action replaces text in Replace mode -->
+    <copyPastePostProcessor implementation="com.maddyhome.idea.vim.group.copy.ReplaceModePastePostProcessor"
+                            order="last"/>
+
     <!-- Registry keys -->
     <registryKey defaultValue="true" description="Enable IdeaVim only in editor component and project tree"
                  key="ideavim.only.in.editor.component"/>

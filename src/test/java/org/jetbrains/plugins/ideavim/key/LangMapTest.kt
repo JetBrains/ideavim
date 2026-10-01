@@ -97,13 +97,11 @@ class LangMapTest : VimTestCase() {
   }
 
   @Test
-//  @VimBehaviorDiffers("Lorem xxxum dolor sit amet",
-//    description = "IdeaVim does not properly support overwrite when expanding a register")
   fun `test langmap converts char for register name in Replace mode`() {
     doTest(
       "R<C-R>a<Esc>",
       "Lorem ${c}ipsum dolor sit amet",
-      "Lorem xxxipsum dolor sit amet",
+      "Lorem xxxum dolor sit amet",
     ) {
       enterCommand("let @x='xxx'")
       enterCommand("set langmap=ax")
