@@ -41,13 +41,15 @@ fun lineToNativeSelection(editor: VimEditor, start: Int, end: Int): Pair<Int, In
 
 private tailrec fun VimEditor.lineStartIncludingClosedFolds(offset: Int): Int {
   val lineStart = getLineStartForOffset(offset)
-  val closedFold = getCollapsedFoldRegionAtOffset(lineStart) ?: return lineStart
+  val closedFold = getCollapsedFoldRegionAtOffset(lineStart)
+  if (closedFold == null || closedFold.startOffset >= lineStart) return lineStart
   return lineStartIncludingClosedFolds(closedFold.startOffset)
 }
 
 private tailrec fun VimEditor.lineEndIncludingClosedFolds(offset: Int): Int {
   val lineEnd = getLineEndForOffset(offset)
-  val closedFold = getCollapsedFoldRegionAtOffset(lineEnd) ?: return lineEnd
+  val closedFold = getCollapsedFoldRegionAtOffset(lineEnd)
+  if (closedFold == null || closedFold.endOffset <= lineEnd) return lineEnd
   return lineEndIncludingClosedFolds(closedFold.endOffset)
 }
 
