@@ -57,6 +57,14 @@ class VimEditorReplaceMask(private val editor: VimEditor) {
     return char != '\n' && char.isWhitespace()
   }
 
+  fun recordOverwriteAt(offset: Int, original: Char) {
+    record(offset, ReplaceModeEdit.Overwrote(original))
+  }
+
+  fun recordInsertAt(offset: Int) {
+    record(offset, ReplaceModeEdit.Inserted)
+  }
+
   fun popEditAt(offset: Int): ReplaceModeEdit? {
     return edits.remove(markerAt(offset))
   }
