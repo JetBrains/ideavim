@@ -11,10 +11,15 @@ package com.maddyhome.idea.vim.common
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.annotations.ApiStatus.Internal
 import java.util.concurrent.ConcurrentLinkedDeque
+import javax.swing.KeyStroke
+import kotlin.coroutines.cancellation.CancellationException
+
+private val logger = vimLogger<VimListenersNotifier>()
 
 @Internal // please do not use this class in your plugins, API is not final and will be changed in future releases
 class VimListenersNotifier {
@@ -27,6 +32,7 @@ class VimListenersNotifier {
   val yankListeners: MutableCollection<VimYankListener> = ConcurrentLinkedDeque()
   val registerListeners: MutableCollection<VimRegisterListener> = ConcurrentLinkedDeque()
   val markListeners: MutableCollection<VimMarkListener> = ConcurrentLinkedDeque()
+  val keyTypedListeners: MutableCollection<VimKeyTypedListener> = ConcurrentLinkedDeque()
 
   fun notifyModeWillChange(editor: VimEditor, oldMode: Mode, newMode: Mode) {
     if (!injector.enabler.isEnabled()) return
@@ -101,6 +107,26 @@ class VimListenersNotifier {
   }
 
   /**
+   * Reports a key the user typed
+   *
+   * Keys passed to the key handler are reported by [com.maddyhome.idea.vim.KeyHandler.handleUserKey]. Call this
+   * directly only for a typed key that IdeaVim handles without the key handler, such as a key typed in the output panel.
+   */
+  fun notifyKeyTyped(editor: VimEditor, key: KeyStroke) {
+    if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
+    // A broken listener must not stop the key from being handled
+    keyTypedListeners.forEach {
+      try {
+        it.keyTyped(editor, key)
+      } catch (e: CancellationException) {
+        throw e
+      } catch (e: Exception) {
+        logger.error("Key typed listener failed", e)
+      }
+    }
+  }
+
+  /**
    * Removes listeners with a given listener owner.
    */
   private fun <T : Listener> unloadListeners(listenerOwner: ListenerOwner, listenerCollection: MutableCollection<T>) {
@@ -116,7 +142,8 @@ class VimListenersNotifier {
       vimPluginListeners,
       isReplaceCharListeners,
       yankListeners,
-      registerListeners
+      registerListeners,
+      keyTypedListeners,
     ).forEach { unloadListeners(listenerOwner, it) }
   }
 
@@ -129,5 +156,6 @@ class VimListenersNotifier {
     isReplaceCharListeners.clear()
     yankListeners.clear()
     registerListeners.clear()
+    keyTypedListeners.clear()
   }
 }

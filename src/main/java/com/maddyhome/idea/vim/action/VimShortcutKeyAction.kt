@@ -47,7 +47,6 @@ import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.isPrimaryEditor
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.impl.state.toMappingMode
-import com.maddyhome.idea.vim.key.KeySource
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.AceJumpService
@@ -86,7 +85,10 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
     if (editor != null && keyStroke != null) {
       // In the Python console, Enter/Up/Down should drive the console's own actions (execute / history) in every Vim
       // mode, with the console's native context-aware behaviour.
-      if (handlePythonConsoleKey(editor, keyStroke, e)) return
+      if (handlePythonConsoleKey(editor, keyStroke, e)) {
+        injector.listenersNotifier.notifyKeyTyped(editor.vim, keyStroke)
+        return
+      }
 
       val owner = VimPlugin.getKey().savedShortcutConflicts[keyStroke]
       if ((owner as? ShortcutOwnerInfo.AllModes)?.owner == ShortcutOwner.UNDEFINED) {
@@ -98,7 +100,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
         // Vim removes a modeless selection as soon as a command is typed
         ModelessSelection.clearIfOwned(editor)
         val keyHandler = KeyHandler.getInstance()
-        keyHandler.handleKey(editor.vim, keyStroke, KeySource.TYPED, e.dataContext.vim, keyHandler.keyHandlerState)
+        keyHandler.handleUserKey(editor.vim, keyStroke, e.dataContext.vim)
         if (start != null) {
           val duration = System.currentTimeMillis() - start
           LOG.info("VimShortcut execution '$keyStroke': $duration ms")

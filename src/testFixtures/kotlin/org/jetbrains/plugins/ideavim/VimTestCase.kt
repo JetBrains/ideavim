@@ -76,7 +76,6 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.getGuiCursorMode
 import com.maddyhome.idea.vim.helper.isVimCurrentSearchMatch
-import com.maddyhome.idea.vim.key.KeySource
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
@@ -1213,7 +1212,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
             val inputModel = TestInputModel.getInstance(editor)
             var key = inputModel.nextKeyStroke()
             while (key != null) {
-              keyHandler.handleKey(editor.vim, key, KeySource.TYPED, dataContext, keyHandler.keyHandlerState)
+              keyHandler.handleUserKey(editor.vim, key, dataContext)
               key = inputModel.nextKeyStroke()
             }
           },

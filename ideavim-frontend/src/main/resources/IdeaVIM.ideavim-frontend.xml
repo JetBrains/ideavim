@@ -491,6 +491,8 @@
       </aliases>
     </vimExtension>
 
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.keylog.KeyLogExtension" name="keylog"/>
+
     <vimExtension implementation="com.maddyhome.idea.vim.extension.yankring.YankRingExtension"
                   name="yankring">
       <aliases>

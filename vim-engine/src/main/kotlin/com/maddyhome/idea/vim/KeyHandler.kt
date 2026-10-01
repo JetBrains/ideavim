@@ -135,6 +135,17 @@ class KeyHandler {
     }
   }
 
+  /**
+   * Entry point for a key the user typed, as opposed to a key IdeaVim feeds to itself
+   *
+   * Reports the key to [com.maddyhome.idea.vim.common.VimKeyTypedListener]s and handles it as [KeySource.TYPED]. The
+   * source alone can't tell the two apart, because `.` repeat and replayed mapping prefixes are [KeySource.TYPED] too.
+   */
+  fun handleUserKey(editor: VimEditor, key: KeyStroke, context: ExecutionContext) {
+    injector.listenersNotifier.notifyKeyTyped(editor, key)
+    handleKey(editor, key, KeySource.TYPED, context, keyHandlerState)
+  }
+
   // Deprecated. Has external usages
   @Deprecated(
     "Use handleKey(editor, key, keySource, context, keyState)",
