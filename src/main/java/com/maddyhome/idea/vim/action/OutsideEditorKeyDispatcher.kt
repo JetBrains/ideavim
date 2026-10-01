@@ -29,7 +29,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.helper.ActionEventKeyStrokeExtractor
 import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
-import com.maddyhome.idea.vim.key.KeySource
 import com.maddyhome.idea.vim.key.MappingInfo
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToActionMappingInfo
@@ -82,15 +81,14 @@ class OutsideEditorKeyDispatcher : DumbAwareAction() {
     val keyHandler = KeyHandler.getInstance()
     val fallbackWindow = injector.fallbackWindow
     if (keyStroke.isEscape) {
+      injector.listenersNotifier.notifyKeyTyped(fallbackWindow, keyStroke)
       resetToNormal()
       return
     }
     try {
       forceNormalModeSilently()
       keyHandler.withoutRecording {
-        keyHandler.handleKey(
-          fallbackWindow, keyStroke, KeySource.TYPED, e.dataContext.vim, keyHandler.keyHandlerState
-        )
+        keyHandler.handleUserKey(fallbackWindow, keyStroke, e.dataContext.vim)
       }
     } catch (ex: ProcessCanceledException) {
       throw ex

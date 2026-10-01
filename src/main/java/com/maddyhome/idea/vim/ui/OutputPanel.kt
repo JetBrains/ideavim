@@ -672,6 +672,8 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       return
     }
 
+    // The key handler never sees this key, and closing the panel passes it on as macro playback, so report it here
+    injector.listenersNotifier.notifyKeyTyped(editor.vim, key)
     if (isAtEnd) {
       handleHitEnterPrompt(key)
     } else {

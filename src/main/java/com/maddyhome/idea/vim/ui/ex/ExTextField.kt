@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.api.VimCommandLineCaret
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.EngineStringHelper.isPrintableCharacter
 import com.maddyhome.idea.vim.helper.selectEditorFont
-import com.maddyhome.idea.vim.key.KeySource
 import com.maddyhome.idea.vim.listener.ModelessSelection
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.options.helpers.GuiCursorAttributes
@@ -235,13 +234,7 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
       myParentPanel.ijEditor?.let { ModelessSelection.clearIfOwned(it) }
       val keyHandler = KeyHandler.getInstance()
       val keyStroke = KeyStroke.getKeyStrokeForEvent(e)
-      keyHandler.handleKey(
-        editor,
-        keyStroke,
-        KeySource.TYPED,
-        IjEditorExecutionContext(myParentPanel.context!!),
-        keyHandler.keyHandlerState
-      )
+      keyHandler.handleUserKey(editor, keyStroke, IjEditorExecutionContext(myParentPanel.context!!))
       e.consume()
     } else {
       super.processKeyEvent(e)

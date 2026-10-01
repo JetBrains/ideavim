@@ -505,6 +505,33 @@ absolute-indent motions (`[_`, `]_`) from the original plugin are not currently 
 </details>
 
 <details>
+<summary><h2>keylog: Writes every typed key to a file</h2></summary>
+
+### Summary:
+Logs all the keys you type, like Vim's `vim -w {scriptout}` command line argument. Use the log to find out which
+commands you use most often.
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `set keylog`
+
+### Instructions
+
+The keys are appended to `ideavim.log` in the same directory as your ideavimrc file (e.g. `~/ideavim.log` for
+`~/.ideavimrc`). To use another file:  
+`let g:keylog_file = "~/vimlogs/ideavim.log"`  
+A relative path is relative to the directory of your ideavimrc file.
+
+The keys are written in Vim's key notation, as used by `:map`, e.g. `ciwfoo<Esc>`. A typed `<` is written as `<lt>`.
+Only the keys you type are logged, not the keys produced by mappings, macros or `.`.
+
+The keys are buffered in memory and written to the file every few seconds, and when the extension is disabled or the
+IDE exits.
+
+The log contains everything you type, including passwords typed into the editor. Keep it private.
+
+</details>
+
+<details>
 <summary><h2>matchit.vim: Extends the % key functionality</h2></summary>
 
 By [Martin Yzeiri](https://github.com/myzeiri)
