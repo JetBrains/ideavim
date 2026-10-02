@@ -28,6 +28,7 @@ usual beta standards.
 ### Features:
 * [VIM-748](https://youtrack.jetbrains.com/issue/VIM-748) [`|`](https://vimhelp.org/cmdline.txt.html#%3Abar) now separates Ex commands that take a pattern or free-form argument, such as [`:s`](https://vimhelp.org/change.txt.html#%3As) and [`:sort`](https://vimhelp.org/change.txt.html#%3Asort), so `:%s/foo/bar/|%s/baz/qux/` runs both substitutions and `:%sort u|1d` sorts and then deletes the first line. A `\|` inside the pattern or replacement is still regex alternation or a literal `|`, and a `|` inside a `:sort` pattern such as `:%sort /a|b/` stays part of it. As in Vim, [`:global`](https://vimhelp.org/repeat.txt.html#%3Aglobal), [`:vglobal`](https://vimhelp.org/repeat.txt.html#%3Avglobal), [`:normal`](https://vimhelp.org/various.txt.html#%3Anormal) and `:!` take the `|` as part of their argument
 * [VIM-3963](https://youtrack.jetbrains.com/issue/VIM-3963) Vim can now be enabled in two more kinds of editors with the `'ideaeditor'` option: `main` for tabs in the main editor area that are not backed by a regular file, such as editors that third-party plugins open for in-memory or decrypted content, and `chat` for the prompt input of [JetBrains AI Assistant](https://www.jetbrains.com/help/ai-assistant/ai-chat.html) chats. Both are off by default — enable them with `:set ideaeditor+=main` or `:set ideaeditor+=chat`. The chat input starts in Insert mode, so `<Enter>` still sends the message
+* [VIM-1306](https://youtrack.jetbrains.com/issue/VIM-1306) New `keylog` extension writes every key you type to a file, like Vim's [`-w`](https://vimhelp.org/starting.txt.html#-w) command line argument. Enable it with `set keylog`. The keys go to `ideavim.log` next to your ideavimrc, or to the file set with `let g:keylog_file = "~/vimlogs/ideavim.log"`
 
 ### Fixes:
 
@@ -45,6 +46,7 @@ usual beta standards.
   another HTML tag now renames its closing tag too, and a completion accepted with `<C-Y>` or a mapping, or
   picked with `<C-N>`/`<C-P>`, is repeated with the completed text
 * [VIM-4333](https://youtrack.jetbrains.com/issue/VIM-4333) Fixed [`=`](https://vimhelp.org/change.txt.html#%3D) and `==` reformatting the whole file instead of only the given lines in C/C++ files in CLion Nova
+* [VIM-1314](https://youtrack.jetbrains.com/issue/VIM-1314) Pasting with the IDE paste action (`Cmd+V`/`Ctrl+V`) in Replace mode now overwrites the characters under the caret, as in Vim, instead of inserting the text before them. `<BS>` puts the original characters back
 
 ### Changes:
 
@@ -58,6 +60,8 @@ usual beta standards.
 * [2082](https://github.com/JetBrains/ideavim/pull/2082) by [1grzyb1](https://github.com/1grzyb1): VIM-748 changing multiple commands with |
 * [2084](https://github.com/JetBrains/ideavim/pull/2084) by [1grzyb1](https://github.com/1grzyb1): VIM-4331 keep the indent of a new line when leaving Insert mode
 * [2088](https://github.com/JetBrains/ideavim/pull/2088) by [1grzyb1](https://github.com/1grzyb1): VIM-1153 replay all keystrokes during .
+* [2096](https://github.com/JetBrains/ideavim/pull/2096) by [1grzyb1](https://github.com/1grzyb1): VIM-1306 Add keylog extension
+* [2097](https://github.com/JetBrains/ideavim/pull/2097) by [1grzyb1](https://github.com/1grzyb1): VIM-1314 Replace mode paste with cmd+v
 * [2090](https://github.com/JetBrains/ideavim/pull/2090) by [1grzyb1](https://github.com/1grzyb1): VIM-4333 Fix auto-indent handling in clion
 * [2091](https://github.com/JetBrains/ideavim/pull/2091) by [1grzyb1](https://github.com/1grzyb1): VIM-3963 Allow enabling vim for plugin editors and ai chat windows
 
