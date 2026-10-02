@@ -159,6 +159,11 @@ object IjOptions {
   )
   val ideaoldundo: ToggleOption =
     addOption(ToggleOption("ideaoldundo", GLOBAL, "ideaoldundo", false, isHidden = true), "oldundo")
+  /**
+   * VIM-3667: handle mappings to IDE actions when no editor is open. See `OutsideEditorKeyDispatcher`.
+   */
+  val ideaoutsideeditor: ToggleOption =
+    addOption(ToggleOption("ideaoutsideeditor", GLOBAL, "ideaoutsideeditor", true, isHidden = true))
   val ideaunifyjumps: ToggleOption =
     addOption(ToggleOption("ideaunifyjumps", GLOBAL, "ideaunifyjumps", true, isHidden = true), "unifyjumps")
 
