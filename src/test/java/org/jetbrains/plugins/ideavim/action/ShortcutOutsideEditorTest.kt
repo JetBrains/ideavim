@@ -83,6 +83,20 @@ class ShortcutOutsideEditorTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
   @Test
+  fun `test mapping does not run when no file is open and ideaoutsideeditor is off`() {
+    configureByText("")
+    enterCommand("set noideaoutsideeditor")
+    enterCommand("map <leader>ws <Action>($GOTO_SYMBOL_ID)")
+    closeAllFiles()
+
+    assertFalse(isKeyClaimedOutsideEditor('\\'), "No key must be claimed when the option is off")
+    typeKeysOutsideEditor("\\ws")
+
+    assertEquals(0, gotoSymbol.invocations.size)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
   fun `test action invoked without editor receives the project`() {
     configureByText("")
     enterCommand("map <leader>sf <Action>($GOTO_FILE_ID)")

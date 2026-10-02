@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.key.MappingInfo
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToActionMappingInfo
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import java.awt.Component
@@ -63,6 +64,7 @@ class OutsideEditorKeyDispatcher : DumbAwareAction() {
 
   private fun isEnabled(e: AnActionEvent): Boolean {
     if (VimPlugin.isNotEnabled()) return false
+    if (!injector.globalIjOptions().ideaoutsideeditor) return false
     if (e.getData(PlatformDataKeys.EDITOR) != null) return false
     if (e.getData(PlatformDataKeys.SPEED_SEARCH_TEXT) != null) return false
     if (e.getData(PlatformDataKeys.IS_MODAL_CONTEXT) == true) return false
@@ -111,6 +113,7 @@ class OutsideEditorKeyDispatcher : DumbAwareAction() {
   }
 
   private fun register(component: JComponent) {
+    if (!injector.globalIjOptions().ideaoutsideeditor) return
     // The shortcut set is rebuilt on every registration, so `:map`/`:unmap` executed since the last focus change are
     // picked up. Escape is always included so that a pending sequence can be cancelled.
     val keys = userMappingKeys().flatten().toMutableSet()
