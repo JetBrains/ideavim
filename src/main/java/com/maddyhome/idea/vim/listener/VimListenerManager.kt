@@ -37,6 +37,7 @@ import com.intellij.openapi.editor.event.SelectionListener
 import com.intellij.openapi.editor.ex.DocumentEx
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.FocusChangeListener
+import com.intellij.openapi.editor.ex.FoldingListener
 import com.intellij.openapi.editor.impl.EditorComponentImpl
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileDocumentManagerListener
@@ -119,7 +120,7 @@ import com.maddyhome.idea.vim.helper.vimDisabled
 import com.maddyhome.idea.vim.helper.vimInitialised
 import com.maddyhome.idea.vim.key.noteCaretMoveInInsertSession
 import com.maddyhome.idea.vim.key.resetAbbreviationSession
-import com.maddyhome.idea.vim.listener.VimListenerManager.VimEditorFactoryListener.editorCreated
+import com.maddyhome.idea.vim.listener.VimListenerManager.VimEditorFactoryListener.scheduleDeferredInitialisation
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.IjVimSearchGroup
 import com.maddyhome.idea.vim.newapi.InsertTimeRecorder
@@ -265,7 +266,7 @@ object VimListenerManager {
       busConnection.subscribe(VirtualFileManager.VFS_CHANGES, BufNewFileTracker)
       busConnection.subscribe(FileDocumentManagerListener.TOPIC, BufWriteListener)
 
-      OutsideEditorKeyDispatcher.getInstance().installFocusListener()
+      OutsideEditorKeyDispatcher.getInstance().installListeners()
 
       // VIM-4205: feed Esc presses to RiderEscAwtKeyTracker. Must be a preprocessor (not a dispatcher)
       // so it fires before Rider's popup manager consumes the event.
@@ -282,7 +283,7 @@ object VimListenerManager {
 
     fun disable() {
       EventFacade.getInstance().restoreTypedActionHandler()
-      OutsideEditorKeyDispatcher.getInstance().removeFocusListener()
+      OutsideEditorKeyDispatcher.getInstance().removeListeners()
 
       val optionGroup = VimPlugin.getOptionGroup()
       optionGroup.removeEffectiveOptionValueChangeListener(Options.guicursor, GuicursorChangeListener)

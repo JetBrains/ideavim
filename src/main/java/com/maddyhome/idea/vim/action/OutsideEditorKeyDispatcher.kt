@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.helper.ActionEventKeyStrokeExtractor
 import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
 import com.maddyhome.idea.vim.key.KeySource
@@ -36,7 +37,9 @@ import com.maddyhome.idea.vim.key.ToActionMappingInfo
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import com.maddyhome.idea.vim.state.mode.Mode
+import org.jetbrains.annotations.VisibleForTesting
 import java.awt.Component
 import java.awt.KeyboardFocusManager
 import java.awt.event.KeyEvent
@@ -142,18 +145,26 @@ class OutsideEditorKeyDispatcher : DumbAwareAction() {
     injector.keyGroup.getKeyMapping(MappingMode.NORMAL).getAll(emptyList())
       .filter { it.mappingInfo.owner.isUserDefined && it.mappingInfo.isActionsOnly }.map { it.getPath() }
 
-  private val focusListener = PropertyChangeListener { evt ->
+  private fun onFocusOwnerChanged(newFocusOwner: Component?) {
     unregister()
-    val newFocusOwner = evt.newValue as? JComponent ?: return@PropertyChangeListener
-    if (shouldHandle(newFocusOwner)) register(newFocusOwner)
+    if (newFocusOwner is JComponent && shouldHandle(newFocusOwner)) register(newFocusOwner)
   }
 
-  fun installFocusListener() {
+  @VisibleForTesting
+  internal val focusListener = PropertyChangeListener { evt -> onFocusOwnerChanged(evt.newValue as? Component) }
+
+  private val optionListener = GlobalOptionChangeListener {
+    onFocusOwnerChanged(KeyboardFocusManager.getCurrentKeyboardFocusManager().focusOwner)
+  }
+
+  fun installListeners() {
     KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener("focusOwner", focusListener)
+    injector.optionGroup.addGlobalOptionChangeListener(IjOptions.ideaoutsideeditor, optionListener)
   }
 
-  fun removeFocusListener() {
+  fun removeListeners() {
     KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener("focusOwner", focusListener)
+    injector.optionGroup.removeGlobalOptionChangeListener(IjOptions.ideaoutsideeditor, optionListener)
     unregister()
   }
 
