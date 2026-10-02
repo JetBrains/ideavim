@@ -33,8 +33,8 @@ object VisualOperation {
     }
     val type = editor.mode.selectionType ?: CHARACTER_WISE
 
-    start = editor.normalizeOffset(start, false)
-    end = editor.normalizeOffset(end, false)
+    start = editor.normalizeOffset(start, true)
+    end = editor.normalizeOffset(end, true) - 1
     val sp = editor.offsetToBufferPosition(start)
     val ep = editor.offsetToBufferPosition(end)
     var lines = ep.line - sp.line + 1
@@ -47,8 +47,8 @@ object VisualOperation {
     } else {
       when (type) {
         SelectionType.LINE_WISE -> ep.column
-        CHARACTER_WISE -> if (lines > 1) ep.column - injector.visualMotionGroup.selectionAdj else ep.column - sp.column
-        SelectionType.BLOCK_WISE -> ep.column - sp.column + 1
+        CHARACTER_WISE -> if (lines > 1) ep.column - injector.visualMotionGroup.selectionAdj + 1 else ep.column - sp.column + 1
+        SelectionType.BLOCK_WISE -> ep.column - sp.column + 2
       }
     }
 

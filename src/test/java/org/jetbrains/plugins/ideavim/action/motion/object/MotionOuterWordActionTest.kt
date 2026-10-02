@@ -56,21 +56,6 @@ class MotionOuterWordActionTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem ipsum dolor sit amet,
-      |
-      |${s}
-      |${c}
-      |${se}
-      |
-      |
-      |consectetur adipiscing elit
-    """,
-    description = "The caret at the same offset as the selection end is an indication that there is an off-by-one error." +
-      "IdeaVim doesn't (currently) allow selecting the end of line char, so this inclusive range does not include the" +
-      "(exclusive) end of line char. Once IdeaVim handles this, we might have to fix things"
-  )
   @Test
   fun `test select empty line`() {
     doTest(
@@ -89,8 +74,8 @@ class MotionOuterWordActionTest : VimTestCase() {
         |Lorem ipsum dolor sit amet,
         |
         |${s}
-        |${c}${se}
-        |
+        |${c}
+        |${se}
         |
         |
         |consectetur adipiscing elit
@@ -141,16 +126,6 @@ class MotionOuterWordActionTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem ipsum dolor sit amet,
-      |
-      |${s}
-      |${c}
-      |${se}consectetur adipiscing elit
-    """,
-    description = "Off by one because IdeaVim does not allow selecting a newline char"
-  )
   @Test
   fun `test select empty line wraps to next line but does not wrap to following line`() {
     doTest(
@@ -166,28 +141,13 @@ class MotionOuterWordActionTest : VimTestCase() {
         |Lorem ipsum dolor sit amet,
         |
         |${s}
-        |${c}${se}
-        |consectetur adipiscing elit
+        |${c}
+        |${se}consectetur adipiscing elit
       """.trimMargin(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem ipsum dolor sit amet,
-      |
-      |${s}
-      |
-      |
-      |
-      |
-      |${c}
-      |${se}
-      |consectetur adipiscing elit
-    """,
-    description = "Off by one because IdeaVim does not allow selecting a newline char"
-  )
   @Test
   fun `test select multiple empty lines`() {
     doTest(
@@ -212,28 +172,14 @@ class MotionOuterWordActionTest : VimTestCase() {
         |
         |
         |
-        |${c}${se}
-        |
+        |${c}
+        |${se}
         |consectetur adipiscing elit
       """.trimMargin(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem ipsum dolor sit amet,
-      |
-      |${s}....
-      |${c}
-      |${se}
-      |
-      |consectetur adipiscing elit
-    """,
-    description = "The caret at the same offset as the selection end is an indication that there is an off-by-one error." +
-      "IdeaVim doesn't (currently) allow selecting the end of line char, so this inclusive range does not include the" +
-      "(exclusive) end of line char. Once IdeaVim handles this, we might have to fix things"
-  )
   @Test
   fun `test select blank line`() {
     doTest(
@@ -251,8 +197,8 @@ class MotionOuterWordActionTest : VimTestCase() {
         |Lorem ipsum dolor sit amet,
         |
         |${s}....
-        |${c}${se}
-        |
+        |${c}
+        |${se}
         |
         |consectetur adipiscing elit
       """.trimMargin().dotToSpace(),
@@ -490,19 +436,6 @@ class MotionOuterWordActionTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem${s} Ipsum
-      |
-      |${c}
-      |${se}
-      |Lorem ipsum dolor sit amet,
-      |consectetur adipiscing elit
-      |Sed in orci mauris.
-      |Cras id tellus in ex imperdiet egestas.
-    """,
-    description = "Off by one because IdeaVim does not currently support selecting newline char"
-  )
   @Test
   fun `test repeated text object expands to multiple empty lines`() {
     doTest(
@@ -520,8 +453,8 @@ class MotionOuterWordActionTest : VimTestCase() {
       """
         |Lorem${s} Ipsum
         |
-        |${c}${se}
-        |
+        |${c}
+        |${se}
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
@@ -555,19 +488,6 @@ class MotionOuterWordActionTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem${s} Ipsum
-      |
-      |........
-      |${c}
-      |${se}Lorem ipsum dolor sit amet,
-      |consectetur adipiscing elit
-      |Sed in orci mauris.
-      |Cras id tellus in ex imperdiet egestas.
-    """,
-    description = "Off by one because IdeaVim does not currently support selecting newline char"
-  )
   @Test
   fun `test repeated text object expands to cover whitespace on following blank lines`() {
     doTest(
@@ -586,8 +506,8 @@ class MotionOuterWordActionTest : VimTestCase() {
         |Lorem${s} Ipsum
         |
         |........
-        |${c}${se}
-        |Lorem ipsum dolor sit amet,
+        |${c}
+        |${se}Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
@@ -708,18 +628,6 @@ class MotionOuterWordActionTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(
-    originalVimAfter =
-      """
-        |Lorem Ipsum...${s}.....
-        |${c}
-        |${se}Lorem ipsum dolor sit amet
-        |consectetur adipiscing elit
-        |Sed in orci mauris.
-        |Cras id tellus in ex imperdiet egestas.
-      """,
-    description = "Off by one because IdeaVim does not currently support selecting newline char"
-  )
   @Test
   fun `test select outer word from whitespace at end of line with multiple lines and existing left-to-right selection`() {
     doTest(
@@ -734,8 +642,8 @@ class MotionOuterWordActionTest : VimTestCase() {
       """.trimMargin().dotToSpace(),
       """
         |Lorem Ipsum...${s}.....
-        |${c}${se}
-        |Lorem ipsum dolor sit amet
+        |${c}
+        |${se}Lorem ipsum dolor sit amet
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
