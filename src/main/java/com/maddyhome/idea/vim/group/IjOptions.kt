@@ -124,6 +124,11 @@ object IjOptions {
       IjOptionConstants.ideaRefactorModeValues
     )
   )
+  /**
+   * Move the caret with the text when scrolling with the mouse wheel or the scrollbar, like Vim does
+   */
+  val ideascrollcursor: ToggleOption =
+    addOption(ToggleOption("ideascrollcursor", GLOBAL, "ideascrollcursor", false))
   val ideastatusicon: StringOption = addOption(
     StringOption(
       "ideastatusicon",

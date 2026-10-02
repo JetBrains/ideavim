@@ -128,6 +128,7 @@ import com.maddyhome.idea.vim.listener.VimListenerManager.VimEditorFactoryListen
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.IjVimSearchGroup
 import com.maddyhome.idea.vim.newapi.InsertTimeRecorder
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.helpers.LangNoRemapChangeListener
@@ -145,6 +146,8 @@ import com.maddyhome.idea.vim.ui.widgets.mode.modeWidgetOptionListener
 import org.jetbrains.annotations.TestOnly
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.awt.event.MouseWheelEvent
+import java.awt.event.MouseWheelListener
 import java.lang.ref.WeakReference
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -398,6 +401,15 @@ object VimListenerManager {
       val searchHighlightsViewportHandler = SearchHighlightsViewportHandler(editor, perEditorDisposable)
       eventFacade.addVisibleAreaListener(editor, searchHighlightsViewportHandler, perEditorDisposable)
       eventFacade.addFoldingListener(editor, searchHighlightsViewportHandler, perEditorDisposable)
+
+      // 'ideascrollcursor': the caret follows the text when the user scrolls with the mouse wheel or the scrollbar
+      val scrollCursorHandler = ScrollCursorHandler(editor)
+      eventFacade.addVisibleAreaListener(editor, scrollCursorHandler, perEditorDisposable)
+      eventFacade.addComponentMouseWheelListener(
+        (editor as EditorEx).scrollPane,
+        scrollCursorHandler,
+        perEditorDisposable,
+      )
 
       injector.editorGroup.editorCreated(IjVimEditor(editor))
       VimPlugin.getChange().editorCreated(IjVimEditor(editor), perEditorDisposable)
@@ -1141,6 +1153,58 @@ object VimListenerManager {
 
     private companion object {
       private const val COALESCE_DELAY_MS = 50
+    }
+  }
+
+  /**
+   * Moves the caret along with the text when the user scrolls with the mouse wheel or drags a scrollbar, so it never
+   * leaves the screen, like Vim does. Only active when 'ideascrollcursor' is set.
+   *
+   * The caret only follows scrolling started by the user. IntelliJ and IdeaVim also scroll programmatically to show
+   * the caret after a jump, a search, etc. and those scrolls must leave the caret where it was put, even if that is
+   * inside the 'scrolloff' margin.
+   *
+   * A wheel notch can be animated (smooth scrolling) or arrive as a burst of precise trackpad events, so the visible
+   * area keeps changing for a short while after the wheel event. The scroll pane's own wheel listener might also run
+   * before ours and scroll synchronously, so the caret is moved both on the wheel event itself and on every visible
+   * area change shortly after it.
+   */
+  private class ScrollCursorHandler(private val editor: Editor) : VisibleAreaListener, MouseWheelListener {
+    private var lastWheelTime = 0L
+
+    override fun mouseWheelMoved(e: MouseWheelEvent) {
+      // Ctrl/Cmd+wheel changes the font size instead of scrolling
+      if (e.isControlDown || e.isMetaDown) return
+      lastWheelTime = System.currentTimeMillis()
+      followScroll()
+    }
+
+    override fun visibleAreaChanged(event: VisibleAreaEvent) {
+      if (isScrollBarDragged() || System.currentTimeMillis() - lastWheelTime <= WHEEL_SCROLL_TIMEOUT_MS) {
+        followScroll()
+      }
+    }
+
+    private fun isScrollBarDragged(): Boolean {
+      val scrollPane = (editor as EditorEx).scrollPane
+      return scrollPane.verticalScrollBar.valueIsAdjusting || scrollPane.horizontalScrollBar.valueIsAdjusting
+    }
+
+    private fun followScroll() {
+      if (editor.isDisposed || editor.isIdeaVimDisabledHere) return
+      if (!injector.globalIjOptions().ideascrollcursor) return
+
+      // Vim has a single cursor, and moving only the primary caret would be surprising
+      if (editor.caretModel.caretCount > 1) return
+
+      // Don't interfere with the command line or a mouse drag selection, which already moves the caret
+      if (editor.vim.mode is Mode.CMD_LINE || MouseEventsDataHolder.mouseDragging) return
+
+      MotionGroup.moveCaretToView(editor)
+    }
+
+    private companion object {
+      private const val WHEEL_SCROLL_TIMEOUT_MS = 500
     }
   }
 

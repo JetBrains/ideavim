@@ -315,6 +315,14 @@ The old name is deprecated, but still accepted by `:set` and by the `&{option}` 
         This option is only used when the refactoring is started in Normal,
         Insert or Replace mode. Visual or Select modes are not changed.
 
+'ideascrollcursor'      boolean (default off)
+                        global
+        When on, scrolling with the mouse wheel or by dragging the scrollbar
+        moves the cursor along with the text, so it stays on screen, like in
+        Vim. The cursor is kept 'scrolloff' lines away from the edge of the
+        window. When off, IntelliJ's default behaviour is kept and the cursor
+        stays where it is, even if it scrolls out of view.
+
 'ideastatusicon'        string  (default "enabled")
                         global
         This option controls the behaviour and appearance of the IdeaVim icon
