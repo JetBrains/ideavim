@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelListener;
 
 /**
  * @author vlan
@@ -114,6 +115,13 @@ public class EventFacade {
                                         @NotNull Disposable disposable) {
     component.addMouseListener(mouseListener);
     Disposer.register(disposable, () -> component.removeMouseListener(mouseListener));
+  }
+
+  public void addComponentMouseWheelListener(@NotNull Component component,
+                                             @NotNull MouseWheelListener mouseWheelListener,
+                                             @NotNull Disposable disposable) {
+    component.addMouseWheelListener(mouseWheelListener);
+    Disposer.register(disposable, () -> component.removeMouseWheelListener(mouseWheelListener));
   }
 
   public void addEditorMouseMotionListener(@NotNull Editor editor,

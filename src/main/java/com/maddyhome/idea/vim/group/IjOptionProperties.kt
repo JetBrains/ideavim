@@ -24,6 +24,7 @@ open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesBase(sco
   val ideaeditor: StringListOptionValue by optionProperty(IjOptions.ideaeditor)
   val idealookupkeys: StringListOptionValue by optionProperty(IjOptions.idealookupkeys)
   var ideamarks: Boolean by optionProperty(IjOptions.ideamarks)
+  var ideascrollcursor: Boolean by optionProperty(IjOptions.ideascrollcursor)
   var ideastatusicon: String by optionProperty(IjOptions.ideastatusicon)
   var ideatrackactionids: Boolean by optionProperty(IjOptions.ideatrackactionids)
   val ideavimsupport: StringListOptionValue by optionProperty(IjOptions.ideavimsupport)
