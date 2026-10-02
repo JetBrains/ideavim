@@ -278,6 +278,21 @@ The old name is deprecated, but still accepted by `:set` and by the `&{option}` 
                         global
         Maps Vim's global marks to IDE bookmarks.
 
+'ideaoutsideeditor'     boolean (default on)
+                        global
+        When on, Normal mode mappings to IDE actions keep working when no
+        file is open, e.g. `map <leader>sf <Action>(GotoFile)` pressed while
+        the Project tool window has the focus and every editor tab is closed.
+
+        Only user mappings whose right-hand side consists of <Action>(...)
+        sequences take part, since there is no editor for anything else to
+        act on. Text fields, such as Search Everywhere, and modal dialogs are
+        not affected, and keys that do not start such a mapping are left to
+        the IDE. <Esc> cancels a partially typed mapping.
+
+        Turn the option off to leave all keys typed outside an editor to the
+        IDE. The change takes effect immediately.
+
 'idearefactormode'      string  (default "select")
                         global or local to buffer
         Specifies the mode to be used when a refactoring selects text to be
