@@ -33,6 +33,7 @@ open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesBase(sco
   // Temporary options to control work-in-progress behaviour
   var ideaclosenotebooks: Boolean by optionProperty(IjOptions.ideaclosenotebooks)
   var ideaoldundo: Boolean by optionProperty(IjOptions.ideaoldundo)
+  var ideaoutsideeditor: Boolean by optionProperty(IjOptions.ideaoutsideeditor)
   var ideaunifyjumps: Boolean by optionProperty(IjOptions.ideaunifyjumps)
 }
 
