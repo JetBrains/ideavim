@@ -24,6 +24,8 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.action.OutsideEditorKeyDispatcher
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -32,8 +34,10 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
+import java.awt.KeyboardFocusManager
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
+import java.beans.PropertyChangeEvent
 import javax.swing.JPanel
 import javax.swing.JTextField
 import javax.swing.KeyStroke
@@ -93,6 +97,27 @@ class ShortcutOutsideEditorTest : VimTestCase() {
     typeKeysOutsideEditor("\\ws")
 
     assertEquals(0, gotoSymbol.invocations.size)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test turning ideaoutsideeditor off unregisters the shortcuts from the focused component`() {
+    configureByText("")
+    enterCommand("map <leader>ws <Action>($GOTO_SYMBOL_ID)")
+    closeAllFiles()
+
+    val dispatcher = OutsideEditorKeyDispatcher.getInstance()
+    ApplicationManager.getApplication().invokeAndWait {
+      val panel = JPanel()
+      dispatcher.focusListener.propertyChange(focusOwnerChange(from = null, to = panel))
+      assertTrue(ActionUtil.getActions(panel).contains(dispatcher), "Precondition: focusing the panel registers keys")
+
+      injector.globalIjOptions().ideaoutsideeditor = false
+      assertFalse(
+        ActionUtil.getActions(panel).contains(dispatcher),
+        "Turning the option off must unregister the shortcuts without waiting for a focus change",
+      )
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
@@ -425,6 +450,9 @@ class ShortcutOutsideEditorTest : VimTestCase() {
       assertFalse(OutsideEditorKeyDispatcher.shouldHandle(JPanel(), null))
     }
   }
+
+  private fun focusOwnerChange(from: Any?, to: Any?) =
+    PropertyChangeEvent(KeyboardFocusManager.getCurrentKeyboardFocusManager(), "focusOwner", from, to)
 
   private fun closeAllFiles() {
     ApplicationManager.getApplication().invokeAndWait {
