@@ -208,7 +208,7 @@ class MapFunctionTest : VimTestCase("\n") {
   fun `test map List with lambda with too many arguments`() {
     enterCommand("echo map([1, 2, 3], {idx, val, other -> val * 2})")
     assertPluginError(true)
-    assertPluginErrorMessage("E119: Not enough arguments for function: <lambda>0")
+    assertPluginErrorMessage("E119: Not enough arguments for function: <lambda>1")
   }
 
   @Test

@@ -147,6 +147,9 @@
   "fir[st]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.SelectFirstFileCommand"
   },
+  "fu[nction]": {
+    "className": "com.maddyhome.idea.vim.vimscript.model.commands.FunctionCommand"
+  },
   "g[lobal]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.GlobalCommand",
     "barSeparates": false

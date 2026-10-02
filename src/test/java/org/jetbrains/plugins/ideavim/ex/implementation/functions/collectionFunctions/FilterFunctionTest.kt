@@ -178,7 +178,7 @@ class FilterFunctionTest : VimTestCase("\n") {
   fun `test filter List with lambda with too many parameters`() {
     enterCommand("echo filter([1, 2, 3], {idx, val, other -> val > 1})")
     assertPluginError(true)
-    assertPluginErrorMessage("E119: Not enough arguments for function: <lambda>0")
+    assertPluginErrorMessage("E119: Not enough arguments for function: <lambda>1")
   }
 
   @Test

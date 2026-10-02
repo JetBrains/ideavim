@@ -235,8 +235,6 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     SelectionVimListenerSuppressor.lock { fixture.tearDown() }
     ExEntryPanel.instance?.deactivate(false)
     VimPlugin.getVariableService().clear()
-    VimFuncref.lambdaCounter = 0
-    VimFuncref.anonymousCounter = 0
     IdeavimErrorListener.testLogger.clear()
     VimPlugin.getRegister().resetRegisters()
     (VimPlugin.getSearch() as VimSearchGroupBase).resetState()

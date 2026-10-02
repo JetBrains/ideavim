@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.commands.AutoCmdCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
+import com.maddyhome.idea.vim.vimscript.model.commands.FunctionCommand
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.IndexedExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
@@ -114,6 +115,16 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
   }
 
   override fun visitFunctionDefinition(ctx: VimscriptParser.FunctionDefinitionContext): Executable {
+    if (ctx.ENDFUNCTION() == null) {
+      // Vim reads lines into the function's body until it finds `:endfunction`. If it reaches the end of the input
+      // without finding it, it reports an error and doesn't define the function. The grammar allows a definition to
+      // end at EOF so that we can parse this, and we report the error as part of the `:function` command. The body
+      // has been parsed, but is discarded
+      val command = FunctionCommand(Range(), CommandModifier.NONE, missingEndFunction = true)
+      command.rangeInScript = ctx.getTextRange()
+      return command
+    }
+
     val functionScope = if (ctx.functionScope() != null) Scope.getByValue(ctx.functionScope().text) else null
     val args = ctx.argumentsDeclaration().variableName().map { it.text }
     val defaultArgs = ctx.argumentsDeclaration().defaultValue()
