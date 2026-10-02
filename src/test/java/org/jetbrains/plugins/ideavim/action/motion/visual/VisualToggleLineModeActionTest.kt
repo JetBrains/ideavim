@@ -10,8 +10,14 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.visual
 
+import com.intellij.codeInsight.folding.CodeFoldingManager
+import com.intellij.codeInsight.folding.impl.FoldingUtil
+import com.intellij.ide.highlighter.HtmlFileType
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -151,5 +157,89 @@ class VisualToggleLineModeActionTest : VimTestCase() {
       """.trimIndent(),
       Mode.VISUAL(SelectionType.LINE_WISE)
     )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun `test enter visual line on collapsed html tag selects whole tag`() {
+    configureByText(
+      HtmlFileType.INSTANCE,
+      """
+        ${c}<div>
+          asdfasdf
+        </div>
+      """.trimIndent(),
+    )
+    collapseFoldAtLine(0)
+
+    typeText("V")
+
+    assertState(
+      """
+        ${s}${c}<div>
+          asdfasdf
+        </div>${se}
+      """.trimIndent(),
+    )
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun `test delete visual line on collapsed html tag deletes whole tag`() {
+    configureByText(
+      HtmlFileType.INSTANCE,
+      """
+        ${c}<div>
+          asdfasdf
+        </div>
+        <p></p>
+      """.trimIndent(),
+    )
+    collapseFoldAtLine(0)
+
+    typeText("Vd")
+
+    assertState("${c}<p></p>")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun `test extend visual line down onto collapsed html tag selects whole tag`() {
+    configureByText(
+      HtmlFileType.INSTANCE,
+      """
+        ${c}<p></p>
+        <div>
+          asdfasdf
+        </div>
+        <p></p>
+      """.trimIndent(),
+    )
+    collapseFoldAtLine(1)
+
+    typeText("Vj")
+
+    assertState(
+      """
+        ${s}<p></p>
+        ${c}<div>
+          asdfasdf
+        </div>
+        ${se}<p></p>
+      """.trimIndent(),
+    )
+    assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
+  }
+
+  private fun collapseFoldAtLine(line: Int) {
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.foldingModel.runBatchFoldingOperation {
+        CodeFoldingManager.getInstance(fixture.project).updateFoldRegions(fixture.editor)
+        val foldRegion = FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, line)
+          ?: error("Expected fold region at line $line")
+        foldRegion.isExpanded = false
+      }
+    }
   }
 }

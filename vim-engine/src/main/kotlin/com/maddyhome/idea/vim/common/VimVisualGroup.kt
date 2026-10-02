@@ -34,11 +34,26 @@ fun charToNativeSelection(editor: VimEditor, start: Int, end: Int, mode: Mode): 
  */
 fun lineToNativeSelection(editor: VimEditor, start: Int, end: Int): Pair<Int, Int> {
   val (nativeStart, nativeEnd) = sort(start, end)
-  val lineStart = editor.getLineStartForOffset(nativeStart)
-  // Extend to \n char of line to fill full line with selection
-  val lineEnd = (editor.getLineEndForOffset(nativeEnd) + 1).coerceAtMost(editor.fileSize().toInt())
-  return lineStart to lineEnd
+  val lineStart = editor.lineStartIncludingClosedFolds(nativeStart)
+  val lineEnd = editor.lineEndIncludingClosedFolds(nativeEnd)
+  return lineStart to editor.offsetAfterNewLine(lineEnd)
 }
+
+private tailrec fun VimEditor.lineStartIncludingClosedFolds(offset: Int): Int {
+  val lineStart = getLineStartForOffset(offset)
+  val closedFold = getCollapsedFoldRegionAtOffset(lineStart)
+  if (closedFold == null || closedFold.startOffset >= lineStart) return lineStart
+  return lineStartIncludingClosedFolds(closedFold.startOffset)
+}
+
+private tailrec fun VimEditor.lineEndIncludingClosedFolds(offset: Int): Int {
+  val lineEnd = getLineEndForOffset(offset)
+  val closedFold = getCollapsedFoldRegionAtOffset(lineEnd)
+  if (closedFold == null || closedFold.endOffset <= lineEnd) return lineEnd
+  return lineEndIncludingClosedFolds(closedFold.endOffset)
+}
+
+private fun VimEditor.offsetAfterNewLine(lineEnd: Int): Int = (lineEnd + 1).coerceAtMost(fileSize().toInt())
 
 fun <T : Comparable<T>> sort(a: T, b: T): Pair<T, T> = if (a > b) b to a else a to b
 
