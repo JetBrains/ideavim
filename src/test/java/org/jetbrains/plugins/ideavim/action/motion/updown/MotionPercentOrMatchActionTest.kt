@@ -392,4 +392,19 @@ $c("("")")
     typeText("%")
     assertState("<a>(<b c=')'/>$c)</a>")
   }
+
+  @Test
+  fun `test percent in empty document does not crash`() {
+    configureByText("")
+    typeText("%")
+    assertState("")
+    assertMode(Mode.NORMAL())
+  }
+
+  @Test
+  fun `test percent on empty last line does not jump to previous line`() {
+    configureByText("foo(bar)\n$c")
+    typeText("%")
+    assertState("foo(bar)\n$c")
+  }
 }
