@@ -236,10 +236,14 @@ private class SearchAddress(pattern: String, offset: Int, move: Boolean) : Addre
           } else {
             directions.add(Direction.BACKWARDS)
           }
-          pat = if (pat.last() == pat[0]) {
+          pat = if (pat.length > 1 && pat.last() == pat[0]) {
             pat.substring(1, pat.length - 1)
           } else {
             pat.substring(1)
+          }
+          // An empty pattern, such as `:/` or `://`, uses the last search pattern
+          if (pat.isEmpty()) {
+            pat = injector.searchGroup.lastSearchPattern ?: throw exExceptionMessage("E35")
           }
           patterns.add(pat)
         }
