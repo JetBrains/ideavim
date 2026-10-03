@@ -121,7 +121,13 @@ fun findMatchingPairOnCurrentLine(editor: VimEditor, caret: ImmutableVimCaret): 
     return commentPos
   }
 
-  val lineEnd = editor.getLineEndOffset(caret.getBufferPosition().line)
+  val line = caret.getBufferPosition().line
+  val lineEnd = editor.getLineEndOffset(line)
+
+  // An empty line (or an empty document) has no characters to match
+  if (editor.getLineStartOffset(line) == lineEnd) {
+    return null
+  }
 
   // To handle the case where visual mode allows the user to go past the end of the line
   if (pos > 0 && pos >= lineEnd) {
