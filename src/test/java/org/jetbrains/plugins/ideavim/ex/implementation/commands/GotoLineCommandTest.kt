@@ -459,6 +459,71 @@ class GotoLineCommandTest : VimTestCase() {
   }
 
   @Test
+  fun `test goto using empty forward search range uses last search pattern`() {
+    doTest(
+      listOf(searchCommand("/natoque"), "1G", exCommand("/")),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |${c}Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |${c}Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test goto using empty backward search range uses last search pattern`() {
+    doTest(
+      listOf(searchCommand("/sit"), "2G", exCommand("?")),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |${c}Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |${c}Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test goto using empty search range without previous pattern reports error`() {
+    configureByText(
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |${c}Morbi nec luctus tortor, id venenatis lacus.
+      """.trimMargin(),
+    )
+    enterCommand("/")
+    assertPluginError(true)
+    assertPluginErrorMessage("E35: No previous regular expression")
+    assertState(
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |${c}Morbi nec luctus tortor, id venenatis lacus.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
   fun `test goto next line with last used substitution pattern`() {
     doTest(
       // This tries to subsititute on the current line and will fail, but it will remember the pattern
