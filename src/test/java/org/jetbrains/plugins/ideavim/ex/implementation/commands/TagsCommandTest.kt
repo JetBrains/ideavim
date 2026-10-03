@@ -108,6 +108,26 @@ class TagsCommandTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
   @Test
+  fun `test does not fail when the line jumped from no longer exists`() {
+    configureByText(text)
+    typeText("3j0")
+    typeText("<C-]>")
+    // Entries keep the line number they were recorded with, so this leaves the entry pointing past the end of the file
+    typeText("ggdG")
+
+    // The line is gone, so there is no text to show after the line number
+    enterCommand("tags")
+    assertPluginError(false)
+    assertExOutput(
+      """  # TO tag         FROM line  in file/text
+        |  1  1 hard                4${"  "}
+        |>
+      """.trimMargin(),
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
   fun `test tags is not shadowed by the tag command`() {
     configureByText(text)
     typeText("<C-]>")
