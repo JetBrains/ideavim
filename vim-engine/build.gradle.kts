@@ -38,10 +38,16 @@ ksp {
   arg("ex_commands_file", "engine_ex_commands.json")
   arg("commands_file", "engine_commands.json")
   arg("extensions_file", "ideavim_extensions.json")
+  arg("help_directory", layout.buildDirectory.dir("help").get().asFile.path)
+  arg("help_file", "engine_help.json")
 }
 
 afterEvaluate {
-  tasks.named("kspKotlin").configure { dependsOn("generateGrammarSource") }
+  tasks.named("kspKotlin").configure {
+    dependsOn("generateGrammarSource")
+    // Written by HelpProcessor, see the generateHelp task
+    outputs.dir(layout.buildDirectory.dir("help"))
+  }
   tasks.named("kspTestKotlin").configure { enabled = false }
 }
 

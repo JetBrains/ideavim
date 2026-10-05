@@ -578,9 +578,13 @@ ksp {
   arg("ex_commands_file", "frontend_ex_commands.json")
   arg("vimscript_functions_file", "frontend_vimscript_functions.json")
   arg("extensions_file", "ideavim_extensions.json")
+  arg("help_directory", layout.buildDirectory.dir("help").get().asFile.path)
+  arg("help_file", "frontend_help.json")
 }
 
 afterEvaluate {
+  // Written by HelpProcessor, see the generateHelp task
+  tasks.named("kspKotlin").configure { outputs.dir(layout.buildDirectory.dir("help")) }
   tasks.named("kspTestFixturesKotlin").configure { enabled = false }
   tasks.named("kspTestKotlin").configure { enabled = false }
 }

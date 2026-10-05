@@ -2,3 +2,4 @@ com.intellij.vim.providers.CommandOrMotionProcessorProvider
 com.intellij.vim.providers.ExCommandProcessorProvider
 com.intellij.vim.providers.VimscriptFunctionProcessorProvider
 com.intellij.vim.providers.ExtensionsProcessorProvider
+com.intellij.vim.providers.HelpProcessorProvider
