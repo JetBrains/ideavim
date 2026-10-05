@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.action.ex
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.action.ex.PathCompletionArgumentParser.expandPercent
+import com.maddyhome.idea.vim.api.ActionIdCompletion
 import com.maddyhome.idea.vim.api.CommandCompletionTypes
 import com.maddyhome.idea.vim.api.CommandLineCompletion
 import com.maddyhome.idea.vim.api.CommandLineCompletionType
@@ -139,7 +140,6 @@ private fun findArgumentMatches(
   val fullCommandName = injector.vimscriptParser.exCommands.getFullCommandName(parsed.commandName) ?: return null
   return when (CommandCompletionTypes.getCompletionType(fullCommandName)) {
     CommandLineCompletionType.FILE -> completeFileName(parsed, editor, context)
-    CommandLineCompletionType.ACTION -> completeActionId(parsed.argumentPrefix)
     CommandLineCompletionType.NONE -> null
   }
 }
@@ -156,13 +156,8 @@ private fun completeFileName(
   return injector.file.listFilesForCompletion(argument, context)
 }
 
-/**
- * Action IDs are matched case-insensitively, so `:action reformat` finds `ReformatCode`.
- */
 private fun completeActionId(prefix: String): List<String> {
-  return injector.actionExecutor.getActionIdList("")
-    .filter { it.startsWith(prefix, ignoreCase = true) }
-    .sortedWith(String.CASE_INSENSITIVE_ORDER)
+  return ActionIdCompletion.findMatches(injector.actionExecutor.getActionIdList(""), prefix)
 }
 
 

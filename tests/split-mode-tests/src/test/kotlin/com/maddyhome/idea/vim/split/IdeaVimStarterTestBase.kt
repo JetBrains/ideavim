@@ -9,13 +9,14 @@
 package com.maddyhome.idea.vim.split
 
 import com.intellij.driver.client.Driver
+import com.intellij.driver.sdk.invokeAction
 import com.intellij.driver.sdk.openFile
 import com.intellij.driver.sdk.singleProject
-import com.intellij.driver.sdk.ui.requestFocusFromIde
 import com.intellij.driver.sdk.ui.components.UiComponent.Companion.waitFound
 import com.intellij.driver.sdk.ui.components.common.codeEditor
 import com.intellij.driver.sdk.ui.components.common.codeEditorForFile
 import com.intellij.driver.sdk.ui.components.common.ideFrame
+import com.intellij.driver.sdk.ui.requestFocusFromIde
 import com.intellij.driver.sdk.waitForIndicators
 import com.intellij.ide.starter.config.ConfigurationStorage
 import com.intellij.ide.starter.config.splitMode
@@ -219,6 +220,19 @@ abstract class IdeaVimStarterTestBase {
         }
         }
       }
+    }
+  }
+
+  protected fun enter() {
+    driver.withContext {
+      ideFrame { codeEditor().apply { waitFound(); keyboard { enter() } } }
+    }
+  }
+
+  /** Invokes basic completion (`CodeCompletion`, Ctrl+Space) in the active editor. */
+  protected fun invokeBasicCompletion() {
+    driver.withContext {
+      ideFrame { codeEditor().apply { waitFound(); invokeAction("CodeCompletion", component = component) } }
     }
   }
 

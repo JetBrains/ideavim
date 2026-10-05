@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.api
 enum class CommandLineCompletionType {
   NONE,
   FILE,
-  ACTION,
 }
 
 object CommandCompletionTypes {
@@ -24,8 +23,6 @@ object CommandCompletionTypes {
     "read" to CommandLineCompletionType.FILE,
     "split" to CommandLineCompletionType.FILE,
     "vsplit" to CommandLineCompletionType.FILE,
-    "action" to CommandLineCompletionType.ACTION,
-    "actionlist" to CommandLineCompletionType.ACTION,
   )
 
   fun getCompletionType(fullCommandName: String): CommandLineCompletionType {
