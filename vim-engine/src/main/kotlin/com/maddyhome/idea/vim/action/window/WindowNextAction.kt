@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 /**
  * @author rasendubi
  */
-@CommandOrMotion(keys = ["<C-W>w", "<C-W><C-W>"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["<C-W>w", "<C-W><C-W>"],
+  modes = [Mode.NORMAL],
+  description = "Move to the next window, wrapping around. With [count], go to window [count]."
+)
 class WindowNextAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -38,7 +42,11 @@ class WindowNextAction : VimActionHandler.SingleExecution() {
   }
 }
 
-@CommandOrMotion(keys = ["<C-W>W"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["<C-W>W"],
+  modes = [Mode.NORMAL],
+  description = "Move to the previous window, wrapping around. With [count], go to window [count]."
+)
 class WindowPrevAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

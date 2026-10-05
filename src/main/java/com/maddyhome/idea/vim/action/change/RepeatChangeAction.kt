@@ -30,7 +30,11 @@ import com.maddyhome.idea.vim.newapi.ij
  * keys back through the key handler, the way `@` replays a macro. Extensions that register a repeat handler are the
  * exception - they are Kotlin callbacks rather than keys, and are still invoked directly.
  */
-@CommandOrMotion(keys = ["."], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["."],
+  modes = [Mode.NORMAL],
+  description = "Repeat the last change, with [count] replacing the original count."
+)
 internal class RepeatChangeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_WRITABLE
 

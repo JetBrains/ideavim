@@ -21,7 +21,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :put"
  */
-@ExCommand(command = "pu[t]")
+@ExCommand(
+  command = "pu[t]",
+  description = "Put the text from register [x] linewise after [line] (default current line). Use line 0 to put above the first line."
+)
 data class PutLinesCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

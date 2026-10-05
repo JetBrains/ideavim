@@ -21,7 +21,11 @@ import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["d", "x", "<Del>"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["d", "x", "<Del>"],
+  modes = [Mode.VISUAL],
+  description = "Delete the highlighted text into register [x]."
+)
 class DeleteVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.DELETE
 

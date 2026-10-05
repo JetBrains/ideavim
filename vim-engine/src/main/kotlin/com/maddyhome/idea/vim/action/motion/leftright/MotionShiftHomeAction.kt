@@ -20,7 +20,11 @@ import com.maddyhome.idea.vim.handler.ShiftedSpecialKeyHandler
 /**
  * @author Alex Plate
  */
-@CommandOrMotion(keys = ["<S-Home>"], modes = [Mode.INSERT, Mode.NORMAL, Mode.VISUAL, Mode.SELECT])
+@CommandOrMotion(
+  keys = ["<S-Home>"],
+  modes = [Mode.INSERT, Mode.NORMAL, Mode.VISUAL, Mode.SELECT],
+  description = "Move to the first character of the line. If 'keymodel' contains startsel, start or extend a selection."
+)
 class MotionShiftHomeAction : ShiftedSpecialKeyHandler() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY

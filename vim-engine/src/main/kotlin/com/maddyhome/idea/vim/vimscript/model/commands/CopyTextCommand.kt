@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :copy"
  */
-@ExCommand(command = "t,co[py]")
+@ExCommand(command = "t,co[py]", description = "Copy the lines in [range] to below line {address}.")
 data class CopyTextCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

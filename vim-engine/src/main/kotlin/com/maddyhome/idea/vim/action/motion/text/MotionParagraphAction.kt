@@ -41,10 +41,18 @@ sealed class MotionParagraphAction(val direction: Direction) : MotionActionHandl
   override val motionType: MotionType = MotionType.EXCLUSIVE
 }
 
-@CommandOrMotion(keys = ["}"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["}"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Move [count] paragraphs forward."
+)
 class MotionParagraphNextAction : MotionParagraphAction(Direction.FORWARDS)
 
-@CommandOrMotion(keys = ["{"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["{"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Move [count] paragraphs backward."
+)
 class MotionParagraphPreviousAction : MotionParagraphAction(Direction.BACKWARDS)
 
 private fun moveCaretToNextParagraph(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {

@@ -18,7 +18,11 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.state.mode.CtrlXCompletionMode
 
-@CommandOrMotion(keys = ["<C-F>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<C-F>"],
+  modes = [Mode.INSERT],
+  description = "After CTRL-X in Insert mode, complete the file name before the cursor using a completion popup."
+)
 class InsertFilePathCompletionAction : VimActionHandler.SingleExecution() {
 
   override fun execute(

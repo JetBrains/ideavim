@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :delcommand"
  */
-@ExCommand(command = "delc[ommand]")
+@ExCommand(command = "delc[ommand]", description = "Delete the user-defined command {cmd}.")
 data class DelCmdCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

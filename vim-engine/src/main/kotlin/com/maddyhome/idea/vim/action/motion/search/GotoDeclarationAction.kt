@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-@CommandOrMotion(keys = ["gD", "gd"], modes = [Mode.NORMAL, Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["gD", "gd"],
+  modes = [Mode.NORMAL, Mode.VISUAL],
+  description = "Go to the declaration of the symbol under the cursor using the IDE's Go to Declaration action. Saves the jump position."
+)
 class GotoDeclarationAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

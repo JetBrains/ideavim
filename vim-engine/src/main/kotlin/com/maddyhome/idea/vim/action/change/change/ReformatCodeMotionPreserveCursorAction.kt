@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.command.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-@CommandOrMotion(keys = ["gw"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["gw"],
+  modes = [Mode.NORMAL],
+  description = "Like gq, format the lines moved over by {motion}, but keep the cursor at the same text position."
+)
 class ReformatCodeMotionPreserveCursorAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.CHANGE
 

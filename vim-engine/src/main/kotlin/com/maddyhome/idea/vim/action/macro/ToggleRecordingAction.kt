@@ -17,7 +17,11 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-@CommandOrMotion(keys = ["q"], modes = [Mode.NORMAL, Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["q"],
+  modes = [Mode.NORMAL, Mode.VISUAL],
+  description = "Start recording typed characters into register {register}. When already recording, stop recording."
+)
 class ToggleRecordingAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

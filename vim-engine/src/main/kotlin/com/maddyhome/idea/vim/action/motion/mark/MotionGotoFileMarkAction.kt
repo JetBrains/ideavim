@@ -22,7 +22,11 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import java.util.*
 
-@CommandOrMotion(keys = ["`"], modes = [Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["`"],
+  modes = [Mode.VISUAL, Mode.OP_PENDING],
+  description = "Jump to the exact position (line and column) of mark {mark}."
+)
 class MotionGotoFileMarkAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
   override val argumentType: Argument.Type = Argument.Type.MARK
@@ -42,7 +46,11 @@ class MotionGotoFileMarkAction : MotionActionHandler.ForEachCaret() {
   }
 }
 
-@CommandOrMotion(keys = ["g`"], modes = [Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["g`"],
+  modes = [Mode.VISUAL, Mode.OP_PENDING],
+  description = "Jump to the exact position (line and column) of mark {mark} without changing the jump list."
+)
 class MotionGotoFileMarkNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 

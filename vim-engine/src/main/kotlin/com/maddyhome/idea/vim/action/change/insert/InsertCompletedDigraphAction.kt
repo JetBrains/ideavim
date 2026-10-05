@@ -31,7 +31,7 @@ import javax.swing.KeyStroke
  * The converted digraph character is re-injected through the key handler so that it is processed as typed input in
  * Insert mode (handled by the change group).
  */
-@CommandOrMotion(keys = ["<C-K>"], modes = [Mode.INSERT])
+@CommandOrMotion(keys = ["<C-K>"], modes = [Mode.INSERT], description = "In Insert mode, enter digraph {char1}{char2}.")
 class InsertCompletedDigraphAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
@@ -62,7 +62,11 @@ class InsertCompletedDigraphAction : VimActionHandler.SingleExecution() {
  * commands (e.g., [LeaveCommandLineAction]). Other characters use [VimCommandLine.handleKey] so that overwrite mode is
  * handled correctly.
  */
-@CommandOrMotion(keys = ["<C-K>"], modes = [Mode.CMD_LINE])
+@CommandOrMotion(
+  keys = ["<C-K>"],
+  modes = [Mode.CMD_LINE],
+  description = "In Command-line mode, enter digraph {char1}{char2}."
+)
 class CmdLineCompletedDigraphAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
   override val argumentType: Argument.Type = Argument.Type.CHARACTER

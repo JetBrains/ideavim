@@ -1,0 +1,2105 @@
+*ideavim.txt*                                                        *ideavim*
+
+                               IDEAVIM COMMANDS
+
+This file lists the commands that IdeaVim implements. Type ":help" followed by
+a subject to jump to it, for example:
+
+    :help x         Normal mode command "x"
+    :help v_d       Visual mode command "d"
+    :help i_CTRL-W  Insert mode command CTRL-W
+    :help c_CTRL-R  Command-line editing command CTRL-R
+    :help :s        Ex command ":s"
+
+Contents:
+1. Insert mode                                                |ideavim-insert|
+2. Normal and Operator-pending mode                           |ideavim-normal|
+3. Visual and Select mode                                     |ideavim-visual|
+4. Command-line editing                                      |ideavim-cmdline|
+5. Ex commands                                                    |ideavim-ex|
+
+==============================================================================
+1. Insert mode                                                *ideavim-insert*
+
+                                             *i_CTRL-@* *i_<C-S-2>* *i_CTRL-2*
+<C-@> <C-S-2> <C-2>     In Insert mode, insert the previously inserted text
+                        and stop inserting.
+
+                                               *i_CTRL-[* *i_CTRL-C* *i_<Esc>*
+<C-[> <C-C> <Esc>       Leave Insert mode and return to Normal mode.
+
+                                                             *i_CTRL-\_CTRL-N*
+<C-\><C-N>              Go to Normal mode from any mode, abandoning any
+                        pending command.
+
+                                                                    *i_CTRL-^*
+<C-^>                   In Insert mode, toggle the use of typed language
+                        mappings (:lmap) by switching 'iminsert' between 0 and
+                        1.
+
+                                                                    *i_CTRL-A*
+<C-A>                   In Insert mode, insert the previously inserted text.
+
+                                                                    *i_CTRL-D*
+<C-D>                   In Insert mode, delete one 'shiftwidth' of indent at
+                        the start of the current line.
+
+                                                                    *i_CTRL-E*
+<C-E>                   In Insert mode, insert the character found below the
+                        cursor.
+
+<C-E>                   With a completion popup open, close the popup and keep
+                        the text typed so far.
+
+                                                                   *i_<C-End>*
+<C-End>                 In Insert mode, move the cursor to the end of line
+                        [count], default the end of the last line.
+
+                                                                    *i_CTRL-F*
+<C-F>                   After CTRL-X in Insert mode, complete the file name
+                        before the cursor using a completion popup.
+
+<C-F>                   With a CTRL-X completion popup open, select the next
+                        matching file name.
+
+                                                                  *i_CTRL-G_u*
+<C-G>u                  In Insert mode, close the current undo step and start
+                        a new one.
+
+                                                           *i_CTRL-H* *i_<BS>*
+<C-H> <BS>              In Insert mode, delete the character before the
+                        cursor. In Replace mode, restore the original
+                        character.
+
+                                                                  *i_<C-Home>*
+<C-Home>                In Insert mode, move the cursor to the start of line
+                        [count], default the first line.
+
+                                                                    *i_CTRL-K*
+<C-K>                   In Insert mode, enter digraph {char1}{char2}.
+
+                                                                    *i_CTRL-L*
+<C-L>                   After CTRL-X in Insert mode, complete the whole line
+                        from matching lines in the buffer using a completion
+                        popup.
+
+<C-L>                   With a CTRL-X completion popup open, select the next
+                        matching whole line.
+
+                                                    *i_<C-Left>* *i_<C-kLeft>*
+<C-Left> <C-kLeft>      In Insert mode, move the cursor [count] words
+                        backward.
+
+                                                                    *i_CTRL-N*
+<C-N>                   In Insert mode, invoke the IDE action that <C-N> is
+                        bound to in the IDE keymap, e.g. to move down in a
+                        completion popup.
+
+<C-N>                   With a completion popup open, select the next item.
+
+                                                                    *i_CTRL-O*
+<C-O>                   In Insert mode, execute one Normal mode command and
+                        then return to Insert mode.
+
+                                                                    *i_CTRL-P*
+<C-P>                   In Insert mode, invoke the IDE action that <C-P> is
+                        bound to in the IDE keymap, e.g. to move up in a
+                        completion popup.
+
+<C-P>                   With a completion popup open, select the previous
+                        item.
+
+                                                              *i_<C-PageDown>*
+<C-PageDown>            In Insert mode, go to the next editor tab, wrapping
+                        around from the last to the first, without leaving
+                        Insert mode.
+
+                                                                *i_<C-PageUp>*
+<C-PageUp>              In Insert mode, go to the previous editor tab,
+                        wrapping around from the first to the last, without
+                        leaving Insert mode.
+
+                                                                    *i_CTRL-R*
+<C-R>                   In Insert mode, insert the contents of {register}.
+                        With = as the register, evaluate an expression and
+                        insert the result.
+
+                                                  *i_<C-Right>* *i_<C-kRight>*
+<C-Right> <C-kRight>    In Insert mode, move the cursor [count] words forward.
+
+                                                                    *i_CTRL-T*
+<C-T>                   In Insert mode, insert one 'shiftwidth' of indent at
+                        the start of the current line.
+
+                                                                    *i_CTRL-U*
+<C-U>                   In Insert mode, delete all entered text before the
+                        cursor in the current line, or the indented text if
+                        none was entered.
+
+                                                         *i_CTRL-V* *i_CTRL-Q*
+<C-V> <C-Q>             In Insert mode, insert the next non-digit character
+                        literally, or a character by its decimal, octal or hex
+                        code.
+
+                                                                    *i_CTRL-W*
+<C-W>                   In Insert mode, delete the word before the cursor.
+
+                                                                    *i_CTRL-X*
+<C-X>                   In Insert mode, start CTRL-X completion; follow with
+                        CTRL-L for whole lines or CTRL-F for file names.
+
+                                                                    *i_CTRL-Y*
+<C-Y>                   In Insert mode, insert the character found above the
+                        cursor.
+
+<C-Y>                   With a completion popup open, accept the selected
+                        item.
+
+                                                *i_<CR>* *i_CTRL-M* *i_CTRL-J*
+<CR> <C-M> <C-J>        In Insert mode, begin a new line.
+
+                                                                     *i_<Del>*
+<Del>                   In Insert mode, delete the character under the cursor
+                        using the IDE's Delete action.
+
+                                                        *i_<Down>* *i_<kDown>*
+<Down> <kDown>          In Insert mode, move the cursor one line down using
+                        the IDE's caret action, starting a new undo step.
+
+                                                                     *i_<End>*
+<End>                   In Insert mode, move the cursor past the last
+                        character of the line.
+
+                                                                    *i_<Home>*
+<Home>                  In Insert mode, move the cursor to the first character
+                        of the line.
+
+                                                                  *i_<Insert>*
+<Insert>                Toggle between Insert and Replace mode.
+
+                                                        *i_<Left>* *i_<kLeft>*
+<Left> <kLeft>          In Insert mode, move the cursor one character to the
+                        left. Wrap to the previous line if 'whichwrap'
+                        contains [.
+
+                                                                *i_<PageDown>*
+<PageDown>              In Insert mode, scroll the window [count] pages
+                        forwards (downwards) in the buffer.
+
+                                                                  *i_<PageUp>*
+<PageUp>                In Insert mode, scroll the window [count] pages
+                        backwards (upwards) in the buffer.
+
+                                                      *i_<Right>* *i_<kRight>*
+<Right> <kRight>        In Insert mode, move the cursor one character to the
+                        right. Wrap to the next line if 'whichwrap' contains
+                        ].
+
+                                                                  *i_<S-Down>*
+<S-Down>                If 'keymodel' contains startsel (or continues the
+                        current selection), start or extend a selection
+                        [count] lines down. Otherwise scroll [count] pages
+                        forward.
+
+                                                                   *i_<S-End>*
+<S-End>                 Move to the end of the line, [count] - 1 lines
+                        downward. If 'keymodel' contains startsel, start or
+                        extend a selection.
+
+                                                                  *i_<S-Home>*
+<S-Home>                Move to the first character of the line. If 'keymodel'
+                        contains startsel, start or extend a selection.
+
+                                                                  *i_<S-Left>*
+<S-Left>                Move [count] words backward. If 'keymodel' contains
+                        startsel, start or extend a selection [count]
+                        characters to the left instead.
+
+                                                                 *i_<S-Right>*
+<S-Right>               Move [count] words forward. If 'keymodel' contains
+                        startsel, start or extend a selection [count]
+                        characters to the right instead.
+
+                                                                    *i_<S-Up>*
+<S-Up>                  If 'keymodel' contains startsel (or continues the
+                        current selection), start or extend a selection
+                        [count] lines up. Otherwise scroll [count] pages
+                        backward.
+
+                                                          *i_<Tab>* *i_CTRL-I*
+<Tab> <C-I>             In Insert mode, insert a tab or the equivalent spaces
+                        using the IDE's Tab action.
+
+                                                            *i_<Up>* *i_<kUp>*
+<Up> <kUp>              In Insert mode, move the cursor one line up using the
+                        IDE's caret action, starting a new undo step.
+
+==============================================================================
+2. Normal and Operator-pending mode                           *ideavim-normal*
+
+                                                                           *!*
+!                       Start a command line to filter the lines moved over by
+                        {motion} through an external {filter} program.
+
+                                                                           *#*
+#                       Search backward for the [count]'th occurrence of the
+                        whole word under or after the cursor.
+
+                                                                           *$*
+$                       Move to the end of the line, [count] - 1 lines
+                        downward.
+
+$                       As an operator motion, move to the end of the line,
+                        [count] - 1 lines downward. The end-of-line character
+                        is not included.
+
+                                                                           *%*
+%                       Jump to the matching bracket, brace or parenthesis of
+                        the one under or after the cursor. With [count], go to
+                        [count] percent of the file (linewise).
+
+                                                                           *&*
+&                       Repeat the last :substitute on the current line,
+                        without its flags.
+
+                                                                           *'*
+'                       Jump to the first non-blank character of the line
+                        containing mark {mark}.
+
+                                                                           *(*
+(                       Move [count] sentences backward.
+
+                                                                           *)*
+)                       Move [count] sentences forward.
+
+                                                                        *star*
+*                       Search forward for the [count]'th occurrence of the
+                        whole word under or after the cursor.
+
+                                                                  *+* *CTRL-M*
++ <C-M>                 Move [count] lines downward, to the first non-blank
+                        character, linewise.
+
+                                                                           *,*
+,                       Repeat the latest f, t, F or T [count] times in the
+                        opposite direction.
+
+                                                                           *-*
+-                       Move [count] lines up, on the first non-blank
+                        character (linewise).
+
+                                                                           *.*
+.                       Repeat the last change, with [count] replacing the
+                        original count.
+
+                                                                           */*
+/                       Search forward for the [count]'th occurrence of
+                        {pattern}, entered on the command line.
+
+                                                                           *0*
+0                       Move to the first character of the line.
+
+                                                                           *:*
+:                       Start entering an Ex command. With [count] or from
+                        Visual mode, a matching line range is filled in.
+
+                                                                           *;*
+;                       Repeat the latest f, t, F or T [count] times.
+
+                                                                           *<*
+<                       Shift the lines covered by {motion} one 'shiftwidth'
+                        leftwards.
+
+                                                               *<BS>* *CTRL-H*
+<BS> <C-H>              Move [count] characters to the left. Wrap to the
+                        previous line if 'whichwrap' contains b.
+
+<BS> <C-H>              As an operator motion, move [count] characters to the
+                        left. The end-of-line character is included when
+                        wrapping via 'whichwrap'.
+
+                                                               *CTRL-\_CTRL-N*
+<C-\><C-N>              Go to Normal mode from any mode, abandoning any
+                        pending command.
+
+                                                                      *CTRL-]*
+<C-]>                   Jump to the definition of the keyword under the cursor
+                        using the IDE's Go to Declaration action, pushing the
+                        position onto the tag stack.
+
+                                                   *CTRL-^* *<C-S-6>* *CTRL-6*
+<C-^> <C-S-6> <C-6>     Switch to the previously active editor tab (the
+                        alternate file).
+
+                                                                      *CTRL-A*
+<C-A>                   Add [count] to the number or alphabetic character at
+                        or after the cursor.
+
+                                                           *CTRL-B* *<PageUp>*
+<C-B> <PageUp>          Scroll the window [count] pages backwards (upwards) in
+                        the buffer.
+
+                                                                      *CTRL-D*
+<C-D>                   Scroll the window [count] lines downwards (default:
+                        half a screen), moving the cursor the same number of
+                        lines. [count] sets 'scroll'.
+
+                                                                    *<C-Down>*
+<C-Down>                Run the IDE action bound to Ctrl+Down in the keymap,
+                        such as moving to the next method.
+
+                                                                      *CTRL-E*
+<C-E>                   Scroll the window [count] lines downwards in the
+                        buffer, revealing lines below the window.
+
+                                                                     *<C-End>*
+<C-End>                 Go to the end of line [count], default the last
+                        character of the file.
+
+                                             *CTRL-F* *<PageDown>* *<S-Enter>*
+<C-F> <PageDown> <S-Enter>
+                        Scroll the window [count] pages forwards (downwards)
+                        in the buffer.
+
+                                                                      *CTRL-G*
+<C-G>                   Display the current file name, cursor position and
+                        file status. With a [count], show the full path of the
+                        file.
+
+                                                              *CTRL-I* *<Tab>*
+<C-I> <Tab>             Go to the [count]th newer position in the jump list.
+
+                                                                      *CTRL-L*
+<C-L>                   Clear and redraw the screen, also clearing the status
+                        line.
+
+                                                                      *CTRL-N*
+<C-N>                   Move [count] lines downward, linewise. With a
+                        completion popup open, select the next item instead.
+
+                                                                      *CTRL-O*
+<C-O>                   Go to the [count]th older position in the jump list.
+
+                                                                      *CTRL-P*
+<C-P>                   Move [count] lines up (linewise). With a completion
+                        popup open, select the previous item in the popup
+                        instead.
+
+                                                             *CTRL-Q* *CTRL-V*
+<C-q> <C-v>             Start blockwise Visual mode, or switch an active
+                        Visual mode to blockwise; stop Visual mode if it is
+                        already blockwise. Starts Select mode instead if
+                        'selectmode' contains cmd.
+
+                                                                      *CTRL-R*
+<C-R>                   Redo [count] changes that were undone.
+
+                                                                      *CTRL-T*
+<C-T>                   Jump back to the [count]th older entry in the tag
+                        stack.
+
+                                                                      *CTRL-U*
+<C-U>                   Scroll the window [count] lines upwards (default: half
+                        a screen), moving the cursor the same number of lines.
+                        [count] sets 'scroll'.
+
+                                                                      *<C-Up>*
+<C-Up>                  Run the IDE action bound to Ctrl+Up in the keymap,
+                        such as moving to the previous method.
+
+                                                                    *CTRL-W_+*
+<C-W>+                  Increase the current window height by [count] rows.
+
+                                                                    *CTRL-W_-*
+<C-W>-                  Decrease the current window height by [count] rows.
+
+                                                                 *CTRL-W_<lt>*
+<C-W><lt>               Decrease the current window width by [count] columns.
+
+                                                                    *CTRL-W_=*
+<C-W>=                  Make all windows (almost) equally high and wide.
+
+                                                                    *CTRL-W_>*
+<C-W>>                  Increase the current window width by [count] columns.
+
+                                                    *CTRL-W__* *CTRL-W_CTRL-_*
+<C-W>_ <C-W><C-_>       Set the current window height to [count] rows; without
+                        [count], make it as high as possible.
+
+                                                         *CTRL-W_c* *CTRL-W_q*
+<C-W>c <C-W>q           Close the current window (editor split).
+
+                                    *CTRL-W_h* *CTRL-W_CTRL-H* *CTRL-W_<Left>*
+<C-W>h <C-W><C-H> <C-W><Left>
+                        Move to the window [count] windows to the left of the
+                        current one.
+
+                                    *CTRL-W_j* *CTRL-W_CTRL-J* *CTRL-W_<Down>*
+<C-W>j <C-W><C-J> <C-W><Down>
+                        Move to the window [count] windows below the current
+                        one.
+
+                                      *CTRL-W_k* *CTRL-W_CTRL-K* *CTRL-W_<Up>*
+<C-W>k <C-W><C-K> <C-W><Up>
+                        Move to the window [count] windows above the current
+                        one.
+
+                                   *CTRL-W_l* *CTRL-W_CTRL-L* *CTRL-W_<Right>*
+<C-W>l <C-W><C-L> <C-W><Right>
+                        Move to the window [count] windows to the right of the
+                        current one.
+
+                                                    *CTRL-W_o* *CTRL-W_CTRL-O*
+<C-W>o <C-W><C-O>       Close all windows (editor splits) except the current
+                        one.
+
+                                         *CTRL-W_s* *CTRL-W_S* *CTRL-W_CTRL-S*
+<C-W>s <C-W>S <C-W><C-S>
+                        Split the current window in two, one above the other,
+                        showing the same file.
+
+                                                    *CTRL-W_v* *CTRL-W_CTRL-V*
+<C-W>v <C-W><C-V>       Split the current window in two side by side, showing
+                        the same file.
+
+                                                                    *CTRL-W_W*
+<C-W>W                  Move to the previous window, wrapping around. With
+                        [count], go to window [count].
+
+                                                    *CTRL-W_w* *CTRL-W_CTRL-W*
+<C-W>w <C-W><C-W>       Move to the next window, wrapping around. With
+                        [count], go to window [count].
+
+                                                                  *CTRL-W_bar*
+<C-W>|                  Set the current window width to [count] columns;
+                        without [count], make it as wide as possible.
+
+                                                                      *CTRL-X*
+<C-X>                   Subtract [count] from the number or alphabetic
+                        character at or after the cursor.
+
+                                                                      *CTRL-Y*
+<C-Y>                   Scroll the window [count] lines upwards in the buffer,
+                        revealing lines above the window.
+
+                                                                        *<CR>*
+<CR>                    Move [count] lines downward, to the first non-blank
+                        character. In a live template, jump to the next
+                        template variable.
+
+                                                                       *<Del>*
+<Del>                   Delete the character under the cursor into register
+                        [x].
+
+                                                            *<Down>* *<kDown>*
+<Down> <kDown>          Move [count] lines downward, linewise. Leaves Select
+                        or Visual mode first if 'keymodel' contains "stopsel".
+
+                                                                       *<End>*
+<End>                   Move to the end of the line, [count] - 1 lines
+                        downward. In Visual and Select mode, 'keymodel'
+                        decides whether the selection is stopped.
+
+                                                                      *<Home>*
+<Home>                  Move to the first character of the line. In Visual and
+                        Select mode, 'keymodel' decides whether the selection
+                        is stopped.
+
+                                                            *<Left>* *<kLeft>*
+<Left> <kLeft>          Move [count] characters to the left. Wrap to the
+                        previous line if 'whichwrap' contains <.
+
+<Left> <kLeft>          As an operator motion, move [count] characters to the
+                        left. The end-of-line character is included when
+                        wrapping via 'whichwrap'.
+
+                                                          *<Right>* *<kRight>*
+<Right> <kRight>        Move [count] characters to the right. Wrap to the next
+                        line if 'whichwrap' contains >.
+
+<Right> <kRight>        As an operator motion, move [count] characters to the
+                        right. The end-of-line character is included when
+                        wrapping via 'whichwrap'.
+
+                                                                    *<S-Down>*
+<S-Down>                If 'keymodel' contains startsel (or continues the
+                        current selection), start or extend a selection
+                        [count] lines down. Otherwise scroll [count] pages
+                        forward.
+
+                                                                     *<S-End>*
+<S-End>                 Move to the end of the line, [count] - 1 lines
+                        downward. If 'keymodel' contains startsel, start or
+                        extend a selection.
+
+                                                                    *<S-Home>*
+<S-Home>                Move to the first character of the line. If 'keymodel'
+                        contains startsel, start or extend a selection.
+
+                                                                    *<S-Left>*
+<S-Left>                Move [count] words backward. If 'keymodel' contains
+                        startsel, start or extend a selection [count]
+                        characters to the left instead.
+
+                                                                   *<S-Right>*
+<S-Right>               Move [count] words forward. If 'keymodel' contains
+                        startsel, start or extend a selection [count]
+                        characters to the right instead.
+
+                                                                      *<S-Up>*
+<S-Up>                  If 'keymodel' contains startsel (or continues the
+                        current selection), start or extend a selection
+                        [count] lines up. Otherwise scroll [count] pages
+                        backward.
+
+                                                                     *<Space>*
+<Space>                 Move [count] characters to the right. Wrap to the next
+                        line if 'whichwrap' contains s.
+
+<Space>                 As an operator motion, move [count] characters to the
+                        right. The end-of-line character is included when
+                        wrapping via 'whichwrap'.
+
+                                                                *<Up>* *<kUp>*
+<Up> <kUp>              Move [count] lines upward, linewise. Leaves Select or
+                        Visual mode first if 'keymodel' contains "stopsel".
+
+                                                                           *=*
+=                       Re-indent the lines covered by {motion} using the
+                        IDE's indentation rules.
+
+                                                                           *>*
+>                       Shift the lines covered by {motion} one 'shiftwidth'
+                        rightwards.
+
+                                                                           *?*
+?                       Search backward for the [count]'th occurrence of
+                        {pattern}, entered on the command line.
+
+                                                                           *@*
+@                       Execute the contents of register {register} [count]
+                        times. @@ repeats the last executed register and @:
+                        repeats the last command-line.
+
+                                                                          *[(*
+[(                      Go to the [count]'th previous unmatched '('.
+
+                                                                          *[[*
+[[                      Move [count] sections backward, or to the previous '{'
+                        in the first column.
+
+                                                                          *[]*
+[]                      Move [count] sections backward, or to the previous '}'
+                        in the first column.
+
+                                                                          *[`*
+[`                      Move to the [count]th previous lowercase mark.
+
+                                                                          *[b*
+[b                      Move backward to the start of the [count]'th previous
+                        camelCase word part.
+
+                                                                          *[M*
+[M                      Go to the [count]'th previous end of a method.
+
+                                                                          *[m*
+[m                      Go to the [count]'th previous start of a method.
+
+                                                                *[P* *]P* *[p*
+[P ]P [p                Like P, but adjust the indent of the put text to the
+                        current line.
+
+                                                                          *[s*
+[s                      Move to the [count]'th previous misspelled word before
+                        the cursor.
+
+                                                                          *[w*
+[w                      Move forward to the start of the [count]'th next
+                        camelCase word part.
+
+                                                                          *[{*
+[{                      Go to the [count]'th previous unmatched '{'.
+
+                                                                          *])*
+])                      Go to the [count]'th next unmatched ')'.
+
+                                                                          *][*
+][                      Move [count] sections forward, or to the next '}' in
+                        the first column.
+
+                                                                          *]]*
+]]                      Move [count] sections forward, or to the next '{' in
+                        the first column.
+
+                                                                          *]`*
+]`                      Move to the [count]th next lowercase mark.
+
+                                                                          *]b*
+]b                      Move backward to the end of the [count]'th previous
+                        camelCase word part.
+
+                                                                          *]M*
+]M                      Go to the [count]'th next end of a method.
+
+                                                                          *]m*
+]m                      Go to the [count]'th next start of a method.
+
+                                                                          *]p*
+]p                      Like p, but adjust the indent of the put text to the
+                        current line.
+
+                                                                          *]s*
+]s                      Move to the [count]'th next misspelled word after the
+                        cursor.
+
+                                                                          *]w*
+]w                      Move forward to the end of the [count]'th next
+                        camelCase word part.
+
+                                                                          *]}*
+]}                      Go to the [count]'th next unmatched '}'.
+
+                                                                           *^*
+^                       Move to the first non-blank character of the line.
+
+                                                                           *_*
+_                       Move [count] - 1 lines downward, to the first
+                        non-blank character, linewise.
+
+                                                                           *`*
+`                       Jump to the exact position (line and column) of mark
+                        {mark}.
+
+                                                                           *A*
+A                       Append text at the end of the line [count] times.
+
+                                                                           *a*
+a                       Append text after the cursor [count] times.
+
+                                                                          *a"*
+a"                      A double-quoted string: select the quoted text,
+                        including the quotes and trailing white space.
+
+                                                                          *a'*
+a'                      A single-quoted string: select the quoted text,
+                        including the quotes and trailing white space.
+
+                                                                     *a<* *a>*
+a< a>                   A <> block: select [count] <> blocks, including the
+                        angle brackets.
+
+                                                                     *a[* *a]*
+a[ a]                   A [] block: select [count] [] blocks, including the
+                        brackets.
+
+                                                                          *a`*
+a`                      A backtick string: select the text between backticks,
+                        including the quotes and trailing white space.
+
+                                                                *aB* *a{* *a}*
+aB a{ a}                A Block: select [count] {} blocks, including the
+                        braces.
+
+                                                                *ab* *a(* *a)*
+ab a( a)                A block: select [count] () blocks, including the
+                        parentheses.
+
+                                                                          *ap*
+ap                      A paragraph: select [count] paragraphs, including the
+                        following blank lines.
+
+                                                                          *as*
+as                      A sentence: select [count] sentences, including
+                        trailing white space.
+
+                                                                          *at*
+at                      A tag block: select [count] XML/HTML tag blocks,
+                        including the tags.
+
+                                                                          *aW*
+aW                      A WORD: select [count] WORDs, including trailing white
+                        space.
+
+                                                                          *aw*
+aw                      A word: select [count] words, including trailing white
+                        space.
+
+                                                                *B* *<C-Left>*
+B <C-Left>              Move [count] WORDS backward.
+
+                                                                           *b*
+b                       Move [count] words backward.
+
+                                                                           *C*
+C                       Delete till the end of the line and [count]-1 more
+                        lines into register [x], then start Insert mode.
+
+                                                                           *c*
+c                       Delete the text moved over by {motion} into register
+                        [x] and start Insert mode.
+
+                                                                           *D*
+D                       Delete from the cursor to the end of the line and
+                        [count]-1 more lines into register [x].
+
+                                                                           *d*
+d                       Delete the text moved over by {motion} into register
+                        [x].
+
+                                                                           *E*
+E                       Move forward to the end of the [count]'th WORD.
+
+                                                                           *e*
+e                       Move forward to the end of the [count]'th word.
+
+                                                                           *F*
+F                       Move to the [count]th occurrence of {char} to the
+                        left.
+
+                                                                           *f*
+f                       Move to the [count]th occurrence of {char} to the
+                        right.
+
+                                                                           *G*
+G                       Go to line [count], default the last line. The cursor
+                        goes to the first non-blank character unless
+                        'startofline' is off.
+
+                                                                          *g#*
+g#                      Like #, but also match the word under the cursor when
+                        it is part of a longer word.
+
+                                                                 *g$* *g<End>*
+g$ g<End>               Move to the last character of the screen line. Differs
+                        from the end of the line when lines wrap.
+
+                                                                          *g&*
+g&                      Repeat the last :substitute on all lines with the same
+                        flags, using the last search pattern.
+
+                                                                          *g'*
+g'                      Jump to the first non-blank character of the line
+                        containing mark {mark} without changing the jump list.
+
+                                                                          *g(*
+g(                      Move backward to the end of the [count]'th previous
+                        sentence.
+
+                                                                          *g)*
+g)                      Move forward to the end of the [count]'th sentence.
+
+                                                                       *gstar*
+g*                      Like *, but also match the word under the cursor when
+                        it is part of a longer word.
+
+                                                                          *g,*
+g,                      Go to the [count]th newer position in the change list.
+
+                                                                *g0* *g<Home>*
+g0 g<Home>              Move to the first character of the screen line.
+                        Differs from 0 when lines wrap.
+
+                                                                          *g8*
+g8                      Display the UTF-8 byte sequence of the character under
+                        the cursor in hex.
+
+                                                                          *g;*
+g;                      Go to the [count]th older position in the change list.
+
+                                                                          *g<*
+g<                      Show the output of the previous command again.
+
+                                                                    *g_CTRL-G*
+g<C-G>                  Display the current cursor position as column, line,
+                        word and byte counts. In Visual mode, show counts for
+                        the selection.
+
+                                                                    *g_CTRL-H*
+g<C-h>                  Start Select mode blockwise, selecting the character
+                        under the cursor.
+
+                                                                          *g?*
+g?                      Rot13-encode the text moved over by {motion}.
+
+                                                                          *g@*
+g@                      Call the function set with 'operatorfunc' on the text
+                        moved over by {motion}.
+
+                                                                          *g^*
+g^                      Move to the first non-blank character of the screen
+                        line. Differs from ^ when lines wrap.
+
+                                                                          *g_*
+g_                      Move to the last non-blank character of the line,
+                        [count] - 1 lines downward.
+
+                                                                          *g`*
+g`                      Jump to the exact position (line and column) of mark
+                        {mark} without changing the jump list.
+
+                                                                          *ga*
+ga                      Print the decimal, hex and octal value of the
+                        character under the cursor.
+
+                                                                     *gD* *gd*
+gD gd                   Go to the declaration of the symbol under the cursor
+                        using the IDE's Go to Declaration action. Saves the
+                        jump position.
+
+                                                                          *gE*
+gE                      Move backward to the end of the [count]'th previous
+                        WORD.
+
+                                                                          *ge*
+ge                      Move backward to the end of the [count]'th previous
+                        word.
+
+                                                               *gg* *<C-Home>*
+gg <C-Home>             Go to line [count], default the first line. The cursor
+                        goes to the first non-blank character unless
+                        'startofline' is off.
+
+                                                                          *gH*
+gH                      Start Select mode linewise, selecting the current
+                        line.
+
+                                                                          *gh*
+gh                      Start Select mode characterwise, selecting the
+                        character under the cursor.
+
+                                                                          *gI*
+gI                      Insert text in column 1 of the line [count] times.
+
+                                                                          *gi*
+gi                      Insert text at the position where Insert mode was last
+                        exited (the '^ mark).
+
+                                                                          *gJ*
+gJ                      Join [count] lines (at least two) without inserting or
+                        removing any spaces.
+
+                                                                *gj* *g<Down>*
+gj g<Down>              Move [count] display lines downward, exclusive.
+
+                                                                  *gk* *g<Up>*
+gk g<Up>                Move [count] display lines up (exclusive motion).
+
+                                                                          *gm*
+gm                      Move to the middle of the screen width in the current
+                        screen line.
+
+                                                                          *gN*
+gN                      Search backward for the last search pattern and select
+                        the match in Visual mode. In Visual mode, extend the
+                        selection to the start of the match.
+
+gN                      Operate on the [count]th previous match of the last
+                        search pattern.
+
+                                                                          *gn*
+gn                      Search forward for the last search pattern and select
+                        the match in Visual mode. In Visual mode, extend the
+                        selection to the end of the match.
+
+gn                      Operate on the [count]th next match of the last search
+                        pattern.
+
+                                                                          *go*
+go                      Go to character [count] in the buffer (default: the
+                        first character).
+
+                                                                          *gP*
+gP                      Put the text from register [x] before the cursor
+                        [count] times and leave the cursor just after the new
+                        text.
+
+                                                                          *gp*
+gp                      Put the text from register [x] after the cursor
+                        [count] times and leave the cursor just after the new
+                        text.
+
+                                                                          *gq*
+gq                      Format the lines moved over by {motion} with the IDE's
+                        code formatter and wrap them at 'textwidth'.
+
+                                                             *gT* *<C-PageUp>*
+gT <C-PageUp>           Go to the previous editor tab, wrapping around from
+                        the first to the last. With [count], go [count] tabs
+                        back.
+
+                                                           *gt* *<C-PageDown>*
+gt <C-PageDown>         Go to the next editor tab, wrapping around from the
+                        last to the first. With [count], go to tab page
+                        [count].
+
+                                                                          *gU*
+gU                      Make the text moved over by {motion} uppercase.
+
+                                                                          *gu*
+gu                      Make the text moved over by {motion} lowercase.
+
+                                                                          *gv*
+gv                      Start Visual mode with the same area and selection
+                        type as the previous Visual selection.
+
+                                                                          *gw*
+gw                      Like gq, format the lines moved over by {motion}, but
+                        keep the cursor at the same text position.
+
+                                                                          *gx*
+gx                      Open the URL under the cursor with the system's
+                        default handler, or with the program in
+                        g:netrw_browsex_viewer if it is set.
+
+                                                                          *g~*
+g~                      Switch the case of the text moved over by {motion}.
+
+                                                                           *H*
+H                       Move to line [count] from the top of the window, on
+                        the first non-blank character. The cursor is adjusted
+                        for 'scrolloff'.
+
+H                       As an operator motion, move linewise to line [count]
+                        from the top of the window. 'scrolloff' is applied
+                        afterwards.
+
+                                                                           *h*
+h                       Move [count] characters to the left. Wrap to the
+                        previous line if 'whichwrap' contains h.
+
+h                       As an operator motion, move [count] characters to the
+                        left. The end-of-line character is included when
+                        wrapping via 'whichwrap'.
+
+                                                                           *I*
+I                       Insert text before the first non-blank character in
+                        the line [count] times.
+
+                                                                *i* *<Insert>*
+i <Insert>              Insert text before the cursor [count] times.
+
+                                                                          *i"*
+i"                      Inner double-quoted string: select the text between
+                        double quotes, excluding the quotes.
+
+                                                                          *i'*
+i'                      Inner single-quoted string: select the text between
+                        single quotes, excluding the quotes.
+
+                                                                  *i>* *i<lt>*
+i> i<lt>                Inner <> block: select [count] <> blocks, excluding
+                        the angle brackets.
+
+                                                                     *i[* *i]*
+i[ i]                   Inner [] block: select [count] [] blocks, excluding
+                        the brackets.
+
+                                                                          *i`*
+i`                      Inner backtick string: select the text between
+                        backticks, excluding the quotes.
+
+                                                                *iB* *i{* *i}*
+iB i{ i}                Inner Block: select [count] {} blocks, excluding the
+                        braces.
+
+                                                                *ib* *i(* *i)*
+ib i( i)                Inner block: select [count] () blocks, excluding the
+                        parentheses.
+
+                                                                          *ip*
+ip                      Inner paragraph: select [count] paragraphs, where a
+                        run of blank lines also counts as a paragraph.
+
+                                                                          *is*
+is                      Inner sentence: select [count] sentences, white space
+                        not included.
+
+                                                                          *it*
+it                      Inner tag block: select [count] XML/HTML tag blocks,
+                        excluding the tags.
+
+                                                                          *iW*
+iW                      Inner WORD: select [count] WORDs, white space not
+                        included.
+
+                                                                          *iw*
+iw                      Inner word: select [count] words, white space not
+                        included.
+
+                                                                           *J*
+J                       Join [count] lines (at least two), replacing each line
+                        break and leading white space with a space.
+
+                                                                  *j* *CTRL-J*
+j <C-J>                 Move [count] lines downward, linewise.
+
+                                                                           *K*
+K                       Show documentation for the symbol under the cursor
+                        using the IDE's Quick Documentation action.
+
+                                                                           *k*
+k                       Move [count] lines up (linewise).
+
+                                                                           *L*
+L                       Move to line [count] from the bottom of the window, on
+                        the first non-blank character. The cursor is adjusted
+                        for 'scrolloff'.
+
+L                       As an operator motion, move linewise to line [count]
+                        from the bottom of the window. 'scrolloff' is applied
+                        afterwards.
+
+                                                                           *l*
+l                       Move [count] characters to the right. Wrap to the next
+                        line if 'whichwrap' contains l.
+
+l                       As an operator motion, move [count] characters to the
+                        right, so the operator can include the last character
+                        of the line.
+
+                                                                           *M*
+M                       Move to the middle line of the window, on the first
+                        non-blank character.
+
+                                                                           *m*
+m                       Set mark {mark} at the cursor position.
+
+                                                                           *N*
+N                       Repeat the last search [count] times in the opposite
+                        direction.
+
+                                                                           *n*
+n                       Repeat the last search [count] times in the same
+                        direction.
+
+                                                                           *O*
+O                       Begin a new line above the cursor and enter Insert
+                        mode.
+
+                                                                           *o*
+o                       Begin a new line below the cursor and enter Insert
+                        mode.
+
+                                                                           *P*
+P                       Put the text from register [x] before the cursor
+                        [count] times.
+
+                                                                           *p*
+p                       Put the text from register [x] after the cursor
+                        [count] times.
+
+                                                                           *q*
+q                       Start recording typed characters into register
+                        {register}. When already recording, stop recording.
+
+                                                                          *q/*
+q/                      Open the command-line window over the search history;
+                        <CR> searches forward for the selected pattern.
+
+                                                                          *q:*
+q:                      Open the command-line window to edit and execute
+                        commands from the : history.
+
+                                                                          *q?*
+q?                      Open the command-line window over the search history;
+                        <CR> searches backward for the selected pattern.
+
+                                                                           *R*
+R                       Enter Replace mode, where each typed character
+                        replaces an existing one.
+
+                                                                           *r*
+r                       Replace [count] characters under and after the cursor
+                        with {char}.
+
+                                                                           *S*
+S                       Delete [count] lines into register [x] and start
+                        Insert mode.
+
+                                                                           *s*
+s                       Delete [count] characters into register [x] and start
+                        Insert mode.
+
+                                                                           *T*
+T                       Move to just after the [count]th occurrence of {char}
+                        to the left.
+
+                                                                           *t*
+t                       Move to just before the [count]th occurrence of {char}
+                        to the right.
+
+                                                                           *U*
+U                       Undo all recent changes made on the last changed line.
+
+                                                                  *u* *<Undo>*
+u <Undo>                Undo [count] changes.
+
+                                                                           *V*
+V                       Start linewise Visual mode, or switch an active Visual
+                        mode to linewise; stop Visual mode if it is already
+                        linewise. Starts Select mode instead if 'selectmode'
+                        contains cmd.
+
+                                                                           *v*
+v                       Start characterwise Visual mode, or switch an active
+                        Visual mode to characterwise; stop Visual mode if it
+                        is already characterwise. Starts Select mode instead
+                        if 'selectmode' contains cmd.
+
+                                                               *W* *<C-Right>*
+W <C-Right>             Move [count] WORDS forward.
+
+                                                                           *w*
+w                       Move [count] words forward.
+
+                                                                           *X*
+X                       Delete [count] characters before the cursor into
+                        register [x].
+
+                                                                           *x*
+x                       Delete [count] characters under and after the cursor
+                        into register [x].
+
+                                                                           *Y*
+Y                       Yank [count] lines into register [x].
+
+                                                                           *y*
+y                       Yank the text covered by {motion} into register [x].
+
+                                                                          *z+*
+z+                      Without [count], redraw with the line just below the
+                        window at the top, cursor on its first non-blank. With
+                        [count], act like z<CR>.
+
+                                                                          *z-*
+z-                      Redraw with line [count] (default: cursor line) at the
+                        bottom of the window and put the cursor on its first
+                        non-blank.
+
+                                                                          *z.*
+z.                      Redraw with line [count] (default: cursor line) at the
+                        center of the window and put the cursor on its first
+                        non-blank.
+
+                                                                       *z<CR>*
+z<CR>                   Redraw with line [count] (default: cursor line) at the
+                        top of the window and put the cursor on its first
+                        non-blank.
+
+                                                                          *z=*
+z=                      Show spelling suggestions for the word under the
+                        cursor and replace it with the chosen one.
+
+                                                                          *z^*
+z^                      Without [count], redraw with the line just above the
+                        window at the bottom, cursor on its first non-blank.
+                        With [count], put line [count] at the bottom first,
+                        then do the same for the new top line.
+
+                                                                          *zA*
+zA                      Toggle the fold under the cursor recursively: close it
+                        and its nested folds when open, open them all when
+                        closed.
+
+                                                                          *za*
+za                      Toggle the fold under the cursor using the IDE's
+                        Expand/Collapse toggle action.
+
+                                                                          *zb*
+zb                      Redraw with line [count] (default: cursor line) at the
+                        bottom of the window, keeping the cursor column.
+
+                                                                          *zC*
+zC                      Close the fold under the cursor recursively using the
+                        IDE's Collapse Recursively action.
+
+                                                                          *zc*
+zc                      Close the fold under the cursor using the IDE's
+                        Collapse action.
+
+                                                                          *zD*
+zD                      Delete the fold at the cursor and all folds nested
+                        inside it. The text itself is not changed.
+
+                                                                          *zd*
+zd                      Delete the fold at the cursor. The text itself is not
+                        changed.
+
+                                                                          *ze*
+ze                      Scroll the text horizontally so the cursor column is
+                        at the right edge of the window.
+
+                                                                          *zf*
+zf                      Create a closed fold over the text covered by
+                        {motion}.
+
+                                                                          *zg*
+zg                      Add the word under the cursor to the IDE's spelling
+                        dictionary as a good word.
+
+                                                                          *zH*
+zH                      Scroll the text [count] half screen widths to the
+                        right, moving the view to the left. Only useful with
+                        'nowrap'.
+
+                                                                *zh* *z<Left>*
+zh z<Left>              Scroll the text [count] characters to the right,
+                        moving the view to the left.
+
+                                                                          *zj*
+zj                      Move down to the start of the [count]th next fold.
+
+                                                                          *zk*
+zk                      Move up to the end of the [count]th previous fold.
+
+                                                                          *zL*
+zL                      Scroll the text [count] half screen widths to the
+                        left, moving the view to the right. Only useful with
+                        'nowrap'.
+
+                                                               *zl* *z<Right>*
+zl z<Right>             Scroll the text [count] characters to the left, moving
+                        the view to the right.
+
+                                                                          *zM*
+zM                      Close all folds in the file.
+
+                                                                          *zm*
+zm                      Fold more: decrease the fold level by [count], closing
+                        more folds.
+
+                                                                          *zO*
+zO                      Open the fold under the cursor recursively using the
+                        IDE's Expand Recursively action.
+
+                                                                          *zo*
+zo                      Open the fold under the cursor using the IDE's Expand
+                        action.
+
+                                                                          *ZQ*
+ZQ                      Close the current editor tab, like :q!.
+
+                                                                          *zR*
+zR                      Open all folds in the file.
+
+                                                                          *zr*
+zr                      Reduce folding: increase the fold level by [count],
+                        opening more folds.
+
+                                                                          *zs*
+zs                      Scroll the text horizontally to put the cursor at the
+                        left edge of the window.
+
+                                                                          *zt*
+zt                      Scroll line [count] (default: cursor line) to the top
+                        of the window, keeping the cursor column.
+
+                                                                          *zw*
+zw                      Remove the word under the cursor from the IDE's
+                        spelling dictionary.
+
+                                                                          *ZZ*
+ZZ                      Save the current file and close its editor.
+
+                                                                          *zz*
+zz                      Redraw with line [count] (default: cursor line) at the
+                        center of the window, keeping the cursor column.
+
+                                                                           *{*
+{                       Move [count] paragraphs backward.
+
+                                                                         *bar*
+|                       Move to column [count] in the current line.
+
+                                                                           *}*
+}                       Move [count] paragraphs forward.
+
+                                                                           *~*
+~                       Switch the case of [count] characters under and after
+                        the cursor and move the cursor past them.
+
+==============================================================================
+3. Visual and Select mode                                     *ideavim-visual*
+
+                                                                         *v_!*
+!                       Start a command line to filter the highlighted lines
+                        through an external {filter} program.
+
+                                                                         *v_<*
+<                       Shift the highlighted lines [count] 'shiftwidth'
+                        leftwards.
+
+                                                                      *v_<BS>*
+<BS>                    In Select mode, delete the selected text and leave
+                        Select mode.
+
+                                                                    *v_CTRL-A*
+<C-A>                   Add [count] to the numbers in the highlighted text.
+
+                                                                    *v_CTRL-G*
+<C-G>                   Toggle between Visual mode and Select mode.
+
+                                                                  *v_<C-Left>*
+<C-Left>                In Select mode, move [count] WORDS backward, extending
+                        the selection.
+
+                                                                    *v_CTRL-O*
+<C-O>                   In Select mode, switch to Visual mode for the duration
+                        of one command, then return to Select mode.
+
+                                                                 *v_<C-Right>*
+<C-Right>               In Select mode, move [count] WORDS forward, extending
+                        the selection.
+
+                                                                    *v_CTRL-X*
+<C-X>                   Subtract [count] from the numbers in the highlighted
+                        text.
+
+                                                *v_<CR>* *v_CTRL-J* *v_CTRL-M*
+<CR> <C-J> <C-M>        In Select mode, replace the selected text with a line
+                        break.
+
+                                                                     *v_<DEL>*
+<DEL>                   In Select mode, delete the selected text and leave
+                        Select mode.
+
+                                                                     *v_<Esc>*
+<Esc>                   Leave Select mode.
+
+                                                         *v_CTRL-[* *v_CTRL-C*
+<Esc> <C-[> <C-C>       Stop Visual mode and return to Normal mode.
+
+                                                                    *v_<Left>*
+<Left>                  In Select mode, move [count] characters left,
+                        extending the selection. If 'keymodel' contains
+                        "stopsel", leave Select mode first.
+
+                                                                   *v_<Right>*
+<Right>                 In Select mode, move [count] characters right,
+                        extending the selection. If 'keymodel' contains
+                        "stopsel", leave Select mode instead.
+
+                                                                         *v_=*
+=                       Re-indent the highlighted lines using the IDE's
+                        auto-indent.
+
+                                                                         *v_>*
+>                       Shift the highlighted lines [count] 'shiftwidth'
+                        rightwards.
+
+                                                                 *v_[p* *v_]p*
+[p ]p                   Replace the highlighted text with the contents of
+                        register [x], adjusting the indent to the current
+                        line.
+
+                                                                 *v_]P* *v_[P*
+]P [P                   Replace the highlighted text with the contents of
+                        register [x], adjusting the indent to the current
+                        line.
+
+                                                                         *v_A*
+A                       In Visual block mode, append the same text after the
+                        block on every line. Otherwise append at the end of
+                        the line.
+
+                                                                         *v_C*
+C                       Change the highlighted lines; in Visual block mode,
+                        change till the end of each line instead.
+
+                                                                   *v_c* *v_s*
+c s                     Delete the highlighted text into register [x] and
+                        start Insert mode.
+
+                                                                         *v_D*
+D                       Delete the highlighted lines into register [x]. In
+                        Visual block mode, delete from the block start to the
+                        end of each line.
+
+                                                         *v_d* *v_x* *v_<Del>*
+d x <Del>               Delete the highlighted text into register [x].
+
+                                                                  *v_g_CTRL-A*
+g<C-A>                  Add [count] to the first highlighted number, 2 times
+                        [count] to the next, and so on.
+
+                                                                  *v_g_CTRL-X*
+g<C-X>                  Subtract [count] from the first highlighted number, 2
+                        times [count] from the next, and so on.
+
+                                                                        *v_g?*
+g?                      Rot13-encode the highlighted text.
+
+                                                                        *v_g@*
+g@                      Call the function set with 'operatorfunc' on the
+                        highlighted text.
+
+                                                                        *v_gJ*
+gJ                      Join the highlighted lines without inserting or
+                        removing any spaces.
+
+                                                                        *v_gP*
+gP                      Replace the highlighted text with the contents of
+                        register [x] and leave the cursor just after the new
+                        text.
+
+                                                                        *v_gp*
+gp                      Replace the highlighted text with the contents of
+                        register [x] and leave the cursor just after the new
+                        text.
+
+                                                                        *v_gq*
+gq                      Format the highlighted lines with the IDE's code
+                        formatter and wrap them at 'textwidth'.
+
+                                                                        *v_gv*
+gv                      Exchange the current and the previous Visual area.
+
+                                                                        *v_gw*
+gw                      Like gq, format the highlighted lines, but put the
+                        cursor back at the start of the selection.
+
+                                                                         *v_I*
+I                       In Visual block mode, insert the same text before the
+                        block on every line. Otherwise insert at the start of
+                        the selection.
+
+                                                                         *v_J*
+J                       Join the highlighted lines, replacing each line break
+                        and leading white space with a space.
+
+                                                                         *v_O*
+O                       Move the cursor to the other end of the selection. In
+                        Visual block mode, move to the other corner in the
+                        same line.
+
+                                                                         *v_o*
+o                       Move the cursor to the other end of the selection.
+
+                                                                         *v_P*
+P                       Replace the highlighted text with the contents of
+                        register [x], without changing the unnamed register.
+
+                                                                         *v_p*
+p                       Replace the highlighted text with the contents of
+                        register [x]. The replaced text is stored in the
+                        unnamed register.
+
+                                                                   *v_R* *v_S*
+R S                     Delete the highlighted lines into register [x] and
+                        start Insert mode.
+
+                                                                         *v_r*
+r                       Replace every highlighted character with {char}.
+
+                                                                  *v_U* *v_gU*
+U gU                    Make the highlighted text uppercase.
+
+                                                                  *v_u* *v_gu*
+u gu                    Make the highlighted text lowercase.
+
+                                                                         *v_X*
+X                       Delete the highlighted lines into register [x]. In
+                        Visual block mode, delete the highlighted block.
+
+                                                                         *v_Y*
+Y                       Yank the highlighted lines into register [x]. In
+                        Visual block mode, yank the highlighted block.
+
+                                                                         *v_y*
+y                       Yank the highlighted text into register [x].
+
+                                                                        *v_zf*
+zf                      Create a closed fold over the Visual selection.
+
+                                                                         *v_~*
+~                       Switch the case of the highlighted text.
+
+==============================================================================
+4. Command-line editing                                      *ideavim-cmdline*
+
+                                                           *c_<BS>* *c_CTRL-H*
+<BS> <C-H>              In Command-line mode, delete the character before the
+                        cursor. Leave Command-line mode if the line is empty.
+
+                                                             *c_CTRL-\_CTRL-N*
+<C-\><C-N>              Go to Normal mode from any mode, abandoning any
+                        pending command.
+
+                                                         *c_CTRL-B* *c_<Home>*
+<C-B> <Home>            In Command-line mode, move the cursor to the start of
+                        the command line.
+
+                                                          *c_CTRL-E* *c_<End>*
+<C-E> <End>             In Command-line mode, move the cursor to the end of
+                        the command line.
+
+                                                                    *c_CTRL-G*
+<C-G>                   While entering a search pattern with 'incsearch', move
+                        to the next match.
+
+                                                                    *c_CTRL-K*
+<C-K>                   In Command-line mode, enter digraph {char1}{char2}.
+
+                                                     *c_<C-Left>* *c_<S-Left>*
+<C-Left> <S-Left>       In Command-line mode, move the cursor one WORD left.
+
+                                                                    *c_CTRL-R*
+<C-R>                   In Command-line mode, insert the contents of
+                        {register} as if typed.
+
+                                                             *c_CTRL-R_CTRL-A*
+<C-R><C-A>              In Command-line mode, insert the WORD under the cursor
+                        in the editor.
+
+           *c_CTRL-R_CTRL-F* *c_CTRL-R_CTRL-R_CTRL-F* *c_CTRL-R_CTRL-O_CTRL-F*
+<C-R><C-F> <C-R><C-R><C-F> <C-R><C-O><C-F>
+                        In Command-line mode, insert the file name under the
+                        cursor in the editor.
+
+                                                             *c_CTRL-R_CTRL-L*
+<C-R><C-L>              In Command-line mode, insert the text of the current
+                        line in the editor.
+
+                                           *c_CTRL-R_CTRL-R* *c_CTRL-R_CTRL-O*
+<C-R><C-R> <C-R><C-O>   In Command-line mode, insert the contents of
+                        {register} literally, without interpreting special
+                        characters.
+
+                             *c_CTRL-R_CTRL-R_CTRL-A* *c_CTRL-R_CTRL-O_CTRL-A*
+<C-R><C-R><C-A> <C-R><C-O><C-A>
+                        In Command-line mode, insert the WORD under the cursor
+                        in the editor literally.
+
+                             *c_CTRL-R_CTRL-R_CTRL-L* *c_CTRL-R_CTRL-O_CTRL-L*
+<C-R><C-R><C-L> <C-R><C-O><C-L>
+                        In Command-line mode, insert the text of the current
+                        line in the editor literally.
+
+           *c_CTRL-R_CTRL-W* *c_CTRL-R_CTRL-R_CTRL-W* *c_CTRL-R_CTRL-O_CTRL-W*
+<C-R><C-W> <C-R><C-R><C-W> <C-R><C-O><C-W>
+                        In Command-line mode, insert the word under the cursor
+                        in the editor, skipping any part of it already typed.
+
+                                                   *c_<C-Right>* *c_<S-Right>*
+<C-Right> <S-Right>     In Command-line mode, move the cursor one WORD right.
+
+                                                                    *c_CTRL-T*
+<C-T>                   While entering a search pattern with 'incsearch', move
+                        to the previous match.
+
+                                                                    *c_CTRL-U*
+<C-U>                   In Command-line mode, delete all text between the
+                        start of the line and the cursor.
+
+                                                         *c_CTRL-V* *c_CTRL-Q*
+<C-V> <C-Q>             In Command-line mode, insert the next non-digit
+                        character literally, or a character by its decimal,
+                        octal or hex code.
+
+                                                                    *c_CTRL-W*
+<C-W>                   In Command-line mode, delete the word before the
+                        cursor.
+
+                                                                    *c_CTRL-Y*
+<C-Y>                   In Command-line mode, copy the modeless selection to
+                        the clipboard.
+
+                                                *c_<CR>* *c_CTRL-M* *c_CTRL-J*
+<CR> <C-M> <C-J>        In Command-line mode, execute the entered Ex command
+                        or search for the entered pattern.
+
+                                                                     *c_<DEL>*
+<DEL>                   In Command-line mode, delete the character under the
+                        cursor (before it at the end of the line). Leave if
+                        the line is empty.
+
+                                                                    *c_<Down>*
+<Down>                  In Command-line mode, recall the next (newer) command
+                        line from history that starts with the typed text.
+
+                                               *c_<Esc>* *c_CTRL-[* *c_CTRL-C*
+<Esc> <C-[> <C-C>       Abandon the command line without executing it and
+                        return to the previous mode.
+
+                                                                  *c_<Insert>*
+<Insert>                In Command-line mode, toggle between insert and
+                        overstrike.
+
+                                                                    *c_<Left>*
+<Left>                  In Command-line mode, move the cursor one character
+                        left. With 'wildmenu' completion active, select the
+                        previous match.
+
+                                                                   *c_<Right>*
+<Right>                 In Command-line mode, move the cursor one character
+                        right. With 'wildmenu' completion active, select the
+                        next match.
+
+                                        *c_<S-Down>* *c_CTRL-N* *c_<PageDown>*
+<S-Down> <C-N> <PageDown>
+                        In Command-line mode, recall the next (newer) command
+                        line from history.
+
+                                                                   *c_<S-Tab>*
+<S-Tab>                 In Command-line mode, complete the Ex command name or
+                        file name before the cursor, cycling through the
+                        matches backwards.
+
+                                            *c_<S-Up>* *c_CTRL-P* *c_<PageUp>*
+<S-Up> <C-P> <PageUp>   In Command-line mode, recall the previous (older)
+                        command line from history.
+
+                                                                     *c_<Tab>*
+<Tab>                   In Command-line mode, complete the Ex command name or
+                        file name before the cursor. Repeat to cycle through
+                        the matches.
+
+                                                                      *c_<Up>*
+<Up>                    In Command-line mode, recall the previous (older)
+                        command line from history that starts with the typed
+                        text.
+
+==============================================================================
+5. Ex commands                                                    *ideavim-ex*
+
+                                                                          *:!*
+:!                      Execute {cmd} in the shell and show its output; with
+                        [range], filter those lines through {cmd}.
+
+                                                                          *:<*
+:<                      Shift [range] lines one 'shiftwidth' left. Repeat the
+                        < to shift several times, e.g. :<<<.
+
+                                                                          *:=*
+:=                      Show the line number of the last line of [range]
+                        (default: the last line in the file). With the l, # or
+                        p flag, also show the line text.
+
+                                                                          *:>*
+:>                      Shift [range] lines one 'shiftwidth' right. Repeat the
+                        > to shift several times, e.g. :>>>.
+
+                                                                          *:@*
+:@                      Execute the contents of {register} as an Ex command at
+                        [line]. :@: repeats the last command line and :@@
+                        repeats the previous :@.
+
+  *:ab* *:abbreviate* *:ia* *:iabbrev* *:ca* *:cabbrev* *:norea* *:noreabbrev*
+                             *:inorea* *:inoreabbrev* *:cnorea* *:cnoreabbrev*
+:ab[breviate] :ia[bbrev] :ca[bbrev] :norea[bbrev] :inorea[bbrev]
+:cnorea[bbrev]
+                        Define abbreviation {lhs} for {rhs} in Insert and/or
+                        Command-line mode; the norea forms are not remapped.
+                        Without {rhs}, list matching abbreviations.
+
+                     *:abc* *:abclear* *:iabc* *:iabclear* *:cabc* *:cabclear*
+:abc[lear] :iabc[lear] :cabc[lear]
+                        Remove all abbreviations for the mode of the command:
+                        Insert and Command-line, Insert only, or Command-line
+                        only. Use <buffer> for buffer-local ones.
+
+                                                                     *:action*
+:action                 Execute the IDE action with the given {action-id}.
+
+                                                      *:actionl* *:actionlist*
+:actionl[ist]           List IDE action IDs and their shortcuts, keeping only
+                        lines that contain the optional search text.
+
+                                                           *:argu* *:argument*
+:argu[ment]             Go to the [count]th editor tab in the current window.
+
+                                                                *:as* *:ascii*
+:as[cii]                Print the decimal, hexadecimal and octal value of the
+                        character under the cursor.
+
+                                                              *:au* *:autocmd*
+:au[tocmd]              Register {cmd} to run when one of the comma-separated
+                        {event}s fires for a file matching {pat}. With [!],
+                        remove all registered autocommands.
+
+                                                             *:aug* *:augroup*
+:aug[roup]              Start the autocommand group {name} for the following
+                        :autocmd commands; END returns to the default group.
+                        With [!], clear group {name}.
+
+                                                                *:b* *:buffer*
+:b[uffer]               Edit buffer [N], alternate buffer #, or the open file
+                        matching {name}; [!] ignores unsaved changes.
+
+                                                              *:bd* *:bdelete*
+:bd[elete]              Close the current file's editor tab, or the file with
+                        buffer number [N] if given.
+
+                                                                *:cal* *:call*
+:cal[l]                 Call the function {name} with the given arguments and
+                        discard the result, optionally for a [range] of lines.
+
+                                                          *:cle* *:clearjumps*
+:cle[arjumps]           Clear the jump list of the current window.
+
+                                                             *:com* *:command*
+:com[mand]              Define the user command {cmd} that executes {rep}.
+                        Without arguments, list all user-defined commands.
+
+                                                           *:comc* *:comclear*
+:comc[lear]             Delete all user-defined commands.
+
+                                                                *:d* *:delete*
+:d[elete]               Delete the lines in [range] (default current line)
+                        into register [x]. A [count] deletes [count] lines
+                        starting with the last line in [range].
+
+                                                         *:delc* *:delcommand*
+:delc[ommand]           Delete the user-defined command {cmd}.
+
+                                                        *:delf* *:delfunction*
+:delf[unction]          Delete the user-defined function {name}. With [!], do
+                        not report an error if the function does not exist.
+
+                                                           *:delm* *:delmarks*
+:delm[arks]             Delete the specified {marks}; ranges like a-d are
+                        allowed. With [!], delete all lowercase marks of the
+                        current file.
+
+                                                            *:dig* *:digraphs*
+:dig[raphs]             Without arguments, list the available digraphs; with
+                        [!], also show headers. With {char1}{char2} {number}
+                        pairs, define new digraphs.
+
+                                         *:dis* *:display* *:reg* *:registers*
+:dis[play] :reg[isters]
+                        Display the type and contents of all registers, or
+                        only of the registers named in {arg}.
+
+                                                 *:e* *:edit* *:bro* *:browse*
+:e[dit] :bro[wse]       Open {file} in the editor. With # as the argument, go
+                        back to the previous file. Without an argument, open
+                        the IDE's Open File dialog.
+
+                                                                 *:ec* *:echo*
+:ec[ho]                 Evaluate each {expr} and display the results separated
+                        by spaces.
+
+                                                             *:exe* *:execute*
+:exe[cute]              Evaluate each {expr} and execute the resulting string
+                        as an Ex command. Multiple arguments are joined with a
+                        space.
+
+                                                                  *:f* *:file*
+:f[ile]                 Display the current file name, cursor position and
+                        file status.
+
+                                                                *:fin* *:find*
+:fin[d]                 Find {file} in the project and open it. Without an
+                        argument, open the IDE's Go to File popup.
+
+                                                               *:fir* *:first*
+:fir[st]                Go to the first editor tab in the current window.
+
+                                                *:g* *:global* *:v* *:vglobal*
+:g[lobal] :v[global]    Execute the Ex command [cmd] (default :p) on the lines
+                        in [range] (default whole file) that match {pattern}.
+                        With :g! or :v, use the lines that do not match.
+
+                                                                 *:go* *:goto*
+:go[to]                 Go to byte [count] in the file, default the first
+                        character.
+
+                                                                  *:h* *:help*
+:h[elp]                 Open the IdeaVim help in a read-only window and jump
+                        to the tag {subject}, e.g. dd, v_d, i_CTRL-W or :s.
+                        Without {subject}, show the start of the help.
+
+                                                             *:his* *:history*
+:his[tory]              Display the history of the given {name} type (cmd,
+                        search, expr, input or all), default command-line
+                        history. An optional {first},{last} limits the entries
+                        shown.
+
+                                                                   *:IdeaPlug*
+:IdeaPlug               Enable the IdeaVim extension with the quoted {name},
+                        similar to Plug in vim-plug.
+
+                                                                  *:j* *:join*
+:j[oin]                 Join the lines in [range], or [count] lines starting
+                        at the last line in [range]. With [!], do not insert
+                        or remove any spaces.
+
+                                                                *:ju* *:jumps*
+:ju[mps]                Print the jump list, marking the current position with
+                        >.
+
+                                                            *:k* *:ma* *:mark*
+:k :ma[rk]              Set mark {a-zA-Z'} at the last line of [range]
+                        (default current line), column 0.
+
+                                                                 *:la* *:last*
+:la[st]                 Go to the last editor tab in the current window.
+
+                                                                        *:let*
+:let                    Assign the value of {expr} to the variable, option or
+                        register {var}. Operators like += and .= are
+                        supported.
+
+                                                        *:loadk* *:loadkeymap*
+:loadk[eymap]           In a sourced keymap file, start the list of {from}
+                        {to} key pairs used for language mappings (:lmap).
+
+                                                           *:lockv* *:lockvar*
+:lockv[ar]              Lock the variable {name} so it can no longer be
+                        changed. A [depth] also locks nested List and
+                        Dictionary items.
+
+                                                     *:ls* *:files* *:buffers*
+:ls :files :buffers     List all open buffers, optionally filtered by the
+                        flags +, =, a, % and #.
+
+                                                                  *:m* *:move*
+:m[ove]                 Move the lines in [range] to below line {address}.
+
+  *:map* *:nm* *:nmap* *:vm* *:vmap* *:xm* *:xmap* *:smap* *:om* *:omap* *:im*
+ *:imap* *:lm* *:lmap* *:cm* *:cmap* *:nn* *:nnoremap* *:vn* *:vnoremap* *:xn*
+    *:xnoremap* *:snor* *:snoremap* *:ono* *:onoremap* *:no* *:noremap* *:ino*
+                              *:inoremap* *:ln* *:lnoremap* *:cno* *:cnoremap*
+:map :nm[ap] :vm[ap] :xm[ap] :smap :om[ap] :im[ap] :lm[ap] :cm[ap] :nn[oremap]
+:vn[oremap] :xn[oremap] :snor[emap] :ono[remap] :no[remap] :ino[remap]
+:ln[oremap] :cno[remap]
+                        Map key sequence {lhs} to {rhs} in the modes of the
+                        command. The nore forms are not remapped. With only
+                        {lhs}, or nothing, list matching mappings.
+
+      *:mapc* *:mapclear* *:nmapc* *:nmapclear* *:vmapc* *:vmapclear* *:xmapc*
+*:xmapclear* *:smapc* *:smapclear* *:omapc* *:omapclear* *:imapc* *:imapclear*
+                                   *:lmapc* *:lmapclear* *:cmapc* *:cmapclear*
+:mapc[lear] :nmapc[lear] :vmapc[lear] :xmapc[lear] :smapc[lear] :omapc[lear]
+:imapc[lear] :lmapc[lear] :cmapc[lear]
+                        Remove all mappings for the modes of the command, e.g.
+                        :nmapclear for Normal mode. :mapclear! clears Insert
+                        and Command-line mode mappings.
+
+                                                                      *:marks*
+:marks                  List all marks, or only the marks named in {arg}.
+
+                                                   *:n* *:next* *:bn* *:bnext*
+:n[ext] :bn[ext]        Go to the [count]th next editor tab.
+
+                                                          *:noh* *:nohlsearch*
+:noh[lsearch]           Stop highlighting matches of the last search pattern
+                        until the next search.
+
+                                                             *:norm* *:normal*
+:norm[al]               Execute {commands} as Normal mode keys, once for each
+                        line in [range]. With [!], mappings are not used.
+
+                                                                 *:on* *:only*
+:on[ly]                 Close all editor windows (splits) except the current
+                        one.
+
+                                                   *:p* *:print* *:P* *:Print*
+:p[rint] :P[rint]       Show [range] lines (default current line) in the
+                        output panel, prefixed with line numbers if 'number'
+                        is set.
+
+                                                              *:pa* *:packadd*
+:pa[ckadd]              Load the optional package {name}. Only matchit is
+                        supported, which enables the 'matchit' option.
+
+                                                             *:Plug* *:Plugin*
+:Plug[in]               Enable the IdeaVim extension named in quotes, using
+                        vim-plug syntax, e.g. Plug 'tpope/vim-surround'.
+
+                                                                *:PlugDisable*
+:PlugDisable            Disable the IdeaVim extension {name}.
+
+                                                                 *:PlugEnable*
+:PlugEnable             Enable the IdeaVim extension {name}.
+
+                                                                  *:po* *:pop*
+:po[p]                  Jump [count] entries back (older) in the tag stack,
+                        returning to where the tag jump was made.
+
+                           *:prev* *:previous* *:bp* *:bprevious* *:N* *:Next*
+:prev[ious] :bp[revious] :N[ext]
+                        Go to the [count]th previous editor tab, wrapping
+                        around at the first one.
+
+                                                                  *:pu* *:put*
+:pu[t]                  Put the text from register [x] linewise after [line]
+                        (default current line). Use line 0 to put above the
+                        first line.
+
+                                   *:q* *:quit* *:clo* *:close* *:hid* *:hide*
+:q[uit] :clo[se] :hid[e]
+                        Close the current editor. :close and :hide behave the
+                        same way as :quit in IdeaVim.
+
+               *:qa* *:qall* *:xa* *:xall* *:wqa* *:wqall* *:quita* *:quitall*
+:qa[ll] :xa[ll] :wqa[ll] :quita[ll]
+                        Close all editor windows.
+
+                                                                  *:r* *:read*
+:r[ead]                 Insert {file} below the cursor or line [range]; with
+                        :read !{cmd}, insert the output of {cmd} instead.
+
+                                                                *:red* *:redo*
+:red[o]                 Redo one change that was undone.
+
+                                                              *:res* *:resize*
+:res[ize]               Set the window height to N rows or change it by +N or
+                        -N; without an argument, maximize it.
+
+                                                            *:s* *:substitute*
+:s[ubstitute]           Substitute {pattern} with {string} in [range] lines,
+                        using [flags] (e.g. g for all matches, i to ignore
+                        case, c to confirm).
+
+                                                  *:scripte* *:scriptencoding*
+:scripte[ncoding]       Specify the character encoding used in the script.
+                        Accepted for compatibility; it does nothing in
+                        IdeaVim.
+
+                                                                  *:se* *:set*
+:se[t]                  Show or set options. Without arguments show all
+                        options that differ from their default value. See :set
+                        {option}, no{option}, {option}={value}.
+
+                                                          *:setg* *:setglobal*
+:setg[lobal]            Like :set, but only show or set the global value of an
+                        option.
+
+                                                                 *:sethandler*
+:sethandler             Choose whether Vim or the IDE handles a shortcut, per
+                        mode, e.g. :sethandler <C-V> n-v:vim i:ide. Without a
+                        shortcut, apply to all conflicting shortcuts.
+
+                                                           *:setl* *:setlocal*
+:setl[ocal]             Like :set, but only show or set the value of an option
+                        that is local to the current buffer or window.
+
+                                                                *:sh* *:shell*
+:sh[ell]                Open the IDE's Terminal tool window.
+
+                                                                      *:smile*
+:smile                  Display some ASCII art, chosen according to the type
+                        of the current file.
+
+                                                               *:so* *:source*
+:so[urce]               Read and execute Ex commands from the file {file}.
+
+                                                                *:sor* *:sort*
+:sor[t]                 Sort lines in [range] (default: the selected lines, or
+                        the whole file). [!] reverses the order; flags: i
+                        ignore case, n numeric, u unique, r sort on
+                        /{pattern}/ match.
+
+                                                *:sp* *:split* *:vs* *:vsplit*
+:sp[lit] :vs[plit]      Split the current editor window in two, horizontally
+                        for :split and vertically for :vsplit. With [file],
+                        open it in the new split.
+
+                                                        *:star* *:startinsert*
+:star[tinsert]          Start Insert mode, as with i. With [!], append at the
+                        end of the line, as with A.
+
+                                                     *:startr* *:startreplace*
+:startr[eplace]         Start Replace mode, as with R. With [!], start at the
+                        end of the line.
+
+                                                        *:stopi* *:stopinsert*
+:stopi[nsert]           Stop Insert or Replace mode and return to Normal mode.
+
+                                                            *:t* *:co* *:copy*
+:t :co[py]              Copy the lines in [range] to below line {address}.
+
+                                                                  *:ta* *:tag*
+:ta[g]                  Jump [count] entries forward (newer) in the tag stack.
+
+                                                           *:tabc* *:tabclose*
+:tabc[lose]             Close the current editor tab, or the tab given by
+                        {arg}: a tab number, +N or -N relative to the current
+                        tab, or the last tab.
+
+                                                            *:tabm* *:tabmove*
+:tabm[ove]              Move the current editor tab to after tab {N}, or +N/-N
+                        positions relative to its current place. Without {N},
+                        move it to the end.
+
+                                                            *:tabn* *:tabnext*
+:tabn[ext]              Go to the next editor tab, wrapping around at the last
+                        one. With {N}, go to tab {N} (first tab is 1).
+
+                                                            *:tabo* *:tabonly*
+:tabo[nly]              Close all editor tabs except the current one.
+
+                                     *:tabp* *:tabprevious* *:tabN* *:tabNext*
+:tabp[revious] :tabN[ext]
+                        Go to the previous editor tab, wrapping around at the
+                        first one. With [count], go [count] tabs back.
+
+                                                                       *:tags*
+:tags                   Show the contents of the tag stack. The current entry
+                        is marked with >.
+
+                                                                  *:u* *:undo*
+:u[ndo]                 Undo one change.
+
+              *:una* *:unabbreviate* *:iuna* *:iunabbrev* *:cuna* *:cunabbrev*
+:una[bbreviate] :iuna[bbrev] :cuna[bbrev]
+                        Remove abbreviation {lhs} for the mode of the command.
+                        Use <buffer> to remove a buffer-local abbreviation.
+
+                                                          *:unlo* *:unlockvar*
+:unlo[ckvar]            Unlock the variable {name}, so it can be changed
+                        again. A [depth] also unlocks nested items.
+
+      *:unm* *:unmap* *:nun* *:nunmap* *:vu* *:vunmap* *:xu* *:xunmap* *:sunm*
+     *:sunmap* *:ou* *:ounmap* *:iu* *:iunmap* *:lu* *:lunmap* *:cu* *:cunmap*
+:unm[ap] :nun[map] :vu[nmap] :xu[nmap] :sunm[ap] :ou[nmap] :iu[nmap] :lu[nmap]
+:cu[nmap]
+                        Remove the mapping of {lhs} for the modes of the
+                        command. :unmap! removes it from Insert and
+                        Command-line modes.
+
+                                                               *:up* *:update*
+:up[date]               Save the current file, but only if it has been
+                        modified.
+
+                                                           *:vert* *:vertical*
+:vert[ical]             Run :resize {cmd} on the window width instead of its
+                        height, e.g. :vertical resize +5.
+
+                                                                 *:w* *:write*
+:w[rite]                Save the current file. With {file}, write [range]
+                        lines (default all lines) to {file}; use [!] to
+                        overwrite an existing file.
+
+                                                                 *:wa* *:wall*
+:wa[ll]                 Save all modified files.
+
+                                                                *:wn* *:wnext*
+:wn[ext]                Save the current file and go to the [count]th next
+                        editor tab.
+
+                                             *:wp* *:wprevious* *:wN* *:wNext*
+:wp[revious] :wN[ext]   Save the current file and go to the [count]th previous
+                        editor tab.
+
+                                              *:wq* *:x* *:xit* *:exi* *:exit*
+:wq :x[it] :exi[t]      Save the current file and close its editor.
+
+                                                                  *:y* *:yank*
+:y[ank]                 Yank [range] lines (default current line) into
+                        register [x]. A [count] yanks that many lines starting
+                        with the last line in [range].
+
+                                                                     *:~* *:&*
+:~ :&                   Repeat the last :substitute in [range] lines. :& uses
+                        the same search pattern, :~ uses the last used search
+                        pattern. [&] keeps the flags.
+
+==============================================================================
+
+This file is generated from the IdeaVim sources by "./gradlew generateHelp".
+Do not edit it by hand, edit the description of the command instead.
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

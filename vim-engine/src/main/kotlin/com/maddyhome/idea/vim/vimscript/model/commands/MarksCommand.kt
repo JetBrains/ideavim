@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :marks"
  */
-@ExCommand(command = "marks")
+@ExCommand(command = "marks", description = "List all marks, or only the marks named in {arg}.")
 data class MarksCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

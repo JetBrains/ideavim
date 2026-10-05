@@ -18,7 +18,11 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.findBlockRange
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 
-@CommandOrMotion(keys = ["i>", "i<lt>"], modes = [Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["i>", "i<lt>"],
+  modes = [Mode.VISUAL, Mode.OP_PENDING],
+  description = "Inner <> block: select [count] <> blocks, excluding the angle brackets."
+)
 class MotionInnerBlockAngleAction : TextObjectActionHandler() {
 
   override val preserveSelectionAnchor: Boolean = false
@@ -36,7 +40,11 @@ class MotionInnerBlockAngleAction : TextObjectActionHandler() {
   }
 }
 
-@CommandOrMotion(keys = ["iB", "i{", "i}"], modes = [Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["iB", "i{", "i}"],
+  modes = [Mode.VISUAL, Mode.OP_PENDING],
+  description = "Inner Block: select [count] {} blocks, excluding the braces."
+)
 class MotionInnerBlockBraceAction : TextObjectActionHandler() {
 
   override val preserveSelectionAnchor: Boolean = false
@@ -54,7 +62,11 @@ class MotionInnerBlockBraceAction : TextObjectActionHandler() {
   }
 }
 
-@CommandOrMotion(keys = ["i[", "i]"], modes = [Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["i[", "i]"],
+  modes = [Mode.VISUAL, Mode.OP_PENDING],
+  description = "Inner [] block: select [count] [] blocks, excluding the brackets."
+)
 class MotionInnerBlockBracketAction : TextObjectActionHandler() {
 
   override val preserveSelectionAnchor: Boolean = false
@@ -72,7 +84,11 @@ class MotionInnerBlockBracketAction : TextObjectActionHandler() {
   }
 }
 
-@CommandOrMotion(keys = ["ib", "i(", "i)"], modes = [Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["ib", "i(", "i)"],
+  modes = [Mode.VISUAL, Mode.OP_PENDING],
+  description = "Inner block: select [count] () blocks, excluding the parentheses."
+)
 class MotionInnerBlockParenAction : TextObjectActionHandler() {
 
   override val preserveSelectionAnchor: Boolean = false
@@ -90,7 +106,11 @@ class MotionInnerBlockParenAction : TextObjectActionHandler() {
   }
 }
 
-@CommandOrMotion(keys = ["a<", "a>"], modes = [Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["a<", "a>"],
+  modes = [Mode.VISUAL, Mode.OP_PENDING],
+  description = "A <> block: select [count] <> blocks, including the angle brackets."
+)
 class MotionOuterBlockAngleAction : TextObjectActionHandler() {
 
   override val preserveSelectionAnchor: Boolean = false
@@ -108,7 +128,11 @@ class MotionOuterBlockAngleAction : TextObjectActionHandler() {
   }
 }
 
-@CommandOrMotion(keys = ["aB", "a{", "a}"], modes = [Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["aB", "a{", "a}"],
+  modes = [Mode.VISUAL, Mode.OP_PENDING],
+  description = "A Block: select [count] {} blocks, including the braces."
+)
 class MotionOuterBlockBraceAction : TextObjectActionHandler() {
 
   override val preserveSelectionAnchor: Boolean = false
@@ -126,7 +150,11 @@ class MotionOuterBlockBraceAction : TextObjectActionHandler() {
   }
 }
 
-@CommandOrMotion(keys = ["a[", "a]"], modes = [Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["a[", "a]"],
+  modes = [Mode.VISUAL, Mode.OP_PENDING],
+  description = "A [] block: select [count] [] blocks, including the brackets."
+)
 class MotionOuterBlockBracketAction : TextObjectActionHandler() {
 
   override val preserveSelectionAnchor: Boolean = false
@@ -144,7 +172,11 @@ class MotionOuterBlockBracketAction : TextObjectActionHandler() {
   }
 }
 
-@CommandOrMotion(keys = ["ab", "a(", "a)"], modes = [Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["ab", "a(", "a)"],
+  modes = [Mode.VISUAL, Mode.OP_PENDING],
+  description = "A block: select [count] () blocks, including the parentheses."
+)
 class MotionOuterBlockParenAction : TextObjectActionHandler() {
 
   override val preserveSelectionAnchor: Boolean = false

@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_COMMAND_REGISTER
 
-@CommandOrMotion(keys = ["@"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["@"],
+  modes = [Mode.NORMAL],
+  description = "Execute the contents of register {register} [count] times. @@ repeats the last executed register and @: repeats the last command-line."
+)
 class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
   override val argumentType: Argument.Type = Argument.Type.REGISTER

@@ -21,7 +21,11 @@ import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["c", "s"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["c", "s"],
+  modes = [Mode.VISUAL],
+  description = "Delete the highlighted text into register [x] and start Insert mode."
+)
 class ChangeVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 

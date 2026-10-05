@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["~"], modes = [Mode.VISUAL])
+@CommandOrMotion(keys = ["~"], modes = [Mode.VISUAL], description = "Switch the case of the highlighted text.")
 class ChangeCaseToggleVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 

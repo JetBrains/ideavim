@@ -19,7 +19,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :quit" / "h :close" / "h :quit"
  */
-@ExCommand(command = "q[uit],clo[se],hid[e]")
+@ExCommand(
+  command = "q[uit],clo[se],hid[e]",
+  description = "Close the current editor. :close and :hide behave the same way as :quit in IdeaVim."
+)
 data class QuitCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

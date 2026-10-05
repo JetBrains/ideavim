@@ -17,7 +17,11 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.register.RegisterConstants
 
-@CommandOrMotion(keys = ["<C-Y>"], modes = [Mode.CMD_LINE])
+@CommandOrMotion(
+  keys = ["<C-Y>"],
+  modes = [Mode.CMD_LINE],
+  description = "In Command-line mode, copy the modeless selection to the clipboard."
+)
 internal class CopyModelessSelectionAction : CommandLineActionHandler() {
   override fun execute(
     commandLine: VimCommandLine,

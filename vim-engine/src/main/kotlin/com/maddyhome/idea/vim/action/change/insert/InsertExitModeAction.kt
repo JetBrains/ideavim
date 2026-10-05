@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_END
 import com.maddyhome.idea.vim.state.mode.Mode as VimMode
 
-@CommandOrMotion(keys = ["<C-[>", "<C-C>", "<Esc>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<C-[>", "<C-C>", "<Esc>"],
+  modes = [Mode.INSERT],
+  description = "Leave Insert mode and return to Normal mode."
+)
 class InsertExitModeAction : VimActionHandler.SingleExecution() {
   // Note: ESC should not require write access itself; any write is gated in processEscape.
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED

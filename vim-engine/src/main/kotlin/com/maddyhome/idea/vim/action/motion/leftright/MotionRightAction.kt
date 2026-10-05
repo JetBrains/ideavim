@@ -40,10 +40,18 @@ abstract class MotionRightBaseAction() : MotionActionHandler.ForEachCaret() {
   protected open fun allowPastEnd(editor: VimEditor) = editor.usesVirtualSpace || editor.isEndAllowed
 }
 
-@CommandOrMotion(keys = ["l"], modes = [Mode.NORMAL, Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["l"],
+  modes = [Mode.NORMAL, Mode.VISUAL],
+  description = "Move [count] characters to the right. Wrap to the next line if 'whichwrap' contains l."
+)
 class MotionRightAction : MotionRightBaseAction()
 
-@CommandOrMotion(keys = ["l"], modes = [Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["l"],
+  modes = [Mode.OP_PENDING],
+  description = "As an operator motion, move [count] characters to the right, so the operator can include the last character of the line."
+)
 class MotionRightOpPendingAction : MotionRightBaseAction() {
   // When the motion is used with an operator, the EOL character is counted.
   // This allows e.g., `dl` to delete the last character in a line. Note that we can't use editor.isEndAllowed to give

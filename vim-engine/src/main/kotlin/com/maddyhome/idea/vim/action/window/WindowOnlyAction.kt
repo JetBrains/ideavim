@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 /**
  * @author rasendubi
  */
-@CommandOrMotion(keys = ["<C-W>o", "<C-W><C-O>"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["<C-W>o", "<C-W><C-O>"],
+  modes = [Mode.NORMAL],
+  description = "Close all windows (editor splits) except the current one."
+)
 class WindowOnlyAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

@@ -16,7 +16,11 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-@CommandOrMotion(keys = ["g8"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["g8"],
+  modes = [Mode.NORMAL],
+  description = "Display the UTF-8 byte sequence of the character under the cursor in hex."
+)
 class FileGetHexAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

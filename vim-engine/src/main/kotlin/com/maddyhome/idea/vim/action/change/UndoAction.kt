@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-@CommandOrMotion(keys = ["u", "<Undo>"], modes = [Mode.NORMAL])
+@CommandOrMotion(keys = ["u", "<Undo>"], modes = [Mode.NORMAL], description = "Undo [count] changes.")
 class UndoAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 

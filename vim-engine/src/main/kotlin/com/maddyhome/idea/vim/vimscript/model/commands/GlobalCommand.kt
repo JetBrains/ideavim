@@ -28,7 +28,11 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * see "h :global" / "h :vglobal"
  */
 // FIXME: I'm such a mess, please refactor me, responsible developer
-@ExCommand(command = "g[lobal],v[global]", barSeparates = false)
+@ExCommand(
+  command = "g[lobal],v[global]",
+  barSeparates = false,
+  description = "Execute the Ex command [cmd] (default :p) on the lines in [range] (default whole file) that match {pattern}. With :g! or :v, use the lines that do not match."
+)
 data class GlobalCommand(val range: Range, val modifier: CommandModifier, val argument: String, val invert: Boolean) :
   Command.SingleExecution(range, modifier, argument) {
 

@@ -14,7 +14,11 @@ import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.handler.Motion
 
-@CommandOrMotion(keys = ["<C-W>"], modes = [Mode.CMD_LINE])
+@CommandOrMotion(
+  keys = ["<C-W>"],
+  modes = [Mode.CMD_LINE],
+  description = "In Command-line mode, delete the word before the cursor."
+)
 class DeletePreviousWordAction : CommandLineActionHandler() {
   override fun execute(commandLine: VimCommandLine): Boolean {
     val caretOffset = commandLine.caret.offset

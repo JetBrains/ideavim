@@ -51,7 +51,12 @@ internal abstract class LookupActionHandler : VimActionHandler.SingleExecution()
 }
 
 /** `<C-Y>` with a popup open: take the selected item. */
-@CommandOrMotion(keys = ["<C-Y>"], modes = [Mode.INSERT], lookup = true)
+@CommandOrMotion(
+  keys = ["<C-Y>"],
+  modes = [Mode.INSERT],
+  lookup = true,
+  description = "With a completion popup open, accept the selected item."
+)
 internal class AcceptLookupAction : LookupActionHandler() {
   override fun executeOnLookup(editor: VimEditor, context: ExecutionContext, lookup: IdeLookup): Boolean {
     lookup.accept(editor.primaryCaret(), context)
@@ -60,7 +65,12 @@ internal class AcceptLookupAction : LookupActionHandler() {
 }
 
 /** `<C-E>` with a popup open: dismiss it, keeping what was typed. */
-@CommandOrMotion(keys = ["<C-E>"], modes = [Mode.INSERT], lookup = true)
+@CommandOrMotion(
+  keys = ["<C-E>"],
+  modes = [Mode.INSERT],
+  lookup = true,
+  description = "With a completion popup open, close the popup and keep the text typed so far."
+)
 internal class CloseLookupAction : LookupActionHandler() {
   override fun executeOnLookup(editor: VimEditor, context: ExecutionContext, lookup: IdeLookup): Boolean {
     lookup.close(editor.primaryCaret(), context)
@@ -69,7 +79,12 @@ internal class CloseLookupAction : LookupActionHandler() {
 }
 
 /** `<C-N>` with a popup open: select the next item. */
-@CommandOrMotion(keys = ["<C-N>"], modes = [Mode.INSERT], lookup = true)
+@CommandOrMotion(
+  keys = ["<C-N>"],
+  modes = [Mode.INSERT],
+  lookup = true,
+  description = "With a completion popup open, select the next item."
+)
 internal class CycleLookupDownAction : LookupActionHandler() {
   override fun executeOnLookup(editor: VimEditor, context: ExecutionContext, lookup: IdeLookup): Boolean {
     lookup.down(editor.primaryCaret(), context)
@@ -78,7 +93,12 @@ internal class CycleLookupDownAction : LookupActionHandler() {
 }
 
 /** `<C-P>` with a popup open: select the previous item. */
-@CommandOrMotion(keys = ["<C-P>"], modes = [Mode.INSERT], lookup = true)
+@CommandOrMotion(
+  keys = ["<C-P>"],
+  modes = [Mode.INSERT],
+  lookup = true,
+  description = "With a completion popup open, select the previous item."
+)
 internal class CycleLookupUpAction : LookupActionHandler() {
   override fun executeOnLookup(editor: VimEditor, context: ExecutionContext, lookup: IdeLookup): Boolean {
     lookup.up(editor.primaryCaret(), context)
@@ -101,8 +121,18 @@ internal abstract class CycleCtrlXLookupAction(private val mode: CtrlXCompletion
   }
 }
 
-@CommandOrMotion(keys = ["<C-L>"], modes = [Mode.INSERT], lookup = true)
+@CommandOrMotion(
+  keys = ["<C-L>"],
+  modes = [Mode.INSERT],
+  lookup = true,
+  description = "With a CTRL-X completion popup open, select the next matching whole line."
+)
 internal class CycleLineCompletionLookupAction : CycleCtrlXLookupAction(CtrlXCompletionMode.WHOLE_LINE)
 
-@CommandOrMotion(keys = ["<C-F>"], modes = [Mode.INSERT], lookup = true)
+@CommandOrMotion(
+  keys = ["<C-F>"],
+  modes = [Mode.INSERT],
+  lookup = true,
+  description = "With a CTRL-X completion popup open, select the next matching file name."
+)
 internal class CycleFilePathCompletionLookupAction : CycleCtrlXLookupAction(CtrlXCompletionMode.FILE_PATH)

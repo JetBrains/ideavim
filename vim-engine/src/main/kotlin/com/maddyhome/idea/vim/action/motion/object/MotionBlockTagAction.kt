@@ -18,7 +18,11 @@ import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 
-@CommandOrMotion(keys = ["it"], modes = [Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["it"],
+  modes = [Mode.VISUAL, Mode.OP_PENDING],
+  description = "Inner tag block: select [count] XML/HTML tag blocks, excluding the tags."
+)
 class MotionInnerBlockTagAction : TextObjectActionHandler() {
 
   override val preserveSelectionAnchor: Boolean = false
@@ -36,7 +40,11 @@ class MotionInnerBlockTagAction : TextObjectActionHandler() {
   }
 }
 
-@CommandOrMotion(keys = ["at"], modes = [Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["at"],
+  modes = [Mode.VISUAL, Mode.OP_PENDING],
+  description = "A tag block: select [count] XML/HTML tag blocks, including the tags."
+)
 class MotionOuterBlockTagAction : TextObjectActionHandler() {
 
   override val preserveSelectionAnchor: Boolean = false

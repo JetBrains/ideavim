@@ -18,7 +18,11 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-@CommandOrMotion(keys = ["~"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["~"],
+  modes = [Mode.NORMAL],
+  description = "Switch the case of [count] characters under and after the cursor and move the cursor past them."
+)
 class ChangeCaseToggleCharacterAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 

@@ -16,7 +16,11 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-@CommandOrMotion(keys = ["<C-G>"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["<C-G>"],
+  modes = [Mode.NORMAL],
+  description = "Display the current file name, cursor position and file status. With a [count], show the full path of the file."
+)
 class FileGetFileInfoAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

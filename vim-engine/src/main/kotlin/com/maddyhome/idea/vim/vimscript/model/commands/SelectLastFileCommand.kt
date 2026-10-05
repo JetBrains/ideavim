@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :last"
  */
-@ExCommand(command = "la[st]")
+@ExCommand(command = "la[st]", description = "Go to the last editor tab in the current window.")
 data class SelectLastFileCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

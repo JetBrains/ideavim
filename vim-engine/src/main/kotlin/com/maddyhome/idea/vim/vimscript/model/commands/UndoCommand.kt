@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :undo"
  */
-@ExCommand(command = "u[ndo]")
+@ExCommand(command = "u[ndo]", description = "Undo one change.")
 data class UndoCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

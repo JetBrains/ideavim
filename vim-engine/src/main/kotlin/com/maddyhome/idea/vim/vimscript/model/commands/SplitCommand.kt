@@ -19,7 +19,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :split" / "h :vsplit"
  */
-@ExCommand(command = "sp[lit],vs[plit]")
+@ExCommand(
+  command = "sp[lit],vs[plit]",
+  description = "Split the current editor window in two, horizontally for :split and vertically for :vsplit. With [file], open it in the new split."
+)
 data class SplitCommand(val range: Range, val argument: String, val splitType: SplitType) :
   Command.SingleExecution(range, CommandModifier.NONE, argument) {
 

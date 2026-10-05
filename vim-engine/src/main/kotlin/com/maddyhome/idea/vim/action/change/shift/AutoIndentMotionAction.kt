@@ -22,7 +22,11 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 /**
  * @author Aleksey Lagoshin
  */
-@CommandOrMotion(keys = ["="], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["="],
+  modes = [Mode.NORMAL],
+  description = "Re-indent the lines covered by {motion} using the IDE's indentation rules."
+)
 class AutoIndentMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.CHANGE
 

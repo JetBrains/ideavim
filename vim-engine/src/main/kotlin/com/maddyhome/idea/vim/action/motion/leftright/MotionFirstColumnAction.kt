@@ -24,7 +24,11 @@ import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-@CommandOrMotion(keys = ["0"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["0"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Move to the first character of the line."
+)
 class MotionFirstColumnAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
@@ -40,7 +44,11 @@ class MotionFirstColumnAction : MotionActionHandler.ForEachCaret() {
 }
 
 // TODO we have the same command but for NX modes
-@CommandOrMotion(keys = ["<Home>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<Home>"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, move the cursor to the first character of the line."
+)
 class MotionFirstColumnInsertModeAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 

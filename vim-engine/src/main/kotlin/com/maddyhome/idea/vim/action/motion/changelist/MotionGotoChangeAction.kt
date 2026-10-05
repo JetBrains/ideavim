@@ -20,7 +20,11 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 
 /** `g;` -- go to [count] older position in the change list. */
-@CommandOrMotion(keys = ["g;"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["g;"],
+  modes = [Mode.NORMAL],
+  description = "Go to the [count]th older position in the change list."
+)
 class MotionGotoChangeOlderAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
@@ -34,7 +38,11 @@ class MotionGotoChangeOlderAction : MotionActionHandler.ForEachCaret() {
 }
 
 /** `g,` -- go to [count] newer position in the change list. */
-@CommandOrMotion(keys = ["g,"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["g,"],
+  modes = [Mode.NORMAL],
+  description = "Go to the [count]th newer position in the change list."
+)
 class MotionGotoChangeNewerAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,

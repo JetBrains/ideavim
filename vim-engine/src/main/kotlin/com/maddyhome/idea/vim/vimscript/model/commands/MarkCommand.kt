@@ -19,7 +19,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :mark"
  */
-@ExCommand(command = "k,ma[rk]")
+@ExCommand(
+  command = "k,ma[rk]",
+  description = "Set mark {a-zA-Z'} at the last line of [range] (default current line), column 0."
+)
 data class MarkCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

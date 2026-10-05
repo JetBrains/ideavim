@@ -13,7 +13,11 @@ import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.common.Graphemes
 
-@CommandOrMotion(keys = ["<BS>", "<C-H>"], modes = [Mode.CMD_LINE])
+@CommandOrMotion(
+  keys = ["<BS>", "<C-H>"],
+  modes = [Mode.CMD_LINE],
+  description = "In Command-line mode, delete the character before the cursor. Leave Command-line mode if the line is empty."
+)
 class DeletePreviousCharAction : CommandLineActionHandler() {
   override fun execute(commandLine: VimCommandLine): Boolean {
     val oldText = commandLine.text

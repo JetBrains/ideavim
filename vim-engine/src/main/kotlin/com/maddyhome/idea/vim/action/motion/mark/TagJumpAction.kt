@@ -27,7 +27,11 @@ import java.util.*
  * Unlike `gd` and `gD` ([com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction]), this is a tag command, so
  * it pushes onto the tag stack and `<C-T>` walks back over it.
  */
-@CommandOrMotion(keys = ["<C-]>"], modes = [Mode.NORMAL, Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["<C-]>"],
+  modes = [Mode.NORMAL, Mode.VISUAL],
+  description = "Jump to the definition of the keyword under the cursor using the IDE's Go to Declaration action, pushing the position onto the tag stack."
+)
 class TagJumpAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

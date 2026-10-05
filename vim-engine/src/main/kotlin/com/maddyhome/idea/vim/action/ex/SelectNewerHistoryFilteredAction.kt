@@ -11,7 +11,11 @@ import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.VimCommandLine
 
-@CommandOrMotion(keys = ["<Down>"], modes = [Mode.CMD_LINE])
+@CommandOrMotion(
+  keys = ["<Down>"],
+  modes = [Mode.CMD_LINE],
+  description = "In Command-line mode, recall the next (newer) command line from history that starts with the typed text."
+)
 class SelectNewerHistoryFilteredAction : CommandLineActionHandler() {
   override fun execute(commandLine: VimCommandLine): Boolean {
     commandLine.selectNewerHistory(filter = true)

@@ -19,7 +19,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 
-@ExCommand(command = "una[bbreviate],iuna[bbrev],cuna[bbrev]")
+@ExCommand(
+  command = "una[bbreviate],iuna[bbrev],cuna[bbrev]",
+  description = "Remove abbreviation {lhs} for the mode of the command. Use <buffer> to remove a buffer-local abbreviation."
+)
 data class UnabbrevCommand(val range: Range, val cmd: String, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

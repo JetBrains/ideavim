@@ -18,7 +18,10 @@ import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
-@ExCommand(command = "sethandler")
+@ExCommand(
+  command = "sethandler",
+  description = "Choose whether Vim or the IDE handles a shortcut, per mode, e.g. :sethandler <C-V> n-v:vim i:ide. Without a shortcut, apply to all conflicting shortcuts."
+)
 data class SetHandlerCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

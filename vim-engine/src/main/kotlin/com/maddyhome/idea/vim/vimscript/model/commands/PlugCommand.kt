@@ -19,7 +19,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * This handler is created to support `Plug` command from vim-plug and `Plugin` command from vundle.
  */
-@ExCommand(command = "Plug[in]")
+@ExCommand(
+  command = "Plug[in]",
+  description = "Enable the IdeaVim extension named in quotes, using vim-plug syntax, e.g. Plug 'tpope/vim-surround'."
+)
 data class PlugCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

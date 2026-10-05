@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :tabonly"
  */
-@ExCommand(command = "tabo[nly]")
+@ExCommand(command = "tabo[nly]", description = "Close all editor tabs except the current one.")
 data class TabOnlyCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

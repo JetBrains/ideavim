@@ -20,7 +20,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 
-@ExCommand(command = "unm[ap],nun[map],vu[nmap],xu[nmap],sunm[ap],ou[nmap],iu[nmap],lu[nmap],cu[nmap]")
+@ExCommand(
+  command = "unm[ap],nun[map],vu[nmap],xu[nmap],sunm[ap],ou[nmap],iu[nmap],lu[nmap],cu[nmap]",
+  description = "Remove the mapping of {lhs} for the modes of the command. :unmap! removes it from Insert and Command-line modes."
+)
 data class UnMapCommand(val range: Range, val cmd: String, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

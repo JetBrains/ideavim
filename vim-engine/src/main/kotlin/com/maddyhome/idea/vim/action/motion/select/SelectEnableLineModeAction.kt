@@ -25,7 +25,11 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
  * @author Alex Plate
  */
 
-@CommandOrMotion(keys = ["gH"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["gH"],
+  modes = [Mode.NORMAL],
+  description = "Start Select mode linewise, selecting the current line."
+)
 class SelectEnableLineModeAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY

@@ -41,16 +41,32 @@ sealed class MotionUnmatchedAction(private val motionChar: Char) : MotionActionH
   }
 }
 
-@CommandOrMotion(keys = ["]}"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["]}"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Go to the [count]'th next unmatched '}'."
+)
 class MotionUnmatchedBraceCloseAction : MotionUnmatchedAction('}')
 
-@CommandOrMotion(keys = ["[{"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["[{"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Go to the [count]'th previous unmatched '{'."
+)
 class MotionUnmatchedBraceOpenAction : MotionUnmatchedAction('{')
 
-@CommandOrMotion(keys = ["])"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["])"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Go to the [count]'th next unmatched ')'."
+)
 class MotionUnmatchedParenCloseAction : MotionUnmatchedAction(')')
 
-@CommandOrMotion(keys = ["[("], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["[("],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Go to the [count]'th previous unmatched '('."
+)
 class MotionUnmatchedParenOpenAction : MotionUnmatchedAction('(')
 
 private fun moveCaretToUnmatchedBlock(editor: VimEditor, caret: ImmutableVimCaret, count: Int, type: Char): Int? {

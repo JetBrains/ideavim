@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.command.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-@CommandOrMotion(keys = ["d"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["d"],
+  modes = [Mode.NORMAL],
+  description = "Delete the text moved over by {motion} into register [x]."
+)
 class DeleteMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.DELETE
 

@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
-@CommandOrMotion(keys = ["<C-q>", "<C-v>"], modes = [Mode.NORMAL, Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["<C-q>", "<C-v>"],
+  modes = [Mode.NORMAL, Mode.VISUAL],
+  description = "Start blockwise Visual mode, or switch an active Visual mode to blockwise; stop Visual mode if it is already blockwise. Starts Select mode instead if 'selectmode' contains cmd."
+)
 class VisualToggleBlockModeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.MODE_CHANGE
 

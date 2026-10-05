@@ -18,7 +18,11 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
 // See `:help v_CTRL-O`
-@CommandOrMotion(keys = ["<C-O>"], modes = [Mode.SELECT, Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["<C-O>"],
+  modes = [Mode.SELECT, Mode.VISUAL],
+  description = "In Select mode, switch to Visual mode for the duration of one command, then return to Select mode."
+)
 class SelectToggleSingleVisualCommandAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 

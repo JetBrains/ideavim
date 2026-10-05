@@ -38,7 +38,7 @@ import kotlin.math.min
 /**
  * see "h :move"
  */
-@ExCommand(command = "m[ove]")
+@ExCommand(command = "m[ove]", description = "Move the lines in [range] to below line {address}.")
 data class MoveTextCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

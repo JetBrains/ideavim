@@ -18,7 +18,11 @@ import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
 /** `q/` — opens the command-line window over search history; `<CR>` searches forward. */
-@CommandOrMotion(keys = ["q/"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["q/"],
+  modes = [Mode.NORMAL],
+  description = "Open the command-line window over the search history; <CR> searches forward for the selected pattern."
+)
 class SearchHistoryForwardAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -34,7 +38,11 @@ class SearchHistoryForwardAction : VimActionHandler.SingleExecution() {
 }
 
 /** `q?` — opens the command-line window over search history; `<CR>` searches backward. */
-@CommandOrMotion(keys = ["q?"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["q?"],
+  modes = [Mode.NORMAL],
+  description = "Open the command-line window over the search history; <CR> searches backward for the selected pattern."
+)
 class SearchHistoryBackwardAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

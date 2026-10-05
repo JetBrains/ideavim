@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :argument"
  */
-@ExCommand(command = "argu[ment]")
+@ExCommand(command = "argu[ment]", description = "Go to the [count]th editor tab in the current window.")
 data class SelectFileCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

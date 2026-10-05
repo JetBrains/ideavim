@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.command.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-@CommandOrMotion(keys = ["gq"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["gq"],
+  modes = [Mode.NORMAL],
+  description = "Format the lines moved over by {motion} with the IDE's code formatter and wrap them at 'textwidth'."
+)
 class ReformatCodeMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.CHANGE
 

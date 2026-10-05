@@ -27,7 +27,11 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :!"
  */
-@ExCommand(command = "!", barSeparates = false)
+@ExCommand(
+  command = "!",
+  barSeparates = false,
+  description = "Execute {cmd} in the shell and show its output; with [range], filter those lines through {cmd}."
+)
 internal data class CmdFilterCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier) {
 

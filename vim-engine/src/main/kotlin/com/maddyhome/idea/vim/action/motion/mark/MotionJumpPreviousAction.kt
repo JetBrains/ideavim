@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 
-@CommandOrMotion(keys = ["<C-O>"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["<C-O>"],
+  modes = [Mode.NORMAL],
+  description = "Go to the [count]th older position in the jump list."
+)
 class MotionJumpPreviousAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,

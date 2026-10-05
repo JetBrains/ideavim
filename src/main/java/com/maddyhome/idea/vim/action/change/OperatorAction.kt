@@ -73,7 +73,11 @@ private fun doOperatorAction(
   }
 }
 
-@CommandOrMotion(keys = ["g@"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["g@"],
+  modes = [Mode.NORMAL],
+  description = "Call the function set with 'operatorfunc' on the text moved over by {motion}."
+)
 internal class OperatorAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
@@ -123,7 +127,11 @@ internal class OperatorAction : VimActionHandler.SingleExecution() {
   }
 }
 
-@CommandOrMotion(keys = ["g@"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["g@"],
+  modes = [Mode.VISUAL],
+  description = "Call the function set with 'operatorfunc' on the highlighted text."
+)
 internal class VisualOperatorAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 

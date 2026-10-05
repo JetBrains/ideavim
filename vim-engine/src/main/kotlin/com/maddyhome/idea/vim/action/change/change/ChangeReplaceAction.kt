@@ -17,7 +17,11 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-@CommandOrMotion(keys = ["R"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["R"],
+  modes = [Mode.NORMAL],
+  description = "Enter Replace mode, where each typed character replaces an existing one."
+)
 class ChangeReplaceAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.CHANGE
 

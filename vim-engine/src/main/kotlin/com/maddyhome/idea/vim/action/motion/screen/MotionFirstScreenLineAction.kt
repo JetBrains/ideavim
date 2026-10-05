@@ -54,8 +54,16 @@ abstract class MotionFirstScreenLineActionBase(private val operatorPending: Bool
   }
 }
 
-@CommandOrMotion(keys = ["H"], modes = [Mode.NORMAL, Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["H"],
+  modes = [Mode.NORMAL, Mode.VISUAL],
+  description = "Move to line [count] from the top of the window, on the first non-blank character. The cursor is adjusted for 'scrolloff'."
+)
 class MotionFirstScreenLineAction : MotionFirstScreenLineActionBase(false)
 
-@CommandOrMotion(keys = ["H"], modes = [Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["H"],
+  modes = [Mode.OP_PENDING],
+  description = "As an operator motion, move linewise to line [count] from the top of the window. 'scrolloff' is applied afterwards."
+)
 class MotionOpPendingFirstScreenLineAction : MotionFirstScreenLineActionBase(true)

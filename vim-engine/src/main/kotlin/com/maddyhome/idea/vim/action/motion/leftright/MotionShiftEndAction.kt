@@ -22,7 +22,11 @@ import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.state.mode.isInsertionAllowed
 
-@CommandOrMotion(keys = ["<S-End>"], modes = [Mode.INSERT, Mode.NORMAL, Mode.VISUAL, Mode.SELECT])
+@CommandOrMotion(
+  keys = ["<S-End>"],
+  modes = [Mode.INSERT, Mode.NORMAL, Mode.VISUAL, Mode.SELECT],
+  description = "Move to the end of the line, [count] - 1 lines downward. If 'keymodel' contains startsel, start or extend a selection."
+)
 class MotionShiftEndAction : ShiftedSpecialKeyHandler() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY

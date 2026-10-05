@@ -21,7 +21,10 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 /**
  * see "h :delfunction"
  */
-@ExCommand(command = "delf[unction]")
+@ExCommand(
+  command = "delf[unction]",
+  description = "Delete the user-defined function {name}. With [!], do not report an error if the function does not exist."
+)
 data class DelfunctionCommand(
   val range: Range,
   val scope: Scope?,

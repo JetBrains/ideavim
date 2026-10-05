@@ -13,7 +13,11 @@ import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.helper.CharacterHelper
 
-@CommandOrMotion(keys = ["<C-Right>", "<S-Right>"], modes = [Mode.CMD_LINE])
+@CommandOrMotion(
+  keys = ["<C-Right>", "<S-Right>"],
+  modes = [Mode.CMD_LINE],
+  description = "In Command-line mode, move the cursor one WORD right."
+)
 class MoveCaretToNextBigWordAction : CommandLineActionHandler() {
   override fun execute(commandLine: VimCommandLine): Boolean {
     // The docs say to move one WORD to the right, but in practice, we just move to the next whitespace character.

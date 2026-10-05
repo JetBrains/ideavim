@@ -25,7 +25,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  *
  * @author John Weigel
  */
-@ExCommand(command = "b[uffer]")
+@ExCommand(
+  command = "b[uffer]",
+  description = "Edit buffer [N], alternate buffer #, or the open file matching {name}; [!] ignores unsaved changes."
+)
 internal data class BufferCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier) {
 

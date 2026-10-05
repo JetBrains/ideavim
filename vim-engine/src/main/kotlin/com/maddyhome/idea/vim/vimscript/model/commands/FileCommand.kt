@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :file"
  */
-@ExCommand(command = "f[ile]")
+@ExCommand(command = "f[ile]", description = "Display the current file name, cursor position and file status.")
 data class FileCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

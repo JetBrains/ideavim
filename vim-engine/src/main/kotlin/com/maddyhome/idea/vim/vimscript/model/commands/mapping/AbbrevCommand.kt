@@ -21,7 +21,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 
-@ExCommand(command = "ab[breviate],ia[bbrev],ca[bbrev],norea[bbrev],inorea[bbrev],cnorea[bbrev]")
+@ExCommand(
+  command = "ab[breviate],ia[bbrev],ca[bbrev],norea[bbrev],inorea[bbrev],cnorea[bbrev]",
+  description = "Define abbreviation {lhs} for {rhs} in Insert and/or Command-line mode; the norea forms are not remapped. Without {rhs}, list matching abbreviations."
+)
 data class AbbrevCommand(val range: Range, val cmd: String, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

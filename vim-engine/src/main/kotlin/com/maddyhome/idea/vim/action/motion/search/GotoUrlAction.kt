@@ -24,7 +24,11 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  * the jump list or the `'` mark - Vim does not list `gx` under `:help jump-motions`, and recording a
  * jump at the unchanged caret position would only reset a pending `<C-O>`/`<C-I>` traversal.
  */
-@CommandOrMotion(keys = ["gx"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["gx"],
+  modes = [Mode.NORMAL],
+  description = "Open the URL under the cursor with the system's default handler, or with the program in g:netrw_browsex_viewer if it is set."
+)
 class GotoUrlAction : VimActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

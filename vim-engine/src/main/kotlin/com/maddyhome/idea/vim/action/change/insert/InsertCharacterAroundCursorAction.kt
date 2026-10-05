@@ -23,7 +23,11 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-@CommandOrMotion(keys = ["<C-Y>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<C-Y>"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, insert the character found above the cursor."
+)
 class InsertCharacterAboveCursorAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
@@ -44,7 +48,11 @@ class InsertCharacterAboveCursorAction : ChangeEditorActionHandler.SingleExecuti
   }
 }
 
-@CommandOrMotion(keys = ["<C-E>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<C-E>"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, insert the character found below the cursor."
+)
 class InsertCharacterBelowCursorAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.INSERT
 

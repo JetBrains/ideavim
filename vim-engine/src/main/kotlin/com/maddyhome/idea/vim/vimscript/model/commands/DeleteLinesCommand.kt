@@ -22,7 +22,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :delete"
  */
-@ExCommand(command = "d[elete]")
+@ExCommand(
+  command = "d[elete]",
+  description = "Delete the lines in [range] (default current line) into register [x]. A [count] deletes [count] lines starting with the last line in [range]."
+)
 data class DeleteLinesCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.ForEachCaret(range, modifier, argument) {
 

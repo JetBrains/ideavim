@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 /**
  * @author rasendubi
  */
-@CommandOrMotion(keys = ["<C-W>v", "<C-W><C-V>"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["<C-W>v", "<C-W><C-V>"],
+  modes = [Mode.NORMAL],
+  description = "Split the current window in two side by side, showing the same file."
+)
 class VerticalSplitAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-@CommandOrMotion(keys = ["ZQ"], modes = [Mode.NORMAL])
+@CommandOrMotion(keys = ["ZQ"], modes = [Mode.NORMAL], description = "Close the current editor tab, like :q!.")
 class FileCloseAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 

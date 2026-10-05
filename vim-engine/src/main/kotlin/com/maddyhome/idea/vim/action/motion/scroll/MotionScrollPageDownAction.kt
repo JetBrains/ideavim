@@ -39,7 +39,11 @@ import java.util.*
 // See https://github.com/vim/vim/issues/15107
 // Note that IdeaVim handles <S-Down> separately because it behaves differently based on 'keymodel'
 // TODO: Is there any way for IdeaVim to handle shift+numpadPlus?
-@CommandOrMotion(keys = ["<C-F>", "<PageDown>", "<S-Enter>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["<C-F>", "<PageDown>", "<S-Enter>"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Scroll the window [count] pages forwards (downwards) in the buffer."
+)
 class MotionScrollPageDownAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
@@ -56,7 +60,11 @@ class MotionScrollPageDownAction : VimActionHandler.SingleExecution() {
   }
 }
 
-@CommandOrMotion(keys = ["<PageDown>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<PageDown>"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, scroll the window [count] pages forwards (downwards) in the buffer."
+)
 class MotionScrollPageDownInsertModeAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY

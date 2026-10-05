@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.vimscript.model.Script
 
-@CommandOrMotion(keys = ["&"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["&"],
+  modes = [Mode.NORMAL],
+  description = "Repeat the last :substitute on the current line, without its flags."
+)
 class ChangeLastSearchReplaceAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 

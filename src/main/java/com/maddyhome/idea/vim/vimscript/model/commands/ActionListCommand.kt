@@ -22,7 +22,10 @@ import java.util.*
 /**
  * @author smartbomb
  */
-@ExCommand(command = "actionl[ist]")
+@ExCommand(
+  command = "actionl[ist]",
+  description = "List IDE action IDs and their shortcuts, keeping only lines that contain the optional search text."
+)
 internal data class ActionListCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier) {
 

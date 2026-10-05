@@ -20,7 +20,10 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 /**
  * see "h :execute"
  */
-@ExCommand(command = "exe[cute]")
+@ExCommand(
+  command = "exe[cute]",
+  description = "Evaluate each {expr} and execute the resulting string as an Ex command. Multiple arguments are joined with a space."
+)
 data class ExecuteCommand(val range: Range, val expressions: List<Expression>) :
   Command.SingleExecution(range, CommandModifier.NONE) {
 

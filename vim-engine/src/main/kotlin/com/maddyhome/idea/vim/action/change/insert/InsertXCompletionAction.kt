@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.state.mode.CtrlXCompletionMode
 import org.jetbrains.annotations.Contract
 
-@CommandOrMotion(keys = ["<C-X>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<C-X>"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, start CTRL-X completion; follow with CTRL-L for whole lines or CTRL-F for file names."
+)
 class InsertXCompletionAction : ChangeEditorActionHandler.SingleExecution() {
   @get:Contract(pure = true)
   override val type: Command.Type = Command.Type.MODE_CHANGE

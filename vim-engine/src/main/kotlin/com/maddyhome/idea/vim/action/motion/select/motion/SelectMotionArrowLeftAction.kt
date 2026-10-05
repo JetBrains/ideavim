@@ -28,7 +28,11 @@ import com.maddyhome.idea.vim.options.OptionConstants
  * @author Alex Plate
  */
 
-@CommandOrMotion(keys = ["<Left>"], modes = [Mode.SELECT])
+@CommandOrMotion(
+  keys = ["<Left>"],
+  modes = [Mode.SELECT],
+  description = "In Select mode, move [count] characters left, extending the selection. If 'keymodel' contains \"stopsel\", leave Select mode first."
+)
 class SelectMotionArrowLeftAction : MotionActionHandler.ForEachCaret() {
 
   override val motionType: MotionType = MotionType.EXCLUSIVE

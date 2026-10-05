@@ -17,7 +17,10 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
-@ExCommand(command = "au[tocmd]")
+@ExCommand(
+  command = "au[tocmd]",
+  description = "Register {cmd} to run when one of the comma-separated {event}s fires for a file matching {pat}. With [!], remove all registered autocommands."
+)
 data class AutoCmdCommand(
   val range: Range,
   val modifier: CommandModifier,

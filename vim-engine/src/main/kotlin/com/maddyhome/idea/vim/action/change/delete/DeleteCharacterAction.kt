@@ -18,13 +18,25 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-@CommandOrMotion(keys = ["<Del>"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["<Del>"],
+  modes = [Mode.NORMAL],
+  description = "Delete the character under the cursor into register [x]."
+)
 class DeleteCharacterAction : DeleteCharacter({ 1 })
 
-@CommandOrMotion(keys = ["X"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["X"],
+  modes = [Mode.NORMAL],
+  description = "Delete [count] characters before the cursor into register [x]."
+)
 class DeleteCharacterLeftAction : DeleteCharacter({ -it })
 
-@CommandOrMotion(keys = ["x"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["x"],
+  modes = [Mode.NORMAL],
+  description = "Delete [count] characters under and after the cursor into register [x]."
+)
 class DeleteCharacterRightAction : DeleteCharacter({ it })
 
 abstract class DeleteCharacter(private val countModifier: (Int) -> Int) : ChangeEditorActionHandler.ForEachCaret() {

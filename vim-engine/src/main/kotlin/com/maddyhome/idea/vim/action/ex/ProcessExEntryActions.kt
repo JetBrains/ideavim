@@ -27,7 +27,11 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import java.util.*
 
-@CommandOrMotion(keys = ["<CR>", "<C-M>", "<C-J>"], modes = [Mode.CMD_LINE])
+@CommandOrMotion(
+  keys = ["<CR>", "<C-M>", "<C-J>"],
+  modes = [Mode.CMD_LINE],
+  description = "In Command-line mode, execute the entered Ex command or search for the entered pattern."
+)
 class ProcessExEntryAction : MotionActionHandler.AmbiguousExecution() {
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_JUMP, CommandFlags.FLAG_END_EX)
   override var motionType: MotionType = MotionType.EXCLUSIVE
@@ -46,7 +50,11 @@ class ProcessExEntryAction : MotionActionHandler.AmbiguousExecution() {
  * Unlike [ProcessExEntryAction], these deliberately do not carry [CommandFlags.FLAG_END_EX]: the command line stays
  * open and the search is not executed. They simply move the incsearch "current match" highlight and caret preview.
  */
-@CommandOrMotion(keys = ["<C-G>"], modes = [Mode.CMD_LINE])
+@CommandOrMotion(
+  keys = ["<C-G>"],
+  modes = [Mode.CMD_LINE],
+  description = "While entering a search pattern with 'incsearch', move to the next match."
+)
 class SearchAgainNextActionCommandLine : MotionActionHandler.SingleExecution() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
@@ -61,7 +69,11 @@ class SearchAgainNextActionCommandLine : MotionActionHandler.SingleExecution() {
   }
 }
 
-@CommandOrMotion(keys = ["<C-T>"], modes = [Mode.CMD_LINE])
+@CommandOrMotion(
+  keys = ["<C-T>"],
+  modes = [Mode.CMD_LINE],
+  description = "While entering a search pattern with 'incsearch', move to the previous match."
+)
 class SearchAgainPreviousActionCommandLine : MotionActionHandler.SingleExecution() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 

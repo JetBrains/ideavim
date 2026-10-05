@@ -22,7 +22,11 @@ import com.maddyhome.idea.vim.state.mode.inBlockSelection
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["o"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["o"],
+  modes = [Mode.VISUAL],
+  description = "Move the cursor to the other end of the selection."
+)
 class VisualSwapEndsAction : VimActionHandler.ForEachCaret() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
@@ -39,7 +43,11 @@ class VisualSwapEndsAction : VimActionHandler.ForEachCaret() {
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["O"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["O"],
+  modes = [Mode.VISUAL],
+  description = "Move the cursor to the other end of the selection. In Visual block mode, move to the other corner in the same line."
+)
 class VisualSwapEndsBlockAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY

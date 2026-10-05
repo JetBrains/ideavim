@@ -31,7 +31,11 @@ import javax.swing.KeyStroke
  * The converted literal character is re-injected through the key handler so that it is processed as typed input in
  * Insert mode (handled by the change group).
  */
-@CommandOrMotion(keys = ["<C-V>", "<C-Q>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<C-V>", "<C-Q>"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, insert the next non-digit character literally, or a character by its decimal, octal or hex code."
+)
 class InsertCompletedLiteralAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
@@ -62,7 +66,11 @@ class InsertCompletedLiteralAction : VimActionHandler.SingleExecution() {
  * commands (e.g., [LeaveCommandLineAction]). Other characters use [VimCommandLine.handleKey] so that overwrite mode is
  * handled correctly.
  */
-@CommandOrMotion(keys = ["<C-V>", "<C-Q>"], modes = [Mode.CMD_LINE])
+@CommandOrMotion(
+  keys = ["<C-V>", "<C-Q>"],
+  modes = [Mode.CMD_LINE],
+  description = "In Command-line mode, insert the next non-digit character literally, or a character by its decimal, octal or hex code."
+)
 class CmdLineCompletedLiteralAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
   override val argumentType: Argument.Type = Argument.Type.CHARACTER

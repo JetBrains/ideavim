@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-@CommandOrMotion(keys = ["a"], modes = [Mode.NORMAL])
+@CommandOrMotion(keys = ["a"], modes = [Mode.NORMAL], description = "Append text after the cursor [count] times.")
 class InsertAfterCursorAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.MODE_CHANGE
 

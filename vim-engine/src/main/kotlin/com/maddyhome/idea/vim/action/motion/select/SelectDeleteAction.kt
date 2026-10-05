@@ -19,13 +19,21 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-@CommandOrMotion(keys = ["<DEL>"], modes = [Mode.SELECT])
+@CommandOrMotion(
+  keys = ["<DEL>"],
+  modes = [Mode.SELECT],
+  description = "In Select mode, delete the selected text and leave Select mode."
+)
 class SelectDeleteAction : SelectDeleteBackspaceActionBase() {
   override val keyStroke: KeyStroke
     get() = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)
 }
 
-@CommandOrMotion(keys = ["<BS>"], modes = [Mode.SELECT])
+@CommandOrMotion(
+  keys = ["<BS>"],
+  modes = [Mode.SELECT],
+  description = "In Select mode, delete the selected text and leave Select mode."
+)
 class SelectBackspaceAction : SelectDeleteBackspaceActionBase() {
   override val keyStroke: KeyStroke
     get() = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)

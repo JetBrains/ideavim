@@ -30,7 +30,11 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
  *
  * For blockwise Visual mode, it initiates insert at the start of block on each line in the selection
  */
-@CommandOrMotion(keys = ["I"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["I"],
+  modes = [Mode.VISUAL],
+  description = "In Visual block mode, insert the same text before the block on every line. Otherwise insert at the start of the selection."
+)
 class VisualInsertAction : VisualOperatorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 

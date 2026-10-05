@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-@CommandOrMotion(keys = ["g?"], modes = [Mode.NORMAL])
+@CommandOrMotion(keys = ["g?"], modes = [Mode.NORMAL], description = "Rot13-encode the text moved over by {motion}.")
 class ChangeRot13MotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.CHANGE
 

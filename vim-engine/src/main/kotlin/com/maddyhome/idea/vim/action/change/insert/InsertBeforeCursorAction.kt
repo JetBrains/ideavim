@@ -18,7 +18,11 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import org.jetbrains.annotations.Contract
 
-@CommandOrMotion(keys = ["i", "<Insert>"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["i", "<Insert>"],
+  modes = [Mode.NORMAL],
+  description = "Insert text before the cursor [count] times."
+)
 class InsertBeforeCursorAction : ChangeEditorActionHandler.SingleExecution() {
   @get:Contract(pure = true)
   override val type: Command.Type = Command.Type.MODE_CHANGE

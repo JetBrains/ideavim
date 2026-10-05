@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.state.KeyHandlerState
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["r"], modes = [Mode.VISUAL])
+@CommandOrMotion(keys = ["r"], modes = [Mode.VISUAL], description = "Replace every highlighted character with {char}.")
 class ChangeVisualCharacterAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
   override val argumentType: Argument.Type = Argument.Type.CHARACTER

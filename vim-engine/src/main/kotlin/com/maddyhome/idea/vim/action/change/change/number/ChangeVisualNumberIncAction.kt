@@ -39,14 +39,30 @@ sealed class IncNumber(val inc: Int, private val avalanche: Boolean) : VisualOpe
   }
 }
 
-@CommandOrMotion(keys = ["<C-A>"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["<C-A>"],
+  modes = [Mode.VISUAL],
+  description = "Add [count] to the numbers in the highlighted text."
+)
 class ChangeVisualNumberIncAction : IncNumber(1, false)
 
-@CommandOrMotion(keys = ["<C-X>"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["<C-X>"],
+  modes = [Mode.VISUAL],
+  description = "Subtract [count] from the numbers in the highlighted text."
+)
 class ChangeVisualNumberDecAction : IncNumber(-1, false)
 
-@CommandOrMotion(keys = ["g<C-A>"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["g<C-A>"],
+  modes = [Mode.VISUAL],
+  description = "Add [count] to the first highlighted number, 2 times [count] to the next, and so on."
+)
 class ChangeVisualNumberAvalancheIncAction : IncNumber(1, true)
 
-@CommandOrMotion(keys = ["g<C-X>"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["g<C-X>"],
+  modes = [Mode.VISUAL],
+  description = "Subtract [count] from the first highlighted number, 2 times [count] from the next, and so on."
+)
 class ChangeVisualNumberAvalancheDecAction : IncNumber(-1, true)

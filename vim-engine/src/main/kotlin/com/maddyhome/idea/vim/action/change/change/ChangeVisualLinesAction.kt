@@ -29,7 +29,11 @@ import java.util.EnumSet
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["R", "S"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["R", "S"],
+  modes = [Mode.VISUAL],
+  description = "Delete the highlighted lines into register [x] and start Insert mode."
+)
 class ChangeVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 

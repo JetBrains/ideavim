@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-@CommandOrMotion(keys = ["<Insert>"], modes = [Mode.INSERT])
+@CommandOrMotion(keys = ["<Insert>"], modes = [Mode.INSERT], description = "Toggle between Insert and Replace mode.")
 class InsertInsertAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 

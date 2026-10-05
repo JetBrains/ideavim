@@ -23,7 +23,11 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  * Typically, an IDE does not need to redraw the screen - it's editor handles scrolling, etc. However, it can be
  * necessary to clear the status line.
  */
-@CommandOrMotion(keys = ["<C-L>"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["<C-L>"],
+  modes = [Mode.NORMAL],
+  description = "Clear and redraw the screen, also clearing the status line."
+)
 internal class RedrawAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

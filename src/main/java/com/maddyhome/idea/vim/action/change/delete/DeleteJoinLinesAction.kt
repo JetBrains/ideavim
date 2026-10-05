@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.newapi.ijOptions
 
-@CommandOrMotion(keys = ["gJ"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["gJ"],
+  modes = [Mode.NORMAL],
+  description = "Join [count] lines (at least two) without inserting or removing any spaces."
+)
 class DeleteJoinLinesAction : ChangeEditorActionHandler.ConditionalSingleExecution() {
   override val type: Command.Type = Command.Type.DELETE
   override fun runAsMulticaret(

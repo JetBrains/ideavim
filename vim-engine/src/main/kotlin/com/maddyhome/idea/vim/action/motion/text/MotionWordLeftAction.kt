@@ -23,7 +23,11 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-@CommandOrMotion(keys = ["b"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["b"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Move [count] words backward."
+)
 class MotionWordLeftAction : MotionActionHandler.ForEachCaret() {
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
@@ -39,7 +43,11 @@ class MotionWordLeftAction : MotionActionHandler.ForEachCaret() {
   }
 }
 
-@CommandOrMotion(keys = ["<C-Left>", "<C-kLeft>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<C-Left>", "<C-kLeft>"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, move the cursor [count] words backward."
+)
 class MotionWordLeftInsertAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 

@@ -19,7 +19,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :tabnext"
  */
-@ExCommand(command = "tabn[ext]")
+@ExCommand(
+  command = "tabn[ext]",
+  description = "Go to the next editor tab, wrapping around at the last one. With {N}, go to tab {N} (first tab is 1)."
+)
 data class NextTabCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

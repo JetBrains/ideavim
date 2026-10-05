@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * Command that is used for disabling plugins. E.g. `:PlugDisable [plugin-name]`
  */
-@ExCommand(command = "PlugDisable")
+@ExCommand(command = "PlugDisable", description = "Disable the IdeaVim extension {name}.")
 class PlugDisable(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

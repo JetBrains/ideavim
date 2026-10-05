@@ -20,7 +20,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :startreplace"
  */
-@ExCommand(command = "startr[eplace]")
+@ExCommand(
+  command = "startr[eplace]",
+  description = "Start Replace mode, as with R. With [!], start at the end of the line."
+)
 data class StartReplaceCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

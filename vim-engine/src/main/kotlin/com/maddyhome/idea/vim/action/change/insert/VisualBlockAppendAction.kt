@@ -22,7 +22,11 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["A"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["A"],
+  modes = [Mode.VISUAL],
+  description = "In Visual block mode, append the same text after the block on every line. Otherwise append at the end of the line."
+)
 class VisualBlockAppendAction : VisualOperatorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 

@@ -52,10 +52,18 @@ abstract class MotionNonShiftedArrowRightBaseAction() : NonShiftedSpecialKeyHand
 }
 
 // Note that Select mode is handled with [SelectMotionArrowRightAction]
-@CommandOrMotion(keys = ["<Right>", "<kRight>"], modes = [Mode.NORMAL, Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["<Right>", "<kRight>"],
+  modes = [Mode.NORMAL, Mode.VISUAL],
+  description = "Move [count] characters to the right. Wrap to the next line if 'whichwrap' contains >."
+)
 class MotionArrowRightAction : MotionNonShiftedArrowRightBaseAction()
 
-@CommandOrMotion(keys = ["<Right>", "<kRight>"], modes = [Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["<Right>", "<kRight>"],
+  modes = [Mode.OP_PENDING],
+  description = "As an operator motion, move [count] characters to the right. The end-of-line character is included when wrapping via 'whichwrap'."
+)
 class MotionArrowRightOpPendingAction : MotionNonShiftedArrowRightBaseAction() {
   // When the motion is used with an operator, the EOL character is counted.
   // This allows e.g., `d<Right>` to delete the last character in a line. Note that we can't use editor.isEndAllowed to
@@ -65,7 +73,11 @@ class MotionArrowRightOpPendingAction : MotionNonShiftedArrowRightBaseAction() {
 }
 
 // Just needs to be a plain motion handler - it's not shifted, and the non-shifted actions don't apply in Insert mode
-@CommandOrMotion(keys = ["<Right>", "<kRight>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<Right>", "<kRight>"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, move the cursor one character to the right. Wrap to the next line if 'whichwrap' contains ]."
+)
 class MotionArrowRightInsertModeAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 

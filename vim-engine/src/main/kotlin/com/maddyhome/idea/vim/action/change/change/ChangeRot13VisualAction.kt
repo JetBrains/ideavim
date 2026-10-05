@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["g?"], modes = [Mode.VISUAL])
+@CommandOrMotion(keys = ["g?"], modes = [Mode.VISUAL], description = "Rot13-encode the highlighted text.")
 class ChangeRot13VisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 

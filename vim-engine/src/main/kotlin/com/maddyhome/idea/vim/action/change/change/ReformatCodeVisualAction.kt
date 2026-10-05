@@ -24,7 +24,11 @@ import java.util.EnumSet
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["gq"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["gq"],
+  modes = [Mode.VISUAL],
+  description = "Format the highlighted lines with the IDE's code formatter and wrap them at 'textwidth'."
+)
 class ReformatCodeVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 

@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :comclear"
  */
-@ExCommand(command = "comc[lear]")
+@ExCommand(command = "comc[lear]", description = "Delete all user-defined commands.")
 data class CmdClearCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

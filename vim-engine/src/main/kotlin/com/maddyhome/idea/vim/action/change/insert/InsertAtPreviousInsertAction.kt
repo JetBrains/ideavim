@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.handler.Motion
 
-@CommandOrMotion(keys = ["gi"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["gi"],
+  modes = [Mode.NORMAL],
+  description = "Insert text at the position where Insert mode was last exited (the '^ mark)."
+)
 class InsertAtPreviousInsertAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 

@@ -18,7 +18,11 @@ import com.maddyhome.idea.vim.api.moveToMotion
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
 
-@CommandOrMotion(keys = ["<S-Left>"], modes = [Mode.INSERT, Mode.NORMAL, Mode.VISUAL, Mode.SELECT])
+@CommandOrMotion(
+  keys = ["<S-Left>"],
+  modes = [Mode.INSERT, Mode.NORMAL, Mode.VISUAL, Mode.SELECT],
+  description = "Move [count] words backward. If 'keymodel' contains startsel, start or extend a selection [count] characters to the left instead."
+)
 class MotionShiftArrowLeftAction : ShiftedArrowKeyHandler(true) {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY

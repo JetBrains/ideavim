@@ -21,7 +21,7 @@ import kotlin.math.min
 /**
  * see "h :goto"
  */
-@ExCommand(command = "go[to]")
+@ExCommand(command = "go[to]", description = "Go to byte [count] in the file, default the first character.")
 data class GotoCharacterCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.ForEachCaret(range, modifier, argument) {
 

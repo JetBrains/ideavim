@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :tags"
  */
-@ExCommand(command = "tags")
+@ExCommand(command = "tags", description = "Show the contents of the tag stack. The current entry is marked with >.")
 data class TagsCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

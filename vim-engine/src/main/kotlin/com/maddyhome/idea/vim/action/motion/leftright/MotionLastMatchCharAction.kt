@@ -19,10 +19,18 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 
-@CommandOrMotion(keys = [";"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = [";"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Repeat the latest f, t, F or T [count] times."
+)
 class MotionLastMatchCharAction : MotionLastMatchCharActionBase(MotionType.INCLUSIVE, reverse = false)
 
-@CommandOrMotion(keys = [","], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = [","],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Repeat the latest f, t, F or T [count] times in the opposite direction."
+)
 class MotionLastMatchCharReverseAction : MotionLastMatchCharActionBase(MotionType.EXCLUSIVE, reverse = true)
 
 sealed class MotionLastMatchCharActionBase(defaultMotionType: MotionType, private val reverse: Boolean) :

@@ -22,7 +22,11 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import java.util.*
 
-@CommandOrMotion(keys = ["'"], modes = [Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["'"],
+  modes = [Mode.VISUAL, Mode.OP_PENDING],
+  description = "Jump to the first non-blank character of the line containing mark {mark}."
+)
 class MotionGotoFileMarkLineAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
   override val argumentType: Argument.Type = Argument.Type.MARK
@@ -42,7 +46,11 @@ class MotionGotoFileMarkLineAction : MotionActionHandler.ForEachCaret() {
   }
 }
 
-@CommandOrMotion(keys = ["g'"], modes = [Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["g'"],
+  modes = [Mode.VISUAL, Mode.OP_PENDING],
+  description = "Jump to the first non-blank character of the line containing mark {mark} without changing the jump list."
+)
 class MotionGotoFileMarkLineNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 

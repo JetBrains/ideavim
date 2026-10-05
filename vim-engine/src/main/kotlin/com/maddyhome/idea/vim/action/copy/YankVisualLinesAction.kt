@@ -26,7 +26,11 @@ import java.util.*
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["Y"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["Y"],
+  modes = [Mode.VISUAL],
+  description = "Yank the highlighted lines into register [x]. In Visual block mode, yank the highlighted block."
+)
 class YankVisualLinesAction : VisualOperatorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.COPY
 

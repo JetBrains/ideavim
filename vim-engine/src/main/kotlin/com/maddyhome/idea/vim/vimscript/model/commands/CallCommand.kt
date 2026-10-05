@@ -22,7 +22,10 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.NamedFunctionCallExpre
 /**
  * see "h :call"
  */
-@ExCommand(command = "cal[l]")
+@ExCommand(
+  command = "cal[l]",
+  description = "Call the function {name} with the given arguments and discard the result, optionally for a [range] of lines."
+)
 class CallCommand(val range: Range, val functionCall: Expression) :
   Command.SingleExecution(range, CommandModifier.NONE) {
 

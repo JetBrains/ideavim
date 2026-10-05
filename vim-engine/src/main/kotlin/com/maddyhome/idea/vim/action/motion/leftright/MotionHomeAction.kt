@@ -21,7 +21,11 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
 
-@CommandOrMotion(keys = ["<Home>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.SELECT])
+@CommandOrMotion(
+  keys = ["<Home>"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.SELECT],
+  description = "Move to the first character of the line. In Visual and Select mode, 'keymodel' decides whether the selection is stopped."
+)
 class MotionHomeAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 

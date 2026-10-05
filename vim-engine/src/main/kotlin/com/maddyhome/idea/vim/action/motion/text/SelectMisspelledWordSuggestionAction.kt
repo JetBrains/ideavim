@@ -20,7 +20,11 @@ import com.maddyhome.idea.vim.command.Command.Type
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-@CommandOrMotion(keys = ["z="], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["z="],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Show spelling suggestions for the word under the cursor and replace it with the chosen one."
+)
 class SelectMisspelledWordSuggestionAction : VimActionHandler.ForEachCaret() {
 
   override fun execute(

@@ -20,7 +20,11 @@ import com.maddyhome.idea.vim.command.Command.Type
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-@CommandOrMotion(keys = ["zg"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["zg"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Add the word under the cursor to the IDE's spelling dictionary as a good word."
+)
 class AddMisspelledWordAction : VimActionHandler.ForEachCaret() {
 
   override fun execute(

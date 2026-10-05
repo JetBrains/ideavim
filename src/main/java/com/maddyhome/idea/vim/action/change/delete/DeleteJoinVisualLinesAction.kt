@@ -22,7 +22,11 @@ import com.maddyhome.idea.vim.newapi.ijOptions
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["gJ"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["gJ"],
+  modes = [Mode.VISUAL],
+  description = "Join the highlighted lines without inserting or removing any spaces."
+)
 class DeleteJoinVisualLinesAction : VisualOperatorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.DELETE
 

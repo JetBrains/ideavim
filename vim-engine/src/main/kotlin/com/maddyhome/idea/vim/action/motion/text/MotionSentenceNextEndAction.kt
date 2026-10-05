@@ -25,10 +25,18 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-@CommandOrMotion(keys = ["g)"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["g)"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Move forward to the end of the [count]'th sentence."
+)
 class MotionSentenceNextEndAction : MotionSentenceEndAction(Direction.FORWARDS)
 
-@CommandOrMotion(keys = ["g("], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["g("],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Move backward to the end of the [count]'th previous sentence."
+)
 class MotionSentencePreviousEndAction : MotionSentenceEndAction(Direction.BACKWARDS)
 
 sealed class MotionSentenceEndAction(val direction: Direction) : MotionActionHandler.ForEachCaret() {

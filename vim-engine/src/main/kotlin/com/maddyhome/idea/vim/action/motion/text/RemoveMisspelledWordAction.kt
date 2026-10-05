@@ -20,7 +20,11 @@ import com.maddyhome.idea.vim.command.Command.Type
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-@CommandOrMotion(keys = ["zw"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["zw"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Remove the word under the cursor from the IDE's spelling dictionary."
+)
 class RemoveMisspelledWordAction : VimActionHandler.ForEachCaret() {
 
   override fun execute(

@@ -21,7 +21,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :@"
  */
-@ExCommand(command = "@")
+@ExCommand(
+  command = "@",
+  description = "Execute the contents of {register} as an Ex command at [line]. :@: repeats the last command line and :@@ repeats the previous :@."
+)
 data class RepeatCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.ForEachCaret(range, modifier, argument) {
 

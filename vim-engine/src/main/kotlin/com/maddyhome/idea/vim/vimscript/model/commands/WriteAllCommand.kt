@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :wall"
  */
-@ExCommand(command = "wa[ll]")
+@ExCommand(command = "wa[ll]", description = "Save all modified files.")
 data class WriteAllCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 
