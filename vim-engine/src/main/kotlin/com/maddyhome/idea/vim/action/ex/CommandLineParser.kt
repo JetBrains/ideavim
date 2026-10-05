@@ -16,6 +16,8 @@ package com.maddyhome.idea.vim.action.ex
  *    (e.g. `:vs` -> complete to `:vsplit`).
  *  - [ArgumentCompletionContext]: a command name plus a separator has been typed,
  *    so completion targets the argument (e.g. `:edit foo` -> complete file paths).
+ *  - [ActionIdCompletionContext]: the command line ends with an unclosed `<Action>(`,
+ *    so completion targets an IDE action ID (e.g. `:nmap x <Action>(Ref` -> `ReformatCode`).
  */
 internal sealed interface CommandLineCompletionContext {
   val completionStart: Int
@@ -32,7 +34,17 @@ internal data class ArgumentCompletionContext(
   override val completionStart: Int,
 ) : CommandLineCompletionContext
 
+internal data class ActionIdCompletionContext(
+  val prefix: String,
+  override val completionStart: Int,
+) : CommandLineCompletionContext
+
+/** An unclosed `<Action>(` at the end of the command line. Key notation is case-insensitive, like `<action>(` */
+private val ACTION_NOTATION_REGEX = Regex("<action>\\(([^()\\s]*)$", RegexOption.IGNORE_CASE)
+
 internal fun parseCommandLineForCompletion(text: String): CommandLineCompletionContext? {
+  parseActionNotationContext(text)?.let { return it }
+
   val trimmed = text.trimStart()
   if (trimmed.isEmpty()) return null
 
@@ -44,6 +56,12 @@ internal fun parseCommandLineForCompletion(text: String): CommandLineCompletionC
   } else {
     parseArgumentContext(trimmed, commandName, leadingSpacesLength)
   }
+}
+
+private fun parseActionNotationContext(text: String): ActionIdCompletionContext? {
+  val match = ACTION_NOTATION_REGEX.find(text) ?: return null
+  val prefix = match.groups[1] ?: return null
+  return ActionIdCompletionContext(prefix.value, prefix.range.first)
 }
 
 private fun isCommandNameOnly(trimmed: String, commandName: String): Boolean =

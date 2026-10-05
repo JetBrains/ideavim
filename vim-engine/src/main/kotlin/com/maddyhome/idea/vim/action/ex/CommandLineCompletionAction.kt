@@ -131,6 +131,7 @@ private fun findMatches(
   return when (parsed) {
     is CommandNameCompletionContext -> findCommandNameMatches(parsed)
     is ArgumentCompletionContext -> findArgumentMatches(parsed, editor, context)
+    is ActionIdCompletionContext -> completeActionId(parsed.prefix)
   }
 }
 
@@ -146,6 +147,7 @@ private fun findArgumentMatches(
   val fullCommandName = injector.vimscriptParser.exCommands.getFullCommandName(parsed.commandName) ?: return null
   return when (CommandCompletionTypes.getCompletionType(fullCommandName)) {
     CommandLineCompletionType.FILE -> completeFileName(parsed, editor, context)
+    CommandLineCompletionType.ACTION -> completeActionId(parsed.argumentPrefix)
     CommandLineCompletionType.NONE -> null
   }
 }
@@ -160,6 +162,15 @@ private fun completeFileName(
     argument = expandPercent(parsed.argumentPrefix, editor)
   }
   return injector.file.listFilesForCompletion(argument, context)
+}
+
+/**
+ * Action IDs are matched case-insensitively, so `:action reformat` finds `ReformatCode`.
+ */
+private fun completeActionId(prefix: String): List<String> {
+  return injector.actionExecutor.getActionIdList("")
+    .filter { it.startsWith(prefix, ignoreCase = true) }
+    .sortedWith(String.CASE_INSENSITIVE_ORDER)
 }
 
 
