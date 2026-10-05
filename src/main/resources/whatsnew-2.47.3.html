@@ -1,0 +1,541 @@
+<!--
+  ~ Copyright 2003-2026 The IdeaVim authors
+  ~
+  ~ Use of this source code is governed by an MIT-style
+  ~ license that can be found in the LICENSE.txt file or at
+  ~ https://opensource.org/licenses/MIT.
+  -->
+
+<!doctype html>
+<html data-theme="__THEME__" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <title>What's New in IdeaVim __VERSION__</title>
+  <style>
+      /* Light theme (default). The IDE theme is injected as data-theme on <html>;
+         prefers-color-scheme is the fallback when the page is viewed standalone. */
+      :root {
+          --bg: #eceef1;
+          --term-bg: #ffffff;
+          --titlebar: #e3e6ea;
+          --border: #d7dbe0;
+          --fg: #1a1c1f;
+          --fg-dim: #5b6168;
+          --prompt: #067d17; /* green prompt */
+          --accent: #871094; /* magenta */
+          --link: #0033b3;
+          --key: #0d6efd;
+          --string: #067d17;
+          --comment: #8c8c8c;
+          --code-bg: #f4f5f7;
+          --code-border: #e3e6ea;
+          --dot1: #ff5f56;
+          --dot2: #ffbd2e;
+          --dot3: #27c93f;
+          --shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+      }
+
+      :root[data-theme="dark"] {
+          --bg: #131417;
+          --term-bg: #1e1f22;
+          --titlebar: #2b2d30;
+          --border: #393b40;
+          --fg: #dfe1e5;
+          --fg-dim: #9aa0a6;
+          --prompt: #57965c;
+          --accent: #c77dbb;
+          --link: #56a8f5;
+          --key: #2aacb8;
+          --string: #6aab73;
+          --comment: #7a7e85;
+          --code-bg: #16171a;
+          --code-border: #393b40;
+          --dot1: #ff5f56;
+          --dot2: #ffbd2e;
+          --dot3: #27c93f;
+          --shadow: 0 12px 48px rgba(0, 0, 0, 0.55);
+      }
+
+      @media (prefers-color-scheme: dark) {
+          :root:not([data-theme="light"]) {
+              --bg: #131417;
+              --term-bg: #1e1f22;
+              --titlebar: #2b2d30;
+              --border: #393b40;
+              --fg: #dfe1e5;
+              --fg-dim: #9aa0a6;
+              --prompt: #57965c;
+              --accent: #c77dbb;
+              --link: #56a8f5;
+              --key: #2aacb8;
+              --string: #6aab73;
+              --comment: #7a7e85;
+              --code-bg: #16171a;
+              --code-border: #393b40;
+              --dot1: #ff5f56;
+              --dot2: #ffbd2e;
+              --dot3: #27c93f;
+              --shadow: 0 12px 48px rgba(0, 0, 0, 0.55);
+          }
+      }
+
+      * {
+          box-sizing: border-box;
+      }
+
+      body {
+          margin: 0;
+          background: var(--bg);
+          color: var(--fg);
+          font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+          font-size: 14.5px;
+          line-height: 1.7;
+          -webkit-font-smoothing: antialiased;
+          padding: 32px 16px 64px;
+      }
+
+      /* Terminal window -------------------------------------------------- */
+      .term {
+          max-width: 760px;
+          margin: 0 auto;
+          background: var(--term-bg);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          box-shadow: var(--shadow);
+          overflow: hidden;
+      }
+
+      .titlebar {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 11px 14px;
+          background: var(--titlebar);
+          border-bottom: 1px solid var(--border);
+      }
+
+      .dot {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+      }
+
+      .dot.r {
+          background: var(--dot1);
+      }
+
+      .dot.y {
+          background: var(--dot2);
+      }
+
+      .dot.g {
+          background: var(--dot3);
+      }
+
+      .titlebar .title {
+          flex: 1 1 auto;
+          text-align: center;
+          font-size: 12.5px;
+          color: var(--fg-dim);
+          margin-right: 44px; /* balance the dots */
+      }
+
+      .body {
+          padding: 26px 30px 30px;
+      }
+
+      /* The intro "command" --------------------------------------------- */
+      .runline {
+          margin: 0 0 6px;
+      }
+
+      .runline .p {
+          color: var(--prompt);
+          font-weight: 700;
+      }
+
+      .runline .cmd {
+          color: var(--fg);
+      }
+
+      .runline .flag {
+          color: var(--key);
+      }
+
+      .out {
+          color: var(--fg-dim);
+          margin: 0 0 28px;
+      }
+
+      .out .v {
+          color: var(--accent);
+          font-weight: 700;
+      }
+
+      /* Blog content ----------------------------------------------------- */
+      h2 {
+          font-size: 17px;
+          font-weight: 700;
+          margin: 0px 0 4px;
+          color: var(--fg);
+          letter-spacing: -0.01em;
+      }
+
+      h2::before {
+          content: "❯ ";
+          color: var(--prompt);
+          font-weight: 700;
+      }
+
+      .kicker {
+          font-size: 12px;
+          color: var(--accent);
+          text-transform: lowercase;
+          letter-spacing: 0.04em;
+          margin: 0 0 10px;
+      }
+
+      .kicker::before {
+          content: "# ";
+          color: var(--comment);
+      }
+
+      p {
+          margin: 0 0 14px;
+      }
+
+      p.note {
+          color: var(--fg-dim);
+      }
+
+      .section {
+          margin-bottom: 30px;
+      }
+
+      .section + .section {
+          border-top: 1px dashed var(--border);
+          padding-top: 4px;
+      }
+
+      /* Inline tokens ---------------------------------------------------- */
+      code, kbd {
+          font-family: inherit;
+          font-size: 13px;
+          background: var(--code-bg);
+          border: 1px solid var(--code-border);
+          border-radius: 5px;
+          padding: 1px 6px;
+          white-space: nowrap;
+      }
+
+      kbd {
+          color: var(--key);
+      }
+
+      code {
+          color: var(--accent);
+      }
+
+      /* Terminal output / code blocks ----------------------------------- */
+      pre {
+          background: var(--code-bg);
+          border: 1px solid var(--code-border);
+          border-radius: 8px;
+          padding: 14px 16px;
+          margin: 0 0 14px;
+          overflow-x: auto;
+          line-height: 1.7;
+          font-size: 13px;
+      }
+
+      pre .cm {
+          color: var(--comment);
+      }
+
+      pre .str {
+          color: var(--string);
+      }
+
+      pre .key {
+          color: var(--key);
+      }
+
+      pre .p {
+          color: var(--prompt);
+      }
+
+      /* "Also worth a look" grid ---------------------------------------- */
+      .grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 14px;
+          margin-top: 6px;
+      }
+
+      @media (max-width: 560px) {
+          .grid {
+              grid-template-columns: 1fr;
+          }
+      }
+
+      .mini {
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          padding: 14px 16px;
+      }
+
+      .mini h3 {
+          margin: 0 0 6px;
+          font-size: 14px;
+      }
+
+      .mini h3::before {
+          content: "$ ";
+          color: var(--prompt);
+      }
+
+      .mini p {
+          margin: 0;
+          font-size: 13px;
+          color: var(--fg-dim);
+      }
+
+      /* Fixes list ------------------------------------------------------- */
+      ul {
+          margin: 4px 0 0;
+          padding: 0;
+          list-style: none;
+      }
+
+      li {
+          margin-bottom: 8px;
+          color: var(--fg-dim);
+          padding-left: 1.6em;
+          text-indent: -1.6em;
+      }
+
+      li::before {
+          content: "+ ";
+          color: var(--prompt);
+          font-weight: 700;
+      }
+
+      li strong {
+          color: var(--fg);
+          font-weight: 700;
+      }
+
+      /* Footer prompt ---------------------------------------------------- */
+      footer {
+          margin-top: 34px;
+          padding-top: 18px;
+          border-top: 1px solid var(--border);
+          color: var(--fg-dim);
+          font-size: 13px;
+      }
+
+      footer .p {
+          color: var(--prompt);
+          font-weight: 700;
+      }
+
+      footer a {
+          color: var(--link);
+          text-decoration: none;
+      }
+
+      footer a:hover {
+          text-decoration: underline;
+      }
+
+      .caret {
+          display: inline-block;
+          width: 0.6em;
+          height: 1.05em;
+          background: var(--fg);
+          vertical-align: text-bottom;
+          animation: blink 1.1s steps(1) infinite;
+      }
+
+      @keyframes blink {
+          50% {
+              background: transparent;
+          }
+      }
+  </style>
+</head>
+<body>
+
+<div class="term">
+  <div class="titlebar">
+    <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+    <span class="title">ideavim — whats-new — 80×24</span>
+  </div>
+
+  <div class="body">
+    <p class="runline"><span class="p">~ $</span> <span class="cmd">ideavim</span>
+    </p>
+    <p class="out">Here's what landed in <span class="v">__VERSION__</span>.</p>
+
+    <!-- YankRing — the star -->
+    <div class="section">
+      <p class="kicker">new plugin · yank history</p>
+      <h2>YankRing — every yank you make is kept</h2>
+      <p>The bundled <strong>YankRing</strong> extension keeps a history of everything you yank, delete or
+        change. Right after a paste, <kbd>&lt;C-P&gt;</kbd> and <kbd>&lt;C-N&gt;</kbd> swap the pasted text for
+        the previous or next entry in the ring — so you can reach for something you copied a few yanks ago
+        without going back for it. It works after <kbd>p</kbd>, <kbd>P</kbd>, <kbd>gp</kbd>, <kbd>gP</kbd> and
+        the <code>]p</code> / <code>[p</code> / <code>]P</code> / <code>[P</code> variants.</p>
+      <pre><span class="str">Plug 'YankRing.vim'</span>
+
+<span class="cm">" right after pasting, cycle the paste through your yank history</span>
+<span class="key">&lt;C-P&gt;</span>   <span class="cm">" replace it with the previous entry</span>
+<span class="key">&lt;C-N&gt;</span>   <span class="cm">" ... or the next one</span>
+
+:YRShow        <span class="cm">" list the ring</span>
+:YRClear       <span class="cm">" empty it</span>
+:YRReplace 3   <span class="cm">" cycle by an explicit offset</span>
+<span class="str">let g:yankring_max_history = 100</span>   <span class="cm">" how many entries to keep</span></pre>
+    </div>
+
+    <!-- modeless selection -->
+    <div class="section">
+      <p class="kicker">mouse · selection</p>
+      <h2>Select with the mouse where Vim doesn't own it</h2>
+      <p>For the modes your <code>'mouse'</code> option leaves out, dragging with the left button now makes a
+        <strong>modeless selection</strong>: the text is selected so you can copy it, but the caret stays put,
+        Visual mode doesn't start, and operators won't act on it. It disappears as soon as you type a command
+        or start another selection.</p>
+      <pre><span class="str">set mouse=n</span>   <span class="cm">" Vim handles the mouse in Normal mode only —</span>
+              <span class="cm">" a drag anywhere else just selects text</span></pre>
+      <p class="note">Turning the mouse off for a mode no longer takes the IDE's mouse features with it: the
+        context menu, gutter clicks, middle-click paste and <kbd>Ctrl</kbd>/<kbd>Alt</kbd>/<kbd>Shift</kbd>
+        gestures keep working, since only a plain left-button click over text is Vim's to interpret.</p>
+    </div>
+
+    <!-- CurSearch -->
+    <div class="section">
+      <p class="kicker">search · highlighting</p>
+      <h2>See which match you're actually on</h2>
+      <p>The match under the caret is now highlighted differently from all the others. After <code>/lorem</code>
+        or <kbd>n</kbd>, the match you land on is drawn with a box around it while the rest keep the plain
+        search highlight, and the box follows you as you move between matches. Previously only the
+        <code>'incsearch'</code> preview looked like that, so once the search was accepted every match became
+        indistinguishable.</p>
+      <pre><span class="str">set hlsearch</span>
+<span class="key">/lorem</span>   <span class="cm">" the match you land on gets the box; n and N move it</span></pre>
+    </div>
+
+    <!-- :stopinsert -->
+    <div class="section">
+      <p class="kicker">ex commands · autocommands</p>
+      <h2>Always come back to Normal mode</h2>
+      <p>The new <code>:stopinsert</code> command leaves Insert or Replace mode as if you had pressed
+        <kbd>Esc</kbd>, and does nothing in any other mode. It is meant for an autocommand, which is Vim's
+        answer to "put me back in Normal mode whenever I switch files".</p>
+      <pre><span class="str">autocmd BufEnter * stopinsert</span>   <span class="cm">" back to Normal mode on every file you open</span></pre>
+      <p class="note">Leaving Insert mode is now something a handler has to ask for: the buffer and window
+        events no longer end an insert session merely because you registered an autocommand for them.</p>
+    </div>
+
+    <!-- Also worth a look -->
+    <div class="section">
+      <p class="kicker">also worth a look</p>
+      <div class="grid">
+        <div class="mini">
+          <h3>sethandler on the command line</h3>
+          <p>The new <code>c</code> mode letter says who owns a shortcut while the <kbd>:</kbd> command line is
+            active. <code>sethandler &lt;F2&gt; a:ide c:vim</code> gives it to the IDE everywhere except there,
+            which keeps a <code>cnoremap &lt;F2&gt; …</code> mapping working.</p>
+        </div>
+        <div class="mini">
+          <h3>macOS key repeat, any time</h3>
+          <p>"Enable repeating keys in macOS on press and hold" is now a checkbox in Settings | Editor | Vim,
+            instead of a one-time question the first time IdeaVim started. macOS reads it at startup, so the IDE
+            asks to restart.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Polish & fixes -->
+    <div class="section">
+      <p class="kicker">polish &amp; fixes</p>
+      <ul>
+        <li><strong>Backspace in Replace mode brings the text back</strong> — Vim remembers what each typed
+          character replaced, so <kbd>R</kbd>, <code>mushroom</code> and eight backspaces leave the original
+          word exactly as it was. <kbd>&lt;C-W&gt;</kbd> restores the characters it steps over too, rather than
+          deleting the word.
+        </li>
+        <li><strong>"Reformat on paste: None" is respected</strong> — a linewise paste no longer reindents the
+          pasted lines when you've turned that Smart Keys setting off, so <code>yyp</code> repeats the line as
+          it was written.
+        </li>
+        <li><strong><code>&lt;CR&gt;</code> survives <code>:execute</code></strong> —
+          <code>:exe "normal! iX\&lt;CR&gt;Y"</code> used to type only <code>X</code>; the Enter key now reaches
+          <code>:normal</code>, and a register built the same way (<code>let @q = "iX\&lt;CR&gt;Y\&lt;Esc&gt;"</code>)
+          inserts both lines.
+        </li>
+        <li><strong><code>:normal</code> gives your mode back</strong> — run from an autocommand while you are
+          typing, it executes its keys as Normal mode commands and returns you to Insert mode instead of
+          dropping you out of it.
+        </li>
+        <li><strong>Paragraph motions and the blank line between</strong> — <code>d}</code> no longer swallows
+          the blank line that separates two paragraphs, <code>y}</code> no longer yanks a trailing new line, and
+          <code>d}</code> / <code>y}</code> on the very first character of the file are linewise again.
+        </li>
+        <li><strong>Word motions at the end of the file</strong> — <code>dw</code>, <code>dW</code> and
+          <code>de</code> on the last character of a file now delete it instead of doing nothing.
+        </li>
+        <li><strong>Motions across writing systems</strong> — a WORD is any run of non-blanks, so <kbd>E</kbd>
+          on <code>abcあいう def</code> lands on <code>う</code>; and non-ASCII punctuation ends a word, so
+          <kbd>w</kbd> on <code>foo—bar</code> stops at the em dash.
+        </li>
+        <li><strong>Sentences and quotes</strong> — <code>)</code> no longer lands past the end of a file that
+          ends with a new line, <code>da"</code> treats a tab after the closing quote as trailing white space,
+          and a count for the inner quote object works (<code>d2i"</code> takes the quotes themselves).
+        </li>
+        <li><strong>Counting matches with <code>:s</code></strong> — the <code>n</code> flag now only reports
+          how many matches there are (<code>:%s/foo/bar/n</code> → <code>2 matches on 2 lines</code>) and leaves
+          your text alone. A backslash delimiter no longer fails either: <code>:s\/new/</code> reuses the last
+          search pattern.
+        </li>
+        <li><strong>Regex corners</strong> — <code>\zs</code> and <code>\ze</code> in an alternative that
+          ultimately fails no longer move the match, a look-behind with alternatives of different lengths keeps
+          trying (<code>\%(a\|ab\)\@&lt;=c</code> matches in <code>abc</code>), and <code>\c</code> no longer
+          makes <code>[[:upper:]]</code> match lowercase.
+        </li>
+        <li><strong>A clean slate on startup</strong> — with <code>'hlsearch'</code> on, projects no longer
+          open with the previous session's search still highlighted.
+        </li>
+        <li><strong>Clipboard registers keep their type on Linux</strong> — a linewise yank stays linewise in
+          the <code>*</code> and <code>+</code> registers, so <code>yy</code> then <code>"*p</code> pastes on a
+          new line. And with <code>clipboard=unnamed</code>, pasting no longer overwrites the very register it
+          pasted from.
+        </li>
+        <li><strong>Vim in a console started from a file</strong> — a Python console launched with "Run file in
+          Python Console" is now recognised, so Normal mode, motions and <kbd>Esc</kbd> work in its input.
+        </li>
+        <li><strong>Autocommands ignore internal editors</strong> — the command-line window, the
+          <code>:substitute</code> preview and the control characters editor are an implementation detail, so
+          <code>autocmd BufEnter * …</code> no longer fires when one of them opens.
+        </li>
+        <li><strong>"See What's New" works in split mode</strong> — the release notes page now opens as
+          expected in the frontend/backend architecture used by remote development.
+        </li>
+      </ul>
+    </div>
+
+    <footer>
+      <p><span class="p">~ $</span> # thanks for using IdeaVim — happy editing<span class="caret"></span></p>
+      <p>
+        <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">full-changelog</a> ·
+        <a href="https://youtrack.jetbrains.com/issues/VIM">report-an-issue</a> ·
+        <a href="https://jb.gg/ideavim-eap">join-the-eap</a>
+      </p>
+    </footer>
+  </div>
+</div>
+
+</body>
+</html>
