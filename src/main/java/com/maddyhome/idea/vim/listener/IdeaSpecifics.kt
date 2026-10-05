@@ -21,6 +21,7 @@ import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.codeInsight.template.impl.TemplateState
 import com.intellij.find.FindModelListener
 import com.intellij.ide.actions.ApplyIntentionAction
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
@@ -35,9 +36,13 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.RangeMarker
 import com.intellij.openapi.editor.actions.EnterAction
+import com.intellij.openapi.editor.event.CaretEvent
+import com.intellij.openapi.editor.event.CaretListener
+import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.keymap.KeymapManager
 import com.intellij.openapi.project.DumbAwareToggleAction
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.TextRange
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
@@ -90,6 +95,8 @@ internal object IdeaSpecifics {
       "com.intellij.codeInsight.generation.surroundWith.SurroundWithHandler\$InvokeSurrounderAction"
     private var editor: Editor? = null
     private var completionData: CompletionData? = null
+    private var editorStateBeforeAction: EditorState? = null
+    private val caretNormalizer = CaretNormalizer()
 
     override fun beforeActionPerformed(action: AnAction, event: AnActionEvent) {
       if (VimPlugin.isNotEnabled()) return
@@ -98,6 +105,7 @@ internal object IdeaSpecifics {
       if (hostEditor != null) {
         editor = hostEditor
       }
+      editorStateBeforeAction = editor?.let { EditorState(it) }
 
       // Remember the mode before the action runs, while it is still correct. For 'idearefactormode' = "keep" the mode
       // must be preserved across the template's selection churn; VimTemplateManagerListener restores this value in
@@ -215,7 +223,11 @@ internal object IdeaSpecifics {
       // perpetually mismatched, so every subsequent Ctrl+Z is spent restoring the caret and the text is never reverted
       // (VIM-4287). Vim's own `u` is unaffected because it calls UndoManager directly with that registry flag forced on.
       if (!isVimAction(action) && !isUndoRedoAction(ActionManager.getInstance().getId(action))) {
-        normalizeCarets(editor)
+        if (editor != null && isAwaitingBackend(action, editor)) {
+          caretNormalizer.normalizeAfterNextCaretMove(editor)
+        } else {
+          caretNormalizer.normalize(editor)
+        }
       }
 
       this.editor = null
@@ -226,21 +238,22 @@ internal object IdeaSpecifics {
 
     private fun isVimAction(action: AnAction): Boolean = (action as? AnActionWrapper)?.delegate is VimShortcutKeyAction
 
-    private fun normalizeCarets(editor: Editor?) {
-      editor?.let { ij ->
-        if (!ij.vimInitialised) return@let
-        val vimEditor = ij.vim
-        if (vimEditor.isEndAllowed) {
-          return
-        }
-        for (caret in ij.caretModel.allCarets) {
-          val normalized = vimEditor.normalizeOffset(caret.offset, false)
-          if (normalized != caret.offset) {
-            caret.moveToOffset(normalized)
-          }
-        }
+    /**
+     * Rider and remote development frontends (JetBrains Client) replace some actions (e.g. `CommentByLineComment` for
+     * C#) with ones that just send a request to the backend, whose changes arrive later. Such an action might still run
+     * on the frontend instead, in which case it has already changed the editor.
+     */
+    private fun isAwaitingBackend(action: AnAction, editor: Editor): Boolean =
+      action.isPossiblyDelegatingToBackend() && editorStateBeforeAction?.isUnchangedIn(editor) == true
+
+    // The interface belongs to the remote development client, which is not available at compile time
+    private fun AnAction.isPossiblyDelegatingToBackend(): Boolean =
+      javaClass.implementsInterface("com.jetbrains.rd.ui.actions.PossiblyDelegatingToBackendAction")
+
+    private fun Class<*>.implementsInterface(name: String): Boolean =
+      generateSequence(this) { it.superclass }.any { cls ->
+        cls.interfaces.any { it.name == name || it.implementsInterface(name) }
       }
-    }
 
     private fun isGotoAction(actionId: String?): Boolean =
       actionId == IdeActions.ACTION_GOTO_BACK || actionId == IdeActions.ACTION_GOTO_FORWARD
@@ -256,6 +269,63 @@ internal object IdeaSpecifics {
         ?: project?.let { FileEditorManager.getInstance(it).selectedTextEditor }
       if (currentEditor != null && !currentEditor.isIdeaVimDisabledHere) {
         injector.jumpService.saveJumpLocation(currentEditor.vim)
+      }
+    }
+
+    private class EditorState(editor: Editor) {
+      private val documentStamp = editor.document.modificationStamp
+      private val caretOffset = editor.caretModel.offset
+
+      fun isUnchangedIn(editor: Editor): Boolean =
+        editor.document.modificationStamp == documentStamp && editor.caretModel.offset == caretOffset
+    }
+
+    /**
+     * IDE actions might leave the caret on the line break, which is not a valid position in Normal mode (VIM-4245).
+     */
+    private class CaretNormalizer {
+      private var pendingNormalization: Disposable? = null
+
+      fun normalize(editor: Editor?) {
+        if (editor == null || !editor.vimInitialised) return
+        val vimEditor = editor.vim
+        if (vimEditor.isEndAllowed) return
+
+        for (caret in editor.caretModel.allCarets) {
+          val normalized = vimEditor.normalizeOffset(caret.offset, false)
+          if (normalized != caret.offset) {
+            caret.moveToOffset(normalized)
+          }
+        }
+      }
+
+      /**
+       * Waits for the caret move made by the backend before normalizing (VIM-4336).
+       *
+       * Moving the caret while the backend request is pending would undo the backend's caret move. The frontend treats
+       * our move as a user change made in the meantime, and replays it on top of the backend's changes once they
+       * arrive. E.g. repeated `CommentByLineComment` would keep the caret on the just commented line.
+       */
+      fun normalizeAfterNextCaretMove(editor: Editor) {
+        cancelPendingNormalization()
+        val disposable = Disposer.newDisposable("IdeaVim caret normalization after backend action")
+        EditorUtil.disposeWithEditor(editor, disposable)
+        pendingNormalization = disposable
+        editor.caretModel.addCaretListener(object : CaretListener {
+          override fun caretPositionChanged(event: CaretEvent) {
+            cancelPendingNormalization()
+            // The backend's changes are applied together, and a caret move made while they're being applied might not
+            // be sent to the backend
+            ApplicationManager.getApplication().invokeLater({
+              if (VimPlugin.isEnabled()) normalize(editor)
+            }, { editor.isDisposed })
+          }
+        }, disposable)
+      }
+
+      private fun cancelPendingNormalization() {
+        pendingNormalization?.let { Disposer.dispose(it) }
+        pendingNormalization = null
       }
     }
 
