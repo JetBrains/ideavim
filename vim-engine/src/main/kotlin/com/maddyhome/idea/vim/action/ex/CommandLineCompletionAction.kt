@@ -20,7 +20,11 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 
-@CommandOrMotion(keys = ["<Tab>"], modes = [Mode.CMD_LINE])
+@CommandOrMotion(
+  keys = ["<Tab>"],
+  modes = [Mode.CMD_LINE],
+  description = "In Command-line mode, complete the Ex command name or file name before the cursor. Repeat to cycle through the matches."
+)
 class CommandLineCompletionAction : CommandLineActionHandler() {
   override fun execute(
     commandLine: VimCommandLine,
@@ -36,7 +40,11 @@ class CommandLineCompletionAction : CommandLineActionHandler() {
   }
 }
 
-@CommandOrMotion(keys = ["<S-Tab>"], modes = [Mode.CMD_LINE])
+@CommandOrMotion(
+  keys = ["<S-Tab>"],
+  modes = [Mode.CMD_LINE],
+  description = "In Command-line mode, complete the Ex command name or file name before the cursor, cycling through the matches backwards."
+)
 class CommandLineCompletionBackwardAction : CommandLineActionHandler() {
   override fun execute(
     commandLine: VimCommandLine,

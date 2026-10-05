@@ -21,7 +21,11 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  * @author Alex Plate
  */
 
-@CommandOrMotion(keys = ["<C-G>"], modes = [Mode.VISUAL, Mode.SELECT])
+@CommandOrMotion(
+  keys = ["<C-G>"],
+  modes = [Mode.VISUAL, Mode.SELECT],
+  description = "Toggle between Visual mode and Select mode."
+)
 class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY

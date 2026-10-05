@@ -20,7 +20,11 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 
-@CommandOrMotion(keys = ["<BS>", "<C-H>"], modes = [Mode.NORMAL, Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["<BS>", "<C-H>"],
+  modes = [Mode.NORMAL, Mode.VISUAL],
+  description = "Move [count] characters to the left. Wrap to the previous line if 'whichwrap' contains b."
+)
 open class MotionBackspaceAction(private val allowPastEnd: Boolean = false) : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
@@ -40,5 +44,9 @@ open class MotionBackspaceAction(private val allowPastEnd: Boolean = false) : Mo
 // This allows e.g., `d<BS>` to delete the end of line character on the previous line when wrap is active
 // ('whichwrap' contains "b")
 // See `:help whichwrap`. This says a delete or change operator, but it appears to apply to all operators
-@CommandOrMotion(keys = ["<BS>", "<C-H>"], modes = [Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["<BS>", "<C-H>"],
+  modes = [Mode.OP_PENDING],
+  description = "As an operator motion, move [count] characters to the left. The end-of-line character is included when wrapping via 'whichwrap'."
+)
 class MotionBackspaceOpPendingModeAction : MotionBackspaceAction(allowPastEnd = true)

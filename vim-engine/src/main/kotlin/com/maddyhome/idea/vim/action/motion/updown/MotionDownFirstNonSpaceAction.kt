@@ -21,7 +21,11 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 
-@CommandOrMotion(keys = ["+", "<C-M>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["+", "<C-M>"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Move [count] lines downward, to the first non-blank character, linewise."
+)
 class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
@@ -37,7 +41,11 @@ class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
 }
 
 // FIXME I should not exist (see class above)
-@CommandOrMotion(keys = ["<CR>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["<CR>"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Move [count] lines downward, to the first non-blank character. In a live template, jump to the next template variable."
+)
 class EnterNormalAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 

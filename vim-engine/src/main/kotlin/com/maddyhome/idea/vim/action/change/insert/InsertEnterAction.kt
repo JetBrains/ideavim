@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-@CommandOrMotion(keys = ["<CR>", "<C-M>", "<C-J>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<CR>", "<C-M>", "<C-J>"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, begin a new line."
+)
 class InsertEnterAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)

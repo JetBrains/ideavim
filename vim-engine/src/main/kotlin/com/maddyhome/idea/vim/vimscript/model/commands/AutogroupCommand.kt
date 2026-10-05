@@ -16,7 +16,10 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
-@ExCommand(command = "aug[roup]")
+@ExCommand(
+  command = "aug[roup]",
+  description = "Start the autocommand group {name} for the following :autocmd commands; END returns to the default group. With [!], clear group {name}."
+)
 data class AutogroupCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

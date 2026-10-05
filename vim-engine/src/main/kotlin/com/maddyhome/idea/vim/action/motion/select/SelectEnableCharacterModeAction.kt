@@ -24,7 +24,11 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
  * @author Alex Plate
  */
 
-@CommandOrMotion(keys = ["gh"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["gh"],
+  modes = [Mode.NORMAL],
+  description = "Start Select mode characterwise, selecting the character under the cursor."
+)
 class SelectEnableCharacterModeAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY

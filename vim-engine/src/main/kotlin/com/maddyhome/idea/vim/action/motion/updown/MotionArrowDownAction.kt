@@ -20,7 +20,11 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 
-@CommandOrMotion(keys = ["<Down>", "<kDown>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.SELECT, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["<Down>", "<kDown>"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.SELECT, Mode.OP_PENDING],
+  description = "Move [count] lines downward, linewise. Leaves Select or Visual mode first if 'keymodel' contains \"stopsel\"."
+)
 class MotionArrowDownAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.LINE_WISE
   override val keepFold: Boolean = true

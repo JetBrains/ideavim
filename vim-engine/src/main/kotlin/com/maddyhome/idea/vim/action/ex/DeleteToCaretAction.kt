@@ -12,7 +12,11 @@ import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.VimCommandLine
 
-@CommandOrMotion(keys = ["<C-U>"], modes = [Mode.CMD_LINE])
+@CommandOrMotion(
+  keys = ["<C-U>"],
+  modes = [Mode.CMD_LINE],
+  description = "In Command-line mode, delete all text between the start of the line and the cursor."
+)
 class DeleteToCaretAction : CommandLineActionHandler() {
   override fun execute(commandLine: VimCommandLine): Boolean {
     val caretOffset = commandLine.caret.offset

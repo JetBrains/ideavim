@@ -22,7 +22,11 @@ import com.maddyhome.idea.vim.undo.VimKeyBasedUndoService
 import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 import java.util.*
 
-@CommandOrMotion(keys = ["<C-G>u"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<C-G>u"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, close the current undo step and start a new one."
+)
 class BreakUndoSequenceAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_UNDO_AWARE)

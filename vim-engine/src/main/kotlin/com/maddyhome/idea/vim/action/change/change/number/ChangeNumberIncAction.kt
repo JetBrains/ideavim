@@ -32,8 +32,16 @@ sealed class IncAction(val inc: Int) : ChangeEditorActionHandler.ForEachCaret() 
   }
 }
 
-@CommandOrMotion(keys = ["<C-A>"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["<C-A>"],
+  modes = [Mode.NORMAL],
+  description = "Add [count] to the number or alphabetic character at or after the cursor."
+)
 class ChangeNumberIncAction : IncAction(1)
 
-@CommandOrMotion(keys = ["<C-X>"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["<C-X>"],
+  modes = [Mode.NORMAL],
+  description = "Subtract [count] from the number or alphabetic character at or after the cursor."
+)
 class ChangeNumberDecAction : IncAction(-1)

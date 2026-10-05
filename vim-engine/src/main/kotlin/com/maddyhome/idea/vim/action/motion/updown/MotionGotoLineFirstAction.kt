@@ -25,7 +25,11 @@ import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-@CommandOrMotion(keys = ["gg", "<C-Home>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["gg", "<C-Home>"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Go to line [count], default the first line. The cursor goes to the first non-blank character unless 'startofline' is off."
+)
 class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
   override val keepFold: Boolean = true
@@ -44,7 +48,11 @@ class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
   }
 }
 
-@CommandOrMotion(keys = ["<C-Home>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<C-Home>"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, move the cursor to the start of line [count], default the first line."
+)
 class MotionGotoLineFirstInsertAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 

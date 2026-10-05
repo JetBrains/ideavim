@@ -21,7 +21,11 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 
-@CommandOrMotion(keys = ["<Space>"], modes = [Mode.NORMAL, Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["<Space>"],
+  modes = [Mode.NORMAL, Mode.VISUAL],
+  description = "Move [count] characters to the right. Wrap to the next line if 'whichwrap' contains s."
+)
 open class MotionSpaceAction(private val allowPastEnd: Boolean = false) : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
@@ -37,5 +41,9 @@ open class MotionSpaceAction(private val allowPastEnd: Boolean = false) : Motion
   override val motionType: MotionType = MotionType.EXCLUSIVE
 }
 
-@CommandOrMotion(keys = ["<Space>"], modes = [Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["<Space>"],
+  modes = [Mode.OP_PENDING],
+  description = "As an operator motion, move [count] characters to the right. The end-of-line character is included when wrapping via 'whichwrap'."
+)
 class MotionSpaceOpPendingModeAction : MotionSpaceAction(allowPastEnd = true)

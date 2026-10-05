@@ -17,7 +17,11 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-@CommandOrMotion(keys = ["<C-H>", "<BS>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<C-H>", "<BS>"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, delete the character before the cursor. In Replace mode, restore the original character."
+)
 internal class InsertBackspaceAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_WRITABLE
 

@@ -19,7 +19,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :bdelete"
  */
-@ExCommand(command = "bd[elete]")
+@ExCommand(
+  command = "bd[elete]",
+  description = "Close the current file's editor tab, or the file with buffer number [N] if given."
+)
 data class BufferCloseCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

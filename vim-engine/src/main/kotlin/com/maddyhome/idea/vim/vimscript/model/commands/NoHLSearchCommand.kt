@@ -18,7 +18,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :nohlsearch"
  */
-@ExCommand(command = "noh[lsearch]")
+@ExCommand(
+  command = "noh[lsearch]",
+  description = "Stop highlighting matches of the last search pattern until the next search."
+)
 data class NoHLSearchCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

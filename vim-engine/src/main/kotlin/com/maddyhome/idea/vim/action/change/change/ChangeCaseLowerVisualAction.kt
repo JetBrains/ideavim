@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
  * While 'v_gu' is not explicitly documented in Vim help, we treat these commands as identical
  * based on observed behavior, without examining Vim's source code.
  */
-@CommandOrMotion(keys = ["u", "gu"], modes = [Mode.VISUAL])
+@CommandOrMotion(keys = ["u", "gu"], modes = [Mode.VISUAL], description = "Make the highlighted text lowercase.")
 class ChangeCaseLowerVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 

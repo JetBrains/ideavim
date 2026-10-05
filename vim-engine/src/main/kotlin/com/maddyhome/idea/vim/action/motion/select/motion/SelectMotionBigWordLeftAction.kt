@@ -20,7 +20,11 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 
-@CommandOrMotion(keys = ["<C-Left>"], modes = [Mode.SELECT])
+@CommandOrMotion(
+  keys = ["<C-Left>"],
+  modes = [Mode.SELECT],
+  description = "In Select mode, move [count] WORDS backward, extending the selection."
+)
 class SelectMotionBigWordLeftAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,

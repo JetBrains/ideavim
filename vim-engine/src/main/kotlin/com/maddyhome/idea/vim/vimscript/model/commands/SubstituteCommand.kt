@@ -19,8 +19,15 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :substitute"
  */
-@ExCommand(command = "~,&")
-@ExCommand(command = "s[ubstitute]", delimitedSections = 2)
+@ExCommand(
+  command = "~,&",
+  description = "Repeat the last :substitute in [range] lines. :& uses the same search pattern, :~ uses the last used search pattern. [&] keeps the flags."
+)
+@ExCommand(
+  command = "s[ubstitute]",
+  delimitedSections = 2,
+  description = "Substitute {pattern} with {string} in [range] lines, using [flags] (e.g. g for all matches, i to ignore case, c to confirm)."
+)
 data class SubstituteCommand(val range: Range, val argument: String, val command: String) :
   Command.SingleExecution(range, CommandModifier.NONE, argument) {
 

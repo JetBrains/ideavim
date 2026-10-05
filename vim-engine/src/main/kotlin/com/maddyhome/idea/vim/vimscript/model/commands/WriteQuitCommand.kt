@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :exit"
  */
-@ExCommand(command = "wq,x[it],exi[t]")
+@ExCommand(command = "wq,x[it],exi[t]", description = "Save the current file and close its editor.")
 data class WriteQuitCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

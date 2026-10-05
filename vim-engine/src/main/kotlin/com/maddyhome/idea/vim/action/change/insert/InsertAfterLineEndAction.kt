@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-@CommandOrMotion(keys = ["A"], modes = [Mode.NORMAL])
+@CommandOrMotion(keys = ["A"], modes = [Mode.NORMAL], description = "Append text at the end of the line [count] times.")
 class InsertAfterLineEndAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.MODE_CHANGE
 

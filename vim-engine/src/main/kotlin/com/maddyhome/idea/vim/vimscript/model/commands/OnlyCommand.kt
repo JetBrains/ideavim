@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :only"
  */
-@ExCommand(command = "on[ly]")
+@ExCommand(command = "on[ly]", description = "Close all editor windows (splits) except the current one.")
 data class OnlyCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

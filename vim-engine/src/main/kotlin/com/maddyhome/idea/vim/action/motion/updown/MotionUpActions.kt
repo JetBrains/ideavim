@@ -21,7 +21,11 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 
-@CommandOrMotion(keys = ["k"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["k"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Move [count] lines up (linewise)."
+)
 open class MotionUpAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
   override val keepFold: Boolean = true
@@ -37,7 +41,11 @@ open class MotionUpAction : MotionActionHandler.ForEachCaret() {
   }
 }
 
-@CommandOrMotion(keys = ["<C-P>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["<C-P>"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Move [count] lines up (linewise). With a completion popup open, select the previous item in the popup instead."
+)
 class MotionUpCtrlPAction : MotionUpAction() {
   override fun getOffset(
     editor: VimEditor,
@@ -59,7 +67,11 @@ class MotionUpCtrlPAction : MotionUpAction() {
   }
 }
 
-@CommandOrMotion(keys = ["gk", "g<Up>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["gk", "g<Up>"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Move [count] display lines up (exclusive motion)."
+)
 class MotionUpNotLineWiseAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 

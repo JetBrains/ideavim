@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 /**
  * @author rasendubi
  */
-@CommandOrMotion(keys = ["<C-W>c", "<C-W>q"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["<C-W>c", "<C-W>q"],
+  modes = [Mode.NORMAL],
+  description = "Close the current window (editor split)."
+)
 class CloseWindowAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

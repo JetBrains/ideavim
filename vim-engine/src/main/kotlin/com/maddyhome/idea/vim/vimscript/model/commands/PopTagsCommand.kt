@@ -20,7 +20,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :pop"
  */
-@ExCommand(command = "po[p]")
+@ExCommand(
+  command = "po[p]",
+  description = "Jump [count] entries back (older) in the tag stack, returning to where the tag jump was made."
+)
 data class PopTagsCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

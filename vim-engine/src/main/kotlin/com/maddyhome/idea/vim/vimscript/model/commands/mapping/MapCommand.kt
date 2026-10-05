@@ -35,7 +35,10 @@ import javax.swing.KeyStroke
 /**
  * @author vlan
  */
-@ExCommand(command = "map,nm[ap],vm[ap],xm[ap],smap,om[ap],im[ap],lm[ap],cm[ap],nn[oremap],vn[oremap],xn[oremap],snor[emap],ono[remap],no[remap],ino[remap],ln[oremap],cno[remap]")
+@ExCommand(
+  command = "map,nm[ap],vm[ap],xm[ap],smap,om[ap],im[ap],lm[ap],cm[ap],nn[oremap],vn[oremap],xn[oremap],snor[emap],ono[remap],no[remap],ino[remap],ln[oremap],cno[remap]",
+  description = "Map key sequence {lhs} to {rhs} in the modes of the command. The nore forms are not remapped. With only {lhs}, or nothing, list matching mappings."
+)
 data class MapCommand(val range: Range, val cmd: String, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

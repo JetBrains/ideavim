@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["y"], modes = [Mode.VISUAL])
+@CommandOrMotion(keys = ["y"], modes = [Mode.VISUAL], description = "Yank the highlighted text into register [x].")
 class YankVisualAction : VisualOperatorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.COPY
 

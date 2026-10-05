@@ -88,7 +88,11 @@ sealed class PutVisualTextBaseAction(
       injector.registerGroup.isPrimaryRegisterSupported()
 }
 
-@CommandOrMotion(keys = ["P"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["P"],
+  modes = [Mode.VISUAL],
+  description = "Replace the highlighted text with the contents of register [x], without changing the unnamed register."
+)
 class PutVisualTextBeforeCursorAction : PutVisualTextBaseAction(
   insertTextBeforeCaret = true,
   indent = true,
@@ -96,17 +100,37 @@ class PutVisualTextBeforeCursorAction : PutVisualTextBaseAction(
   modifyRegister = false
 )
 
-@CommandOrMotion(keys = ["p"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["p"],
+  modes = [Mode.VISUAL],
+  description = "Replace the highlighted text with the contents of register [x]. The replaced text is stored in the unnamed register."
+)
 class PutVisualTextAfterCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = false, indent = true, caretAfterInsertedText = false)
 
-@CommandOrMotion(keys = ["]P", "[P"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["]P", "[P"],
+  modes = [Mode.VISUAL],
+  description = "Replace the highlighted text with the contents of register [x], adjusting the indent to the current line."
+)
 class PutVisualTextBeforeCursorNoIndentAction : PutVisualTextBaseAction(insertTextBeforeCaret = true, indent = false, caretAfterInsertedText = false)
 
-@CommandOrMotion(keys = ["[p", "]p"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["[p", "]p"],
+  modes = [Mode.VISUAL],
+  description = "Replace the highlighted text with the contents of register [x], adjusting the indent to the current line."
+)
 class PutVisualTextAfterCursorNoIndentAction : PutVisualTextBaseAction(insertTextBeforeCaret = false, indent = false, caretAfterInsertedText = false)
 
-@CommandOrMotion(keys = ["gP"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["gP"],
+  modes = [Mode.VISUAL],
+  description = "Replace the highlighted text with the contents of register [x] and leave the cursor just after the new text."
+)
 class PutVisualTextBeforeCursorMoveCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = true)
 
-@CommandOrMotion(keys = ["gp"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["gp"],
+  modes = [Mode.VISUAL],
+  description = "Replace the highlighted text with the contents of register [x] and leave the cursor just after the new text."
+)
 class PutVisualTextAfterCursorMoveCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = false, indent = true, caretAfterInsertedText = true)

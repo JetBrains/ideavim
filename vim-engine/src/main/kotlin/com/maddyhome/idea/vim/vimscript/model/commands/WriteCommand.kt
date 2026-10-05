@@ -21,7 +21,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :write"
  */
-@ExCommand(command = "w[rite]")
+@ExCommand(
+  command = "w[rite]",
+  description = "Save the current file. With {file}, write [range] lines (default all lines) to {file}; use [!] to overwrite an existing file."
+)
 data class WriteCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

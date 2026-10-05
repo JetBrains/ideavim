@@ -51,8 +51,16 @@ abstract class MotionLastScreenLineActionBase(private val operatorPending: Boole
   }
 }
 
-@CommandOrMotion(keys = ["L"], modes = [Mode.NORMAL, Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["L"],
+  modes = [Mode.NORMAL, Mode.VISUAL],
+  description = "Move to line [count] from the bottom of the window, on the first non-blank character. The cursor is adjusted for 'scrolloff'."
+)
 class MotionLastScreenLineAction : MotionLastScreenLineActionBase(false)
 
-@CommandOrMotion(keys = ["L"], modes = [Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["L"],
+  modes = [Mode.OP_PENDING],
+  description = "As an operator motion, move linewise to line [count] from the bottom of the window. 'scrolloff' is applied afterwards."
+)
 class MotionOpPendingLastScreenLineAction : MotionLastScreenLineActionBase(true)

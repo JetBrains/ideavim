@@ -20,7 +20,11 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 
-@CommandOrMotion(keys = ["<C-^>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<C-^>"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, toggle the use of typed language mappings (:lmap) by switching 'iminsert' between 0 and 1."
+)
 class ToggleLanguageInsertModeAction : VimActionHandler.SingleExecution() {
   override fun execute(
     editor: VimEditor,

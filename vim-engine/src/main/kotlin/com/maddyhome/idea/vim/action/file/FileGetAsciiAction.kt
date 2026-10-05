@@ -16,7 +16,11 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-@CommandOrMotion(keys = ["ga"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["ga"],
+  modes = [Mode.NORMAL],
+  description = "Print the decimal, hex and octal value of the character under the cursor."
+)
 class FileGetAsciiAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

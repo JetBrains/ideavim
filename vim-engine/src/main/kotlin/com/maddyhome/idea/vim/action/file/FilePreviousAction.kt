@@ -15,7 +15,11 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-@CommandOrMotion(keys = ["<C-^>", "<C-S-6>", "<C-6>"], modes = [com.intellij.vim.annotations.Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["<C-^>", "<C-S-6>", "<C-6>"],
+  modes = [com.intellij.vim.annotations.Mode.NORMAL],
+  description = "Switch to the previously active editor tab (the alternate file)."
+)
 class FilePreviousAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

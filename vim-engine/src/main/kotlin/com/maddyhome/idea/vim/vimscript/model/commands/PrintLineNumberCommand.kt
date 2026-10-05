@@ -18,7 +18,10 @@ import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.helper.EngineStringHelper
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
-@ExCommand(command = "=")
+@ExCommand(
+  command = "=",
+  description = "Show the line number of the last line of [range] (default: the last line in the file). With the l, # or p flag, also show the line text."
+)
 data class PrintLineNumberCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

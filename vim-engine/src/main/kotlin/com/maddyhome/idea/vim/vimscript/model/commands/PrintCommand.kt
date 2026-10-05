@@ -21,7 +21,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :print"
  */
-@ExCommand(command = "p[rint],P[rint]")
+@ExCommand(
+  command = "p[rint],P[rint]",
+  description = "Show [range] lines (default current line) in the output panel, prefixed with line numbers if 'number' is set."
+)
 data class PrintCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

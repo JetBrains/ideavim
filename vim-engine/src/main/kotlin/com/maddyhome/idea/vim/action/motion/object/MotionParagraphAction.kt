@@ -18,7 +18,11 @@ import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 
-@CommandOrMotion(keys = ["ap"], modes = [Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["ap"],
+  modes = [Mode.VISUAL, Mode.OP_PENDING],
+  description = "A paragraph: select [count] paragraphs, including the following blank lines."
+)
 class MotionOuterParagraphAction : TextObjectActionHandler() {
 
   override val preserveSelectionAnchor: Boolean = false
@@ -36,7 +40,11 @@ class MotionOuterParagraphAction : TextObjectActionHandler() {
   }
 }
 
-@CommandOrMotion(keys = ["ip"], modes = [Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["ip"],
+  modes = [Mode.VISUAL, Mode.OP_PENDING],
+  description = "Inner paragraph: select [count] paragraphs, where a run of blank lines also counts as a paragraph."
+)
 class MotionInnerParagraphAction : TextObjectActionHandler() {
 
   override val preserveSelectionAnchor: Boolean = false

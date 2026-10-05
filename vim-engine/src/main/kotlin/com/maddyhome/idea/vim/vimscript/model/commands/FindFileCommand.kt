@@ -19,7 +19,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :file"
  */
-@ExCommand(command = "fin[d]")
+@ExCommand(
+  command = "fin[d]",
+  description = "Find {file} in the project and open it. Without an argument, open the IDE's Go to File popup."
+)
 data class FindFileCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

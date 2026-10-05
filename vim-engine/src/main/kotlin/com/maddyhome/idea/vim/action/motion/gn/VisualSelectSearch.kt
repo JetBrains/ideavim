@@ -25,7 +25,11 @@ import com.maddyhome.idea.vim.state.mode.inVisualMode
 import java.util.*
 import kotlin.math.max
 
-@CommandOrMotion(keys = ["gn"], modes = [Mode.NORMAL, Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["gn"],
+  modes = [Mode.NORMAL, Mode.VISUAL],
+  description = "Search forward for the last search pattern and select the match in Visual mode. In Visual mode, extend the selection to the end of the match."
+)
 class VisualSelectNextSearch : MotionActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = noneOfEnum()
 
@@ -41,7 +45,11 @@ class VisualSelectNextSearch : MotionActionHandler.SingleExecution() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 }
 
-@CommandOrMotion(keys = ["gN"], modes = [Mode.NORMAL, Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["gN"],
+  modes = [Mode.NORMAL, Mode.VISUAL],
+  description = "Search backward for the last search pattern and select the match in Visual mode. In Visual mode, extend the selection to the start of the match."
+)
 class VisualSelectPreviousSearch : MotionActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = noneOfEnum()
 

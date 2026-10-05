@@ -24,7 +24,11 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import java.util.*
 
-@CommandOrMotion(keys = ["<C-W>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<C-W>"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, delete the word before the cursor."
+)
 class InsertDeletePreviousWordAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.INSERT
 

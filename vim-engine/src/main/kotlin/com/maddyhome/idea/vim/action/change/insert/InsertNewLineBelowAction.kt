@@ -18,7 +18,11 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.state.mode.Mode
 
-@CommandOrMotion(keys = ["o"], modes = [com.intellij.vim.annotations.Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["o"],
+  modes = [com.intellij.vim.annotations.Mode.NORMAL],
+  description = "Begin a new line below the cursor and enter Insert mode."
+)
 class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
@@ -34,7 +38,11 @@ class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecution() {
   }
 }
 
-@CommandOrMotion(keys = ["O"], modes = [com.intellij.vim.annotations.Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["O"],
+  modes = [com.intellij.vim.annotations.Mode.NORMAL],
+  description = "Begin a new line above the cursor and enter Insert mode."
+)
 class InsertNewLineAboveAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 

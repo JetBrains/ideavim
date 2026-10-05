@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :next" / "h :bnext"
  */
-@ExCommand(command = "n[ext],bn[ext]")
+@ExCommand(command = "n[ext],bn[ext]", description = "Go to the [count]th next editor tab.")
 data class NextFileCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

@@ -21,7 +21,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /*
  * see "h :tabmove"
  */
-@ExCommand(command = "tabm[ove]")
+@ExCommand(
+  command = "tabm[ove]",
+  description = "Move the current editor tab to after tab {N}, or +N/-N positions relative to its current place. Without {N}, move it to the end."
+)
 data class TabMoveCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

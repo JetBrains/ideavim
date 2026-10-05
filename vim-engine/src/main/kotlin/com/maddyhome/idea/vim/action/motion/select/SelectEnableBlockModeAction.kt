@@ -24,7 +24,11 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
  * @author Alex Plate
  */
 
-@CommandOrMotion(keys = ["g<C-h>"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["g<C-h>"],
+  modes = [Mode.NORMAL],
+  description = "Start Select mode blockwise, selecting the character under the cursor."
+)
 class SelectEnableBlockModeAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY

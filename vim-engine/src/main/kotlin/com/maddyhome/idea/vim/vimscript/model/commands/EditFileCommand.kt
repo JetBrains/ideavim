@@ -19,7 +19,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :edit"
  */
-@ExCommand(command = "e[dit],bro[wse]")
+@ExCommand(
+  command = "e[dit],bro[wse]",
+  description = "Open {file} in the editor. With # as the argument, go back to the previous file. Without an argument, open the IDE's Open File dialog."
+)
 data class EditFileCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

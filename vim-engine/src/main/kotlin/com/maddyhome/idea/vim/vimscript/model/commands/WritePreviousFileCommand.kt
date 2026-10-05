@@ -19,7 +19,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :wprevious"
  */
-@ExCommand(command = "wp[revious],wN[ext]")
+@ExCommand(
+  command = "wp[revious],wN[ext]",
+  description = "Save the current file and go to the [count]th previous editor tab."
+)
 data class WritePreviousFileCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

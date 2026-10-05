@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :first"
  */
-@ExCommand(command = "fir[st]")
+@ExCommand(command = "fir[st]", description = "Go to the first editor tab in the current window.")
 data class SelectFirstFileCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

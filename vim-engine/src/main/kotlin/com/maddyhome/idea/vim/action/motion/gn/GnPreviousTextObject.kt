@@ -22,7 +22,11 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler
  * @author Alex Plate
  */
 
-@CommandOrMotion(keys = ["gN"], modes = [Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["gN"],
+  modes = [Mode.OP_PENDING],
+  description = "Operate on the [count]th previous match of the last search pattern."
+)
 class GnPreviousTextObject : TextObjectActionHandler() {
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE

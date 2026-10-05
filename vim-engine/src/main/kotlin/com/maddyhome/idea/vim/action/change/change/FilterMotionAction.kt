@@ -23,7 +23,11 @@ import com.maddyhome.idea.vim.helper.endOffsetInclusive
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.EnumSet
 
-@CommandOrMotion(keys = ["!"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["!"],
+  modes = [Mode.VISUAL],
+  description = "Start a command line to filter the highlighted lines through an external {filter} program."
+)
 class FilterVisualLinesAction : VimActionHandler.SingleExecution(), FilterCommand {
   override val type: Command.Type = Command.Type.CHANGE
 
@@ -47,7 +51,11 @@ class FilterVisualLinesAction : VimActionHandler.SingleExecution(), FilterComman
  * The format is `!{motion}{filter}`, e.g. `!3jsort -nrk 2`. After the motion is entered, the range is calculated and
  * the ex command line is started with the initial text `:[range]!`. The {filter} will be typed into the ex entry field.
  */
-@CommandOrMotion(keys = ["!"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["!"],
+  modes = [Mode.NORMAL],
+  description = "Start a command line to filter the lines moved over by {motion} through an external {filter} program."
+)
 class FilterMotionAction : VimActionHandler.SingleExecution(), FilterCommand, DuplicableOperatorAction {
 
   override val type: Command.Type = Command.Type.CHANGE

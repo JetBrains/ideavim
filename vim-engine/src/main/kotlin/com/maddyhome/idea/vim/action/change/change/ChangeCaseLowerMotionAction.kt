@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-@CommandOrMotion(keys = ["gu"], modes = [Mode.NORMAL])
+@CommandOrMotion(keys = ["gu"], modes = [Mode.NORMAL], description = "Make the text moved over by {motion} lowercase.")
 class ChangeCaseLowerMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
   private val logger = vimLogger<ChangeCaseLowerMotionAction>()
 

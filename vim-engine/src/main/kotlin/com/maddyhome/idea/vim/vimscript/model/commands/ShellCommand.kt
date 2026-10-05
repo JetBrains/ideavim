@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * @author John Grib
  * see "h :shell"
  */
-@ExCommand(command = "sh[ell]")
+@ExCommand(command = "sh[ell]", description = "Open the IDE's Terminal tool window.")
 data class ShellCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

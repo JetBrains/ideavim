@@ -18,7 +18,11 @@ import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 
-@CommandOrMotion(keys = ["is"], modes = [Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["is"],
+  modes = [Mode.VISUAL, Mode.OP_PENDING],
+  description = "Inner sentence: select [count] sentences, white space not included."
+)
 class MotionInnerSentenceAction : TextObjectActionHandler() {
 
   override val preserveSelectionAnchor: Boolean = false
@@ -36,7 +40,11 @@ class MotionInnerSentenceAction : TextObjectActionHandler() {
   }
 }
 
-@CommandOrMotion(keys = ["as"], modes = [Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["as"],
+  modes = [Mode.VISUAL, Mode.OP_PENDING],
+  description = "A sentence: select [count] sentences, including trailing white space."
+)
 class MotionOuterSentenceAction : TextObjectActionHandler() {
 
   override val preserveSelectionAnchor: Boolean = false

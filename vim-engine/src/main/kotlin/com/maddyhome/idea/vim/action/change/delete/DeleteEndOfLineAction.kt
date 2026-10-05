@@ -18,7 +18,11 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-@CommandOrMotion(keys = ["D"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["D"],
+  modes = [Mode.NORMAL],
+  description = "Delete from the cursor to the end of the line and [count]-1 more lines into register [x]."
+)
 class DeleteEndOfLineAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.DELETE
 

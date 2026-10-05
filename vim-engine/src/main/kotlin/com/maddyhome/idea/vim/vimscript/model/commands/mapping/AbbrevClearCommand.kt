@@ -19,7 +19,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 
-@ExCommand(command = "abc[lear],iabc[lear],cabc[lear]")
+@ExCommand(
+  command = "abc[lear],iabc[lear],cabc[lear]",
+  description = "Remove all abbreviations for the mode of the command: Insert and Command-line, Insert only, or Command-line only. Use <buffer> for buffer-local ones."
+)
 data class AbbrevClearCommand(val range: Range, val cmd: String, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * XXX: [argument] is currently unused. When `:update {file}` support is added, expand [argument] using
  * [VimPathExpansion.expandPath] to support environment variables (`$VAR`, `${VAR}`) and tilde (`~`, `~/`).
  */
-@ExCommand(command = "up[date]")
+@ExCommand(command = "up[date]", description = "Save the current file, but only if it has been modified.")
 data class UpdateCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

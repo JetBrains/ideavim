@@ -20,7 +20,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :digraphs"
  */
-@ExCommand(command = "dig[raphs]")
+@ExCommand(
+  command = "dig[raphs]",
+  description = "Without arguments, list the available digraphs; with [!], also show headers. With {char1}{char2} {number} pairs, define new digraphs."
+)
 data class DigraphCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

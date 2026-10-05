@@ -19,7 +19,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :previous" / "h :bprevious"
  */
-@ExCommand(command = "prev[ious],bp[revious],N[ext]")
+@ExCommand(
+  command = "prev[ious],bp[revious],N[ext]",
+  description = "Go to the [count]th previous editor tab, wrapping around at the first one."
+)
 data class PreviousFileCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

@@ -24,16 +24,32 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 // Vim considers an empty line as a word/WORD, but for vi compatibility, `e` and `E` do not stop at empty lines.
 // This is only applicable for forwards motion (the "right" actions). The backwards ("left") actions `ge` and `gE`
 // always stop at empty lines (as do word forward/backward motions `w`/`W` and `b`/`B`).
-@CommandOrMotion(keys = ["gE"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["gE"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Move backward to the end of the [count]'th previous WORD."
+)
 class MotionBigWordEndLeftAction : WordEndAction(Direction.BACKWARDS, bigWord = true)
 
-@CommandOrMotion(keys = ["E"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["E"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Move forward to the end of the [count]'th WORD."
+)
 class MotionBigWordEndRightAction : WordEndAction(Direction.FORWARDS, bigWord = true, stopAtEmptyLine = false)
 
-@CommandOrMotion(keys = ["ge"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["ge"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Move backward to the end of the [count]'th previous word."
+)
 class MotionWordEndLeftAction : WordEndAction(Direction.BACKWARDS, bigWord = false)
 
-@CommandOrMotion(keys = ["e"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["e"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Move forward to the end of the [count]'th word."
+)
 class MotionWordEndRightAction : WordEndAction(Direction.FORWARDS, bigWord = false, stopAtEmptyLine = false)
 
 sealed class WordEndAction(

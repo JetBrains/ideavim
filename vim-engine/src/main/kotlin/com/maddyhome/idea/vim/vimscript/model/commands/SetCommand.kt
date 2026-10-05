@@ -36,21 +36,27 @@ import kotlin.math.ceil
 /**
  * see "h :set"
  */
-@ExCommand(command = "se[t]")
+@ExCommand(
+  command = "se[t]",
+  description = "Show or set options. Without arguments show all options that differ from their default value. See :set {option}, no{option}, {option}={value}."
+)
 data class SetCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   SetCommandBase(range, modifier, argument) {
 
   override fun getScope(editor: VimEditor): OptionAccessScope = OptionAccessScope.EFFECTIVE(editor)
 }
 
-@ExCommand(command = "setg[lobal]")
+@ExCommand(command = "setg[lobal]", description = "Like :set, but only show or set the global value of an option.")
 data class SetglobalCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   SetCommandBase(range, modifier, argument) {
 
   override fun getScope(editor: VimEditor): OptionAccessScope = OptionAccessScope.GLOBAL(editor)
 }
 
-@ExCommand(command = "setl[ocal]")
+@ExCommand(
+  command = "setl[ocal]",
+  description = "Like :set, but only show or set the value of an option that is local to the current buffer or window."
+)
 data class SetlocalCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   SetCommandBase(range, modifier, argument) {
 

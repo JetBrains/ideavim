@@ -21,7 +21,11 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 
-@CommandOrMotion(keys = ["j", "<C-J>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["j", "<C-J>"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Move [count] lines downward, linewise."
+)
 open class MotionDownAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
   override val keepFold: Boolean = true
@@ -37,7 +41,11 @@ open class MotionDownAction : MotionActionHandler.ForEachCaret() {
   }
 }
 
-@CommandOrMotion(keys = ["<C-N>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["<C-N>"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Move [count] lines downward, linewise. With a completion popup open, select the next item instead."
+)
 class MotionDownCtrlNAction : MotionDownAction() {
   override fun getOffset(
     editor: VimEditor,
@@ -59,7 +67,11 @@ class MotionDownCtrlNAction : MotionDownAction() {
   }
 }
 
-@CommandOrMotion(keys = ["gj", "g<Down>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["gj", "g<Down>"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Move [count] display lines downward, exclusive."
+)
 class MotionDownNotLineWiseAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 

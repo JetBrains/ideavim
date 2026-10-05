@@ -13,7 +13,11 @@ import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.common.Graphemes
 
-@CommandOrMotion(keys = ["<DEL>"], modes = [Mode.CMD_LINE])
+@CommandOrMotion(
+  keys = ["<DEL>"],
+  modes = [Mode.CMD_LINE],
+  description = "In Command-line mode, delete the character under the cursor (before it at the end of the line). Leave if the line is empty."
+)
 class DeleteNextCharAction : CommandLineActionHandler() {
   override fun execute(commandLine: VimCommandLine): Boolean {
     val caretOffset = commandLine.caret.offset

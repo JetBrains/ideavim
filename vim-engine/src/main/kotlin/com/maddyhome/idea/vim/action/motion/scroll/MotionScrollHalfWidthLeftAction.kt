@@ -33,7 +33,11 @@ zH                      Move the view on the text half a screenwidth to the
 
 [count] is used but undocumented.
  */
-@CommandOrMotion(keys = ["zL"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["zL"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Scroll the text [count] half screen widths to the left, moving the view to the right. Only useful with 'nowrap'."
+)
 class MotionScrollHalfWidthLeftAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

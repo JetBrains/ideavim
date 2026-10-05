@@ -18,7 +18,11 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.state.mode.CtrlXCompletionMode
 
-@CommandOrMotion(keys = ["<C-L>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<C-L>"],
+  modes = [Mode.INSERT],
+  description = "After CTRL-X in Insert mode, complete the whole line from matching lines in the buffer using a completion popup."
+)
 class InsertLineCompletionAction : VimActionHandler.SingleExecution() {
 
   override fun execute(

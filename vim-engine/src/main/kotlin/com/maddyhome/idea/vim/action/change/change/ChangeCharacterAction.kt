@@ -23,7 +23,11 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.state.KeyHandlerState
 
-@CommandOrMotion(keys = ["r"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["r"],
+  modes = [Mode.NORMAL],
+  description = "Replace [count] characters under and after the cursor with {char}."
+)
 class ChangeCharacterAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
   override val argumentType: Argument.Type = Argument.Type.CHARACTER

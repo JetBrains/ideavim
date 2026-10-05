@@ -20,7 +20,11 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["gv"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["gv"],
+  modes = [Mode.NORMAL],
+  description = "Start Visual mode with the same area and selection type as the previous Visual selection."
+)
 class VisualSelectPreviousAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

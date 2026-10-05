@@ -18,7 +18,11 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.Command.SingleExecution
 import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 
-@ExCommand(command = "loadk[eymap]", barSeparates = false)
+@ExCommand(
+  command = "loadk[eymap]",
+  barSeparates = false,
+  description = "In a sourced keymap file, start the list of {from} {to} key pairs used for language mappings (:lmap)."
+)
 data class LoadKeymapCommand(val range: Range, val cmd: String, val modifier: CommandModifier, val argument: String) :
 
   SingleExecution(range, modifier, argument) {

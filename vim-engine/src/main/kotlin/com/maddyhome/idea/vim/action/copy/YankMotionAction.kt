@@ -18,7 +18,11 @@ import com.maddyhome.idea.vim.command.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-@CommandOrMotion(keys = ["y"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["y"],
+  modes = [Mode.NORMAL],
+  description = "Yank the text covered by {motion} into register [x]."
+)
 class YankMotionAction : VimActionHandler.SingleExecution(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.COPY
 

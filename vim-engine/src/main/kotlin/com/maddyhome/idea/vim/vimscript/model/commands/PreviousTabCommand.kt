@@ -19,7 +19,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :tabprevious"
  */
-@ExCommand(command = "tabp[revious],tabN[ext]")
+@ExCommand(
+  command = "tabp[revious],tabN[ext]",
+  description = "Go to the previous editor tab, wrapping around at the first one. With [count], go [count] tabs back."
+)
 data class PreviousTabCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

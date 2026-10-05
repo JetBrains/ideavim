@@ -21,7 +21,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * @author Rieon Ke
  * see "h :tabclose"
  */
-@ExCommand(command = "tabc[lose]")
+@ExCommand(
+  command = "tabc[lose]",
+  description = "Close the current editor tab, or the tab given by {arg}: a tab number, +N or -N relative to the current tab, or the last tab."
+)
 data class TabCloseCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

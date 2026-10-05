@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :wnext"
  */
-@ExCommand(command = "wn[ext]")
+@ExCommand(command = "wn[ext]", description = "Save the current file and go to the [count]th next editor tab.")
 data class WriteNextFileCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

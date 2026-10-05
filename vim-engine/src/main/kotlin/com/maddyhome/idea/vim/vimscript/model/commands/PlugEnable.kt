@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * Command that is used for enabling plugins. E.g. `:PlugEnable [plugin-name]`
  */
-@ExCommand(command = "PlugEnable")
+@ExCommand(command = "PlugEnable", description = "Enable the IdeaVim extension {name}.")
 class PlugEnable(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

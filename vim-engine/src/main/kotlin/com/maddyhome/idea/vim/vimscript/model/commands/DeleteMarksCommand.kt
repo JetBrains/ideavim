@@ -29,7 +29,10 @@ private val TRAILING_SPACES = Regex("\\s*$")
 private const val ESCAPED_QUOTE = "\\\""
 private const val UNESCAPED_QUOTE = "\""
 
-@ExCommand(command = "delm[arks]")
+@ExCommand(
+  command = "delm[arks]",
+  description = "Delete the specified {marks}; ranges like a-d are allowed. With [!], delete all lowercase marks of the current file."
+)
 data class DeleteMarksCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

@@ -20,7 +20,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :registers" / "h :display"
  */
-@ExCommand(command = "dis[play],reg[isters]")
+@ExCommand(
+  command = "dis[play],reg[isters]",
+  description = "Display the type and contents of all registers, or only of the registers named in {arg}."
+)
 data class RegistersCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

@@ -29,7 +29,11 @@ import java.util.EnumSet
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["C"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["C"],
+  modes = [Mode.VISUAL],
+  description = "Change the highlighted lines; in Visual block mode, change till the end of each line instead."
+)
 class ChangeVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 

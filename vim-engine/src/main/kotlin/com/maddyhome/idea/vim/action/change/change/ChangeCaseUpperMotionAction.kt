@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-@CommandOrMotion(keys = ["gU"], modes = [Mode.NORMAL])
+@CommandOrMotion(keys = ["gU"], modes = [Mode.NORMAL], description = "Make the text moved over by {motion} uppercase.")
 class ChangeCaseUpperMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
   private val logger = vimLogger<ChangeCaseUpperMotionAction>()
 

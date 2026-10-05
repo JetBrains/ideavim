@@ -31,7 +31,10 @@ import org.jetbrains.annotations.NonNls
  *
  * @author John Weigel
  */
-@ExCommand(command = "ls,files,buffers")
+@ExCommand(
+  command = "ls,files,buffers",
+  description = "List all open buffers, optionally filtered by the flags +, =, a, % and #."
+)
 internal data class BufferListCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier) {
 

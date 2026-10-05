@@ -22,7 +22,11 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["gv"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["gv"],
+  modes = [Mode.VISUAL],
+  description = "Exchange the current and the previous Visual area."
+)
 class VisualSwapSelectionsAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

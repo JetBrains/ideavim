@@ -20,7 +20,11 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 // Remember that Insert mode mappings also apply to Replace
-@CommandOrMotion(keys = ["<C-O>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<C-O>"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, execute one Normal mode command and then return to Insert mode."
+)
 class InsertSingleCommandAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 

@@ -23,7 +23,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :yank"
  */
-@ExCommand(command = "y[ank]")
+@ExCommand(
+  command = "y[ank]",
+  description = "Yank [range] lines (default current line) into register [x]. A [count] yanks that many lines starting with the last line in [range]."
+)
 data class YankLinesCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

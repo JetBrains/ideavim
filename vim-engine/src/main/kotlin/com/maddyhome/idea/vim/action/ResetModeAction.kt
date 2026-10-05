@@ -21,7 +21,8 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 
 @CommandOrMotion(
   keys = ["<C-\\><C-N>"],
-  modes = [Mode.NORMAL, Mode.VISUAL, Mode.SELECT, Mode.OP_PENDING, Mode.INSERT, Mode.CMD_LINE]
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.SELECT, Mode.OP_PENDING, Mode.INSERT, Mode.CMD_LINE],
+  description = "Go to Normal mode from any mode, abandoning any pending command."
 )
 class ResetModeAction : VimActionHandler.ConditionalMulticaret() {
   private lateinit var modeBeforeReset: com.maddyhome.idea.vim.state.mode.Mode

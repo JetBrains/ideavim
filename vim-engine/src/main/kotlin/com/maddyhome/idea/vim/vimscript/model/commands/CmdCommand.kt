@@ -23,7 +23,11 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * @author Elliot Courant
  * see "h :command"
  */
-@ExCommand(command = "com[mand]", barSeparates = false)
+@ExCommand(
+  command = "com[mand]",
+  barSeparates = false,
+  description = "Define the user command {cmd} that executes {rep}. Without arguments, list all user-defined commands."
+)
 data class CmdCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier) {
 

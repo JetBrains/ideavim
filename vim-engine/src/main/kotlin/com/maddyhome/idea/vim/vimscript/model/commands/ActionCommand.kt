@@ -21,7 +21,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * @author smartbomb
  */
-@ExCommand(command = "action")
+@ExCommand(
+  command = "action",
+  description = "Execute the IDE action with the given {action-id}."
+)
 data class ActionCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier) {
 

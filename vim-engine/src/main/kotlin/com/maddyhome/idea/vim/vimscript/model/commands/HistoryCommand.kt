@@ -22,7 +22,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :history"
  */
-@ExCommand(command = "his[tory]")
+@ExCommand(
+  command = "his[tory]",
+  description = "Display the history of the given {name} type (cmd, search, expr, input or all), default command-line history. An optional {first},{last} limits the entries shown."
+)
 data class HistoryCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

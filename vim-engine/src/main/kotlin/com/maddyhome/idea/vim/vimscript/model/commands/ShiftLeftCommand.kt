@@ -22,7 +22,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :<"
  */
-@ExCommand("<")
+@ExCommand(
+  command = "<",
+  description = "Shift [range] lines one 'shiftwidth' left. Repeat the < to shift several times, e.g. :<<<."
+)
 data class ShiftLeftCommand(val range: Range, val argument: String, val length: Int) :
   Command.ForEachCaret(range, CommandModifier.NONE, argument) {
 

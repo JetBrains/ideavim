@@ -20,7 +20,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 
-@ExCommand(command = "mapc[lear],nmapc[lear],vmapc[lear],xmapc[lear],smapc[lear],omapc[lear],imapc[lear],lmapc[lear],cmapc[lear]")
+@ExCommand(
+  command = "mapc[lear],nmapc[lear],vmapc[lear],xmapc[lear],smapc[lear],omapc[lear],imapc[lear],lmapc[lear],cmapc[lear]",
+  description = "Remove all mappings for the modes of the command, e.g. :nmapclear for Normal mode. :mapclear! clears Insert and Command-line mode mappings."
+)
 data class MapClearCommand(val range: Range, val cmd: String, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

@@ -25,7 +25,11 @@ import java.util.*
  * see "h :sort"
  */
 // todo make it multicaret
-@ExCommand(command = "sor[t]", delimitedSections = 1)
+@ExCommand(
+  command = "sor[t]",
+  delimitedSections = 1,
+  description = "Sort lines in [range] (default: the selected lines, or the whole file). [!] reverses the order; flags: i ignore case, n numeric, u unique, r sort on /{pattern}/ match."
+)
 data class SortCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

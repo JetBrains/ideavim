@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["<C-W>j", "<C-W><C-J>", "<C-W><Down>"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["<C-W>j", "<C-W><C-J>", "<C-W><Down>"],
+  modes = [Mode.NORMAL],
+  description = "Move to the window [count] windows below the current one."
+)
 class WindowDownAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -37,7 +41,11 @@ class WindowDownAction : VimActionHandler.SingleExecution() {
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["<C-W>h", "<C-W><C-H>", "<C-W><Left>"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["<C-W>h", "<C-W><C-H>", "<C-W><Left>"],
+  modes = [Mode.NORMAL],
+  description = "Move to the window [count] windows to the left of the current one."
+)
 class WindowLeftAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -55,7 +63,11 @@ class WindowLeftAction : VimActionHandler.SingleExecution() {
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["<C-W>l", "<C-W><C-L>", "<C-W><Right>"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["<C-W>l", "<C-W><C-L>", "<C-W><Right>"],
+  modes = [Mode.NORMAL],
+  description = "Move to the window [count] windows to the right of the current one."
+)
 class WindowRightAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -73,7 +85,11 @@ class WindowRightAction : VimActionHandler.SingleExecution() {
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["<C-W>k", "<C-W><C-K>", "<C-W><Up>"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["<C-W>k", "<C-W><C-K>", "<C-W><Up>"],
+  modes = [Mode.NORMAL],
+  description = "Move to the window [count] windows above the current one."
+)
 class WindowUpAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

@@ -27,7 +27,11 @@ import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
  *
  * see "h :vertical" / "h :vertical-resize"
  */
-@ExCommand(command = "vert[ical]", barSeparates = false)
+@ExCommand(
+  command = "vert[ical]",
+  barSeparates = false,
+  description = "Run :resize {cmd} on the window width instead of its height, e.g. :vertical resize +5."
+)
 internal data class VerticalCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

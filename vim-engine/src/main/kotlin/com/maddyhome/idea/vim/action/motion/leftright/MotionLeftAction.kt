@@ -36,12 +36,20 @@ abstract class MotionLeftBaseAction(private val allowPastEnd: Boolean) : MotionA
   }
 }
 
-@CommandOrMotion(keys = ["h"], modes = [Mode.NORMAL, Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["h"],
+  modes = [Mode.NORMAL, Mode.VISUAL],
+  description = "Move [count] characters to the left. Wrap to the previous line if 'whichwrap' contains h."
+)
 class MotionLeftAction : MotionLeftBaseAction(allowPastEnd = false)
 
 // When the motion is used with an operator, the EOL character is counted.
 // This allows e.g., `dh` to delete the end of line character on the previous line when wrap is active
 // ('whichwrap' contains "h")
 // See `:help whichwrap`. This says a delete or change operator, but it appears to apply to all operators
-@CommandOrMotion(keys = ["h"], modes = [Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["h"],
+  modes = [Mode.OP_PENDING],
+  description = "As an operator motion, move [count] characters to the left. The end-of-line character is included when wrapping via 'whichwrap'."
+)
 class MotionLeftOpPendingModeAction : MotionLeftBaseAction(allowPastEnd = true)

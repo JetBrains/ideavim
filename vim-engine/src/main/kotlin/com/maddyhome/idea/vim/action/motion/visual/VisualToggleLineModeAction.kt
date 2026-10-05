@@ -22,7 +22,11 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
-@CommandOrMotion(keys = ["V"], modes = [Mode.NORMAL, Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["V"],
+  modes = [Mode.NORMAL, Mode.VISUAL],
+  description = "Start linewise Visual mode, or switch an active Visual mode to linewise; stop Visual mode if it is already linewise. Starts Select mode instead if 'selectmode' contains cmd."
+)
 class VisualToggleLineModeAction : VimActionHandler.ConditionalMulticaret() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

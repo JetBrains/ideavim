@@ -28,7 +28,11 @@ import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.state.mode.isInsertionAllowed
 import java.util.*
 
-@CommandOrMotion(keys = ["<C-End>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["<C-End>"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Go to the end of line [count], default the last character of the file."
+)
 class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
@@ -52,7 +56,11 @@ class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
   }
 }
 
-@CommandOrMotion(keys = ["<C-End>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<C-End>"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, move the cursor to the end of line [count], default the end of the last line."
+)
 class MotionGotoLineLastEndInsertAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 

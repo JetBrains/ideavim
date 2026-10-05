@@ -17,7 +17,11 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
 /** `q:` — opens the command-line window over `:` history. */
-@CommandOrMotion(keys = ["q:"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["q:"],
+  modes = [Mode.NORMAL],
+  description = "Open the command-line window to edit and execute commands from the : history."
+)
 class CommandHistoryAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

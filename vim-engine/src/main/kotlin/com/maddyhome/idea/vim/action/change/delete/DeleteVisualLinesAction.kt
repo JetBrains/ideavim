@@ -28,7 +28,11 @@ import java.util.*
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["X"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["X"],
+  modes = [Mode.VISUAL],
+  description = "Delete the highlighted lines into register [x]. In Visual block mode, delete the highlighted block."
+)
 class DeleteVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.DELETE
 

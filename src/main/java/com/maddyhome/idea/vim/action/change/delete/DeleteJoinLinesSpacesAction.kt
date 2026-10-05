@@ -18,7 +18,11 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.newapi.ijOptions
 
-@CommandOrMotion(keys = ["J"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["J"],
+  modes = [Mode.NORMAL],
+  description = "Join [count] lines (at least two), replacing each line break and leading white space with a space."
+)
 class DeleteJoinLinesSpacesAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.DELETE
 

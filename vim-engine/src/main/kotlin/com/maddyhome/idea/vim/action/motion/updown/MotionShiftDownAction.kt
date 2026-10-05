@@ -22,7 +22,11 @@ import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
  * @author Alex Plate
  */
 
-@CommandOrMotion(keys = ["<S-Down>"], modes = [Mode.INSERT, Mode.NORMAL, Mode.VISUAL, Mode.SELECT])
+@CommandOrMotion(
+  keys = ["<S-Down>"],
+  modes = [Mode.INSERT, Mode.NORMAL, Mode.VISUAL, Mode.SELECT],
+  description = "If 'keymodel' contains startsel (or continues the current selection), start or extend a selection [count] lines down. Otherwise scroll [count] pages forward."
+)
 class MotionShiftDownAction : ShiftedArrowKeyHandler(false) {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY

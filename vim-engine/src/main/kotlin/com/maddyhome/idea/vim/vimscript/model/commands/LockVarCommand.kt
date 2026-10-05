@@ -22,7 +22,11 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 /**
  * see :h lockvar
  */
-@ExCommand(command = "lockv[ar]", barSeparates = false)
+@ExCommand(
+  command = "lockv[ar]",
+  barSeparates = false,
+  description = "Lock the variable {name} so it can no longer be changed. A [depth] also locks nested List and Dictionary items."
+)
 class LockVarCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 
@@ -44,7 +48,11 @@ class LockVarCommand(val range: Range, val modifier: CommandModifier, val argume
 /**
  * see :h unlockvar
  */
-@ExCommand(command = "unlo[ckvar]", barSeparates = false)
+@ExCommand(
+  command = "unlo[ckvar]",
+  barSeparates = false,
+  description = "Unlock the variable {name}, so it can be changed again. A [depth] also unlocks nested items."
+)
 class UnlockVarCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

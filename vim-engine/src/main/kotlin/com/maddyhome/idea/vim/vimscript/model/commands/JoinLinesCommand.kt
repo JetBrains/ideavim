@@ -22,7 +22,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :join"
  */
-@ExCommand(command = "j[oin]")
+@ExCommand(
+  command = "j[oin]",
+  description = "Join the lines in [range], or [count] lines starting at the last line in [range]. With [!], do not insert or remove any spaces."
+)
 data class JoinLinesCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.ForEachCaret(range, modifier, argument) {
 

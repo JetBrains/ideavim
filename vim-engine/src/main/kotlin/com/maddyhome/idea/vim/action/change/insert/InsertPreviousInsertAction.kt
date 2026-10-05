@@ -17,7 +17,11 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-@CommandOrMotion(keys = ["<C-A>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<C-A>"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, insert the previously inserted text."
+)
 class InsertPreviousInsertAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
@@ -32,7 +36,11 @@ class InsertPreviousInsertAction : ChangeEditorActionHandler.SingleExecution() {
   }
 }
 
-@CommandOrMotion(keys = ["<C-@>", "<C-S-2>", "<C-2>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<C-@>", "<C-S-2>", "<C-2>"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, insert the previously inserted text and stop inserting."
+)
 class InsertPreviousInsertExitAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 

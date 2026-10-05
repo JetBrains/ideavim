@@ -50,10 +50,18 @@ abstract class MotionNonShiftedArrowLeftBaseAction() : NonShiftedSpecialKeyHandl
 }
 
 // Note that Select mode is handled in [SelectMotionArrowLeftAction]
-@CommandOrMotion(keys = ["<Left>", "<kLeft>"], modes = [Mode.NORMAL, Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["<Left>", "<kLeft>"],
+  modes = [Mode.NORMAL, Mode.VISUAL],
+  description = "Move [count] characters to the left. Wrap to the previous line if 'whichwrap' contains <."
+)
 class MotionArrowLeftAction : MotionNonShiftedArrowLeftBaseAction()
 
-@CommandOrMotion(keys = ["<Left>", "<kLeft>"], modes = [Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["<Left>", "<kLeft>"],
+  modes = [Mode.OP_PENDING],
+  description = "As an operator motion, move [count] characters to the left. The end-of-line character is included when wrapping via 'whichwrap'."
+)
 class MotionArrowLeftOpPendingAction : MotionNonShiftedArrowLeftBaseAction() {
   // When the motion is used with an operator, the EOL character is counted.
   // This allows e.g., `d<Left>` to delete the end of line character on the previous line when wrap is active
@@ -63,7 +71,11 @@ class MotionArrowLeftOpPendingAction : MotionNonShiftedArrowLeftBaseAction() {
 }
 
 // Just needs to be a plain motion handler - it's not shifted, and the non-shifted actions don't apply in Insert mode
-@CommandOrMotion(keys = ["<Left>", "<kLeft>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<Left>", "<kLeft>"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, move the cursor one character to the left. Wrap to the previous line if 'whichwrap' contains [."
+)
 class MotionArrowLeftInsertModeAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 

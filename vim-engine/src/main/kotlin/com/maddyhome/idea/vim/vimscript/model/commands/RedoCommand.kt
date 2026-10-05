@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :redo"
  */
-@ExCommand(command = "red[o]")
+@ExCommand(command = "red[o]", description = "Redo one change that was undone.")
 data class RedoCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

@@ -18,7 +18,10 @@ import com.maddyhome.idea.vim.vimscript.model.commands.Command.SingleExecution
 import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 
 // It's no-op in IdeaVim we just need it to not fail in vim scripts for keymap
-@ExCommand(command = "scripte[ncoding]")
+@ExCommand(
+  command = "scripte[ncoding]",
+  description = "Specify the character encoding used in the script. Accepted for compatibility; it does nothing in IdeaVim."
+)
 data class ScriptEncodingCommand(
   val range: Range,
   val modifier: CommandModifier,

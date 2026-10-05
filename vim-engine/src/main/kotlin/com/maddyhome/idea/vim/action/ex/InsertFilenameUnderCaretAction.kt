@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.api.injector
  * This implementation is used for both inserting normally, and inserting literally. A filename can't (or at least
  * shouldn't) contain control characters, so it can only be inserted literally, as plain text.
  */
-@CommandOrMotion(keys = ["<C-R><C-F>", "<C-R><C-R><C-F>", "<C-R><C-O><C-F>"], modes = [Mode.CMD_LINE])
+@CommandOrMotion(
+  keys = ["<C-R><C-F>", "<C-R><C-R><C-F>", "<C-R><C-O><C-F>"],
+  modes = [Mode.CMD_LINE],
+  description = "In Command-line mode, insert the file name under the cursor in the editor."
+)
 class InsertFilenameUnderCaretAction : CommandLineActionHandler() {
   override fun execute(commandLine: VimCommandLine): Boolean {
     val editor = commandLine.editor

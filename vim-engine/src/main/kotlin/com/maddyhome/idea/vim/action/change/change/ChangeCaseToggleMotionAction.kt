@@ -21,7 +21,11 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-@CommandOrMotion(keys = ["g~"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["g~"],
+  modes = [Mode.NORMAL],
+  description = "Switch the case of the text moved over by {motion}."
+)
 class ChangeCaseToggleMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
   private val logger = vimLogger<ChangeCaseToggleMotionAction>()
 

@@ -16,7 +16,11 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-@CommandOrMotion(keys = ["g<C-G>"], modes = [Mode.NORMAL, Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["g<C-G>"],
+  modes = [Mode.NORMAL, Mode.VISUAL],
+  description = "Display the current cursor position as column, line, word and byte counts. In Visual mode, show counts for the selection."
+)
 class FileGetLocationInfoAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

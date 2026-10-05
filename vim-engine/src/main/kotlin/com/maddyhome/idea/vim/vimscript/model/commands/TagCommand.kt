@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :tag"
  */
-@ExCommand(command = "ta[g]")
+@ExCommand(command = "ta[g]", description = "Jump [count] entries forward (newer) in the tag stack.")
 data class TagCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

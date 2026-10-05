@@ -20,7 +20,11 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 // todo make it for each caret
-@ExCommand(command = "norm[al]", barSeparates = false)
+@ExCommand(
+  command = "norm[al]",
+  barSeparates = false,
+  description = "Execute {commands} as Normal mode keys, once for each line in [range]. With [!], mappings are not used."
+)
 data class NormalCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

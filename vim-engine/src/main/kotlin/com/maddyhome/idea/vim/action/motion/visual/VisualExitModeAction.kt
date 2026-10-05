@@ -23,7 +23,11 @@ import com.maddyhome.idea.vim.helper.exitVisualMode
 /**
  * @author vlan
  */
-@CommandOrMotion(keys = ["<Esc>", "<C-[>", "<C-C>"], modes = [Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["<Esc>", "<C-[>", "<C-C>"],
+  modes = [Mode.VISUAL],
+  description = "Stop Visual mode and return to Normal mode."
+)
 class VisualExitModeAction : VimActionHandler.ConditionalMulticaret() {
   override val type: Command.Type = Command.Type.MODE_CHANGE
   override fun runAsMulticaret(

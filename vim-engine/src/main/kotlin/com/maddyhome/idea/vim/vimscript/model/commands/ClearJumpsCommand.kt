@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
-@ExCommand(command = "cle[arjumps]")
+@ExCommand(command = "cle[arjumps]", description = "Clear the jump list of the current window.")
 data class ClearJumpsCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

@@ -20,7 +20,11 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 
-@CommandOrMotion(keys = ["<Up>", "<kUp>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.SELECT, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["<Up>", "<kUp>"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.SELECT, Mode.OP_PENDING],
+  description = "Move [count] lines upward, linewise. Leaves Select or Visual mode first if 'keymodel' contains \"stopsel\"."
+)
 class MotionArrowUpAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.LINE_WISE
   override val keepFold: Boolean = true

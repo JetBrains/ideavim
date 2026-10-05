@@ -16,7 +16,11 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-@CommandOrMotion(keys = ["gT", "<C-PageUp>"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["gT", "<C-PageUp>"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Go to the previous editor tab, wrapping around from the first to the last. With [count], go [count] tabs back."
+)
 class PreviousTabAction : VimActionHandler.SingleExecution() {
   override fun execute(
     editor: VimEditor,
@@ -31,7 +35,11 @@ class PreviousTabAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 }
 
-@CommandOrMotion(keys = ["<C-PageUp>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<C-PageUp>"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, go to the previous editor tab, wrapping around from the first to the last, without leaving Insert mode."
+)
 class InsertPreviousTabAction : VimActionHandler.SingleExecution() {
   override fun execute(
     editor: VimEditor,

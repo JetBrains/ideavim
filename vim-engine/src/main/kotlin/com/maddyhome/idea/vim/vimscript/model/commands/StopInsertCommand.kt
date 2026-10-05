@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :stopinsert"
  */
-@ExCommand(command = "stopi[nsert]")
+@ExCommand(command = "stopi[nsert]", description = "Stop Insert or Replace mode and return to Normal mode.")
 data class StopInsertCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

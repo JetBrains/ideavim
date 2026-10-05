@@ -19,7 +19,8 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 
 @CommandOrMotion(
   keys = ["iW"],
-  modes = [com.intellij.vim.annotations.Mode.VISUAL, com.intellij.vim.annotations.Mode.OP_PENDING]
+  modes = [com.intellij.vim.annotations.Mode.VISUAL, com.intellij.vim.annotations.Mode.OP_PENDING],
+  description = "Inner WORD: select [count] WORDs, white space not included."
 )
 class MotionInnerBigWordAction : TextObjectActionHandler() {
 
@@ -38,7 +39,8 @@ class MotionInnerBigWordAction : TextObjectActionHandler() {
 
 @CommandOrMotion(
   keys = ["aW"],
-  modes = [com.intellij.vim.annotations.Mode.VISUAL, com.intellij.vim.annotations.Mode.OP_PENDING]
+  modes = [com.intellij.vim.annotations.Mode.VISUAL, com.intellij.vim.annotations.Mode.OP_PENDING],
+  description = "A WORD: select [count] WORDs, including trailing white space."
 )
 class MotionOuterBigWordAction : TextObjectActionHandler() {
 
@@ -57,7 +59,8 @@ class MotionOuterBigWordAction : TextObjectActionHandler() {
 
 @CommandOrMotion(
   keys = ["iw"],
-  modes = [com.intellij.vim.annotations.Mode.VISUAL, com.intellij.vim.annotations.Mode.OP_PENDING]
+  modes = [com.intellij.vim.annotations.Mode.VISUAL, com.intellij.vim.annotations.Mode.OP_PENDING],
+  description = "Inner word: select [count] words, white space not included."
 )
 class MotionInnerWordAction : TextObjectActionHandler() {
 
@@ -76,7 +79,8 @@ class MotionInnerWordAction : TextObjectActionHandler() {
 
 @CommandOrMotion(
   keys = ["aw"],
-  modes = [com.intellij.vim.annotations.Mode.VISUAL, com.intellij.vim.annotations.Mode.OP_PENDING]
+  modes = [com.intellij.vim.annotations.Mode.VISUAL, com.intellij.vim.annotations.Mode.OP_PENDING],
+  description = "A word: select [count] words, including trailing white space."
 )
 class MotionOuterWordAction : TextObjectActionHandler() {
 

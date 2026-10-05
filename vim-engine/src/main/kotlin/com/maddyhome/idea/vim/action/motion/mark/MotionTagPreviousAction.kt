@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 
-@CommandOrMotion(keys = ["<C-T>"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["<C-T>"],
+  modes = [Mode.NORMAL],
+  description = "Jump back to the [count]th older entry in the tag stack."
+)
 class MotionTagPreviousAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,

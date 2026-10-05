@@ -16,7 +16,11 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-@CommandOrMotion(keys = ["U"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["U"],
+  modes = [Mode.NORMAL],
+  description = "Undo all recent changes made on the last changed line."
+)
 class LineUndoAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 

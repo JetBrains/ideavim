@@ -34,7 +34,11 @@ import kotlin.io.path.readText
  * - `:$read file` - insert at the end of the buffer
  * - `:{line}read file` - insert after the specified line number
  */
-@ExCommand(command = "r[ead]", barSeparates = false)
+@ExCommand(
+  command = "r[ead]",
+  barSeparates = false,
+  description = "Insert {file} below the cursor or line [range]; with :read !{cmd}, insert the output of {cmd} instead."
+)
 data class ReadCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

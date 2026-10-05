@@ -66,20 +66,44 @@ sealed class PutTextBaseAction(
   }
 }
 
-@CommandOrMotion(keys = ["p"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["p"],
+  modes = [Mode.NORMAL],
+  description = "Put the text from register [x] after the cursor [count] times."
+)
 class PutTextAfterCursorAction : PutTextBaseAction(insertTextBeforeCaret = false, indent = true, caretAfterInsertedText = false)
 
-@CommandOrMotion(keys = ["gp"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["gp"],
+  modes = [Mode.NORMAL],
+  description = "Put the text from register [x] after the cursor [count] times and leave the cursor just after the new text."
+)
 class PutTextAfterCursorActionMoveCursor : PutTextBaseAction(insertTextBeforeCaret = false, indent = true, caretAfterInsertedText = true)
 
-@CommandOrMotion(keys = ["]p"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["]p"],
+  modes = [Mode.NORMAL],
+  description = "Like p, but adjust the indent of the put text to the current line."
+)
 class PutTextAfterCursorNoIndentAction : PutTextBaseAction(insertTextBeforeCaret = false, indent = false, caretAfterInsertedText = false)
 
-@CommandOrMotion(keys = ["[P", "]P", "[p"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["[P", "]P", "[p"],
+  modes = [Mode.NORMAL],
+  description = "Like P, but adjust the indent of the put text to the current line."
+)
 class PutTextBeforeCursorNoIndentAction : PutTextBaseAction(insertTextBeforeCaret = true, indent = false, caretAfterInsertedText = false)
 
-@CommandOrMotion(keys = ["P"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["P"],
+  modes = [Mode.NORMAL],
+  description = "Put the text from register [x] before the cursor [count] times."
+)
 class PutTextBeforeCursorAction : PutTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = false)
 
-@CommandOrMotion(keys = ["gP"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["gP"],
+  modes = [Mode.NORMAL],
+  description = "Put the text from register [x] before the cursor [count] times and leave the cursor just after the new text."
+)
 class PutTextBeforeCursorActionMoveCursor : PutTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = true)

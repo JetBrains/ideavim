@@ -20,7 +20,11 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 /**
  * @author Alex Plate
  */
-@CommandOrMotion(keys = ["<C-N>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<C-N>"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, invoke the IDE action that <C-N> is bound to in the IDE keymap, e.g. to move down in a completion popup."
+)
 class LookupDownAction : VimActionHandler.SingleExecution() {
 
   private val keySet = parseKeysSet("<C-N>")

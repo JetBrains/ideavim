@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-@CommandOrMotion(keys = ["ZZ"], modes = [Mode.NORMAL])
+@CommandOrMotion(keys = ["ZZ"], modes = [Mode.NORMAL], description = "Save the current file and close its editor.")
 class FileSaveCloseAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 

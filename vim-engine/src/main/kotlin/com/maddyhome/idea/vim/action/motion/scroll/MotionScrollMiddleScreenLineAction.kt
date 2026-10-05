@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-@CommandOrMotion(keys = ["zz"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["zz"],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Redraw with line [count] (default: cursor line) at the center of the window, keeping the cursor column."
+)
 class MotionScrollMiddleScreenLineAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -35,7 +39,11 @@ class MotionScrollMiddleScreenLineAction : VimActionHandler.SingleExecution() {
   }
 }
 
-@CommandOrMotion(keys = ["z."], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["z."],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
+  description = "Redraw with line [count] (default: cursor line) at the center of the window and put the cursor on its first non-blank."
+)
 class MotionScrollMiddleScreenLineStartAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

@@ -26,7 +26,10 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.operators.AssignmentOp
 /**
  * see "h :let"
  */
-@ExCommand(command = "let")
+@ExCommand(
+  command = "let",
+  description = "Assign the value of {expr} to the variable, option or register {var}. Operators like += and .= are supported."
+)
 data class LetCommand(
   val range: Range,
   val lvalue: Expression?,

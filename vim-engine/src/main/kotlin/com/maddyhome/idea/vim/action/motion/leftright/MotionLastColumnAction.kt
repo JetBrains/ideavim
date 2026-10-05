@@ -52,13 +52,25 @@ abstract class MotionLastColumnBaseAction(private val isMotionForOperator: Boole
   }
 }
 
-@CommandOrMotion(keys = ["$"], modes = [Mode.NORMAL, Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["$"],
+  modes = [Mode.NORMAL, Mode.VISUAL],
+  description = "Move to the end of the line, [count] - 1 lines downward."
+)
 open class MotionLastColumnAction : MotionLastColumnBaseAction()
 
-@CommandOrMotion(keys = ["$"], modes = [Mode.OP_PENDING])
+@CommandOrMotion(
+  keys = ["$"],
+  modes = [Mode.OP_PENDING],
+  description = "As an operator motion, move to the end of the line, [count] - 1 lines downward. The end-of-line character is not included."
+)
 class MotionLastColumnOpPendingAction : MotionLastColumnBaseAction(isMotionForOperator = true)
 
-@CommandOrMotion(keys = ["<End>"], modes = [Mode.INSERT])
+@CommandOrMotion(
+  keys = ["<End>"],
+  modes = [Mode.INSERT],
+  description = "In Insert mode, move the cursor past the last character of the line."
+)
 class MotionLastColumnInsertAction : MotionLastColumnAction() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
 }

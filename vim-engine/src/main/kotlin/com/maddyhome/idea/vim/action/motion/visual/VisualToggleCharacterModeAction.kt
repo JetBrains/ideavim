@@ -19,7 +19,11 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
-@CommandOrMotion(keys = ["v"], modes = [Mode.NORMAL, Mode.VISUAL])
+@CommandOrMotion(
+  keys = ["v"],
+  modes = [Mode.NORMAL, Mode.VISUAL],
+  description = "Start characterwise Visual mode, or switch an active Visual mode to characterwise; stop Visual mode if it is already characterwise. Starts Select mode instead if 'selectmode' contains cmd."
+)
 class VisualToggleCharacterModeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

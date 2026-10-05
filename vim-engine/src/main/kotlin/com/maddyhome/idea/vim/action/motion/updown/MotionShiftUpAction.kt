@@ -22,7 +22,11 @@ import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
  * @author Alex Plate
  */
 
-@CommandOrMotion(keys = ["<S-Up>"], modes = [Mode.INSERT, Mode.NORMAL, Mode.VISUAL, Mode.SELECT])
+@CommandOrMotion(
+  keys = ["<S-Up>"],
+  modes = [Mode.INSERT, Mode.NORMAL, Mode.VISUAL, Mode.SELECT],
+  description = "If 'keymodel' contains startsel (or continues the current selection), start or extend a selection [count] lines up. Otherwise scroll [count] pages backward."
+)
 class MotionShiftUpAction : ShiftedArrowKeyHandler(false) {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY

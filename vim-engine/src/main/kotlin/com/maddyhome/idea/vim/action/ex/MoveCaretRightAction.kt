@@ -15,7 +15,11 @@ import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.Graphemes
 
-@CommandOrMotion(keys = ["<Right>"], modes = [Mode.CMD_LINE])
+@CommandOrMotion(
+  keys = ["<Right>"],
+  modes = [Mode.CMD_LINE],
+  description = "In Command-line mode, move the cursor one character right. With 'wildmenu' completion active, select the next match."
+)
 class MoveCaretRightAction : CommandLineActionHandler() {
   override fun execute(commandLine: VimCommandLine): Boolean {
     val completion = commandLine.activeCompletion

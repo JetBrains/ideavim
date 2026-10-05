@@ -17,7 +17,11 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-@CommandOrMotion(keys = ["gI"], modes = [Mode.NORMAL])
+@CommandOrMotion(
+  keys = ["gI"],
+  modes = [Mode.NORMAL],
+  description = "Insert text in column 1 of the line [count] times."
+)
 class InsertLineStartAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 

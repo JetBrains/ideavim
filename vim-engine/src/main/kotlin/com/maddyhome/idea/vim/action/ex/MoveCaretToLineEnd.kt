@@ -12,7 +12,11 @@ import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.VimCommandLine
 
-@CommandOrMotion(keys = ["<C-E>", "<End>"], modes = [Mode.CMD_LINE])
+@CommandOrMotion(
+  keys = ["<C-E>", "<End>"],
+  modes = [Mode.CMD_LINE],
+  description = "In Command-line mode, move the cursor to the end of the command line."
+)
 class MoveCaretToLineEnd : CommandLineActionHandler() {
   override fun execute(commandLine: VimCommandLine): Boolean {
     commandLine.caret.offset = commandLine.text.length

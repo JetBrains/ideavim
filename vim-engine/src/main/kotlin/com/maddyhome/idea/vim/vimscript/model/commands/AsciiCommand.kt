@@ -19,7 +19,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :ascii"
  */
-@ExCommand(command = "as[cii]")
+@ExCommand(
+  command = "as[cii]",
+  description = "Print the decimal, hexadecimal and octal value of the character under the cursor."
+)
 data class AsciiCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

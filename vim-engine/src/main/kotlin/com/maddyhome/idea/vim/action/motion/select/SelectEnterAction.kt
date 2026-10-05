@@ -21,7 +21,11 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  * @author Alex Plate
  */
 
-@CommandOrMotion(keys = ["<CR>", "<C-J>", "<C-M>"], modes = [Mode.SELECT])
+@CommandOrMotion(
+  keys = ["<CR>", "<C-J>", "<C-M>"],
+  modes = [Mode.SELECT],
+  description = "In Select mode, replace the selected text with a line break."
+)
 class SelectEnterAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 

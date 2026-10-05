@@ -23,7 +23,7 @@ import kotlin.math.absoluteValue
 /**
  * see "h :jumps"
  */
-@ExCommand(command = "ju[mps]")
+@ExCommand(command = "ju[mps]", description = "Print the jump list, marking the current position with >.")
 data class JumpsCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 
