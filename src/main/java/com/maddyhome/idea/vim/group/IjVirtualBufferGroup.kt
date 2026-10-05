@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.CmdwinKeys
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.vim
 import javax.swing.SwingConstants
 
 class IjVirtualBufferGroup : VirtualBufferGroup {
@@ -69,6 +70,22 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
     }
   }
 
+  override fun openHelp(context: ExecutionContext, editor: VimEditor, content: String, line: Int) {
+    val project = projectOf(context) ?: (editor as IjVimEditor).editor.project ?: return
+    val fem = FileEditorManagerEx.getInstanceEx(project)
+    val file = findOpenFile(project, VirtualBufferKind.Help)
+      // Like Vim's help buffer, the help can't be modified
+      ?: createBufferFile(editor, VirtualBufferKind.Help, content).apply { isWritable = false }
+        .also { openSplitFile(fem, it, focus = true) }
+
+    // Like in Vim, this moves to the window that already shows the help instead of opening it once more. It also waits
+    // for the editor of a just opened split to be created.
+    val helpEditor = fem.openFile(file, true, true).filterIsInstance<TextEditor>().firstOrNull()?.editor?.vim ?: return
+    helpEditor.primaryCaret().moveToOffset(helpEditor.getLineStartOffset(line))
+    // `:help` shows the tag at the top of the window
+    injector.scroll.scrollCurrentLineToDisplayTop(helpEditor, line + 1, false)
+  }
+
   /**
    * Refuses to open a new virtual buffer while one is already open — they can't be nested
    * (`:help cmdwin`). Shows an error and returns true if the caller should abort.
@@ -83,6 +100,7 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
     VirtualBufferKind.Command, is VirtualBufferKind.Search -> "E1292: Command-line window is already open"
     VirtualBufferKind.ControlCharsEditor -> "A control characters editor is already open"
     VirtualBufferKind.SubstitutePreview -> "A substitute preview is already open"
+    VirtualBufferKind.Help -> "A help window is already open"
   }
 
   /** The kind of the currently open (nesting-restricted) virtual buffer, or null if none is open. */
@@ -90,8 +108,8 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
     val project = projectOf(context) ?: return null
     return FileEditorManager.getInstance(project).openFiles
       .mapNotNull { it.getUserData(CmdwinKeys.KIND) }
-      // The inccommand=split preview is transient and must not block cmdwin from opening.
-      .firstOrNull { it != VirtualBufferKind.SubstitutePreview }
+      // The inccommand=split preview is transient and the help is a regular read-only window, neither blocks cmdwin
+      .firstOrNull { it != VirtualBufferKind.SubstitutePreview && it != VirtualBufferKind.Help }
   }
 
   private fun findOpenFile(project: Project?, kind: VirtualBufferKind): VirtualFile? {

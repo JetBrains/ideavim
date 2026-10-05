@@ -28,8 +28,8 @@ internal class JsonFileWriter(
     prettyPrintIndent = "  "
   }
 
-  inline fun <reified T> write(fileName: String, data: T) {
-    val generatedDirPath = Path(environment.options["generated_directory"]!!)
+  inline fun <reified T> write(fileName: String, data: T, directory: String = environment.options["generated_directory"]!!) {
+    val generatedDirPath = Path(directory)
     Files.createDirectories(generatedDirPath)
 
     val filePath = generatedDirPath.resolve(fileName)

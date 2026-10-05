@@ -1,0 +1,53 @@
+# Regenerates the help file that :help opens (src/main/resources/help/ideavim.txt) from the descriptions in the
+# @ExCommand and @CommandOrMotion annotations, and commits it when it changed.
+
+name: Update Help
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+    # The commit of this workflow changes only the help file, there is nothing to regenerate after it
+    paths-ignore:
+      - 'src/main/resources/help/**'
+
+# A newer push regenerates the help from a newer state, so the older run can be dropped
+concurrency:
+  group: update-help
+  cancel-in-progress: true
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    if: github.repository == 'JetBrains/ideavim'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # A key that is allowed to push to the protected master branch
+          ssh-key: ${{ secrets.PUSH_TO_PROTECTED_BRANCH_SECRET }}
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Generate help
+        run: ./gradlew generateHelp
+        env:
+          ORG_GRADLE_PROJECT_downloadIdeaSources: false
+          ORG_GRADLE_PROJECT_instrumentPluginCode: false
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update help file
+          commit_user_name: IdeaVim Bot
+          commit_user_email: maintainers@ideavim.dev
+          commit_author: IdeaVim Bot <maintainers@ideavim.dev>
+          file_pattern: src/main/resources/help/ideavim.txt

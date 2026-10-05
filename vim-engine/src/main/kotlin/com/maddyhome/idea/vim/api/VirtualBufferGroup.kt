@@ -42,4 +42,12 @@ interface VirtualBufferGroup {
 
   /** Replaces the content of an already-open virtual buffer of [kind] in place. */
   fun refresh(context: ExecutionContext, kind: VirtualBufferKind, content: String)
+
+  /**
+   * Shows [content] in the read-only help window, with the cursor at the start of [line], the way `:help` does.
+   *
+   * Like in Vim, an already open help window is reused rather than opening another one. It also doesn't take part in
+   * the nesting restriction of the other virtual buffers.
+   */
+  fun openHelp(context: ExecutionContext, editor: VimEditor, content: String, line: Int)
 }

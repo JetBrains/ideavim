@@ -20,6 +20,11 @@ package com.intellij.vim.annotations
 @Repeatable
 annotation class ExCommand(
   val command: String,
+  /**
+   * A short description of what the command does, written for users. It's rendered into IdeaVim's help file
+   * (`:help`), so keep it in the same style as Vim's own help: a sentence or two, in the imperative mood.
+   */
+  val description: String,
   /** `false` when the command takes a `|` as part of its argument, so it can never be followed by another command */
   val barSeparates: Boolean = true,
   /** The number of delimiter-wrapped sections the argument holds, like the pattern and replacement of `:s/pat/sub/` */

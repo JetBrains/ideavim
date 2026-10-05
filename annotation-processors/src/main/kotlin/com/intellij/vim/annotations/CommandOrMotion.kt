@@ -29,6 +29,11 @@ annotation class CommandOrMotion(
    * `InsertCharacterAboveCursorAction` does not. Exactly one of each pair may exist for a given key and mode.
    */
   val lookup: Boolean = false,
+  /**
+   * A short description of what the command does, written for users. It's rendered into IdeaVim's help file
+   * (`:help`), so keep it in the same style as Vim's own help: a sentence or two, in the imperative mood.
+   */
+  val description: String,
 )
 
 annotation class TextObject(val keys: String)

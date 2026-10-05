@@ -90,6 +90,20 @@ tasks.register("releaseActions", JavaExec::class) {
   environment("YOUTRACK_TOKEN", youtrackToken)
 }
 
+tasks.register("generateHelp", JavaExec::class) {
+  group = "other"
+  description = "Generates the help file that :help opens from the descriptions of the commands"
+  // The descriptions are collected by HelpProcessor while running KSP over the modules that declare commands
+  dependsOn(":vim-engine:kspKotlin", ":kspKotlin")
+  mainClass.set("scripts.help.GenerateHelpKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  args = listOf(
+    "${rootProject.rootDir}/src/main/resources/help/ideavim.txt",
+    "${rootProject.rootDir}/vim-engine/build/help/engine_help.json",
+    "${rootProject.rootDir}/build/help/frontend_help.json",
+  )
+}
+
 tasks.test {
   useJUnitPlatform()
 }

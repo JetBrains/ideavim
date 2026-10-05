@@ -81,6 +81,12 @@ If you are looking for:
     - Vim script parsing: package `com.maddyhome.idea.vim.vimscript.parser`.
     - Vim script executor: `Executor`.
 
+- Help (`:help`):
+    - Every `@CommandOrMotion` and `@ExCommand` has a `description`. It's rendered into the
+      [help file](src/main/resources/help/ideavim.txt) that `:help` opens.
+    - The help file is regenerated with `./gradlew generateHelp`. On `master`, the "Update Help" workflow does it
+      automatically, so there is no need to commit it with your change.
+
 - Extensions:
     - Extensions handler: `VimExtensionHandler`.
     - Available extensions: package `com/maddyhome/idea/vim/extension`.

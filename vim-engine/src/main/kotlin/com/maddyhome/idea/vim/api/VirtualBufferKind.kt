@@ -31,4 +31,9 @@ sealed class VirtualBufferKind {
   data object SubstitutePreview : VirtualBufferKind() {
     override val fileName: String = "[Preview Substitute]"
   }
+
+  /** The read-only window `:help` opens, see `:help help-buffer-options` */
+  data object Help : VirtualBufferKind() {
+    override val fileName: String = "ideavim.txt"
+  }
 }
