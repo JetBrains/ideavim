@@ -101,6 +101,12 @@ class ActionIdCompletionTest : VimExTestCase() {
   }
 
   @Test
+  fun `test tab completes action command in mapping`() {
+    typeText(":nmap x :action ${PREFIX}A<Tab>")
+    assertExText("nmap x :action ${PREFIX}Alpha")
+  }
+
+  @Test
   fun `test closed action notation is not completed`() {
     typeText(":nmap x <lt>Action>(${PREFIX}A)<Tab>")
     assertExText("nmap x <Action>(${PREFIX}A)")

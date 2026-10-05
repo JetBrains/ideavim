@@ -14,6 +14,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.updateSettings.impl.UpdateSettings
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.group.FrontendActionIdsSync
 import com.maddyhome.idea.vim.newapi.IjVimEnabler
 import com.maddyhome.idea.vim.ui.JoinEap
 import com.maddyhome.idea.vim.ui.JoinEap.EAP_LINK
@@ -47,5 +48,7 @@ internal class PluginStartup : ProjectActivity/*, LightEditCompatible*/ {
     VimPlugin.getInstance().initialize()
 
     (injector.enabler as IjVimEnabler).ideOpened()
+
+    FrontendActionIdsSync.sendToBackend()
   }
 }

@@ -12,6 +12,7 @@ import com.intellij.ide.plugins.DynamicPluginListener
 import com.intellij.ide.plugins.IdeaPluginDescriptor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.group.FrontendActionIdsSync
 import com.maddyhome.idea.vim.vimscript.model.commands.IdeaPlug
 
 class IjPluginListener : DynamicPluginListener {
@@ -28,6 +29,7 @@ class IjPluginListener : DynamicPluginListener {
 
   override fun pluginLoaded(pluginDescriptor: IdeaPluginDescriptor) {
     super.pluginLoaded(pluginDescriptor)
+    FrontendActionIdsSync.sendToBackend()
     if (!pluginDescriptor.isIdeaVimExtension()) return
 
     // 1) Scan plugin jar
@@ -47,6 +49,7 @@ class IjPluginListener : DynamicPluginListener {
     isUpdate: Boolean,
   ) {
     super.pluginUnloaded(pluginDescriptor, isUpdate)
+    FrontendActionIdsSync.sendToBackend()
     if (!pluginDescriptor.isIdeaVimExtension()) return
 
     val pluginId = pluginDescriptor.pluginId.idString

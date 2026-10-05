@@ -20,6 +20,12 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjVimSystemInfoService"
                         serviceInterface="com.maddyhome.idea.vim.api.SystemInfoService"/>
 
+    <!-- Action ID completion in the ideavimrc file. Registered here, because in split mode the completion
+         runs on the backend, while in monolith everything runs in one process. -->
+    <completion.contributor language="any" order="first"
+                            implementationClass="com.maddyhome.idea.vim.completion.IdeaVimRcCompletionContributor"/>
+    <typedHandler implementation="com.maddyhome.idea.vim.completion.IdeaVimRcTypedHandler"/>
+
   </extensions>
 
 

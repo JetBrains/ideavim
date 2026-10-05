@@ -49,5 +49,9 @@
     <!-- RPC: expose document changes with undo grouping for split mode -->
     <platform.rpc.backend.remoteApiProvider
         implementation="com.maddyhome.idea.vim.group.change.ChangeRemoteApiProvider"/>
+
+    <!-- RPC: receive the frontend's action IDs for the ideavimrc completion -->
+    <platform.rpc.backend.remoteApiProvider
+        implementation="com.maddyhome.idea.vim.group.action.ActionIdRemoteApiProvider"/>
   </extensions>
 </idea-plugin>
