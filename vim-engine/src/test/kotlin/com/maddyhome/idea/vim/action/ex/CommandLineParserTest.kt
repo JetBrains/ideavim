@@ -155,4 +155,34 @@ class CommandLineParserTest {
   fun `test parse returns null for command followed by non-space chars`() {
     assertNull(parseCommandLineForCompletion("foo123"))
   }
+
+  @Test
+  fun `test parse unclosed action notation returns action id context`() {
+    val result = assertIs<ActionIdCompletionContext>(parseCommandLineForCompletion("nmap x <Action>(Ref"))
+    assertEquals("Ref", result.prefix)
+    assertEquals(16, result.completionStart)
+  }
+
+  @Test
+  fun `test parse action notation with empty prefix`() {
+    val result = assertIs<ActionIdCompletionContext>(parseCommandLineForCompletion("nmap x <Action>("))
+    assertEquals("", result.prefix)
+    assertEquals(16, result.completionStart)
+  }
+
+  @Test
+  fun `test parse action notation is case insensitive`() {
+    val result = assertIs<ActionIdCompletionContext>(parseCommandLineForCompletion("nmap x <action>(Ref"))
+    assertEquals("Ref", result.prefix)
+  }
+
+  @Test
+  fun `test parse closed action notation falls back to argument context`() {
+    assertIs<ArgumentCompletionContext>(parseCommandLineForCompletion("nmap x <Action>(ReformatCode)"))
+  }
+
+  @Test
+  fun `test parse action notation followed by space falls back to argument context`() {
+    assertIs<ArgumentCompletionContext>(parseCommandLineForCompletion("nmap x <Action>(Ref oo"))
+  }
 }
