@@ -58,9 +58,9 @@ data class SetHandlerCommand(val range: Range, val modifier: CommandModifier, va
     if (key != null) {
       injector.keyGroup.savedShortcutConflicts[key] = resultingOwner
     } else {
-      injector.keyGroup.shortcutConflicts.keys.forEach { conflictKey ->
-        injector.keyGroup.savedShortcutConflicts[conflictKey] = resultingOwner
-      }
+      injector.keyGroup.shortcutConflicts.keys
+        .filterNot { injector.keyGroup.isVimByDefaultShortcut(it) }
+        .forEach { conflictKey -> injector.keyGroup.savedShortcutConflicts[conflictKey] = resultingOwner }
     }
     return true
   }

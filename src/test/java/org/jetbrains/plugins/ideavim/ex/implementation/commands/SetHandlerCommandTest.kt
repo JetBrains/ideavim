@@ -263,4 +263,29 @@ class SetHandlerCommandTest : VimTestCase() {
     kotlin.test.assertTrue(fixture.editor.vim.mode is Mode.CMD_LINE)
     kotlin.test.assertEquals(ShortcutOwner.VIM, owner.forEditor(fixture.editor.vim))
   }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `test explicit handler for Enter is saved`() {
+    configureByText("")
+    typeText(commandToKeys("sethandler <CR> a:ide"))
+    val key = VimPlugin.getKey().savedShortcutConflicts.entries.single().key
+    val owner = VimPlugin.getKey().savedShortcutConflicts.entries.single().value
+    kotlin.test.assertEquals("<CR>", injector.parser.toKeyNotation(key))
+    kotlin.test.assertEquals(ShortcutOwnerInfo.allPerModeIde, owner)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `test handler for all shortcuts skips Enter and arrow keys`() {
+    configureByText("")
+    typeText(commandToKeys("sethandler a:ide"))
+    val saved = VimPlugin.getKey().savedShortcutConflicts
+    kotlin.test.assertTrue(saved.isNotEmpty())
+    for (key in listOf("<CR>", "<Up>", "<Down>", "<Left>", "<Right>")) {
+      val keyStroke = injector.parser.parseKeys(key).single()
+      kotlin.test.assertTrue(keyStroke in VimPlugin.getKey().shortcutConflicts, "$key should be listed as a conflict")
+      kotlin.test.assertFalse(keyStroke in saved, "$key should not get a handler from `sethandler a:ide`")
+    }
+  }
 }

@@ -91,7 +91,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
       }
 
       val owner = VimPlugin.getKey().savedShortcutConflicts[keyStroke]
-      if ((owner as? ShortcutOwnerInfo.AllModes)?.owner == ShortcutOwner.UNDEFINED) {
+      if ((owner as? ShortcutOwnerInfo.AllModes)?.owner == ShortcutOwner.UNDEFINED && keyStroke !in VIM_DEFAULT_EDITOR_KEYS) {
         VimPlugin.getNotifications(editor.project).notifyAboutShortcutConflict(keyStroke)
       }
       // Should we use HelperKt.getTopLevelEditor(editor) here, as we did in former EditorKeyHandler?
@@ -345,15 +345,11 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
 
     @JvmField
     val VIM_ONLY_EDITOR_KEYS: Set<KeyStroke> =
-      ImmutableSet.builder<KeyStroke>().addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0))
+      ImmutableSet.builder<KeyStroke>()
         .addAll(getKeyStrokes(KeyEvent.VK_ESCAPE, 0))
         .addAll(getKeyStrokes(KeyEvent.VK_BACK_SPACE, 0, InputEvent.CTRL_DOWN_MASK))
         .addAll(getKeyStrokes(KeyEvent.VK_INSERT, 0))
         .addAll(getKeyStrokes(KeyEvent.VK_DELETE, 0, InputEvent.CTRL_DOWN_MASK))
-        .addAll(getKeyStrokes(KeyEvent.VK_UP, 0))
-        .addAll(getKeyStrokes(KeyEvent.VK_DOWN, 0))
-        .addAll(getKeyStrokes(KeyEvent.VK_LEFT, 0))
-        .addAll(getKeyStrokes(KeyEvent.VK_RIGHT, 0))
         .addAll(
           getKeyStrokes(
             KeyEvent.VK_HOME,
@@ -379,6 +375,21 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
             InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK,
           ),
         ).build()
+
+    /**
+     * Keys that are handled by Vim unless the user explicitly assigns a handler to that particular key, either with
+     * `sethandler <key> ...` or in the shortcut conflicts settings. They are pressed constantly and every keymap binds
+     * them to editor actions, so we don't notify about their conflict and handlers set for all shortcuts at once
+     * (`sethandler a:ide`, "Toggle all unset Handlers") skip them.
+     */
+    @JvmField
+    val VIM_DEFAULT_EDITOR_KEYS: Set<KeyStroke> =
+      ImmutableSet.builder<KeyStroke>().addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0))
+        .addAll(getKeyStrokes(KeyEvent.VK_UP, 0))
+        .addAll(getKeyStrokes(KeyEvent.VK_DOWN, 0))
+        .addAll(getKeyStrokes(KeyEvent.VK_LEFT, 0))
+        .addAll(getKeyStrokes(KeyEvent.VK_RIGHT, 0))
+        .build()
 
     private const val ACTION_ID = "VimShortcutKeyAction"
 
