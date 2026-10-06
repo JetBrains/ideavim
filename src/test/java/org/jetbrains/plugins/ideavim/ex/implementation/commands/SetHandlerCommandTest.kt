@@ -277,12 +277,12 @@ class SetHandlerCommandTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
-  fun `test handler for all shortcuts skips Enter and arrow keys`() {
+  fun `test handler for all shortcuts skips Enter, Esc and arrow keys`() {
     configureByText("")
     typeText(commandToKeys("sethandler a:ide"))
     val saved = VimPlugin.getKey().savedShortcutConflicts
     kotlin.test.assertTrue(saved.isNotEmpty())
-    for (key in listOf("<CR>", "<Up>", "<Down>", "<Left>", "<Right>")) {
+    for (key in listOf("<CR>", "<Esc>", "<Up>", "<Down>", "<Left>", "<Right>")) {
       val keyStroke = injector.parser.parseKeys(key).single()
       kotlin.test.assertTrue(keyStroke in VimPlugin.getKey().shortcutConflicts, "$key should be listed as a conflict")
       kotlin.test.assertFalse(keyStroke in saved, "$key should not get a handler from `sethandler a:ide`")

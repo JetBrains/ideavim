@@ -9,10 +9,12 @@ package com.maddyhome.idea.vim.ui
 
 import com.intellij.icons.AllIcons
 import com.intellij.ide.IdeBundle
+import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionToolbarPosition
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
@@ -51,6 +53,7 @@ import com.maddyhome.idea.vim.vimscript.services.VimRcService
 import org.jetbrains.annotations.Nls
 import java.awt.BorderLayout
 import java.awt.Dimension
+import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.BoxLayout
 import javax.swing.JComponent
@@ -475,10 +478,19 @@ internal class VimEmulationConfigurable : Configurable {
         for ((keyStroke, value) in VimPlugin.getKey().shortcutConflicts) {
           val actions = VimPlugin.getKey().getKeymapConflicts(keyStroke)
           if (actions.isNotEmpty()) {
-            rows.add(Row(keyStroke, actions[0].action as AnAction, value))
+            rows.add(Row(keyStroke, displayedAction(keyStroke) ?: actions[0].action as AnAction, value))
           }
         }
         rows.sort()
+      }
+
+      /**
+       * Escape is bound to many context-specific actions (closing the commit dialog, a tooltip, etc.), and showing an
+       * arbitrary one of them is misleading, so we show the generic editor Escape action instead.
+       */
+      private fun displayedAction(keyStroke: KeyStroke): AnAction? {
+        if (keyStroke != KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)) return null
+        return ActionManager.getInstance().getAction(IdeActions.ACTION_EDITOR_ESCAPE)
       }
 
       private val currentData: Map<KeyStroke, ShortcutOwnerInfo>

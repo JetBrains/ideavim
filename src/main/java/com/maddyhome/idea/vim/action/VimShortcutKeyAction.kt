@@ -224,6 +224,12 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
     }
 
     if (keyCode == KeyEvent.VK_ESCAPE) {
+      // Escape is Vim's by default, but the user can explicitly hand it over to the IDE, e.g. `sethandler <Esc> n:ide`
+      if (keyStroke in VIM_DEFAULT_EDITOR_KEYS &&
+        VimPlugin.getKey().savedShortcutConflicts[keyStroke]?.forEditor(editor.vim) == ShortcutOwner.IDE
+      ) {
+        return ActionEnableStatus.no("Owner of Esc is IDE", LogLevel.DEBUG)
+      }
       return if (isEnabledForEscape(editor)) {
         ActionEnableStatus.yes("Is enabled for Esc", LogLevel.INFO)
       } else {
@@ -346,7 +352,6 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
     @JvmField
     val VIM_ONLY_EDITOR_KEYS: Set<KeyStroke> =
       ImmutableSet.builder<KeyStroke>()
-        .addAll(getKeyStrokes(KeyEvent.VK_ESCAPE, 0))
         .addAll(getKeyStrokes(KeyEvent.VK_BACK_SPACE, 0, InputEvent.CTRL_DOWN_MASK))
         .addAll(getKeyStrokes(KeyEvent.VK_INSERT, 0))
         .addAll(getKeyStrokes(KeyEvent.VK_DELETE, 0, InputEvent.CTRL_DOWN_MASK))
@@ -385,6 +390,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
     @JvmField
     val VIM_DEFAULT_EDITOR_KEYS: Set<KeyStroke> =
       ImmutableSet.builder<KeyStroke>().addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0))
+        .addAll(getKeyStrokes(KeyEvent.VK_ESCAPE, 0))
         .addAll(getKeyStrokes(KeyEvent.VK_UP, 0))
         .addAll(getKeyStrokes(KeyEvent.VK_DOWN, 0))
         .addAll(getKeyStrokes(KeyEvent.VK_LEFT, 0))

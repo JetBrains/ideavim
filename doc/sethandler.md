@@ -33,7 +33,7 @@ By using `sethandler` you can define handlers:
  - For a single shortcut: `sethandler <C-A> n:vim i-x:ide` - use Vim handler in normal mode and IDE handler in insert and visual modes,
  - For all shortcuts: `sethandler n:vim i:ide` - use Vim handlers in normal mode and IDE handlers in insert mode.
 
-`<CR>` and the plain arrow keys (`<Up>`, `<Down>`, `<Left>`, `<Right>`) are always handled by Vim unless
+`<CR>`, `<Esc>` and the plain arrow keys (`<Up>`, `<Down>`, `<Left>`, `<Right>`) are always handled by Vim unless
 you set a handler for that particular key, e.g. `sethandler <CR> i:ide`. Handlers for all shortcuts don't apply to them.
 
 Later definitions override earlier ones, so `a:ide c:vim` first assigns every mode to the IDE
