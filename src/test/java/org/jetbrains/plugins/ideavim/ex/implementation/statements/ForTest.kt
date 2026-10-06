@@ -91,6 +91,68 @@ class ForTest : VimTestCase() {
     assertExOutput("123")
   }
 
+  // Previously, `continue` inside a loop over a list skipped the index increment, causing an infinite loop
+  @Test
+  fun `test continue when iterating over list`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        """
+      let result = '' |
+      for item in [1, 2, 3, 4, 5] |
+        if item % 2 == 0 |
+          continue |
+        endif |
+        let result .= item |
+      endfor |
+      echo result
+        """.trimIndent(),
+      ),
+    )
+    assertExOutput("135")
+  }
+
+  // Previously, `continue` inside a loop over a list skipped the index increment, causing an infinite loop
+  @Test
+  fun `test continue in for with list`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        """
+      let result = '' |
+      for [f, s] in [[1, 'a'], [2, 'b'], [3, 'c']] |
+        if f == 2 |
+          continue |
+        endif |
+        let result .= f .. s |
+      endfor |
+      echo result
+        """.trimIndent(),
+      ),
+    )
+    assertExOutput("1a3c")
+  }
+
+  @Test
+  fun `test break when iterating over list`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        """
+      let result = '' |
+      for item in [1, 2, 3, 4, 5] |
+        if item == 3 |
+          break |
+        endif |
+        let result .= item |
+      endfor |
+      echo result
+        """.trimIndent(),
+      ),
+    )
+    assertExOutput("12")
+  }
+
   @Test
   fun `test break`() {
     configureByText("\n")

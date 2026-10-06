@@ -70,8 +70,8 @@ data class ForLoop(val variable: VariableExpression, val iterable: Expression, v
           result = ExecutionResult.Success
           break
         } else if (result is ExecutionResult.Continue) {
+          // Don't use `continue` here: it would skip the index increment below and loop forever
           result = ExecutionResult.Success
-          continue
         } else if (result is ExecutionResult.Error) {
           break
         }
@@ -117,8 +117,8 @@ data class ForLoopWithList(val variables: List<String>, val iterable: Expression
           result = ExecutionResult.Success
           break
         } else if (result is ExecutionResult.Continue) {
+          // Don't use `continue` here: it would skip the index increment below and loop forever
           result = ExecutionResult.Success
-          continue
         } else if (result is ExecutionResult.Error) {
           break
         }
