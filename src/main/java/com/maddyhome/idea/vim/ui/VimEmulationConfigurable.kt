@@ -290,7 +290,9 @@ internal class VimEmulationConfigurable : Configurable {
 
       for (rowIndex in 0 until model.rows.size) {
         val row = model.rows[rowIndex]
-        if (row.owner is AllModes && row.owner == ShortcutOwnerInfo.allUndefined) {
+        if (row.owner is AllModes && row.owner == ShortcutOwnerInfo.allUndefined &&
+          !VimPlugin.getKey().isVimByDefaultShortcut(row.keyStroke)
+        ) {
           rowsToChange.add(rowIndex)
         }
       }

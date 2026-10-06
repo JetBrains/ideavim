@@ -23,13 +23,18 @@ import com.intellij.openapi.keymap.ex.KeymapManagerEx;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
 import com.maddyhome.idea.vim.action.change.LazyVimCommand;
-import com.maddyhome.idea.vim.api.*;
+import com.maddyhome.idea.vim.api.NativeAction;
+import com.maddyhome.idea.vim.api.VimEditor;
+import com.maddyhome.idea.vim.api.VimKeyGroupBase;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.extension.VimExtensionFacade;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.EditorHelperRt;
 import com.maddyhome.idea.vim.helper.ShortcutHelper;
-import com.maddyhome.idea.vim.key.*;
+import com.maddyhome.idea.vim.key.MappingOwner;
+import com.maddyhome.idea.vim.key.RequiredShortcut;
+import com.maddyhome.idea.vim.key.ShortcutOwner;
+import com.maddyhome.idea.vim.key.ShortcutOwnerInfo;
 import com.maddyhome.idea.vim.newapi.IjNativeAction;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import org.jdom.Element;
@@ -208,6 +213,11 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   public void unregisterShortcutKeys(@NotNull VimEditor editor) {
     EventFacade.getInstance().unregisterCustomShortcutSet(VimShortcutKeyAction.getInstance(),
                                                           ((IjVimEditor)editor).getEditor().getContentComponent());
+  }
+
+  @Override
+  public boolean isVimByDefaultShortcut(@NotNull KeyStroke keyStroke) {
+    return VimShortcutKeyAction.VIM_DEFAULT_EDITOR_KEYS.contains(keyStroke);
   }
 
   @Override

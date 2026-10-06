@@ -106,6 +106,12 @@ interface VimKeyGroup {
   val savedShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
 
   /**
+   * Returns true if the shortcut stays with Vim unless a handler is set for this particular key. Handlers set for all
+   * shortcuts at once (`sethandler a:ide`) don't apply to it.
+   */
+  fun isVimByDefaultShortcut(keyStroke: KeyStroke): Boolean = false
+
+  /**
    * Deprecated function to get the builtin commands for the given mode in a form that can be iterated over
    */
   @Suppress("DEPRECATION")

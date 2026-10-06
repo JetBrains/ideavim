@@ -17,6 +17,7 @@ import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class VimShortcutKeyActionTest : VimTestCase() {
 
@@ -39,6 +40,17 @@ class VimShortcutKeyActionTest : VimTestCase() {
     for (modifier in modifiers) {
       val end = KeyStroke.getKeyStroke(KeyEvent.VK_END, modifier)
       assertFalse(VimShortcutKeyAction.VIM_ONLY_EDITOR_KEYS.contains(end), "$end should not be a Vim-only editor key")
+    }
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `Enter and arrows are not Vim-only editor keys so sethandler can release them to the IDE`() {
+    val keyCodes = listOf(KeyEvent.VK_ENTER, KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT)
+    for (keyCode in keyCodes) {
+      val key = KeyStroke.getKeyStroke(keyCode, 0)
+      assertFalse(VimShortcutKeyAction.VIM_ONLY_EDITOR_KEYS.contains(key), "$key should not be a Vim-only editor key")
+      assertTrue(VimShortcutKeyAction.VIM_DEFAULT_EDITOR_KEYS.contains(key), "$key should be handled by Vim by default")
     }
   }
 }
