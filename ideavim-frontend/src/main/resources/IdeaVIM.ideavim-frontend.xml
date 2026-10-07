@@ -380,6 +380,15 @@
       </aliases>
     </vimExtension>
 
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.visualmulti.VimVisualMultiExtension"
+                  name="visual-multi">
+      <aliases>
+        <alias name="https://github.com/mg979/vim-visual-multi"/>
+        <alias name="mg979/vim-visual-multi"/>
+        <alias name="vim-visual-multi"/>
+      </aliases>
+    </vimExtension>
+
     <vimExtension implementation="com.maddyhome.idea.vim.extension.textobjentire.VimTextObjEntireExtension"
                   name="textobj-entire">
       <aliases>
