@@ -44,6 +44,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 private var Editor.vimMultipleCursorsWholeWord: Boolean? by userData()
+private var Editor.vimMultipleCursorsIgnoreCase: Boolean? by userData()
 private var Editor.vimMultipleCursorsLastSelection: TextRange? by userData()
 
 /**
@@ -69,6 +70,13 @@ internal abstract class VimMultipleCursorsExtensionBase : VimExtension {
    */
   protected fun isFlagEnabled(variableName: String): Boolean =
     VimPlugin.getVariableService().getGlobalVariableValue(variableName)?.toVimNumber()?.booleanValue ?: true
+
+  /**
+   * Whether occurrences of [text] are searched ignoring case
+   *
+   * vim-multiple-cursors is always case sensitive, regardless of 'ignorecase' and 'smartcase'.
+   */
+  protected open fun ignoreCase(text: String): Boolean = false
 
   abstract class WriteActionHandler : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
@@ -105,9 +113,9 @@ internal abstract class VimMultipleCursorsExtensionBase : VimExtension {
 
         // The handler is specific to whole/not-whole word, but the next occurrence is based on the initial call
         editor.vimMultipleCursorsWholeWord = whole
+        editor.vimMultipleCursorsIgnoreCase = null
         editor.vimMultipleCursorsLastSelection = selection
       } else {
-        // vim-multiple-cursors is case sensitive, so it's ok to use a case sensitive set here
         val patterns = sortedSetOf<String>()
         val newPositions = arrayListOf<VisualPosition>()
 
@@ -147,8 +155,14 @@ internal abstract class VimMultipleCursorsExtensionBase : VimExtension {
         }
 
         // All the carets should be selecting the same text. If they're not, then it's likely they have been added
-        // by some other means, so we shouldn't continue with the VIM behaviour
-        if (patterns.size > 1) return
+        // by some other means, so we shouldn't continue with the VIM behaviour. When ignoring case, the occurrences can
+        // differ in case
+        val distinctPatterns = if (editor.vimMultipleCursorsIgnoreCase == true) {
+          patterns.mapTo(mutableSetOf()) { it.lowercase() }
+        } else {
+          patterns
+        }
+        if (distinctPatterns.size > 1) return
 
         // If we are adding the first new cursor, based on the current selection, we do a non-whole word match (ignoring
         // the value passed to the handler during mapping. We should fix the mappings for visual mode). If we're adding
@@ -161,13 +175,9 @@ internal abstract class VimMultipleCursorsExtensionBase : VimExtension {
         // changed, so we're adding a first cursor based on the current selection (set a new non-whole word flag)
         val currentSelection = TextRange(caretModel.primaryCaret.selectionStart, caretModel.primaryCaret.selectionEnd)
         var lastSelection = editor.vimMultipleCursorsLastSelection
-        val wholeWord = if (lastSelection != null && lastSelection.startOffset == currentSelection.startOffset &&
+        val isNextCursor = lastSelection != null && lastSelection.startOffset == currentSelection.startOffset &&
           lastSelection.endOffset == currentSelection.endOffset
-        ) {
-          editor.vimMultipleCursorsWholeWord ?: false
-        } else {
-          false
-        }
+        val wholeWord = if (isNextCursor) editor.vimMultipleCursorsWholeWord ?: false else false
         editor.vimMultipleCursorsWholeWord = wholeWord
         lastSelection = currentSelection
 
@@ -175,8 +185,13 @@ internal abstract class VimMultipleCursorsExtensionBase : VimExtension {
         // longer selected
         val pattern = editor.vim.getText(lastSelection)
 
+        // Like the word boundary flag, the case is decided when adding the first cursor. The text of the last cursor
+        // can differ in case from the first one, e.g. `FOO` found for `foo`, which would make 'smartcase' case sensitive
+        val ignoreCase = (if (isNextCursor) editor.vimMultipleCursorsIgnoreCase else null) ?: ignoreCase(pattern)
+        editor.vimMultipleCursorsIgnoreCase = ignoreCase
+
         val primaryCaret = editor.caretModel.primaryCaret
-        val nextOffset = findNextOccurrence(editor, primaryCaret.offset, pattern, wholeWord)
+        val nextOffset = findNextOccurrence(editor, primaryCaret.offset, pattern, wholeWord, ignoreCase)
         if (nextOffset != -1) {
           caretModel.allCarets.forEach {
             if (it.selectionStart == nextOffset) {
@@ -214,8 +229,8 @@ internal abstract class VimMultipleCursorsExtensionBase : VimExtension {
         enterVisualMode(editor.vim)
       }
 
-      // Note that ignoreCase is not overridden by the `\C` in the pattern
-      val pattern = makePattern(text, whole)
+      // The `\c` or `\C` in the pattern takes precedence over 'ignorecase' and 'smartcase'
+      val pattern = makePattern(text, whole, ignoreCase(text))
       val matches = injector.searchHelper.findAll(IjVimEditor(editor), pattern, 0, -1, false)
       for (match in matches) {
         if (match.contains(primaryCaret.offset)) {
@@ -235,8 +250,9 @@ internal abstract class VimMultipleCursorsExtensionBase : VimExtension {
       val primaryCaret = editor.caretModel.primaryCaret
       val selectedText = primaryCaret.selectedText ?: return
 
-      val nextOffset =
-        findNextOccurrence(editor, primaryCaret.offset, selectedText, editor.vimMultipleCursorsWholeWord ?: false)
+      val wholeWord = editor.vimMultipleCursorsWholeWord ?: false
+      val ignoreCase = editor.vimMultipleCursorsIgnoreCase ?: ignoreCase(selectedText)
+      val nextOffset = findNextOccurrence(editor, primaryCaret.offset, selectedText, wholeWord, ignoreCase)
       if (nextOffset != -1) {
         editor.caretModel.allCarets.forEach {
           if (it.selectionStart == nextOffset) {
@@ -288,7 +304,13 @@ internal abstract class VimMultipleCursorsExtensionBase : VimExtension {
     KeyHandler.getInstance().reset(editor)
   }
 
-  private fun findNextOccurrence(editor: Editor, startOffset: Int, text: String, whole: Boolean): Int {
+  private fun findNextOccurrence(
+    editor: Editor,
+    startOffset: Int,
+    text: String,
+    whole: Boolean,
+    ignoreCase: Boolean,
+  ): Int {
     val searchOptions = enumSetOf(SearchOptions.WHOLE_FILE)
     if (injector.options(editor.vim).wrapscan) {
       searchOptions.add(SearchOptions.WRAP)
@@ -296,17 +318,19 @@ internal abstract class VimMultipleCursorsExtensionBase : VimExtension {
 
     return injector.searchHelper.findPattern(
       IjVimEditor(editor),
-      makePattern(text, whole),
+      makePattern(text, whole, ignoreCase),
       startOffset,
       1,
       searchOptions
     )?.startOffset ?: -1
   }
 
-  private fun makePattern(text: String, whole: Boolean): String {
-    // Pattern is "very nomagic" (ignore regex chars) and "force case sensitive". This is vim-multiple-cursors behaviour
-    // In very nomagic mode, only backslash has special meaning, so we need to escape backslashes in the text
+  private fun makePattern(text: String, whole: Boolean, ignoreCase: Boolean): String {
+    // Pattern is "very nomagic" (ignore regex chars), and the case is forced with `\c` or `\C`, so it doesn't depend on
+    // 'ignorecase' and 'smartcase'. In very nomagic mode, only backslash has special meaning, so we need to escape
+    // backslashes in the text
     val escapedText = text.replace("\\", "\\\\")
-    return "\\V\\C" + if (whole) "\\<$escapedText\\>" else escapedText
+    val case = if (ignoreCase) "\\c" else "\\C"
+    return "\\V$case" + if (whole) "\\<$escapedText\\>" else escapedText
   }
 }

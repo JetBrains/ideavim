@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.extension.visualmulti
 import com.intellij.openapi.editor.impl.EditorComponentImpl
 import com.intellij.openapi.util.NlsSafe
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
@@ -50,6 +51,13 @@ private const val DEFAULT_MAPPINGS = "VM_default_mappings"
  */
 @NlsSafe
 private const val MAPS = "VM_maps"
+
+/**
+ * How occurrences are matched, the same as `g:VM_case_setting` in vim-visual-multi: `'smart'`, `'sensitive'` or
+ * `'ignore'`. Any other value, including the default empty string, follows 'ignorecase' and 'smartcase'.
+ */
+@NlsSafe
+private const val CASE_SETTING = "VM_case_setting"
 
 /**
  * The default `g:VM_leader` of vim-visual-multi
@@ -109,6 +117,22 @@ internal class VimVisualMultiExtension : VimMultipleCursorsExtensionBase() {
   }
 
   override fun getName() = "visual-multi"
+
+  /**
+   * vim-visual-multi sets 'ignorecase' and 'smartcase' according to `g:VM_case_setting` for the duration of the
+   * session, and searches the occurrences with them. We don't change the options of the user, but resolve them the
+   * same way here, and the search pattern then forces the case.
+   */
+  override fun ignoreCase(text: String): Boolean {
+    val setting = VimPlugin.getVariableService().getGlobalVariableValue(CASE_SETTING) as? VimString
+    val (ignoreCase, smartCase) = when (setting?.value?.lowercase()) {
+      "smart" -> true to true
+      "sensitive" -> false to false
+      "ignore" -> true to false
+      else -> injector.globalOptions().let { it.ignorecase to it.smartcase }
+    }
+    return ignoreCase && !(smartCase && text.any { it.isUpperCase() })
+  }
 
   override fun init() {
     registerMappings(readMappingKeys())

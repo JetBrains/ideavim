@@ -364,6 +364,18 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
   }
 
   @Test
+  fun `test pattern is case sensitive regardless of VM_case_setting`() {
+    // g:VM_case_setting belongs to the visual-multi extension, which shares the implementation with this one
+    val before = "${c}foo Foo foo"
+    configureByText(before)
+    enterCommand("let g:VM_case_setting = 'ignore'")
+
+    typeText(injector.parser.parseKeys("<C-n><C-n>"))
+
+    assertState("${s}foo$se Foo ${s}foo$se")
+  }
+
+  @Test
   fun `test ignores regex in search pattern`() {
     val before = "test ${s}t.*st${c}$se toast tallest t.*st"
     val editor = configureByText(before)
