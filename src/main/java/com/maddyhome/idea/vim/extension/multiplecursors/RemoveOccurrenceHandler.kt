@@ -18,13 +18,14 @@ import com.maddyhome.idea.vim.newapi.vim
  */
 internal class RemoveOccurrenceHandler : WriteActionHandler() {
 
-  override fun executeInWriteAction(editor: Editor) {
+  override fun executeInWriteAction(editor: Editor): Boolean {
     val caret = editor.caretModel.primaryCaret
-    if (caret.selectedText == null) return
+    if (caret.selectedText == null) return false
 
     if (!editor.caretModel.removeCaret(caret)) {
       editor.vim.exitVisualMode()
     }
     injector.scroll.scrollCaretIntoView(editor.vim)
+    return true
   }
 }

@@ -21,12 +21,12 @@ internal class AllOccurrencesHandler(
   private val caseSensitivity: CaseSensitivity,
 ) : WriteActionHandler() {
 
-  override fun executeInWriteAction(editor: Editor) {
-    if (editor.caretModel.caretCount > 1) return
+  override fun executeInWriteAction(editor: Editor): Boolean {
+    if (editor.caretModel.caretCount > 1) return false
 
     val primaryCaret = editor.caretModel.primaryCaret
     val text = if (editor.inVisualMode) primaryCaret.selectedText else primaryCaret.wordUnderCaret()
-    if (text == null) return
+    if (text == null) return false
 
     if (!editor.inVisualMode) {
       enterCharacterwiseVisualMode(editor.vim)
@@ -37,10 +37,12 @@ internal class AllOccurrencesHandler(
         primaryCaret.vim.moveToOffset(occurrence.startOffset)
         primaryCaret.selectOccurrence(occurrence.startOffset, text)
       } else {
-        val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(occurrence.startOffset), true) ?: return
+        val position = editor.offsetToVisualPosition(occurrence.startOffset)
+        val caret = editor.caretModel.addCaret(position, true) ?: return false
         caret.selectOccurrence(occurrence.startOffset, text)
       }
     }
     editor.updateCaretsVisualAttributes()
+    return true
   }
 }

@@ -15,21 +15,22 @@ import com.intellij.openapi.editor.Editor
  */
 internal class SkipOccurrenceHandler(private val caseSensitivity: CaseSensitivity) : WriteActionHandler() {
 
-  override fun executeInWriteAction(editor: Editor) {
+  override fun executeInWriteAction(editor: Editor): Boolean {
     val primaryCaret = editor.caretModel.primaryCaret
-    val text = primaryCaret.selectedText ?: return
+    val text = primaryCaret.selectedText ?: return false
 
     val search = editor.occurrenceSearch
     val wholeWord = search?.wholeWord ?: false
     val ignoreCase = search?.ignoreCase ?: caseSensitivity.ignoresCase(text)
 
-    val nextOffset = findNextOccurrence(editor, primaryCaret.offset, text, wholeWord, ignoreCase) ?: return
+    val nextOffset = findNextOccurrence(editor, primaryCaret.offset, text, wholeWord, ignoreCase) ?: return false
     if (editor.isSelectedByAnyCaret(nextOffset)) {
       showNoMoreMatches()
-      return
+      return false
     }
 
     primaryCaret.moveToVisualPosition(editor.offsetToVisualPosition(nextOffset))
     primaryCaret.selectOccurrence(nextOffset, text)
+    return true
   }
 }

@@ -27,31 +27,28 @@ import com.maddyhome.idea.vim.newapi.vim
 internal class NextOccurrenceHandler(
   private val wholeWord: Boolean,
   private val caseSensitivity: CaseSensitivity,
+  override val acceptsCount: Boolean = false,
 ) : WriteActionHandler() {
 
-  override fun executeInWriteAction(editor: Editor) {
-    if (editor.inVisualMode) {
-      addNextOccurrence(editor)
-    } else {
-      startWithWordUnderCaret(editor)
-    }
-  }
+  override fun executeInWriteAction(editor: Editor): Boolean =
+    if (editor.inVisualMode) addNextOccurrence(editor) else startWithWordUnderCaret(editor)
 
-  private fun startWithWordUnderCaret(editor: Editor) {
-    if (editor.caretModel.caretCount > 1) return
+  private fun startWithWordUnderCaret(editor: Editor): Boolean {
+    if (editor.caretModel.caretCount > 1) return false
 
     val word = editor.caretModel.primaryCaret.selectWordUnderCaret()
     editor.occurrenceSearch = word?.let {
       OccurrenceSearch(wholeWord, caseSensitivity.ignoresCase(editor.vim.getText(it)), lastOccurrence = it)
     }
+    return word != null
   }
 
-  private fun addNextOccurrence(editor: Editor) {
+  private fun addNextOccurrence(editor: Editor): Boolean {
     val carets = editor.caretModel.allCarets
-    if (carets.any { it.selectedText == null }) return
-    if (splitMultilineSelections(editor)) return
+    if (carets.any { it.selectedText == null }) return false
+    if (splitMultilineSelections(editor)) return true
     // Cursors added in another way may select different texts
-    if (!selectSameText(editor, carets)) return
+    if (!selectSameText(editor, carets)) return false
 
     val search = continueOrStartSearch(editor)
     val pattern = editor.vim.getText(search.lastOccurrence)
@@ -60,12 +57,13 @@ internal class NextOccurrenceHandler(
     val nextOffset = findNextOccurrence(editor, startOffset, pattern, search.wholeWord, search.ignoreCase)
     if (nextOffset == null || editor.isSelectedByAnyCaret(nextOffset)) {
       showNoMoreMatches()
-      return
+      return false
     }
 
-    val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(nextOffset), true) ?: return
+    val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(nextOffset), true) ?: return false
     editor.updateCaretsVisualAttributes()
     editor.occurrenceSearch = search.copy(lastOccurrence = caret.selectOccurrence(nextOffset, pattern))
+    return true
   }
 
   /**
