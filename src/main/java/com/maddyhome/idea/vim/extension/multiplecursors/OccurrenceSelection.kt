@@ -1,0 +1,66 @@
+/*
+ * Copyright 2003-2026 The IdeaVim authors
+ *
+ * Use of this source code is governed by an MIT-style
+ * license that can be found in the LICENSE.txt file or at
+ * https://opensource.org/licenses/MIT.
+ */
+
+package com.maddyhome.idea.vim.extension.multiplecursors
+
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getText
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.group.visual.vimSetSelection
+import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.helper.endOffsetInclusive
+import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.SelectionType
+
+/**
+ * Selects the occurrence of [text] at [offset], with the caret at its end
+ */
+internal fun Caret.selectOccurrence(offset: Int, text: String): TextRange {
+  vim.vimSetSelection(offset, offset + text.length - 1, true)
+  injector.scroll.scrollCaretIntoView(editor.vim)
+  return selectedRange
+}
+
+/**
+ * Enters Visual mode and selects the word under the caret. Returns `null` if the caret is not on a word.
+ */
+internal fun Caret.selectWordUnderCaret(): TextRange? {
+  val word = injector.searchHelper.findWordAtOrFollowingCursor(editor.vim, vim, isBigWord = false) ?: return null
+  if (word.startOffset > offset) return null
+
+  enterCharacterwiseVisualMode(editor.vim)
+  vim.vimSetSelection(word.startOffset, word.endOffsetInclusive, true)
+  return selectedRange
+}
+
+internal fun Caret.wordUnderCaret(): String? {
+  val word = injector.searchHelper.findWordAtOrFollowingCursor(editor.vim, vim, isBigWord = false) ?: return null
+  if (word.startOffset > offset) return null
+  return editor.vim.getText(word)
+}
+
+internal val Caret.selectedRange: TextRange
+  get() = TextRange(selectionStart, selectionEnd)
+
+internal fun Editor.isSelectedByAnyCaret(offset: Int): Boolean =
+  caretModel.allCarets.any { it.selectionStart == offset }
+
+internal fun enterCharacterwiseVisualMode(editor: VimEditor) {
+  VimPlugin.getVisualMotion().enterVisualMode(editor, SelectionType.CHARACTER_WISE)
+  // The key handler has to know about Visual mode for the next keys
+  KeyHandler.getInstance().reset(editor)
+}
+
+internal fun showNoMoreMatches() {
+  VimPlugin.showMessage(MessageHelper.message("multiple-cursors.message.no.more.matches"))
+}

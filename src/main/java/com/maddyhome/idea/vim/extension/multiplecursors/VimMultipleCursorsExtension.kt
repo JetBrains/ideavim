@@ -47,14 +47,15 @@ internal class VimMultipleCursorsExtension : VimMultipleCursorsExtensionBase() {
   override fun getName() = "multiple-cursors"
 
   override fun init() {
-    putPlugMapping(MappingMode.NXO, NEXT_WHOLE_OCCURRENCE, NextOccurrenceHandler())
-    putPlugMapping(MappingMode.NXO, NEXT_OCCURRENCE, NextOccurrenceHandler(whole = false))
-    putPlugMapping(MappingMode.NXO, ALL_WHOLE_OCCURRENCES, AllOccurrencesHandler())
-    putPlugMapping(MappingMode.NXO, ALL_OCCURRENCES, AllOccurrencesHandler(whole = false))
-    putPlugMapping(MappingMode.X, SKIP_OCCURRENCE, SkipOccurrenceHandler())
+    val case = AlwaysCaseSensitive
+    putPlugMapping(MappingMode.NXO, NEXT_WHOLE_OCCURRENCE, NextOccurrenceHandler(wholeWord = true, case))
+    putPlugMapping(MappingMode.NXO, NEXT_OCCURRENCE, NextOccurrenceHandler(wholeWord = false, case))
+    putPlugMapping(MappingMode.NXO, ALL_WHOLE_OCCURRENCES, AllOccurrencesHandler(wholeWord = true, case))
+    putPlugMapping(MappingMode.NXO, ALL_OCCURRENCES, AllOccurrencesHandler(wholeWord = false, case))
+    putPlugMapping(MappingMode.X, SKIP_OCCURRENCE, SkipOccurrenceHandler(case))
     putPlugMapping(MappingMode.X, REMOVE_OCCURRENCE, RemoveOccurrenceHandler())
 
-    if (isFlagEnabled(USE_DEFAULT_MAPPING)) {
+    if (isGlobalFlagEnabled(USE_DEFAULT_MAPPING)) {
       putDefaultMapping(MappingMode.NXO, "<C-n>", NEXT_WHOLE_OCCURRENCE)
       putDefaultMapping(MappingMode.NXO, "g<C-n>", NEXT_OCCURRENCE)
       putDefaultMapping(MappingMode.NXO, "<A-n>", ALL_WHOLE_OCCURRENCES)
