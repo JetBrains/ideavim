@@ -92,6 +92,65 @@ class VisualMultiLeaderTest : VisualMultiTestCase() {
   }
 
   @Test
+  fun `test VM_leader set to two backslashes`() {
+    // A backslash is literal in the keys of a mapping, while parseKeys would read `\\` as one escaped backslash
+    val before = """qwe
+      |asd
+      |q${c}we
+    """.trimMargin()
+    configureByText(before)
+    reinitAfter("let g:VM_leader = '\\\\'")
+
+    typeText("<Bslash><Bslash>A")
+
+    val after = """${s}qwe$se
+      |asd
+      |${s}qwe$se
+    """.trimMargin()
+    assertState(after)
+  }
+
+  @Test
+  fun `test VM_leader of two backslashes is not a single backslash`() {
+    val before = """qwe
+      |asd
+      |q${c}we
+    """.trimMargin()
+    configureByText(before)
+    reinitAfter("let g:VM_leader = '\\\\'")
+
+    typeText("<Bslash>A")
+
+    // A single backslash is not the leader, so `A` is the normal append command
+    assertState(
+      """qwe
+      |asd
+      |qwe$c
+      """.trimMargin(),
+    )
+    assertMode(Mode.INSERT)
+  }
+
+  @Test
+  fun `test VM_leader with backslash before key notation`() {
+    // parseKeys would read `\<` as an escaped `<`, and `Space>` as literal characters
+    val before = """qwe
+      |asd
+      |q${c}we
+    """.trimMargin()
+    configureByText(before)
+    reinitAfter("let g:VM_leader = '\\<Space>'")
+
+    typeText("<Bslash><Space>A")
+
+    val after = """${s}qwe$se
+      |asd
+      |${s}qwe$se
+    """.trimMargin()
+    assertState(after)
+  }
+
+  @Test
   fun `test VM_leader with key notation`() {
     val before = """qwe
       |asd
