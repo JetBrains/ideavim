@@ -49,9 +49,23 @@ open class ShortcutDispatcher<T>(
   })
 
   protected val trie = KeyStrokeTrie<T>(name)
-  private val shortcutSet: ShortcutSet
+  private var shortcutSet: ShortcutSet = CustomShortcutSet.EMPTY
+
+  protected val keyStrokes: MutableList<KeyStroke> = mutableListOf()
 
   init {
+    setMappings(data)
+  }
+
+  /**
+   * Replaces all the mappings of this dispatcher.
+   *
+   * The new keys start to reach the dispatcher once [register] is called again. The shortcut set belongs to the action,
+   * so a single [register] call updates the keys for every component this dispatcher is registered on.
+   */
+  protected fun setMappings(data: Map<List<KeyStroke>, T>) {
+    keyStrokes.clear()
+    trie.clear()
     val keys: MutableList<KeyStroke> = mutableListOf()
     for ((k, v) in data) {
       keys.addAll(k)
@@ -60,8 +74,6 @@ open class ShortcutDispatcher<T>(
     val shortcuts = keys.map { KeyboardShortcut(it, null) }
     shortcutSet = CustomShortcutSet(*shortcuts.toTypedArray())
   }
-
-  protected val keyStrokes: MutableList<KeyStroke> = mutableListOf()
 
   final override fun actionPerformed(e: AnActionEvent) {
     var keyStroke = getKeyStroke(e) ?: return

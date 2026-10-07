@@ -41,6 +41,8 @@ class NerdTreeEverywhere : VimExtension {
     val oldFocusOwner = evt.oldValue
     val dispatcher = service<Dispatcher>()
     if (newFocusOwner is Tree) {
+      // Pick up the changed `g:NERDTreeMap*` variables without restarting the IDE
+      dispatcher.reloadMappings()
       // It's okay to have `register` called multiple times, as its internal implementation prevents duplicate registrations
       dispatcher.register(newFocusOwner)
     }
@@ -55,7 +57,20 @@ class NerdTreeEverywhere : VimExtension {
   }
 
   @Service
-  class Dispatcher : AbstractDispatcher(PLUGIN_NAME, navigationMappings.toMutableMap().apply {
+  class Dispatcher : AbstractDispatcher(PLUGIN_NAME, ::createEverywhereMappings) {
+    init {
+      templatePresentation.isEnabledInModalContext = true
+    }
+  }
+
+  override fun dispose() {
+    KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener("focusOwner", focusListener)
+    super.dispose()
+  }
+}
+
+private fun createEverywhereMappings(): Map<List<KeyStroke>, NerdTreeAction> =
+  createNavigationMappings().toMutableMap().apply {
     // NerdTreeEverywhere must handle all file-opening mappings that NerdTree uses.
     // Multi-key sequences like 'gs'/'gi' add their individual keys ('s', 'i') to the
     // CustomShortcutSet, which would capture those keys and swallow them as invalid
@@ -94,17 +109,7 @@ class NerdTreeEverywhere : VimExtension {
       injector.window.splitWindowHorizontal(event.dataContext.vim, file.path, focusNew = false)
       tree.requestFocus()
     })
-  }) {
-    init {
-      templatePresentation.isEnabledInModalContext = true
-    }
   }
-
-  override fun dispose() {
-    KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener("focusOwner", focusListener)
-    super.dispose()
-  }
-}
 
 /**
  * Opens a file via [injector.file] (which routes through RPC in split mode),
