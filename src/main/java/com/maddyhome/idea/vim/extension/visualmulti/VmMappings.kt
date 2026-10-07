@@ -9,12 +9,14 @@
 package com.maddyhome.idea.vim.extension.visualmulti
 
 import com.intellij.openapi.util.NlsSafe
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.multiplecursors.AllOccurrencesHandler
 import com.maddyhome.idea.vim.extension.multiplecursors.NextOccurrenceHandler
 import com.maddyhome.idea.vim.extension.multiplecursors.RemoveOccurrenceHandler
 import com.maddyhome.idea.vim.extension.multiplecursors.SkipOccurrenceHandler
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 /**
  * The default `g:VM_leader`
@@ -43,16 +45,29 @@ internal class VmMapping(
 /**
  * The mappings available before a session starts. They start the session.
  */
-internal val permanentMappings = listOf(
-  VmMapping("Find Under", MappingMode.N, "<C-n>", alwaysMapped = true) {
-    NextOccurrenceHandler(wholeWord = true, VmCaseSetting)
-  },
-  VmMapping("Find Subword Under", MappingMode.X, "<C-n>", alwaysMapped = true) {
-    NextOccurrenceHandler(wholeWord = false, VmCaseSetting)
-  },
-  VmMapping("Select All", MappingMode.N, "${LEADER}A") { AllOccurrencesHandler(wholeWord = true, VmCaseSetting) },
-  VmMapping("Visual All", MappingMode.X, "${LEADER}A") { AllOccurrencesHandler(wholeWord = false, VmCaseSetting) },
-)
+internal fun getPermanentMappings(): List<VmMapping> {
+  val leader = getLeader()
+  return listOf(
+    VmMapping("Find Under", MappingMode.N, "<C-n>", alwaysMapped = true) {
+      NextOccurrenceHandler(wholeWord = true, VmCaseSetting)
+    },
+    VmMapping("Find Subword Under", MappingMode.X, "<C-n>", alwaysMapped = true) {
+      NextOccurrenceHandler(wholeWord = false, VmCaseSetting)
+    },
+    VmMapping("Select All", MappingMode.N, "${leader}A") {
+      AllOccurrencesHandler(
+        wholeWord = true,
+        VmCaseSetting
+      )
+    },
+    VmMapping("Visual All", MappingMode.X, "${leader}A") {
+      AllOccurrencesHandler(
+        wholeWord = false,
+        VmCaseSetting
+      )
+    },
+  )
+}
 
 /**
  * The mappings active only inside a session. Outside it, the keys keep their Vim meaning.
@@ -69,3 +84,8 @@ internal val sessionMappings = listOf(
   // In Normal mode, <Esc> is partly handled by the IDE, which we don't want to break
   VmMapping("Exit", MappingMode.X, "<Esc>", alwaysMapped = true) { ExitHandler() },
 )
+
+internal fun getLeader(): String {
+  val leader = injector.variableService.getGlobalVariableValue("VM_leader") ?: return LEADER
+  return (leader as VimString).value.replace("\\", "<Bslash>")
+}

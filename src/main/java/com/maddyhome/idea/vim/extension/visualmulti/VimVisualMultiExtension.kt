@@ -65,7 +65,7 @@ internal class VimVisualMultiExtension : VimMultipleCursorsExtensionBase() {
   }
 
   private fun registerPlugMappings() {
-    for (mapping in permanentMappings) {
+    for (mapping in getPermanentMappings()) {
       putPlugMapping(mapping.modes, mapping.plug, StartSessionHandler(mapping.createHandler()))
     }
     for (mapping in sessionMappings) {
@@ -74,7 +74,7 @@ internal class VimVisualMultiExtension : VimMultipleCursorsExtensionBase() {
   }
 
   private fun registerPermanentKeys(keys: Map<String, MappingKeys>) {
-    for (mapping in permanentMappings) {
+    for (mapping in getPermanentMappings()) {
       val mappingKeys = keys[mapping.name] ?: continue
       if (mappingKeys.fromUser) {
         putMapping(mapping.modes, mappingKeys.keys, mapping.plug)
