@@ -43,6 +43,16 @@ fun MutableMap<List<KeyStroke>, NerdTreeAction>.register(mapping: String, action
  * Default~
  * Key      Description                                                             Map settings
  *
+ * j........Move the selection down......................................*NERDTreeMapSelectNext*
+ * k........Move the selection up....................................*NERDTreeMapSelectPrevious*
+ * gg.......Jump to the first node......................................*NERDTreeMapSelectFirst*
+ * G........Jump to the last node........................................*NERDTreeMapSelectLast*
+ * <C-D>....Move the selection half a page down.................*NERDTreeMapScrollHalfPageDown*
+ * <C-U>....Move the selection half a page up.....................*NERDTreeMapScrollHalfPageUp*
+ * /........Start speed search..........................................*NERDTreeMapSpeedSearch*
+ *
+ * The mappings above are IdeaVim-specific, original NERDTree uses regular Vim motions for them.
+ *
  * O........Recursively open the selected directory..................*NERDTreeMapOpenRecursively*
  * x........Close the current nodes parent..................................*NERDTreeMapCloseDir*
  * X........Recursively close all children of the current node.........*NERDTreeMapCloseChildren*
@@ -55,19 +65,19 @@ fun MutableMap<List<KeyStroke>, NerdTreeAction>.register(mapping: String, action
  * <C-K>....Jump up to previous sibling of the current directory.....*NERDTreeMapJumpPrevSibling*
  * </code></pre>
  */
-val navigationMappings: Map<List<KeyStroke>, NerdTreeAction> = mutableMapOf<List<KeyStroke>, NerdTreeAction>().apply {
+fun createNavigationMappings(): Map<List<KeyStroke>, NerdTreeAction> = mutableMapOf<List<KeyStroke>, NerdTreeAction>().apply {
   // TODO support going [count] lines upward/downward or to line [count]
   // Delegate to JTree's Swing ActionMap (same path as native arrow keys via TreeAction/DefaultTreeUI).
   // This avoids ActionManager.tryToExecute which can RPC to backend in split mode,
   // while preserving platform features (separator skipping, cycle scrolling, loading node handling).
-  register("k", NerdTreeAction.swing("selectPrevious"))
-  register("j", NerdTreeAction.swing("selectNext"))
-  register("G", NerdTreeAction.swing("selectLast"))
-  register("gg", NerdTreeAction.swing("selectFirst"))
-  register("<C-D>", NerdTreeAction { _, tree ->
+  register("NERDTreeMapSelectPrevious", "k", NerdTreeAction.swing("selectPrevious"))
+  register("NERDTreeMapSelectNext", "j", NerdTreeAction.swing("selectNext"))
+  register("NERDTreeMapSelectLast", "G", NerdTreeAction.swing("selectLast"))
+  register("NERDTreeMapSelectFirst", "gg", NerdTreeAction.swing("selectFirst"))
+  register("NERDTreeMapScrollHalfPageDown", "<C-D>", NerdTreeAction { _, tree ->
     navigateHalfPage(tree, ScrollDirection.DOWN)
   })
-  register("<C-U>", NerdTreeAction { _, tree ->
+  register("NERDTreeMapScrollHalfPageUp", "<C-U>", NerdTreeAction { _, tree ->
     navigateHalfPage(tree, ScrollDirection.UP)
   })
 
@@ -144,7 +154,7 @@ val navigationMappings: Map<List<KeyStroke>, NerdTreeAction> = mutableMapOf<List
   register("NERDTreeMapJumpNextSibling", "<C-J>", NerdTreeAction.swing("selectNextSibling"))
   register("NERDTreeMapJumpPrevSibling", "<C-K>", NerdTreeAction.swing("selectPreviousSibling"))
 
-  register("/", NerdTreeAction { event, tree ->
+  register("NERDTreeMapSpeedSearch", "/", NerdTreeAction { event, tree ->
     armSelectionRestoreOnEscape(tree)
     NerdTreeAction.callAction(null, "SpeedSearch")
   })

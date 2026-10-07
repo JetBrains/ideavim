@@ -11,18 +11,26 @@ package org.jetbrains.plugins.ideavim.extension.nerdtree
 import com.intellij.openapi.actionSystem.ActionUiKind
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.options.advanced.AdvancedSettings
 import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.ui.treeStructure.Tree
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.extension.nerdtree.AbstractDispatcher
 import com.maddyhome.idea.vim.extension.nerdtree.armSelectionRestoreOnEscape
-import com.maddyhome.idea.vim.extension.nerdtree.navigationMappings
+import com.maddyhome.idea.vim.extension.nerdtree.createNavigationMappings
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import java.awt.event.KeyEvent
+import javax.swing.KeyStroke
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreePath
@@ -144,6 +152,49 @@ class NerdTreeTest : VimTestCase() {
     }
   }
 
+  @Test
+  fun `test navigation keys can be remapped with variables`() {
+    VimPlugin.getVariableService().storeGlobalVariable("NERDTreeMapSelectNext", VimString("<C-N>"))
+    VimPlugin.getVariableService().storeGlobalVariable("NERDTreeMapScrollHalfPageDown", VimString("<C-F>"))
+    onEdt {
+      val mappings = createNavigationMappings()
+      assertNull(mappings[injector.parser.parseKeys("j")], "`j` should not be mapped after remapping it to <C-N>")
+      assertNull(mappings[injector.parser.parseKeys("<C-D>")], "<C-D> should not be mapped after remapping it to <C-F>")
+
+      val tree = createTallTree(childCount = 40, visibleRows = 10)
+      tree.setSelectionRow(1)
+
+      tree.perform("<C-N>")
+      assertEquals(2, tree.selectedRow, "<C-N> should move the selection one row down")
+
+      tree.perform("<C-F>")
+      assertEquals(7, tree.selectedRow, "<C-F> should move the selection half a page down")
+    }
+  }
+
+  // Changing the variables (e.g. by reloading the ideavimrc) should not require restarting the IDE
+  @Test
+  fun `test reloading mappings picks up changed variables`() {
+    onEdt {
+      val dispatcher = object : AbstractDispatcher("test", ::createNavigationMappings) {}
+      val tree = createSampleTree()
+      dispatcher.register(tree)
+      assertTrue(dispatcher.hasShortcut("j"), "`j` should be mapped by default")
+
+      VimPlugin.getVariableService().storeGlobalVariable("NERDTreeMapSelectNext", VimString("<C-N>"))
+      dispatcher.reloadMappings()
+      dispatcher.register(tree)
+
+      assertFalse(dispatcher.hasShortcut("j"), "`j` should not be mapped after remapping it to <C-N>")
+      assertTrue(dispatcher.hasShortcut("<C-N>"), "<C-N> should be mapped after reloading the mappings")
+    }
+  }
+
+  private fun AbstractDispatcher.hasShortcut(key: String): Boolean {
+    val keyStroke: KeyStroke = injector.parser.parseKeys(key).single()
+    return shortcutSet.shortcuts.any { it is KeyboardShortcut && it.firstKeyStroke == keyStroke }
+  }
+
   private fun onEdt(block: () -> Unit) {
     ApplicationManager.getApplication().invokeAndWait(block)
   }
@@ -194,7 +245,7 @@ class NerdTreeTest : VimTestCase() {
     get() = selectionRows?.single() ?: -1
 
   private fun Tree.perform(keys: String) {
-    val action = navigationMappings[injector.parser.parseKeys(keys)] ?: error("No NERDTree mapping for `$keys`")
+    val action = createNavigationMappings()[injector.parser.parseKeys(keys)] ?: error("No NERDTree mapping for `$keys`")
     action.action(AnActionEvent.createEvent(DataContext.EMPTY_CONTEXT, null, "test", ActionUiKind.NONE, null), this)
   }
 

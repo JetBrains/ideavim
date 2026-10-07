@@ -18,6 +18,7 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.wm.ToolWindowId
 import com.intellij.openapi.wm.ex.ToolWindowManagerEx
+import com.intellij.ui.treeStructure.Tree
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -29,8 +30,11 @@ import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
+import java.awt.KeyboardFocusManager
+import java.beans.PropertyChangeListener
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import javax.swing.KeyStroke
+import javax.swing.SwingUtilities
 import kotlin.concurrent.read
 import kotlin.concurrent.write
 
@@ -109,9 +113,11 @@ internal class NerdTree : VimExtension {
       VimExtensionFacade.addCommand("NERDTreeRefreshRoot", IjCommandHandler("Synchronize"))
     }
     ProjectManager.getInstance().openProjects.forEach(::installDispatcher)
+    KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener("focusOwner", focusListener)
   }
 
   override fun dispose() {
+    KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener("focusOwner", focusListener)
     lock.write {
       enabled = false
       // TODO remove ex-commands
@@ -162,7 +168,7 @@ internal class NerdTree : VimExtension {
   }
 
   @Service(Service.Level.PROJECT)
-  class NerdDispatcher : AbstractDispatcher(PLUGIN_NAME, createMappings()) {
+  class NerdDispatcher : AbstractDispatcher(PLUGIN_NAME, ::createMappings) {
     companion object {
       fun getInstance(project: Project): NerdDispatcher {
         return project.service<NerdDispatcher>()
@@ -176,7 +182,7 @@ internal class NerdTree : VimExtension {
   }
 }
 
-private fun createMappings(): Map<List<KeyStroke>, NerdTreeAction> = navigationMappings.toMutableMap().apply {
+private fun createMappings(): Map<List<KeyStroke>, NerdTreeAction> = createNavigationMappings().toMutableMap().apply {
   // File opening actions use injector.file.openFile() which routes through RPC in split mode:
   //   monolith:    injector.file → IjFileGroup.openFile() → rpc() → FileRemoteApiImpl (local)
   //   split mode:  injector.file → IjFileGroup.openFile() → rpc() → FileRemoteApiImpl (backend)
@@ -304,6 +310,26 @@ fun closeEditorTree() {
 
 private val lock = ReentrantReadWriteLock()
 private var enabled = false
+
+/**
+ * Reloads the mappings every time the project view gets focus, so the changed `g:NERDTreeMap*` variables are applied
+ * without restarting the IDE.
+ */
+private val focusListener = PropertyChangeListener { evt ->
+  val newFocusOwner = evt.newValue as? Tree ?: return@PropertyChangeListener
+  lock.read {
+    if (!enabled) return@PropertyChangeListener
+    for (project in ProjectManager.getInstance().openProjects) {
+      val component = (ProjectView.getInstance(project) as ProjectViewImpl).component ?: continue
+      if (SwingUtilities.isDescendingFrom(newFocusOwner, component)) {
+        val dispatcher = NerdTree.NerdDispatcher.getInstance(project)
+        dispatcher.reloadMappings()
+        dispatcher.register(component)
+        return@PropertyChangeListener
+      }
+    }
+  }
+}
 
 private fun installDispatcher(project: Project) {
   lock.read {

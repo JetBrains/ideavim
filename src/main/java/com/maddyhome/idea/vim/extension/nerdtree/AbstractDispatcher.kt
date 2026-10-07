@@ -21,8 +21,14 @@ import javax.swing.KeyStroke
 /**
  * Handles keyboard shortcuts and delegates them to appropriate actions.
  */
-abstract class AbstractDispatcher(name: String, mappings: Map<List<KeyStroke>, NerdTreeAction>) :
-  ShortcutDispatcher<NerdTreeAction>(name, mappings, NerdTreeListener) {
+abstract class AbstractDispatcher(name: String, private val createMappings: () -> Map<List<KeyStroke>, NerdTreeAction>) :
+  ShortcutDispatcher<NerdTreeAction>(name, createMappings(), NerdTreeListener) {
+
+  /**
+   * Re-reads the `g:NERDTreeMap*` variables, so that changing them (e.g. by reloading the ideavimrc) doesn't require
+   * restarting the IDE. Call [register] afterward to apply the new keys.
+   */
+  fun reloadMappings() = setMappings(createMappings())
 
   private object NerdTreeListener : Listener<NerdTreeAction> {
     override fun onMatch(e: AnActionEvent, keyStrokes: MutableList<KeyStroke>, data: NerdTreeAction) {
