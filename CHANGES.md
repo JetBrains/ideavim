@@ -31,6 +31,8 @@ usual beta standards.
 * [VIM-1306](https://youtrack.jetbrains.com/issue/VIM-1306) New `keylog` extension writes every key you type to a file, like Vim's [`-w`](https://vimhelp.org/starting.txt.html#-w) command line argument. Enable it with `set keylog`. The keys go to `ideavim.log` next to your ideavimrc, or to the file set with `let g:keylog_file = "~/vimlogs/ideavim.log"`
 * [`:help`](https://vimhelp.org/helphelp.txt.html#%3Ahelp) now opens IdeaVim's own read-only help file inside the IDE instead of a web page. It lists every supported command with a description of what it does in IdeaVim, and `:help :s` or `:help i_CTRL-W` jumps straight to that command
 * Action IDs can now be completed: press `<Tab>`/`<S-Tab>` after `:action` or `:actionlist` in the command line to cycle through matching IDs, and in `.ideavimrc` code completion suggests action IDs, with their names and descriptions, inside `<Action(...)>` and after `action`
+* [VIM-1948](https://youtrack.jetbrains.com/issue/VIM-1948) New `'ideascrollcursor'` option makes the caret move with the text when scrolling with the mouse wheel or the scrollbar, keeping it [`'scrolloff'`](https://vimhelp.org/options.txt.html#%27scrolloff%27) lines from the edge of the window, as in Vim. It is off by default — enable it with `:set ideascrollcursor`
+* [VIM-720](https://youtrack.jetbrains.com/issue/VIM-720) `<CR>`, `<Esc>` and the arrow keys can now be handed over to the IDE with [`sethandler`](https://github.com/JetBrains/ideavim/blob/master/doc/sethandler.md) for that key, e.g. `sethandler <CR> i:ide` or `sethandler <Esc> n:ide`. Handlers set for all shortcuts at once, such as `sethandler a:ide`, still leave these keys to Vim
 
 ### Fixes:
 
@@ -42,6 +44,7 @@ usual beta standards.
 * [VIM-1314](https://youtrack.jetbrains.com/issue/VIM-1314) Pasting with the IDE paste action (`Cmd+V`/`Ctrl+V`) in Replace mode now overwrites the characters under the caret, as in Vim, instead of inserting the text before them. `<BS>` puts the original characters back
 * [VIM-1894](https://youtrack.jetbrains.com/issue/VIM-1894) Fixed [`V`](https://vimhelp.org/visual.txt.html#V) on a collapsed fold selecting only its first line. Linewise Visual mode now takes in the whole folded region, so `Vd` on a collapsed `<div>` deletes the entire tag, and `Vj` onto a collapsed fold selects all of it
 * [VIM-4336](https://youtrack.jetbrains.com/issue/VIM-4336) Fixed the caret ending up in the wrong place after IDE actions that run asynchronously in Rider, such as commenting a line
+* [VIM-1503](https://youtrack.jetbrains.com/issue/VIM-1503) Fixed dead keys and input methods typing text into the document in Normal, Visual and Operator-pending modes. Pressing a dead key such as `'` after `vi` no longer replaces the Visual selection, and a composed character like `é` can be used as a command argument, e.g. `fé`
 
 ### Merged PRs:
 * [2082](https://github.com/JetBrains/ideavim/pull/2082) by [1grzyb1](https://github.com/1grzyb1): VIM-748 changing multiple commands with |
@@ -51,6 +54,9 @@ usual beta standards.
 * [2090](https://github.com/JetBrains/ideavim/pull/2090) by [1grzyb1](https://github.com/1grzyb1): VIM-4333 Fix auto-indent handling in clion
 * [2091](https://github.com/JetBrains/ideavim/pull/2091) by [1grzyb1](https://github.com/1grzyb1): VIM-3963 Allow enabling vim for plugin editors and ai chat windows
 * [2098](https://github.com/JetBrains/ideavim/pull/2098) by [1grzyb1](https://github.com/1grzyb1): VIM-1894 include collapsed region during visual selection
+* [2102](https://github.com/JetBrains/ideavim/pull/2102) by [1grzyb1](https://github.com/1grzyb1): VIM-1948 Scroll caret while mouse scrolling
+* [2112](https://github.com/JetBrains/ideavim/pull/2112) by [1grzyb1](https://github.com/1grzyb1): VIM-720 Allow handling esc, enter, arrows directly by ide
+* [2113](https://github.com/JetBrains/ideavim/pull/2113) by [1grzyb1](https://github.com/1grzyb1): VIM-1503 don't type dead keys
 
 ## 2.47.2, 2026-10-02
 
