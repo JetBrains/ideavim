@@ -17,11 +17,23 @@ import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.newapi.ij
 
 internal abstract class WriteActionHandler : ExtensionHandler {
+
+  /**
+   * Whether a count repeats the command
+   */
+  open val acceptsCount: Boolean = false
+
   override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
+    val count = if (acceptsCount) operatorArguments.count1 else 1
     ApplicationManager.getApplication().runWriteAction {
-      executeInWriteAction(editor.ij)
+      for (i in 1..count) {
+        if (!executeInWriteAction(editor.ij)) break
+      }
     }
   }
 
-  abstract fun executeInWriteAction(editor: Editor)
+  /**
+   * Returns whether the command has done anything. Repeating stops at the first command that hasn't.
+   */
+  abstract fun executeInWriteAction(editor: Editor): Boolean
 }

@@ -49,10 +49,10 @@ internal fun getPermanentMappings(): List<VmMapping> {
   val leader = getLeader()
   return listOf(
     VmMapping("Find Under", MappingMode.N, "<C-n>", alwaysMapped = true) {
-      NextOccurrenceHandler(wholeWord = true, VmCaseSetting)
+      NextOccurrenceHandler(wholeWord = true, VmCaseSetting, acceptsCount = true)
     },
     VmMapping("Find Subword Under", MappingMode.X, "<C-n>", alwaysMapped = true) {
-      NextOccurrenceHandler(wholeWord = false, VmCaseSetting)
+      NextOccurrenceHandler(wholeWord = false, VmCaseSetting, acceptsCount = true)
     },
     VmMapping("Select All", MappingMode.N, "${leader}A") {
       AllOccurrencesHandler(
@@ -77,7 +77,7 @@ internal fun getPermanentMappings(): List<VmMapping> {
  */
 internal val sessionMappings = listOf(
   VmMapping("Find Next", MappingMode.X, "n", alwaysMapped = true) {
-    NextOccurrenceHandler(wholeWord = false, VmCaseSetting)
+    NextOccurrenceHandler(wholeWord = false, VmCaseSetting, acceptsCount = true)
   },
   VmMapping("Skip Region", MappingMode.X, "q", alwaysMapped = true) { SkipOccurrenceHandler(VmCaseSetting) },
   VmMapping("Remove Region", MappingMode.X, "Q", alwaysMapped = true) { RemoveOccurrenceHandler() },
