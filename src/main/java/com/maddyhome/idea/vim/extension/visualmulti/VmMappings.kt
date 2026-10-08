@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.multiplecursors.AllOccurrencesHandler
+import com.maddyhome.idea.vim.extension.multiplecursors.NewSelection
 import com.maddyhome.idea.vim.extension.multiplecursors.NextOccurrenceHandler
 import com.maddyhome.idea.vim.extension.multiplecursors.RemoveOccurrenceHandler
 import com.maddyhome.idea.vim.extension.multiplecursors.SkipOccurrenceHandler
@@ -52,7 +53,7 @@ internal fun getPermanentMappings(): List<VmMapping> {
       NextOccurrenceHandler(wholeWord = true, VmCaseSetting, acceptsCount = true)
     },
     VmMapping("Find Subword Under", MappingMode.X, "<C-n>", alwaysMapped = true) {
-      NextOccurrenceHandler(wholeWord = false, VmCaseSetting, acceptsCount = true)
+      NextOccurrenceHandler(wholeWord = false, VmCaseSetting, acceptsCount = true, NewSelection.START_SEARCH)
     },
     VmMapping("Add Cursor Down", MappingMode.N, "<C-Down>") {
       NextLineHandler(NextLineHandler.Direction.DOWN)
@@ -72,6 +73,8 @@ internal fun getPermanentMappings(): List<VmMapping> {
         VmCaseSetting
       )
     },
+    VmMapping("Visual Cursors", MappingMode.X, "${leader}c") { VisualCursorsHandler() },
+    VmMapping("Visual Add", MappingMode.X, "${leader}a") { VisualAddHandler(VmCaseSetting) },
   )
 }
 
@@ -83,7 +86,7 @@ internal fun getPermanentMappings(): List<VmMapping> {
  */
 internal val sessionMappings = listOf(
   VmMapping("Find Next", MappingMode.X, "n", alwaysMapped = true) {
-    NextOccurrenceHandler(wholeWord = false, VmCaseSetting, acceptsCount = true)
+    NextOccurrenceHandler(wholeWord = false, VmCaseSetting, acceptsCount = true, NewSelection.ADD_NEXT)
   },
   VmMapping("Skip Region", MappingMode.X, "q", alwaysMapped = true) { SkipOccurrenceHandler(VmCaseSetting) },
   VmMapping("Remove Region", MappingMode.X, "Q", alwaysMapped = true) { RemoveOccurrenceHandler() },

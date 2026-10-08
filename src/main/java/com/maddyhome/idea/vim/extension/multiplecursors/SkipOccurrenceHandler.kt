@@ -30,7 +30,8 @@ internal class SkipOccurrenceHandler(private val caseSensitivity: CaseSensitivit
     }
 
     primaryCaret.moveToVisualPosition(editor.offsetToVisualPosition(nextOffset))
-    primaryCaret.selectOccurrence(nextOffset, text)
+    val occurrence = primaryCaret.selectOccurrence(nextOffset, text)
+    editor.occurrenceSearch = search?.copy(lastOccurrence = occurrence)
     return true
   }
 }

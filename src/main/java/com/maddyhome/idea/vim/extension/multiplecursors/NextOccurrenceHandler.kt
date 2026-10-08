@@ -12,14 +12,34 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.api.getText
-import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.newapi.vim
 
 /**
+ * What happens to a selection that is not the last added occurrence, e.g. one made by the user
+ */
+internal enum class NewSelection {
+  /**
+   * vim-multiple-cursors: a selection over several lines becomes a cursor on each line, otherwise the next occurrence
+   * is added
+   */
+  SPLIT_LINES_OR_ADD_NEXT,
+
+  /**
+   * Find Subword Under of vim-visual-multi: the selection becomes the first region
+   */
+  START_SEARCH,
+
+  /**
+   * Find Next of vim-visual-multi
+   */
+  ADD_NEXT,
+}
+
+/**
  * In Normal mode, selects the word under the caret. In Visual mode, adds a cursor at the next occurrence of the
- * selection, or turns a selection over several lines into a cursor on each line.
+ * selection.
  *
  * @param wholeWord Whether the word selected in Normal mode is searched with word boundaries. In Visual mode, the flag
  *   of the started search is used.
@@ -28,6 +48,7 @@ internal class NextOccurrenceHandler(
   private val wholeWord: Boolean,
   private val caseSensitivity: CaseSensitivity,
   override val acceptsCount: Boolean = false,
+  private val newSelection: NewSelection = NewSelection.SPLIT_LINES_OR_ADD_NEXT,
 ) : WriteActionHandler() {
 
   override fun executeInWriteAction(editor: Editor): Boolean =
@@ -36,17 +57,26 @@ internal class NextOccurrenceHandler(
   private fun startWithWordUnderCaret(editor: Editor): Boolean {
     if (editor.caretModel.caretCount > 1) return false
 
-    val word = editor.caretModel.primaryCaret.selectWordUnderCaret()
-    editor.occurrenceSearch = word?.let {
-      OccurrenceSearch(wholeWord, caseSensitivity.ignoresCase(editor.vim.getText(it)), lastOccurrence = it)
-    }
-    return word != null
+    editor.occurrenceSearch = null
+    val word = editor.caretModel.primaryCaret.selectWordUnderCaret() ?: return false
+    startOccurrenceSearch(editor, word, wholeWord, caseSensitivity)
+    return true
   }
 
   private fun addNextOccurrence(editor: Editor): Boolean {
     val carets = editor.caretModel.allCarets
     if (carets.any { it.selectedText == null }) return false
-    if (splitMultilineSelections(editor)) return true
+    if (!isLastOccurrenceSelected(editor)) {
+      when (newSelection) {
+        NewSelection.SPLIT_LINES_OR_ADD_NEXT -> if (splitMultilineSelections(editor)) return true
+        NewSelection.START_SEARCH -> {
+          val selection = editor.caretModel.primaryCaret.selectedRange
+          startOccurrenceSearch(editor, selection, wholeWord = false, caseSensitivity)
+          return true
+        }
+        NewSelection.ADD_NEXT -> Unit
+      }
+    }
     // Cursors added in another way may select different texts
     if (!selectSameText(editor, carets)) return false
 
@@ -66,22 +96,16 @@ internal class NextOccurrenceHandler(
     return true
   }
 
+  private fun isLastOccurrenceSelected(editor: Editor): Boolean =
+    editor.occurrenceSearch?.lastOccurrence == editor.caretModel.primaryCaret.selectedRange
+
   /**
-   * Continues the search if the selection is the last added occurrence. Otherwise, the user has selected something
-   * else, which starts a new search without word boundaries.
+   * A new search, e.g. for a selection made by the user, is without word boundaries
    */
   private fun continueOrStartSearch(editor: Editor): OccurrenceSearch {
     val selection = editor.caretModel.primaryCaret.selectedRange
-    val pattern = editor.vim.getText(selection)
-    val previous = editor.occurrenceSearch?.takeIf { it.lastOccurrence == selection }
-
-    val search = OccurrenceSearch(
-      wholeWord = previous?.wholeWord ?: false,
-      ignoreCase = previous?.ignoreCase ?: caseSensitivity.ignoresCase(pattern),
-      lastOccurrence = selection,
-    )
-    editor.occurrenceSearch = search
-    return search
+    return editor.occurrenceSearch?.takeIf { it.lastOccurrence == selection }
+      ?: startOccurrenceSearch(editor, selection, wholeWord = false, caseSensitivity)
   }
 
   private fun selectSameText(editor: Editor, carets: List<Caret>): Boolean {
@@ -103,7 +127,7 @@ internal class NextOccurrenceHandler(
     }
     if (newCaretPositions.isEmpty()) return false
 
-    editor.vim.exitVisualMode()
+    leaveVisualMode(editor.vim)
     newCaretPositions.forEach { editor.caretModel.addCaret(it, true) }
     editor.updateCaretsVisualAttributes()
     return true
@@ -113,7 +137,8 @@ internal class NextOccurrenceHandler(
     // A selection that ends with a new line ends on the next line
     val endsWithNewLine = caret.selectedText?.endsWith('\n') == true
     val selectionEnd = if (endsWithNewLine) caret.selectionEnd - 1 else caret.selectionEnd
-    val followingLines = editor.document.getLineNumber(selectionEnd) - editor.document.getLineNumber(caret.selectionStart)
+    val document = editor.document
+    val followingLines = document.getLineNumber(selectionEnd) - document.getLineNumber(caret.selectionStart)
 
     val start = editor.offsetToVisualPosition(caret.selectionStart)
     return (1..followingLines).map { VisualPosition(start.line + it, start.column) }

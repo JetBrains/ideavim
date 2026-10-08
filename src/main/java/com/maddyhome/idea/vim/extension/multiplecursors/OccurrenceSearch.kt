@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.extension.multiplecursors
 
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.common.TextRange
@@ -35,6 +36,19 @@ internal data class OccurrenceSearch(
 internal var Editor.occurrenceSearch: OccurrenceSearch? by userData()
 
 /**
+ * Starts a search for the text of [selection], without adding a cursor yet
+ */
+internal fun startOccurrenceSearch(
+  editor: Editor,
+  selection: TextRange,
+  wholeWord: Boolean,
+  caseSensitivity: CaseSensitivity,
+): OccurrenceSearch {
+  val ignoreCase = caseSensitivity.ignoresCase(editor.vim.getText(selection))
+  return OccurrenceSearch(wholeWord, ignoreCase, selection).also { editor.occurrenceSearch = it }
+}
+
+/**
  * Returns the start offset of the next occurrence of [text] after [startOffset], wrapping around if 'wrapscan' is set
  */
 internal fun findNextOccurrence(
@@ -52,17 +66,22 @@ internal fun findNextOccurrence(
   return injector.searchHelper.findPattern(editor.vim, pattern, startOffset, 1, searchOptions)?.startOffset
 }
 
-internal fun findAllOccurrences(editor: Editor, text: String, wholeWord: Boolean, ignoreCase: Boolean): List<TextRange> {
+internal fun findAllOccurrences(
+  editor: Editor,
+  text: String,
+  wholeWord: Boolean,
+  ignoreCase: Boolean,
+): List<TextRange> {
   val pattern = occurrencePattern(text, wholeWord, ignoreCase)
   return injector.searchHelper.findAll(editor.vim, pattern, 0, -1, false)
 }
 
 /**
- * The text is matched literally with "very nomagic", where only the backslash needs escaping. The case is forced with
- * `\c` or `\C`, which takes precedence over 'ignorecase' and 'smartcase'.
+ * The text is matched literally with "very nomagic", where only the backslash and the new line need escaping. The case
+ * is forced with `\c` or `\C`, which takes precedence over 'ignorecase' and 'smartcase'.
  */
 private fun occurrencePattern(text: String, wholeWord: Boolean, ignoreCase: Boolean): String {
-  val escapedText = text.replace("\\", "\\\\")
+  val escapedText = text.replace("\\", "\\\\").replace("\n", "\\n")
   val case = if (ignoreCase) "\\c" else "\\C"
   val body = if (wholeWord) "\\<$escapedText\\>" else escapedText
   return "\\V$case$body"

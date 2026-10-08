@@ -19,14 +19,21 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
+import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
 /**
  * Selects the occurrence of [text] at [offset], with the caret at its end
  */
-internal fun Caret.selectOccurrence(offset: Int, text: String): TextRange {
-  vim.vimSetSelection(offset, offset + text.length - 1, true)
+internal fun Caret.selectOccurrence(offset: Int, text: String): TextRange =
+  selectRange(TextRange(offset, offset + text.length))
+
+/**
+ * Selects [range], with the caret at its end
+ */
+internal fun Caret.selectRange(range: TextRange): TextRange {
+  vim.vimSetSelection(range.startOffset, range.endOffset - 1, true)
   injector.scroll.scrollCaretIntoView(editor.vim)
   return selectedRange
 }
@@ -57,7 +64,12 @@ internal fun Editor.isSelectedByAnyCaret(offset: Int): Boolean =
 
 internal fun enterCharacterwiseVisualMode(editor: VimEditor) {
   VimPlugin.getVisualMotion().enterVisualMode(editor, SelectionType.CHARACTER_WISE)
-  // The key handler has to know about Visual mode for the next keys
+  // The key handler has to know about the mode for the next keys
+  KeyHandler.getInstance().reset(editor)
+}
+
+internal fun leaveVisualMode(editor: VimEditor) {
+  editor.exitVisualMode()
   KeyHandler.getInstance().reset(editor)
 }
 
