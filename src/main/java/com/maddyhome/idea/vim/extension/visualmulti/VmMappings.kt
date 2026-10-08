@@ -98,6 +98,7 @@ internal val sessionMappings = listOf(
       Direction.BACKWARDS,
     )
   },
+  VmMapping("Switch Mode", MappingMode.N + MappingMode.X, "<Tab>", alwaysMapped = true) { SwitchModeHandler() },
   VmMapping("Goto Next", MappingMode.X, "]", alwaysMapped = true) { GotoRegionHandler(Direction.FORWARDS) },
   VmMapping("Goto Prev", MappingMode.X, "[", alwaysMapped = true) { GotoRegionHandler(Direction.BACKWARDS) },
   VmMapping("Skip Region", MappingMode.X, "q", alwaysMapped = true) { SkipOccurrenceHandler(VmCaseSetting) },
