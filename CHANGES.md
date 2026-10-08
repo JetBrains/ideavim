@@ -33,6 +33,7 @@ usual beta standards.
 * Action IDs can now be completed: press `<Tab>`/`<S-Tab>` after `:action` or `:actionlist` in the command line to cycle through matching IDs, and in `.ideavimrc` code completion suggests action IDs, with their names and descriptions, inside `<Action(...)>` and after `action`
 * [VIM-1948](https://youtrack.jetbrains.com/issue/VIM-1948) New `'ideascrollcursor'` option makes the caret move with the text when scrolling with the mouse wheel or the scrollbar, keeping it [`'scrolloff'`](https://vimhelp.org/options.txt.html#%27scrolloff%27) lines from the edge of the window, as in Vim. It is off by default — enable it with `:set ideascrollcursor`
 * [VIM-720](https://youtrack.jetbrains.com/issue/VIM-720) `<CR>`, `<Esc>` and the arrow keys can now be handed over to the IDE with [`sethandler`](https://github.com/JetBrains/ideavim/blob/master/doc/sethandler.md) for that key, e.g. `sethandler <CR> i:ide` or `sethandler <Esc> n:ide`. Handlers set for all shortcuts at once, such as `sethandler a:ide`, still leave these keys to Vim
+* [VIM-2372](https://youtrack.jetbrains.com/issue/VIM-2372) The [NERDTree](https://github.com/JetBrains/ideavim/blob/master/doc/NERDTree-support.md) navigation keys `j`, `k`, `gg`, `G`, `<C-D>`, `<C-U>` and `/` can now be changed like the other NERDTree keys, e.g. `let g:NERDTreeMapSelectNext = '<C-N>'` or `let g:NERDTreeMapSpeedSearch = 'f'`. Changed `g:NERDTreeMap*` variables are applied the next time the Project tool window gets focus, without restarting the IDE
 
 ### Fixes:
 
@@ -57,6 +58,7 @@ usual beta standards.
 * [2102](https://github.com/JetBrains/ideavim/pull/2102) by [1grzyb1](https://github.com/1grzyb1): VIM-1948 Scroll caret while mouse scrolling
 * [2112](https://github.com/JetBrains/ideavim/pull/2112) by [1grzyb1](https://github.com/1grzyb1): VIM-720 Allow handling esc, enter, arrows directly by ide
 * [2113](https://github.com/JetBrains/ideavim/pull/2113) by [1grzyb1](https://github.com/1grzyb1): VIM-1503 don't type dead keys
+* [2115](https://github.com/JetBrains/ideavim/pull/2115) by [1grzyb1](https://github.com/1grzyb1): VIM-2372 Add missing mappings for navigation keys
 
 ## 2.47.2, 2026-10-02
 
