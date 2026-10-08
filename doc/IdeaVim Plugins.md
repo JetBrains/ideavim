@@ -1165,6 +1165,81 @@ component has focus.
 </details>
 
 <details>
+<summary><h2>visual-multi: Multiple cursors and selections</h2></summary>
+
+Original plugin: [vim-visual-multi](https://github.com/mg979/vim-visual-multi).
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'mg979/vim-visual-multi'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plugin 'mg979/vim-visual-multi'</code>
+      <br/>
+      <code>Plug 'https://github.com/mg979/vim-visual-multi'</code>
+      <br/>
+      <code>Plug 'vim-visual-multi'</code>
+      <br/>
+      <code>set visual-multi</code>
+      </details>
+
+Don't enable it together with `multiple-cursors`, both use `<C-n>`.
+
+### Instructions
+
+The cursors are the native IDE carets. The regions are their Visual selections, so motions and commands work on all
+of them. Press `<Tab>` to switch between regions and cursors.
+
+`\\` is the leader, see `g:VM_leader` below.
+
+Available anytime:
+
+| Action                                                  | Shortcut               |
+|---------------------------------------------------------|------------------------|
+| Select word under cursor / selection, add next one      | `<C-n>`                |
+| Select all occurrences of word / selection              | `\\A`                  |
+| Add cursor down / up                                    | `<C-Down>` / `<C-Up>`  |
+| Cursor on each line of selection                        | `\\c` (Visual)         |
+| Selection becomes regions                               | `\\a` (Visual)         |
+| Reselect regions of the last session                    | `\\gS`                 |
+
+With multiple cursors or regions (a session):
+
+| Action                                                  | Shortcut               |
+|---------------------------------------------------------|------------------------|
+| Find next / previous occurrence                         | `n` / `N`              |
+| Go to next / previous region                            | `]` / `[`              |
+| Skip region / remove region                             | `q` / `Q`              |
+| Switch between regions and cursors                      | `<Tab>`                |
+| Insert before / after regions, at line start / end      | `i` / `a` / `I` / `A`  |
+| Run `:normal` command / repeat it                       | `\\z` / `\\Z`          |
+| Run macro                                               | `\\@`                  |
+| Case conversion (`u` `U` `C` `t` `c` `P` `s` `S` `-` `.` `<Space>`) | `\\C`  |
+| Align cursors                                           | `\\a`                  |
+| Exit                                                    | `<Esc>`                |
+
+`n`, `N`, `]`, `[`, `q`, `Q`, `i`, `a`, `I`, `A` and `<Esc>` work on regions, the others on regions and cursors.
+Outside a session, these keys keep their Vim meaning. Every action has a `<Plug>` mapping named after it, e.g.
+`<Plug>(VM-Find-Under)`.
+
+### Options
+
+```
+" Change mappings, an empty string disables one
+let g:VM_maps = {}
+let g:VM_maps['Find Under'] = '<C-d>'
+let g:VM_maps['Find Subword Under'] = '<C-d>'
+
+let g:VM_leader = '\'                     " Default is '\\'
+let g:VM_default_mappings = 0             " Keep only <C-n>
+let g:VM_case_setting = 'smart'           " 'smart', 'sensitive' or 'ignore', default follows 'ignorecase'
+let g:VM_skip_shorter_lines = 0           " <C-Down> and <C-Up> don't skip shorter lines
+let g:VM_skip_empty_lines = 1             " <C-Down> and <C-Up> skip empty lines
+let g:VM_quit_after_leaving_insert_mode = 1
+```
+
+</details>
+
+<details>
 <summary><h2>visual-star-search: Makes * and # search for the selected text</h2></summary>
 
 Original plugin: [vim-visual-star-search](https://github.com/bronson/vim-visual-star-search).
