@@ -15,14 +15,10 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.multiplecursors.CaseSensitivity
-import com.maddyhome.idea.vim.extension.multiplecursors.enterCharacterwiseVisualMode
-import com.maddyhome.idea.vim.extension.multiplecursors.leaveVisualMode
-import com.maddyhome.idea.vim.extension.multiplecursors.selectRange
+import com.maddyhome.idea.vim.extension.multiplecursors.selectRegions
 import com.maddyhome.idea.vim.extension.multiplecursors.selectedRange
 import com.maddyhome.idea.vim.extension.multiplecursors.startOccurrenceSearch
-import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
 /**
@@ -42,7 +38,7 @@ internal class VisualAddHandler(private val caseSensitivity: CaseSensitivity) : 
     }
     if (regions != null) {
       if (regions.isEmpty()) return
-      selectRegions(editor.ij, regions)
+      editor.ij.selectRegions(regions)
     }
 
     val primaryCaret = editor.ij.caretModel.primaryCaret
@@ -57,16 +53,4 @@ internal class VisualAddHandler(private val caseSensitivity: CaseSensitivity) : 
   private fun blockRegions(editor: Editor): List<TextRange> =
     editor.caretModel.allCarets.map { it.selectedRange }.filter { it.endOffset > it.startOffset }
 
-  private fun selectRegions(editor: Editor, regions: List<TextRange>) {
-    leaveVisualMode(editor.vim)
-    editor.caretModel.removeSecondaryCarets()
-    enterCharacterwiseVisualMode(editor.vim)
-
-    editor.caretModel.primaryCaret.selectRange(regions.first())
-    for (region in regions.drop(1)) {
-      val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(region.startOffset), true) ?: continue
-      caret.selectRange(region)
-    }
-    editor.updateCaretsVisualAttributes()
-  }
 }

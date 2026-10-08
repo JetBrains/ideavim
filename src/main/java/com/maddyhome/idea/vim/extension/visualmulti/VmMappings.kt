@@ -74,6 +74,7 @@ internal fun getPermanentMappings(): List<VmMapping> {
         VmCaseSetting
       )
     },
+    VmMapping("Reselect Last", MappingMode.N, "${leader}gS") { ReselectLastHandler() },
     VmMapping("Visual Cursors", MappingMode.X, "${leader}c") { VisualCursorsHandler() },
     VmMapping("Visual Add", MappingMode.X, "${leader}a") { VisualAddHandler(VmCaseSetting) },
   )
