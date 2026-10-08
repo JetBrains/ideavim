@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.extension.visualmulti
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.ModeChangeListener
+import com.maddyhome.idea.vim.extension.multiplecursors.isGlobalFlagEnabled
 import com.maddyhome.idea.vim.helper.userData
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -52,12 +53,19 @@ internal object VmSession {
    *
    * vim-visual-multi keeps a single cursor in Normal mode until it is exited. We don't highlight the regions, so such a
    * session would be invisible, and `n` would unexpectedly behave differently.
+   *
+   * With `g:VM_quit_after_leaving_insert_mode`, leaving Insert mode exits the session too.
    */
   object EndOnModeChange : ModeChangeListener {
     override fun modeChanged(editor: VimEditor, oldMode: Mode) {
       if (editor.carets().size <= 1) {
         end(editor)
+      } else if (oldMode is Mode.INSERT && isActive(editor) && quitsAfterInsertMode()) {
+        end(editor)
+        editor.removeSecondaryCarets()
       }
     }
+
+    private fun quitsAfterInsertMode() = isGlobalFlagEnabled("VM_quit_after_leaving_insert_mode", default = false)
   }
 }
