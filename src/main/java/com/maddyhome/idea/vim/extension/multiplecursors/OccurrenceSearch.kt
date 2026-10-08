@@ -12,6 +12,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
+import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.SearchOptions
 import com.maddyhome.idea.vim.helper.enumSetOf
@@ -26,11 +27,13 @@ import com.maddyhome.idea.vim.newapi.vim
  *
  * @param lastOccurrence The selection of the last added cursor. When the current selection is different, the user has
  *   selected something else, and a new search starts.
+ * @param direction The direction of the last search, which skipping follows
  */
 internal data class OccurrenceSearch(
   val wholeWord: Boolean,
   val ignoreCase: Boolean,
   val lastOccurrence: TextRange,
+  val direction: Direction = Direction.FORWARDS,
 )
 
 internal var Editor.occurrenceSearch: OccurrenceSearch? by userData()
@@ -49,19 +52,26 @@ internal fun startOccurrenceSearch(
 }
 
 /**
- * Returns the start offset of the next occurrence of [text] after [startOffset], wrapping around if 'wrapscan' is set
+ * Returns the start offset of the occurrence of [text] after the [current] one, or before it when searching backwards.
+ * The search wraps around if 'wrapscan' is set.
  */
-internal fun findNextOccurrence(
+internal fun findOccurrence(
   editor: Editor,
-  startOffset: Int,
+  current: TextRange,
   text: String,
   wholeWord: Boolean,
   ignoreCase: Boolean,
+  direction: Direction,
 ): Int? {
   val searchOptions = enumSetOf(SearchOptions.WHOLE_FILE)
   if (injector.options(editor.vim).wrapscan) {
     searchOptions.add(SearchOptions.WRAP)
   }
+  if (direction == Direction.BACKWARDS) {
+    searchOptions.add(SearchOptions.BACKWARDS)
+  }
+  // The selection ends after its last character, so the search starts at it to skip the current occurrence
+  val startOffset = if (direction == Direction.FORWARDS) current.endOffset - 1 else current.startOffset
   val pattern = occurrencePattern(text, wholeWord, ignoreCase)
   return injector.searchHelper.findPattern(editor.vim, pattern, startOffset, 1, searchOptions)?.startOffset
 }

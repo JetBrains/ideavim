@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.extension.visualmulti
 import com.intellij.openapi.util.NlsSafe
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.multiplecursors.AllOccurrencesHandler
 import com.maddyhome.idea.vim.extension.multiplecursors.NewSelection
@@ -87,6 +88,15 @@ internal fun getPermanentMappings(): List<VmMapping> {
 internal val sessionMappings = listOf(
   VmMapping("Find Next", MappingMode.X, "n", alwaysMapped = true) {
     NextOccurrenceHandler(wholeWord = false, VmCaseSetting, acceptsCount = true, NewSelection.ADD_NEXT)
+  },
+  VmMapping("Find Prev", MappingMode.X, "N", alwaysMapped = true) {
+    NextOccurrenceHandler(
+      wholeWord = false,
+      VmCaseSetting,
+      acceptsCount = true,
+      NewSelection.ADD_NEXT,
+      Direction.BACKWARDS,
+    )
   },
   VmMapping("Skip Region", MappingMode.X, "q", alwaysMapped = true) { SkipOccurrenceHandler(VmCaseSetting) },
   VmMapping("Remove Region", MappingMode.X, "Q", alwaysMapped = true) { RemoveOccurrenceHandler() },
