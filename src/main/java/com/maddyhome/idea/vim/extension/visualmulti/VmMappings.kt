@@ -98,6 +98,8 @@ internal val sessionMappings = listOf(
       Direction.BACKWARDS,
     )
   },
+  VmMapping("Goto Next", MappingMode.X, "]", alwaysMapped = true) { GotoRegionHandler(Direction.FORWARDS) },
+  VmMapping("Goto Prev", MappingMode.X, "[", alwaysMapped = true) { GotoRegionHandler(Direction.BACKWARDS) },
   VmMapping("Skip Region", MappingMode.X, "q", alwaysMapped = true) { SkipOccurrenceHandler(VmCaseSetting) },
   VmMapping("Remove Region", MappingMode.X, "Q", alwaysMapped = true) { RemoveOccurrenceHandler() },
   // In Normal mode, <Esc> is partly handled by the IDE, which we don't want to break
