@@ -105,6 +105,10 @@ internal fun getSessionMappings(): List<VmMapping> {
     VmMapping("Goto Prev", MappingMode.X, "[", alwaysMapped = true) { GotoRegionHandler(Direction.BACKWARDS) },
     VmMapping("Skip Region", MappingMode.X, "q", alwaysMapped = true) { SkipOccurrenceHandler(VmCaseSetting) },
     VmMapping("Remove Region", MappingMode.X, "Q", alwaysMapped = true) { RemoveOccurrenceHandler() },
+    VmMapping("i", MappingMode.X, "i", alwaysMapped = true) { InsertHandler("i") },
+    VmMapping("a", MappingMode.X, "a", alwaysMapped = true) { InsertHandler("a") },
+    VmMapping("I", MappingMode.X, "I", alwaysMapped = true) { InsertHandler("I") },
+    VmMapping("A", MappingMode.X, "A", alwaysMapped = true) { InsertHandler("A") },
     VmMapping("Run Normal", MappingMode.N + MappingMode.X, "${leader}z", alwaysMapped = true) {
       RunNormalHandler(repeatLast = false)
     },
