@@ -75,6 +75,22 @@ internal fun Editor.makePrimary(caret: Caret): Caret {
   return primary
 }
 
+/**
+ * Replaces the carets with characterwise selections of [regions], the last one being the primary caret
+ */
+internal fun Editor.selectRegions(regions: List<TextRange>) {
+  leaveVisualMode(vim)
+  caretModel.removeSecondaryCarets()
+  enterCharacterwiseVisualMode(vim)
+
+  caretModel.primaryCaret.selectRange(regions.first())
+  for (region in regions.drop(1)) {
+    val caret = caretModel.addCaret(offsetToVisualPosition(region.startOffset), true) ?: continue
+    caret.selectRange(region)
+  }
+  updateCaretsVisualAttributes()
+}
+
 internal val Caret.selectedRange: TextRange
   get() = TextRange(selectionStart, selectionEnd)
 

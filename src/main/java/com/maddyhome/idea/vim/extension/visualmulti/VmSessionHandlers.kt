@@ -45,10 +45,11 @@ internal class SessionOnlyHandler(private val handler: ExtensionHandler, private
 }
 
 /**
- * Keeps only the primary cursor and goes back to Normal mode
+ * Keeps only the primary cursor and goes back to Normal mode. The regions can be selected again with Reselect Last.
  */
 internal class ExitHandler : ExtensionHandler {
   override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
+    saveLastRegions(editor)
     VmSession.end(editor)
     editor.removeSecondaryCarets()
     leaveVisualMode(editor)
