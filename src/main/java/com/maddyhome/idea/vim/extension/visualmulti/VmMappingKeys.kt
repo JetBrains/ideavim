@@ -41,7 +41,7 @@ internal fun readMappingKeys(): Map<String, MappingKeys> {
   val defaultMappings = isGlobalFlagEnabled(DEFAULT_MAPPINGS)
 
   return buildMap {
-    for (mapping in getPermanentMappings() + sessionMappings) {
+    for (mapping in getPermanentMappings() + getSessionMappings()) {
       val userKeys = userMaps?.get(mapping.name) as? VimString
       val keys = when {
         userKeys != null -> MappingKeys(userKeys.value, fromUser = true)

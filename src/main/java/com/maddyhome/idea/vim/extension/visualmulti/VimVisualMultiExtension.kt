@@ -68,7 +68,7 @@ internal class VimVisualMultiExtension : VimMultipleCursorsExtensionBase() {
     for (mapping in getPermanentMappings()) {
       putPlugMapping(mapping.modes, mapping.plug, StartSessionHandler(mapping.createHandler()))
     }
-    for (mapping in sessionMappings) {
+    for (mapping in getSessionMappings()) {
       putPlugMapping(mapping.modes, mapping.plug, mapping.createHandler())
     }
   }
@@ -91,7 +91,7 @@ internal class VimVisualMultiExtension : VimMultipleCursorsExtensionBase() {
    * vim-visual-multi doesn't override existing buffer mappings. We don't override the mappings of the user either.
    */
   private fun registerSessionKeys(keys: Map<String, MappingKeys>) {
-    for (mapping in sessionMappings) {
+    for (mapping in getSessionMappings()) {
       val fromKeys = injector.parser.parseKeys(keys[mapping.name]?.keys ?: continue)
       val modes = mapping.modes.filterTo(mutableSetOf()) { injector.keyGroup.getMappingInfo(fromKeys, it) == null }
       if (modes.isEmpty()) continue

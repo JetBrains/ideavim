@@ -85,27 +85,36 @@ internal fun getPermanentMappings(): List<VmMapping> {
  * vim-visual-multi maps them regardless of `g:VM_default_mappings`, and in Normal mode, because it stays in Normal mode
  * and draws the selections itself. Our selections are native, so we map them in Visual mode.
  */
-internal val sessionMappings = listOf(
-  VmMapping("Find Next", MappingMode.X, "n", alwaysMapped = true) {
-    NextOccurrenceHandler(wholeWord = false, VmCaseSetting, acceptsCount = true, NewSelection.ADD_NEXT)
-  },
-  VmMapping("Find Prev", MappingMode.X, "N", alwaysMapped = true) {
-    NextOccurrenceHandler(
-      wholeWord = false,
-      VmCaseSetting,
-      acceptsCount = true,
-      NewSelection.ADD_NEXT,
-      Direction.BACKWARDS,
-    )
-  },
-  VmMapping("Switch Mode", MappingMode.N + MappingMode.X, "<Tab>", alwaysMapped = true) { SwitchModeHandler() },
-  VmMapping("Goto Next", MappingMode.X, "]", alwaysMapped = true) { GotoRegionHandler(Direction.FORWARDS) },
-  VmMapping("Goto Prev", MappingMode.X, "[", alwaysMapped = true) { GotoRegionHandler(Direction.BACKWARDS) },
-  VmMapping("Skip Region", MappingMode.X, "q", alwaysMapped = true) { SkipOccurrenceHandler(VmCaseSetting) },
-  VmMapping("Remove Region", MappingMode.X, "Q", alwaysMapped = true) { RemoveOccurrenceHandler() },
-  // In Normal mode, <Esc> is partly handled by the IDE, which we don't want to break
-  VmMapping("Exit", MappingMode.X, "<Esc>", alwaysMapped = true) { ExitHandler() },
-)
+internal fun getSessionMappings(): List<VmMapping> {
+  val leader = getLeader()
+  return listOf(
+    VmMapping("Find Next", MappingMode.X, "n", alwaysMapped = true) {
+      NextOccurrenceHandler(wholeWord = false, VmCaseSetting, acceptsCount = true, NewSelection.ADD_NEXT)
+    },
+    VmMapping("Find Prev", MappingMode.X, "N", alwaysMapped = true) {
+      NextOccurrenceHandler(
+        wholeWord = false,
+        VmCaseSetting,
+        acceptsCount = true,
+        NewSelection.ADD_NEXT,
+        Direction.BACKWARDS,
+      )
+    },
+    VmMapping("Switch Mode", MappingMode.N + MappingMode.X, "<Tab>", alwaysMapped = true) { SwitchModeHandler() },
+    VmMapping("Goto Next", MappingMode.X, "]", alwaysMapped = true) { GotoRegionHandler(Direction.FORWARDS) },
+    VmMapping("Goto Prev", MappingMode.X, "[", alwaysMapped = true) { GotoRegionHandler(Direction.BACKWARDS) },
+    VmMapping("Skip Region", MappingMode.X, "q", alwaysMapped = true) { SkipOccurrenceHandler(VmCaseSetting) },
+    VmMapping("Remove Region", MappingMode.X, "Q", alwaysMapped = true) { RemoveOccurrenceHandler() },
+    VmMapping("Run Normal", MappingMode.N + MappingMode.X, "${leader}z", alwaysMapped = true) {
+      RunNormalHandler(repeatLast = false)
+    },
+    VmMapping("Run Last Normal", MappingMode.N + MappingMode.X, "${leader}Z", alwaysMapped = true) {
+      RunNormalHandler(repeatLast = true)
+    },
+    // In Normal mode, <Esc> is partly handled by the IDE, which we don't want to break
+    VmMapping("Exit", MappingMode.X, "<Esc>", alwaysMapped = true) { ExitHandler() },
+  )
+}
 
 internal fun getLeader(): String {
   val leader = injector.variableService.getGlobalVariableValue("VM_leader") ?: return LEADER
