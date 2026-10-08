@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.extension.multiplecursors
 
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.newapi.vim
 
 /**
@@ -22,8 +21,12 @@ internal class RemoveOccurrenceHandler : WriteActionHandler() {
     val caret = editor.caretModel.primaryCaret
     if (caret.selectedText == null) return false
 
-    if (!editor.caretModel.removeCaret(caret)) {
-      editor.vim.exitVisualMode()
+    if (editor.caretModel.removeCaret(caret)) {
+      // The search continues from the cursor that is the last one now
+      val lastOccurrence = editor.caretModel.primaryCaret.selectedRange
+      editor.occurrenceSearch = editor.occurrenceSearch?.copy(lastOccurrence = lastOccurrence)
+    } else {
+      leaveVisualMode(editor.vim)
     }
     injector.scroll.scrollCaretIntoView(editor.vim)
     return true

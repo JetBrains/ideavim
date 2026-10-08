@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
-import com.maddyhome.idea.vim.helper.exitVisualMode
+import com.maddyhome.idea.vim.extension.multiplecursors.leaveVisualMode
 import com.maddyhome.idea.vim.newapi.ij
 import javax.swing.KeyStroke
 
@@ -51,6 +51,6 @@ internal class ExitHandler : ExtensionHandler {
   override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
     VmSession.end(editor)
     editor.removeSecondaryCarets()
-    editor.exitVisualMode()
+    leaveVisualMode(editor)
   }
 }

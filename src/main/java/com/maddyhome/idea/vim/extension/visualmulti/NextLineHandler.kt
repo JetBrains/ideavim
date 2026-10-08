@@ -16,7 +16,6 @@ import com.maddyhome.idea.vim.api.lineLength
 import com.maddyhome.idea.vim.api.normalizeColumn
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.extension.ExtensionHandler
-import com.maddyhome.idea.vim.extension.multiplecursors.isGlobalFlagEnabled
 
 /**
  * Adds a cursor on the line below or above the last added one, keeping its column
@@ -56,28 +55,5 @@ internal class NextLineHandler(private val direction: Direction) : ExtensionHand
 
   internal enum class Direction(val step: Int) {
     DOWN(1), UP(-1)
-  }
-}
-
-/**
- * `g:VM_skip_shorter_lines` and `g:VM_skip_empty_lines`
- */
-private class LineSkipping(private val shorterLines: Boolean, private val emptyLines: Boolean) {
-
-  /**
-   * A line is shorter when it doesn't reach the column. An empty line reaches the first column, unless empty lines are
-   * skipped. vim-visual-multi checks empty lines only when it skips shorter lines.
-   */
-  fun skips(lineLength: Int, column: Int): Boolean = when {
-    !shorterLines -> false
-    lineLength == 0 -> emptyLines || column > 0
-    else -> lineLength <= column
-  }
-
-  companion object {
-    fun read() = LineSkipping(
-      shorterLines = isGlobalFlagEnabled("VM_skip_shorter_lines"),
-      emptyLines = isGlobalFlagEnabled("VM_skip_empty_lines", default = false),
-    )
   }
 }

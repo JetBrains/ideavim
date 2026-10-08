@@ -324,4 +324,87 @@ class VisualMultiSessionTest : VisualMultiTestCase() {
 
     assertState("${c}0 foo")
   }
+
+  @Test
+  fun `test Normal mode commands work after Esc exits session`() {
+    configureByText(
+      """q${c}we
+      |asd
+      |qwe
+      """.trimMargin(),
+    )
+
+    typeText("<C-n><C-n>" + "<Esc>" + "x")
+
+    assertState(
+      """qwe
+      |asd
+      |q${c}w
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test Normal mode commands work after removing last region`() {
+    configureByText(
+      """q${c}we
+      |asd
+      """.trimMargin(),
+    )
+
+    typeText("<C-n>" + "Q" + "x")
+
+    assertState(
+      """q${c}w
+      |asd
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test ctrl-n continues after skipping region`() {
+    configureByText(
+      """q${c}we
+      |asd
+      |qwe
+      |asd
+      |qwe
+      """.trimMargin(),
+    )
+
+    typeText("<C-n><C-n>" + "q" + "<C-n>")
+
+    assertState(
+      """${s}qwe$se
+      |asd
+      |qwe
+      |asd
+      |${s}qwe$se
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test ctrl-n continues after removing region`() {
+    configureByText(
+      """q${c}we
+      |asd
+      |qwe
+      |asd
+      |qwe
+      """.trimMargin(),
+    )
+
+    // Q removes the second region, and <C-n> adds it again from the first one
+    typeText("<C-n><C-n>" + "Q" + "<C-n>")
+
+    assertState(
+      """${s}qwe$se
+      |asd
+      |${s}qwe$se
+      |asd
+      |qwe
+      """.trimMargin(),
+    )
+  }
 }

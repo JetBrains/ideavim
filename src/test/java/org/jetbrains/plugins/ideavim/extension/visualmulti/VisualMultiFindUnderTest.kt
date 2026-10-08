@@ -85,11 +85,47 @@ class VisualMultiFindUnderTest : VisualMultiTestCase() {
     """.trimMargin()
     configureByText(before)
 
-    typeText("vll" + "<C-n>")
+    typeText("vll" + "<C-n><C-n>")
 
     val after = """${s}qwe$se
       |asd${s}qwe${se}asd
       |qwe
+    """.trimMargin()
+    assertState(after)
+  }
+
+  @Test
+  fun `test first ctrl-n in visual mode only makes the selection a region`() {
+    val before = """${c}qwe
+      |qwe
+    """.trimMargin()
+    configureByText(before)
+
+    typeText("vll" + "<C-n>")
+
+    val after = """${s}qwe$se
+      |qwe
+    """.trimMargin()
+    assertState(after)
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+  }
+
+  @Test
+  fun `test ctrl-n on multiline selection finds multiline occurrences`() {
+    // vim-multiple-cursors would put a cursor on each line instead
+    val before = """${c}ab
+      |cd
+      |ab
+      |cd
+    """.trimMargin()
+    configureByText(before)
+
+    typeText("vj" + "<C-n><C-n>")
+
+    val after = """${s}ab
+      |c${se}d
+      |${s}ab
+      |c${se}d
     """.trimMargin()
     assertState(after)
   }
