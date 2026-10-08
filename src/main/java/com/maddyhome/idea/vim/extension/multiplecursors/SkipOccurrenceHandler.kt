@@ -9,9 +9,10 @@
 package com.maddyhome.idea.vim.extension.multiplecursors
 
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.common.Direction
 
 /**
- * Moves the last added cursor to the next occurrence
+ * Moves the last added cursor to the next occurrence, or to the previous one if the last search was backwards
  */
 internal class SkipOccurrenceHandler(private val caseSensitivity: CaseSensitivity) : WriteActionHandler() {
 
@@ -22,8 +23,10 @@ internal class SkipOccurrenceHandler(private val caseSensitivity: CaseSensitivit
     val search = editor.occurrenceSearch
     val wholeWord = search?.wholeWord ?: false
     val ignoreCase = search?.ignoreCase ?: caseSensitivity.ignoresCase(text)
+    val direction = search?.direction ?: Direction.FORWARDS
 
-    val nextOffset = findNextOccurrence(editor, primaryCaret.offset, text, wholeWord, ignoreCase) ?: return false
+    val current = primaryCaret.selectedRange
+    val nextOffset = findOccurrence(editor, current, text, wholeWord, ignoreCase, direction) ?: return false
     if (editor.isSelectedByAnyCaret(nextOffset)) {
       showNoMoreMatches()
       return false

@@ -12,6 +12,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.api.getText
+import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.newapi.vim
@@ -39,7 +40,7 @@ internal enum class NewSelection {
 
 /**
  * In Normal mode, selects the word under the caret. In Visual mode, adds a cursor at the next occurrence of the
- * selection.
+ * selection, or at the previous one when searching backwards.
  *
  * @param wholeWord Whether the word selected in Normal mode is searched with word boundaries. In Visual mode, the flag
  *   of the started search is used.
@@ -49,6 +50,7 @@ internal class NextOccurrenceHandler(
   private val caseSensitivity: CaseSensitivity,
   override val acceptsCount: Boolean = false,
   private val newSelection: NewSelection = NewSelection.SPLIT_LINES_OR_ADD_NEXT,
+  private val direction: Direction = Direction.FORWARDS,
 ) : WriteActionHandler() {
 
   override fun executeInWriteAction(editor: Editor): Boolean =
@@ -80,11 +82,12 @@ internal class NextOccurrenceHandler(
     // Cursors added in another way may select different texts
     if (!selectSameText(editor, carets)) return false
 
-    val search = continueOrStartSearch(editor)
-    val pattern = editor.vim.getText(search.lastOccurrence)
-    val startOffset = editor.caretModel.primaryCaret.offset
+    val search = continueOrStartSearch(editor).copy(direction = direction)
+    editor.occurrenceSearch = search
+    val current = search.lastOccurrence
+    val pattern = editor.vim.getText(current)
 
-    val nextOffset = findNextOccurrence(editor, startOffset, pattern, search.wholeWord, search.ignoreCase)
+    val nextOffset = findOccurrence(editor, current, pattern, search.wholeWord, search.ignoreCase, direction)
     if (nextOffset == null || editor.isSelectedByAnyCaret(nextOffset)) {
       showNoMoreMatches()
       return false
