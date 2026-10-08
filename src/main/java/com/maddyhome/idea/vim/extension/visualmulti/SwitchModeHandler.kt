@@ -27,7 +27,7 @@ internal class SwitchModeHandler : ExtensionHandler {
 
   override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
     if (editor.inVisualMode) {
-      regionsToCursors(editor)
+      collapseRegionsToCursors(editor)
     } else {
       cursorsToRegions(editor)
     }
@@ -38,9 +38,14 @@ internal class SwitchModeHandler : ExtensionHandler {
     editor.nativeCarets().forEach { it.vimSetSelection(it.offset) }
   }
 
-  private fun regionsToCursors(editor: VimEditor) {
-    val selectionStarts = editor.nativeCarets().associateWith { it.vimSelectionStart }
-    leaveVisualMode(editor)
-    selectionStarts.forEach { (caret, start) -> caret.moveToOffset(start) }
-  }
+}
+
+/**
+ * Leaves Visual mode with a cursor where each region's selection started, like vim-visual-multi does when switching
+ * to cursor mode
+ */
+internal fun collapseRegionsToCursors(editor: VimEditor) {
+  val selectionStarts = editor.nativeCarets().associateWith { it.vimSelectionStart }
+  leaveVisualMode(editor)
+  selectionStarts.forEach { (caret, start) -> caret.moveToOffset(start) }
 }
