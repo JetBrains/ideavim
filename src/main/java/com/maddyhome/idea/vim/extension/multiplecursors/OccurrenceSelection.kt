@@ -43,18 +43,20 @@ internal fun Caret.selectRange(range: TextRange): TextRange {
  * Enters Visual mode and selects the word under the caret. Returns `null` if the caret is not on a word.
  */
 internal fun Caret.selectWordUnderCaret(): TextRange? {
-  val word = injector.searchHelper.findWordAtOrFollowingCursor(editor.vim, vim, isBigWord = false) ?: return null
-  if (word.startOffset > offset) return null
-
+  val word = wordRange() ?: return null
   enterCharacterwiseVisualMode(editor.vim)
   vim.vimSetSelection(word.startOffset, word.endOffsetInclusive, true)
   return selectedRange
 }
 
-internal fun Caret.wordUnderCaret(): String? {
+internal fun Caret.wordUnderCaret(): String? = wordRange()?.let { editor.vim.getText(it) }
+
+/**
+ * The word under the caret, or `null` if the caret is not on a word
+ */
+internal fun Caret.wordRange(): TextRange? {
   val word = injector.searchHelper.findWordAtOrFollowingCursor(editor.vim, vim, isBigWord = false) ?: return null
-  if (word.startOffset > offset) return null
-  return editor.vim.getText(word)
+  return if (word.startOffset > offset) null else word
 }
 
 /**

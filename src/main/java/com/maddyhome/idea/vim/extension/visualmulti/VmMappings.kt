@@ -116,6 +116,9 @@ internal fun getSessionMappings(): List<VmMapping> {
     VmMapping("Run Last Normal", MappingMode.N + MappingMode.X, "${leader}Z", alwaysMapped = true) {
       RunNormalHandler(repeatLast = true)
     },
+    VmMapping("Case Conversion Menu", MappingMode.N + MappingMode.X, "${leader}C", alwaysMapped = true) {
+      CaseConversionHandler()
+    },
     VmMapping("Run Macro", MappingMode.N + MappingMode.X, "${leader}@", alwaysMapped = true) { RunMacroHandler() },
     // In Normal mode, <Esc> is partly handled by the IDE, which we don't want to break
     VmMapping("Exit", MappingMode.X, "<Esc>", alwaysMapped = true) { ExitHandler() },
