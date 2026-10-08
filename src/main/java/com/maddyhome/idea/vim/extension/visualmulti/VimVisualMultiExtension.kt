@@ -10,8 +10,11 @@ package com.maddyhome.idea.vim.extension.visualmulti
 
 import com.maddyhome.idea.vim.api.getMappingInfo
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.multiplecursors.VimMultipleCursorsExtensionBase
+import javax.swing.KeyStroke
 
 /**
  * Emulation of vim-visual-multi
@@ -85,19 +88,38 @@ internal class VimVisualMultiExtension : VimMultipleCursorsExtensionBase() {
   }
 
   /**
-   * The keys are mapped to the handler rather than to the `<Plug>` mapping, so the handler knows which keys to run
-   * outside the session.
+   * The keys are mapped to the handler rather than to the `<Plug>` mapping, so the handler knows what to do outside the
+   * session.
    *
    * vim-visual-multi doesn't override existing buffer mappings. We don't override the mappings of the user either.
    */
   private fun registerSessionKeys(keys: Map<String, MappingKeys>) {
     for (mapping in getSessionMappings()) {
-      val fromKeys = injector.parser.parseKeys(keys[mapping.name]?.keys ?: continue)
-      val modes = mapping.modes.filterTo(mutableSetOf()) { injector.keyGroup.getMappingInfo(fromKeys, it) == null }
-      if (modes.isEmpty()) continue
+      val keysText = keys[mapping.name]?.keys ?: continue
+      val fromKeys = injector.parser.parseKeys(keysText)
+      for (mode in mapping.modes) {
+        val outsideSession = outsideSessionHandler(keys, keysText, mode, fromKeys) ?: continue
+        val handler = SessionOnlyHandler(mapping.createHandler(), outsideSession)
+        putExtensionHandlerMapping(setOf(mode), fromKeys, owner, handler, false)
+      }
+    }
+  }
 
-      val handler = SessionOnlyHandler(mapping.createHandler(), fromKeys)
-      putExtensionHandlerMapping(modes, fromKeys, owner, handler, false)
+  /**
+   * Usually the keys keep their Vim meaning outside the session. When a permanent mapping uses the same keys, e.g.
+   * `\\a` for Visual Add and Align, it is the permanent mapping. Returns `null` for the keys mapped by the user.
+   */
+  private fun outsideSessionHandler(
+    keys: Map<String, MappingKeys>,
+    keysText: String,
+    mode: MappingMode,
+    fromKeys: List<KeyStroke>,
+  ): ExtensionHandler? {
+    val permanent = getPermanentMappings().firstOrNull { mode in it.modes && keys[it.name]?.keys == keysText }
+    return when {
+      permanent != null -> StartSessionHandler(permanent.createHandler())
+      injector.keyGroup.getMappingInfo(fromKeys, mode) == null -> NativeKeysHandler(fromKeys)
+      else -> null
     }
   }
 }

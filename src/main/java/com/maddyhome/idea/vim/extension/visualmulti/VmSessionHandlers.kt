@@ -26,18 +26,27 @@ internal class StartSessionHandler(private val handler: ExtensionHandler) : Exte
 }
 
 /**
- * Runs [handler] inside the session. Outside it, runs the [keys] without mappings, e.g. `n` still extends the Visual
- * selection to the next match.
+ * Runs [handler] inside the session, and [outsideSession] outside it
  */
-internal class SessionOnlyHandler(private val handler: ExtensionHandler, private val keys: List<KeyStroke>) :
-  ExtensionHandler {
+internal class SessionOnlyHandler(
+  private val handler: ExtensionHandler,
+  private val outsideSession: ExtensionHandler,
+) : ExtensionHandler {
 
   override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-    if (VmSession.isActive(editor)) {
-      handler.execute(editor, context, operatorArguments)
-    } else {
-      executeNormalWithoutMapping(countKeys(operatorArguments.count0) + keys, editor.ij)
-    }
+    val active = if (VmSession.isActive(editor)) handler else outsideSession
+    active.execute(editor, context, operatorArguments)
+  }
+}
+
+/**
+ * Runs the [keys] without mappings, so they keep their Vim meaning, e.g. `n` still extends the Visual selection to the
+ * next match
+ */
+internal class NativeKeysHandler(private val keys: List<KeyStroke>) : ExtensionHandler {
+
+  override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
+    executeNormalWithoutMapping(countKeys(operatorArguments.count0) + keys, editor.ij)
   }
 
   private fun countKeys(count: Int): List<KeyStroke> =
