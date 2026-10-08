@@ -54,6 +54,12 @@ internal fun getPermanentMappings(): List<VmMapping> {
     VmMapping("Find Subword Under", MappingMode.X, "<C-n>", alwaysMapped = true) {
       NextOccurrenceHandler(wholeWord = false, VmCaseSetting, acceptsCount = true)
     },
+    VmMapping("Add Cursor Down", MappingMode.N, "<C-Down>") {
+      NextLineHandler(NextLineHandler.Direction.DOWN)
+    },
+    VmMapping("Add Cursor Up", MappingMode.N, "<C-Up>") {
+      NextLineHandler(NextLineHandler.Direction.UP)
+    },
     VmMapping("Select All", MappingMode.N, "${leader}A") {
       AllOccurrencesHandler(
         wholeWord = true,

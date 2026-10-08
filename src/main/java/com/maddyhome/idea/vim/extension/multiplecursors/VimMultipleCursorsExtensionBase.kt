@@ -42,7 +42,8 @@ internal abstract class VimMultipleCursorsExtensionBase : VimExtension {
 }
 
 /**
- * Whether a global flag variable, such as `g:multi_cursor_use_default_mapping`, is enabled. It is, unless it's `0`.
+ * Whether a global flag variable, such as `g:multi_cursor_use_default_mapping`, is enabled. Any non-zero value enables
+ * it, and [default] is used when the variable is not set.
  */
-internal fun isGlobalFlagEnabled(variableName: String): Boolean =
-  VimPlugin.getVariableService().getGlobalVariableValue(variableName)?.toVimNumber()?.booleanValue ?: true
+internal fun isGlobalFlagEnabled(variableName: String, default: Boolean = true): Boolean =
+  VimPlugin.getVariableService().getGlobalVariableValue(variableName)?.toVimNumber()?.booleanValue ?: default
