@@ -20,6 +20,7 @@ import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
 import com.maddyhome.idea.vim.helper.exitVisualMode
+import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
@@ -54,6 +55,24 @@ internal fun Caret.wordUnderCaret(): String? {
   val word = injector.searchHelper.findWordAtOrFollowingCursor(editor.vim, vim, isBigWord = false) ?: return null
   if (word.startOffset > offset) return null
   return editor.vim.getText(word)
+}
+
+/**
+ * IntelliJ can't change the primary caret, so [caret] is added again as the primary one, with its selection
+ */
+internal fun Editor.makePrimary(caret: Caret): Caret {
+  val anchor = caret.vim.vimSelectionStart
+  val head = caret.offset
+  val hasSelection = caret.hasSelection()
+
+  caretModel.removeCaret(caret)
+  val primary = caretModel.addCaret(offsetToVisualPosition(head), true) ?: return caretModel.primaryCaret
+  if (hasSelection) {
+    primary.vim.vimSetSelection(anchor, head, true)
+  }
+  updateCaretsVisualAttributes()
+  injector.scroll.scrollCaretIntoView(vim)
+  return primary
 }
 
 internal val Caret.selectedRange: TextRange
