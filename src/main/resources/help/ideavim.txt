@@ -1796,6 +1796,10 @@ zf                      Create a closed fold over the Visual selection.
                                                                *:fir* *:first*
 :fir[st]                Go to the first editor tab in the current window.
 
+                                                             *:fu* *:function*
+:fu[nction]             List all user-defined functions, the definition of the
+                        function {name}, or the functions matching /{pattern}.
+
                                                 *:g* *:global* *:v* *:vglobal*
 :g[lobal] :v[global]    Execute the Ex command [cmd] (default :p) on the lines
                         in [range] (default whole file) that match {pattern}.
