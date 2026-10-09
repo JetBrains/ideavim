@@ -29,7 +29,10 @@ import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 
-@ExCommand(command = "fu[nction]")
+@ExCommand(
+  command = "fu[nction]",
+  description = "List all user-defined functions, the definition of the function {name}, or the functions matching /{pattern}."
+)
 internal class FunctionCommand private constructor(
   val range: Range,
   modifier: CommandModifier,
