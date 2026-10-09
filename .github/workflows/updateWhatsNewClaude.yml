@@ -67,6 +67,7 @@ jobs:
             - Keep the entire `<head>`/`<style>` block, every CSS class, the
               `data-theme="__THEME__"` attribute and the `__VERSION__` token unchanged.
             - Never hard-code a version; leave `__VERSION__` exactly as-is.
+            - Keep the `<!-- whatsnew-release-commit: ... -->` line at the top unchanged.
             - Escape HTML correctly inside `code`/`kbd`/`pre` (`&lt;` `&gt;` `&amp;`).
             - Keep the friendly, user-facing tone; no `VIM-####` ids or raw issue URLs.
 

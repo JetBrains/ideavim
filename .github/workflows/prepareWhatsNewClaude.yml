@@ -1,5 +1,10 @@
 name: Prepare What's New with Claude
 
+# The PR goes to master so that master keeps every page and the full changelog, but the page itself
+# describes the `release` branch: the release is published from that branch as is (only the EAP build
+# moves it to master), so changes that are only on master are not part of the upcoming release. The
+# TeamCity release build takes the merged whatsnew-tbr.html from master and promotes it.
+
 on:
   workflow_dispatch:  # Manually triggered by a maintainer
 
@@ -20,6 +25,22 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Full history so the changelog can be analyzed and the PR branch pushed
+
+      - name: Fetch the release branch
+        id: release
+        run: |
+          git fetch origin release:refs/remotes/origin/release
+          echo "commit=$(git rev-parse origin/release)" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Claude runs prepareReleaseChangelog.ts to see which changelog entries the release contains
+      - name: Install script dependencies
+        run: npm ci --no-fund --no-audit
+        working-directory: scripts-ts
 
       # Tells apart "the JWT expired" from "the quota is gone" BEFORE Claude runs -
       # claude-code-action reports both as a bare `result is_error:true`.
@@ -63,23 +84,34 @@ jobs:
             gone, so USUALLY it does NOT exist when this workflow runs — only the version-specific
             pages for older releases (`whatsnew-<version>.html`) remain.
 
-            Read the now-updated `## [To Be Released]` section of `CHANGES.md` (everything between
-            that heading and the next dated release heading, e.g. `## 2.39.0, ...`). Use only its
-            Features and Fixes; you may skip Merged PRs.
+            ### Describe only what the release will contain
+            The release is built from the `origin/release` branch, which may be BEHIND master, so not
+            everything under `## [To Be Released]` in `CHANGES.md` is part of it. After Step 1, run
+            exactly this command (do not work it out from `git log` yourself):
+
+                scripts-ts/node_modules/.bin/tsx scripts-ts/src/prepareReleaseChangelog.ts --print . origin/release
+
+            It prints the `## To Be Released` section the release will be published with - the same one
+            the release build puts in the plugin. Below, "the release section" means this output. Use
+            only its Features and Fixes; you may skip Merged PRs. The entries it leaves out stay in
+            `CHANGES.md`; they will be on the page of the next release. Run it again if you change
+            `CHANGES.md` afterwards.
+            Leave the `<!-- whatsnew-release-commit: ... -->` line at the top of the page as it is
+            (or do not add one): this workflow records there which release commit the page describes.
 
             First decide what to do by checking the working tree:
             - List `src/main/resources/whatsnew-*.html`.
             - **If `whatsnew-tbr.html` does NOT exist (the normal case):** create it fresh,
-              describing every Feature and Fix currently under `## [To Be Released]`.
+              describing every Feature and Fix in the release section.
             - **If `whatsnew-tbr.html` ALREADY exists (it was generated earlier this cycle):**
-              do NOT rebuild it from scratch. Diff it against the current `## [To Be Released]`
-              section — work out which changelog entries are NOT yet represented on the page — and
+              do NOT rebuild it from scratch. Diff it against the release section — work out which
+              changelog entries are NOT yet represented on the page — and
               update the page to incorporate ONLY those new/changed items, preserving the existing
               sections, ordering and wording already present. This is an incremental update, not a
               rewrite. (If nothing in the changelog is new relative to the page, make no changes
               and do not open a PR.)
 
-            - If, after Step 1, `## [To Be Released]` still has no Features or Fixes, STOP:
+            - If the release section has no Features or Fixes, STOP:
               do not create or change the HTML and do not open a PR. Explain why in your final message.
 
             ### Style — match the existing pages EXACTLY
@@ -121,7 +153,48 @@ jobs:
               - Body: a short summary of the changelog entries added and the What's New highlights.
 
           # Changelog needs the skill + git/gh/web; the page generation needs file read/write.
-          claude_args: '--allowed-tools "Skill,Read,Write,Edit,Glob,Grep,Bash(git:*),Bash(gh:*),WebSearch,WebFetch(domain:plugins.jetbrains.com),WebFetch(domain:youtrack.jetbrains.com),WebFetch(domain:github.com)"'
+          claude_args: '--allowed-tools "Skill,Read,Write,Edit,Glob,Grep,Bash(git:*),Bash(gh:*),Bash(scripts-ts/node_modules/.bin/tsx scripts-ts/src/prepareReleaseChangelog.ts:*),WebSearch,WebFetch(domain:plugins.jetbrains.com),WebFetch(domain:youtrack.jetbrains.com),WebFetch(domain:github.com)"'
+
+      # The release build refuses a page written for another commit of the release branch: an EAP build or a
+      # cherry-pick after this run changes what the release contains. So the commit is recorded even when
+      # the page itself needed no changes - then in a PR of its own.
+      - name: Record the release commit the page describes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_COMMIT: ${{ steps.release.outputs.commit }}
+        run: |
+          set -e
+          tbr="src/main/resources/whatsnew-tbr.html"
+          marker="<!-- whatsnew-release-commit: $RELEASE_COMMIT -->"
+          git config user.name "IdeaVim Bot"
+          git config user.email "maintainers@ideavim.dev"
+          git fetch origin master
+          pr=$(gh pr list --head whatsnew-tbr --state open --json number --jq '.[0].number // empty')
+          if [ -n "$pr" ]; then
+            git fetch origin whatsnew-tbr
+            git checkout -f -B whatsnew-tbr origin/whatsnew-tbr
+          elif git cat-file -e "origin/master:$tbr" 2>/dev/null; then
+            git checkout -f -B whatsnew-tbr origin/master
+          else
+            echo "No What's New page to record the release commit in"
+            exit 0
+          fi
+          if grep -qxF "$marker" "$tbr"; then
+            echo "The page already describes release commit $RELEASE_COMMIT"
+            exit 0
+          fi
+          sed -i '/^<!-- whatsnew-release-commit: .* -->$/d' "$tbr"
+          sed -i "1i $marker" "$tbr"
+          git commit -qam "Record release commit $RELEASE_COMMIT for What's New"
+          if [ -n "$pr" ]; then
+            git push origin whatsnew-tbr
+            echo "Recorded release commit $RELEASE_COMMIT in PR #$pr"
+          else
+            git push -f origin whatsnew-tbr
+            gh pr create --base master --head whatsnew-tbr \
+              --title "Prepare What's New for the upcoming release" \
+              --body "The release branch moved to $RELEASE_COMMIT, and the What's New page needed no changes for it. This only records the new commit, so the release build accepts the page."
+          fi
 
       # Decodes the session log that the action writes but never prints.
       - name: Claude run post-mortem

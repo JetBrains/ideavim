@@ -39,7 +39,6 @@ dependencies {
 }
 
 val releaseType: String? by project
-val youtrackToken: String by project
 
 kotlin {
   compilerOptions {
@@ -80,14 +79,6 @@ tasks.register("calculateNewDevVersion", JavaExec::class) {
   mainClass.set("scripts.release.CalculateNewDevVersionKt")
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf("${rootProject.rootDir}")
-}
-
-tasks.register("releaseActions", JavaExec::class) {
-  group = "other"
-  mainClass.set("scripts.ReleaseActionsKt")
-  classpath = sourceSets["main"].runtimeClasspath
-  args = listOf(project.version.toString(), releaseType ?: "")
-  environment("YOUTRACK_TOKEN", youtrackToken)
 }
 
 tasks.register("generateHelp", JavaExec::class) {
