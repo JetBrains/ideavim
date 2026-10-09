@@ -1674,6 +1674,32 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   }
 
   /**
+   * Replaces the indent of the line emptied by a linewise change with the one the language gives it.
+   *
+   * Vim reindents this line with 'cindent' or 'indentexpr' whatever 'autoindent' is set to (`fix_indent()`, called from
+   * `op_change()` in ops.c), so the caret ends up at the indent of the surrounding code rather than at the indent the
+   * line used to have. Like the indent of `o`, this is only available where the language has a formatter.
+   *
+   * @return true if the line was reindented
+   */
+  private fun reindentChangedLine(editor: VimEditor, caret: VimCaret): Boolean {
+    val indent = getLanguageIndent(editor, caret.offset) ?: return false
+    val line = caret.getBufferPosition().line
+    val lineStart = editor.getLineStartOffset(line)
+    injector.application.runWriteAction {
+      (editor as MutableVimEditor).replaceString(lineStart, editor.getLineEndOffset(line), indent)
+    }
+    caret.moveToOffset(lineStart + indent.length)
+    return true
+  }
+
+  /**
+   * The indent the language would give to the line at [offset], or null if the language has no formatter to work it
+   * out, in which case the line keeps the indent it was given.
+   */
+  protected open fun getLanguageIndent(editor: VimEditor, offset: Int): String? = null
+
+  /**
    * Deletes the range of text and enters insert mode
    *
    * @param editor            The editor to change
@@ -1717,7 +1743,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
           } else {
             insertNewLineAbove(editor, updatedCaret, indentColumn)
           }
-          pendingAutoIndent = autoIndent
+          val reindented = reindentChangedLine(editor, updatedCaret)
+          pendingAutoIndent = autoIndent || reindented
         }
       } else {
         if (type === SelectionType.BLOCK_WISE) {

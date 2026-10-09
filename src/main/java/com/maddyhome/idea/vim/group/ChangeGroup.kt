@@ -218,6 +218,13 @@ class ChangeGroup : VimChangeGroupBase() {
     }
   }
 
+  override fun getLanguageIndent(editor: VimEditor, offset: Int): String? {
+    val ijEditor = (editor as IjVimEditor).editor
+    return rpc(ijEditor.project) {
+      FormatRemoteApi.getInstance().lineIndent(ijEditor.editorId(), offset)
+    }
+  }
+
   private fun moveCaretToFirstNonBlank(
     editor: IjVimEditor,
     range: TextRange,
