@@ -295,12 +295,14 @@ export async function getVersionIdByName(name: string): Promise<string | null> {
 
   const data = await response.json();
 
-  if (data.length === 0) {
+  // The query also matches other names that contain this one, such as its EAP versions
+  const version = data.find((v: { name: string }) => v.name === name);
+  if (!version) {
     console.log(`Version "${name}" not found`);
     return null;
   }
 
-  const versionId = data[0].id;
+  const versionId = version.id;
   console.log(`Found version "${name}" with ID: ${versionId}`);
   return versionId;
 }

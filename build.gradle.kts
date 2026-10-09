@@ -508,7 +508,7 @@ gradle.projectsEvaluated {
 
 // The rendered change notes body, plus the version whose CHANGES.md section it came from.
 // Patch releases have no section of their own (promoteChangelog.ts rolls them into the parent
-// minor), so 2.45.1 resolves to 2.45.0 - and so does its YouTrack link, because releaseActions.kt
+// minor), so 2.45.1 resolves to 2.45.0 - and so does its YouTrack link, because releaseActions.ts
 // only ever creates fix versions for minors. Note that getLatest() returns the first section in
 // file order, not the highest version, so CHANGES.md must stay sorted and free of empty headers.
 val changeNotesParts = provider {
