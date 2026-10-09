@@ -669,15 +669,17 @@ class FoldMotionOperatorTest : FoldActionTestBase() {
     )
     updateFoldRegions()
     typeText("czk")
+    // The closing brace of the method is part of the change, so the emptied line is still inside the method body and
+    // the language indents it as such, as Vim's 'cindent' does. Joined by hand, as the indent is trailing white space
     assertState(
-      """
-          class TestClass {
-              public void method() {
-                  System.out.println("a");
-                  System.out.println("b");
-              
-          }
-      """.trimIndent(),
+      listOf(
+        "class TestClass {",
+        "    public void method() {",
+        "        System.out.println(\"a\");",
+        "        System.out.println(\"b\");",
+        "        ",
+        "}",
+      ).joinToString("\n"),
     )
     assertMode(Mode.INSERT)
   }

@@ -114,6 +114,8 @@ class VimFuncTextObjExtensionTest : VimJavaTestCase() {
     )
   }
 
+  // The emptied line is reindented by the language, like Vim's 'cindent' does after a linewise change, so the caret is
+  // at the indent of the class members rather than at the indent of the line it was on
   @Test
   fun `test cam puts caret in insert mode after deleting method`() {
     doTest(
@@ -125,7 +127,7 @@ class VimFuncTextObjExtensionTest : VimJavaTestCase() {
             }
         }
       """.trimIndent(),
-      "public class Foo {\n        ${c}\n}",
+      "public class Foo {\n    ${c}\n}",
       Mode.INSERT,
       fileType = JavaFileType.INSTANCE,
     )

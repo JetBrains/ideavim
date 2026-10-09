@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.group.format
 
+import com.intellij.application.options.CodeStyle
+import com.intellij.lang.LanguageFormatting
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.application.ApplicationManager
@@ -21,6 +23,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import com.intellij.psi.codeStyle.ExternalFormatProcessor
+import com.intellij.psi.util.PsiUtilCore
 import com.maddyhome.idea.vim.group.onEdt
 
 /**
@@ -46,6 +49,28 @@ internal class FormatRemoteApiImpl : FormatRemoteApi {
       formatExternally(externalFormatter, project, psiFile, lines)
     } else {
       autoIndentLines(editor, lines)
+    }
+  }
+
+  /**
+   * Goes through [CodeStyle.getLineIndent], as the Enter handler does: a
+   * [LineIndentProvider][com.intellij.psi.codeStyle.lineIndent.LineIndentProvider] of the language answers straight
+   * from the text, and the formatter, which needs the PSI to be up to date, is only asked if there is none.
+   *
+   * The document is committed up front because the fallback to the formatter would otherwise commit it from inside the
+   * read action.
+   */
+  override suspend fun lineIndent(editorId: EditorId, offset: Int): String? = onEdt {
+    val editor = editorId.findEditorOrNull() ?: return@onEdt null
+    val project = editor.project ?: return@onEdt null
+    val documentManager = PsiDocumentManager.getInstance(project)
+    ApplicationManager.getApplication().runWriteAction { documentManager.commitDocument(editor.document) }
+
+    ApplicationManager.getApplication().runReadAction<String?> {
+      val psiFile = documentManager.getPsiFile(editor.document) ?: return@runReadAction null
+      if (LanguageFormatting.INSTANCE.forContext(psiFile) == null) return@runReadAction null
+      val language = PsiUtilCore.getLanguageAtOffset(psiFile, offset)
+      CodeStyle.getLineIndent(editor, language, offset, true)
     }
   }
 

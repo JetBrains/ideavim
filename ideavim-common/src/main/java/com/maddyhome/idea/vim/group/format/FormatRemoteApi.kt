@@ -24,6 +24,12 @@ interface FormatRemoteApi : RemoteApi<Unit> {
    */
   suspend fun format(editorId: EditorId, startOffset: Int, endOffset: Int)
 
+  /**
+   * The indent the language gives to the line at [offset], as the IDE works it out for a new line. Null if the
+   * language has no formatter, or if the indent of the line is not to be adjusted.
+   */
+  suspend fun lineIndent(editorId: EditorId, offset: Int): String?
+
   companion object {
     @JvmStatic
     suspend fun getInstance(): FormatRemoteApi {

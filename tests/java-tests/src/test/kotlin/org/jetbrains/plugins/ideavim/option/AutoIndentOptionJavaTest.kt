@@ -11,7 +11,6 @@ package org.jetbrains.plugins.ideavim.option
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimJavaTestCase
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 /**
@@ -130,11 +129,6 @@ class AutoIndentOptionJavaTest : VimJavaTestCase() {
 
   // `cc` and `S` - Vim puts the caret in column 0, but 'cindent' then indents the emptied line again
 
-  @Disabled(
-    "`cc` and `S` do not ask the IDE for an indent at all - they keep the indent the line already had, or put the " +
-      "caret in column 0. Vim empties the line and lets 'cindent' indent it again, so the text ends up indented " +
-      "even with 'noautoindent'. Enabling this test means reindenting the emptied line through the Platform"
-  )
   @Test
   fun `test cc keeps the language indent when autoindent is off`() {
     configureIndentedStatement()
@@ -143,11 +137,6 @@ class AutoIndentOptionJavaTest : VimJavaTestCase() {
     assertState(codeWithLine2ReplacedBy("$indent${c}y"))
   }
 
-  @Disabled(
-    "`cc` and `S` do not ask the IDE for an indent at all - they keep the indent the line already had, or put the " +
-      "caret in column 0. Vim empties the line and lets 'cindent' indent it again, so the text ends up indented " +
-      "even with 'noautoindent'. Enabling this test means reindenting the emptied line through the Platform"
-  )
   @Test
   fun `test S keeps the language indent when autoindent is off`() {
     configureIndentedStatement()
