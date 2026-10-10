@@ -401,9 +401,9 @@ class MotionInnerBigWordActionTest : VimTestCase() {
       """
         |Lorem ipsum dolor sit amet,
         |
-        |${s}${c}
+        |${s}
+        |${c}
         |${se}
-        |
         |consectetur adipiscing elit
       """.trimMargin(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
