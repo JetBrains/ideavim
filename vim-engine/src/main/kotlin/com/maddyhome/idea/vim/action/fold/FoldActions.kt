@@ -305,8 +305,21 @@ class VimCreateFoldVisualAction : VisualOperatorActionHandler.ForEachCaret() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     val textRange = range.toVimTextRange(true)
-    editor.createFoldRegion(textRange.startOffset, textRange.endOffset, collapse = true)
+    val endOffset = getEndOffset(textRange, editor)
+
+    editor.createFoldRegion(textRange.startOffset, endOffset, collapse = true)
     return true
+  }
+
+  private fun getEndOffset(
+    range: TextRange,
+    editor: VimEditor,
+  ): Int {
+    // if last char is \n we want to exclude it so next line won't be collapsed
+    if (range.endOffset > range.startOffset && editor.charAt(range.endOffset - 1) == '\n') {
+      return range.endOffset - 1
+    }
+    return range.endOffset
   }
 }
 
