@@ -35,6 +35,7 @@ usual beta standards.
 * [VIM-720](https://youtrack.jetbrains.com/issue/VIM-720) `<CR>`, `<Esc>` and the arrow keys can now be handed over to the IDE with [`sethandler`](https://github.com/JetBrains/ideavim/blob/master/doc/sethandler.md) for that key, e.g. `sethandler <CR> i:ide` or `sethandler <Esc> n:ide`. Handlers set for all shortcuts at once, such as `sethandler a:ide`, still leave these keys to Vim
 * [VIM-2372](https://youtrack.jetbrains.com/issue/VIM-2372) The [NERDTree](https://github.com/JetBrains/ideavim/blob/master/doc/NERDTree-support.md) navigation keys `j`, `k`, `gg`, `G`, `<C-D>`, `<C-U>` and `/` can now be changed like the other NERDTree keys, e.g. `let g:NERDTreeMapSelectNext = '<C-N>'` or `let g:NERDTreeMapSpeedSearch = 'f'`. Changed `g:NERDTreeMap*` variables are applied the next time the Project tool window gets focus, without restarting the IDE
 * [VIM-2293](https://youtrack.jetbrains.com/issue/VIM-2293) New `visual-multi` extension emulates [vim-visual-multi](https://github.com/mg979/vim-visual-multi) using the IDE's native carets. Enable it with `Plug 'mg979/vim-visual-multi'`. Press `<C-n>` to select the word under the cursor and add its next occurrence, `\\A` to select all occurrences, or `<C-Down>`/`<C-Up>` to add cursors on the lines below/above. During a session, `n`/`N` find the next/previous occurrence, `q`/`Q` skip or remove a region, `<Tab>` switches between regions and cursors, and `\\z`, `\\@`, `\\C` and `\\a` run a `:normal` command, run a macro, convert case and align the cursors. Keys can be changed with `g:VM_maps` and `g:VM_leader`. See the [documentation](https://github.com/JetBrains/ideavim/blob/master/doc/IdeaVim%20Plugins.md) for all keys and options
+* Added the [`:function`](https://vimhelp.org/userfunc.txt.html#%3Afunction) command for listing user-defined functions. `:function` lists every global function with its arguments and flags. `:function MyFunc` shows a single function, and `:function /pattern` lists the functions whose names match the pattern
 
 ### Fixes:
 
@@ -47,6 +48,15 @@ usual beta standards.
 * [VIM-1894](https://youtrack.jetbrains.com/issue/VIM-1894) Fixed [`V`](https://vimhelp.org/visual.txt.html#V) on a collapsed fold selecting only its first line. Linewise Visual mode now takes in the whole folded region, so `Vd` on a collapsed `<div>` deletes the entire tag, and `Vj` onto a collapsed fold selects all of it
 * [VIM-4336](https://youtrack.jetbrains.com/issue/VIM-4336) Fixed the caret ending up in the wrong place after IDE actions that run asynchronously in Rider, such as commenting a line
 * [VIM-1503](https://youtrack.jetbrains.com/issue/VIM-1503) Fixed dead keys and input methods typing text into the document in Normal, Visual and Operator-pending modes. Pressing a dead key such as `'` after `vi` no longer replaces the Visual selection, and a composed character like `é` can be used as a command argument, e.g. `fé`
+* [VIM-2524](https://youtrack.jetbrains.com/issue/VIM-2524) [`cc`](https://vimhelp.org/change.txt.html#cc) and [`S`](https://vimhelp.org/change.txt.html#S) on an empty or blank line now indent it to match the surrounding code, the same indent `o` on the line above would give, instead of keeping whatever white space the line already had
+* Fixed [`%`](https://vimhelp.org/motion.txt.html#%25) jumping to the wrong bracket, or not moving, when an apostrophe that does not start a string sits between the brackets — in `(it's) y's`, `%` on `(` now jumps to the matching `)`
+* Fixed `%` throwing an exception in an empty file
+* Fixed `:/` and `:?` with an empty pattern throwing an exception. As in Vim, they now use the last search pattern, and report `E35: No previous regular expression` when there is none
+* Fixed [`:continue`](https://vimhelp.org/eval.txt.html#%3Acontinue) inside a `:for` loop over a List hanging the IDE — `for x in [1, 2] | continue | endfor` now finishes
+* Fixed [`slice()`](https://vimhelp.org/builtin.txt.html#slice%28%29) returning the whole list or string when the end index works out to zero — `slice([1, 2, 3], 0, 0)` now returns `[]`
+* Fixed [`:tags`](https://vimhelp.org/tagsrch.txt.html#%3Atags) reporting an error when the line a tag jump was made from has since been deleted
+* Fixed searching for a pattern containing `\<` throwing an exception while the [command-line window](https://vimhelp.org/cmdline.txt.html#cmdline-window) opened by `q:`, `q/` or `q?` is open
+* Fixed the `ReplaceWithRegister` extension's `gr` in Visual mode deleting whole lines when the selection spans lines — with `vj` selecting from the middle of one line into the next, `gr` now replaces only the selected text and keeps the rest of both lines
 
 ### Merged PRs:
 * [2082](https://github.com/JetBrains/ideavim/pull/2082) by [1grzyb1](https://github.com/1grzyb1): VIM-748 changing multiple commands with |
@@ -61,6 +71,9 @@ usual beta standards.
 * [2113](https://github.com/JetBrains/ideavim/pull/2113) by [1grzyb1](https://github.com/1grzyb1): VIM-1503 don't type dead keys
 * [2115](https://github.com/JetBrains/ideavim/pull/2115) by [1grzyb1](https://github.com/1grzyb1): VIM-2372 Add missing mappings for navigation keys
 * [2117](https://github.com/JetBrains/ideavim/pull/2117) by [1grzyb1](https://github.com/1grzyb1): VIM-2293 Implement Vim visual multi plugin
+* [2119](https://github.com/JetBrains/ideavim/pull/2119) by [1grzyb1](https://github.com/1grzyb1): VIM-2524 calculate indent after cc
+* [2103](https://github.com/JetBrains/ideavim/pull/2103) by [citizenmatt](https://github.com/citizenmatt): Implement :function command to list functions
+* [2086](https://github.com/JetBrains/ideavim/pull/2086) by [valis](https://github.com/valis): Don't treat quotes inside non-string tokens as string delimiters in %
 
 ## 2.47.2, 2026-10-02
 
