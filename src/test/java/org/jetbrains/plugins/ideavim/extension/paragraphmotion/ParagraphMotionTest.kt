@@ -82,7 +82,11 @@ class ParagraphMotionTest : VimTestCase() {
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
-    val after = """${c}Lorem ipsum dolor sit amet,"""
+    val after = """Lorem ipsum dolor sit amet,
+        |....${c}
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+    """.trimMargin().dotToSpace()
     doTest("d}", before, after, Mode.NORMAL())
   }
 
@@ -145,7 +149,8 @@ class ParagraphMotionTest : VimTestCase() {
         |${c}Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
-    val after = """
+    val after = """Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
         |${c}Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()

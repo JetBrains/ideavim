@@ -192,8 +192,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
       """
                     A Discovery
 
-                    I ${s}found it in a legendary land${c}${se}
-                    all rocks and lavender and tufted grass,
+                    I ${s}found it in a legendary land${c}
+                    ${se}all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
@@ -312,8 +312,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
       """
                     A Discovery
 
-                    I ${s}it in a legendary land${c}${se}
-                    all rocks and lavender and tufted grass,
+                    I ${s}it in a legendary land${c}
+                    ${se}all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
@@ -406,8 +406,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     A Discovery
 
                     Iall rocks and lavender and tufted grass,
-                    w${s}here it was settled on some sodden sand${c}${se}
-                    hard by the torrent of a mountain pass.
+                    w${s}here it was settled on some sodden sand${c}
+                    ${se}hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
@@ -428,12 +428,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
       """
-                     A Discovery
+                    A Discovery
 
-                     I
-                     all rocks and lavender and tufted grass,
-                     w${s}here it was settled on some sodden sand[long line]
-                     hard by the torrent of a mountain pass.${c}${se}
+                    Iall rocks and lavender and tufted grass,
+                    w${s}here it was settled on some sodden sand[long line]
+                    hard by the torrent of a mountain pass.${c}${se}
       """.trimIndent(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
