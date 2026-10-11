@@ -46,7 +46,6 @@ usual beta standards.
 * [VIM-4333](https://youtrack.jetbrains.com/issue/VIM-4333) Fixed [`=`](https://vimhelp.org/change.txt.html#%3D) and `==` reformatting the whole file instead of only the given lines in C/C++ files in CLion Nova
 * [VIM-1314](https://youtrack.jetbrains.com/issue/VIM-1314) Pasting with the IDE paste action (`Cmd+V`/`Ctrl+V`) in Replace mode now overwrites the characters under the caret, as in Vim, instead of inserting the text before them. `<BS>` puts the original characters back
 * [VIM-1894](https://youtrack.jetbrains.com/issue/VIM-1894) Fixed [`V`](https://vimhelp.org/visual.txt.html#V) on a collapsed fold selecting only its first line. Linewise Visual mode now takes in the whole folded region, so `Vd` on a collapsed `<div>` deletes the entire tag, and `Vj` onto a collapsed fold selects all of it
-* [VIM-4336](https://youtrack.jetbrains.com/issue/VIM-4336) Fixed the caret ending up in the wrong place after IDE actions that run asynchronously in Rider, such as commenting a line
 * [VIM-1503](https://youtrack.jetbrains.com/issue/VIM-1503) Fixed dead keys and input methods typing text into the document in Normal, Visual and Operator-pending modes. Pressing a dead key such as `'` after `vi` no longer replaces the Visual selection, and a composed character like `é` can be used as a command argument, e.g. `fé`
 * [VIM-2524](https://youtrack.jetbrains.com/issue/VIM-2524) [`cc`](https://vimhelp.org/change.txt.html#cc) and [`S`](https://vimhelp.org/change.txt.html#S) on an empty or blank line now indent it to match the surrounding code, the same indent `o` on the line above would give, instead of keeping whatever white space the line already had
 * Fixed [`%`](https://vimhelp.org/motion.txt.html#%25) jumping to the wrong bracket, or not moving, when an apostrophe that does not start a string sits between the brackets — in `(it's) y's`, `%` on `(` now jumps to the matching `)`
@@ -74,6 +73,14 @@ usual beta standards.
 * [2119](https://github.com/JetBrains/ideavim/pull/2119) by [1grzyb1](https://github.com/1grzyb1): VIM-2524 calculate indent after cc
 * [2103](https://github.com/JetBrains/ideavim/pull/2103) by [citizenmatt](https://github.com/citizenmatt): Implement :function command to list functions
 * [2086](https://github.com/JetBrains/ideavim/pull/2086) by [valis](https://github.com/valis): Don't treat quotes inside non-string tokens as string delimiters in %
+
+## 2.47.3, 2026-10-05
+
+### Fixes:
+* [VIM-4336](https://youtrack.jetbrains.com/issue/VIM-4336) Fixed the caret ending up in the wrong place after IDE actions that run asynchronously in Rider, such as commenting a line
+
+### Merged PRs:
+* [2107](https://github.com/JetBrains/ideavim/pull/2107) by [1grzyb1](https://github.com/1grzyb1): VIM-4336 postpone caret normalization for async actions
 
 ## 2.47.2, 2026-10-02
 
