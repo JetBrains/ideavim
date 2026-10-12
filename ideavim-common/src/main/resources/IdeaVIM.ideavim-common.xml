@@ -9,6 +9,12 @@
 <idea-plugin>
   <!-- Shared code loaded in ALL product modes (monolith, client, backend). -->
 
+  <dependencies>
+    <!-- RemoteApiProviderService. Embedded in the core classloader up to 2026.2; a standalone module since 2026.3,
+         so it must be declared explicitly. -->
+    <module name="intellij.platform.rpc"/>
+  </dependencies>
+
   <extensions defaultExtensionNs="com.intellij">
     <!-- Services that must be available in ALL product modes (used by both frontend and backend).
          Frontend-only services are registered in ideavim-frontend.xml.

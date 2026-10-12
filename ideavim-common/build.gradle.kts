@@ -52,6 +52,7 @@ dependencies {
 
     bundledModule("intellij.spellchecker")
     bundledModule("intellij.platform.kernel.impl")
+    bundledModule("intellij.platform.rpc")
   }
 }
 
