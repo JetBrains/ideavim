@@ -234,7 +234,7 @@ internal class NotificationService(private val project: Project?) : VimNotificat
     val notification = Notification(
       IDEAVIM_NOTIFICATION_ID,
       IDEAVIM_NOTIFICATION_TITLE,
-      "Welcome to IdeaVim $version see what's new in",
+      "Welcome to IdeaVim $version see what's new",
       NotificationType.INFORMATION,
     )
     notification.icon = VimIcons.IDEAVIM
