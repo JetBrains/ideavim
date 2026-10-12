@@ -538,6 +538,15 @@
       </aliases>
     </vimExtension>
 
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.cleverf.CleverFExtension"
+                  name="clever-f">
+      <aliases>
+        <alias name="https://github.com/rhysd/clever-f.vim"/>
+        <alias name="rhysd/clever-f.vim"/>
+        <alias name="clever-f.vim"/>
+      </aliases>
+    </vimExtension>
+
     <vimExtension implementation="com.maddyhome.idea.vim.extension.camelcasemotion.CamelCaseMotion"
                   name="CamelCaseMotion">
       <aliases>
