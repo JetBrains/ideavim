@@ -222,6 +222,57 @@ When classes are nested, the innermost enclosing class is selected.
 </details>
 
 <details>
+<summary><h2>clever-f: Repeat f, F, t and T by pressing the same key again</h2></summary>
+
+Original plugin: [clever-f.vim](https://github.com/rhysd/clever-f.vim).
+
+### Summary:
+Extends `f`, `F`, `t` and `T` so that pressing the same key again repeats the last search, instead of `;` and `,`.
+After `f{char}`, `f` jumps to the next `{char}` and `F` to the previous one. The direction is relative to the first
+search, so after `F{char}`, `f` keeps searching backward. Unlike the builtin motions, searches cross line boundaries.
+Moving the cursor in any other way, changing the text or entering Insert mode starts a new search. Works in normal,
+visual and operator-pending modes, and takes a `[count]`. The characters the search can jump to on the cursor line
+are highlighted until the search ends.
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'rhysd/clever-f.vim'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plugin 'rhysd/clever-f.vim'</code>
+      <br/>
+      <code>Plug 'https://github.com/rhysd/clever-f.vim'</code>
+      <br/>
+      <code>Plug 'clever-f.vim'</code>
+      <br/>
+      <code>set clever-f</code>
+      </details>
+
+### Instructions
+
+https://github.com/rhysd/clever-f.vim/blob/master/doc/clever_f.txt
+
+Supported variables (`g:clever_f_not_overwrites_standard_mappings` must be set before the plugin is loaded):
+
+| Variable | Description |
+|----------|-------------|
+| `g:clever_f_across_no_line` | Search only in the current line |
+| `g:clever_f_ignore_case` | Ignore case |
+| `g:clever_f_smart_case` | Ignore case unless the input is an uppercase character |
+| `g:clever_f_fix_key_direction` | `f` always searches forward and `F` always backward |
+| `g:clever_f_chars_match_any_signs` | Characters which match any sign, e.g. `';'` |
+| `g:clever_f_repeat_last_char_inputs` | Keys which repeat the last searched character, `<CR>` by default |
+| `g:clever_f_timeout_ms` | Start a new search if the last one is older than this |
+| `g:clever_f_mark_char` | Highlight the characters the search can jump to, enabled by default |
+| `g:clever_f_not_overwrites_standard_mappings` | Don't map `f`, `F`, `t` and `T` |
+
+Available `<Plug>` mappings: `<Plug>(clever-f-f)`, `<Plug>(clever-f-F)`, `<Plug>(clever-f-t)`, `<Plug>(clever-f-T)`,
+`<Plug>(clever-f-repeat-forward)`, `<Plug>(clever-f-repeat-back)` and `<Plug>(clever-f-reset)`.
+
+`g:clever_f_mark_cursor`, `g:clever_f_mark_direct`, custom highlight colors and migemo are not currently supported.
+
+</details>
+
+<details>
 <summary><h2>commentary: Adds mapping for quickly commenting stuff out</h2></summary>
 
 By [Daniel Leong](https://github.com/dhleong)  

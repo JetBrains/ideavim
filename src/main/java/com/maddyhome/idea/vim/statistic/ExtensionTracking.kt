@@ -29,7 +29,8 @@ object ExtensionTracking {
     "matchit",
     "textobj-indent",
     "mini-ai",
-    "indentwise"
+    "indentwise",
+    "clever-f"
   )
   val enabledExtensions: MutableSet<String> = ConcurrentHashMap.newKeySet()
 }
