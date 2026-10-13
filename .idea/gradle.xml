@@ -23,6 +23,7 @@
             <option value="$PROJECT_DIR$/scripts" />
             <option value="$PROJECT_DIR$/tests" />
             <option value="$PROJECT_DIR$/tests/java-tests" />
+            <option value="$PROJECT_DIR$/tests/large-file-tests" />
             <option value="$PROJECT_DIR$/tests/long-running-tests" />
             <option value="$PROJECT_DIR$/tests/property-tests" />
             <option value="$PROJECT_DIR$/tests/split-mode-tests" />

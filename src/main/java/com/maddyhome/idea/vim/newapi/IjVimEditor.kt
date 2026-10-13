@@ -69,7 +69,7 @@ import org.jetbrains.annotations.ApiStatus
 import java.lang.System.identityHashCode
 
 @ApiStatus.Internal
-class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase() {
+open class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase() {
   companion object {
     // For cases where Editor does not have a project (for some reason)
     // It's something IJ Platform related and stored here because of this reason

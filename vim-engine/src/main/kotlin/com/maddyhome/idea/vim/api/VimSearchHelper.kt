@@ -236,6 +236,23 @@ interface VimSearchHelper {
     ignoreCase: Boolean,
   ): List<TextRange>
 
+  /**
+   * Find all occurrences of the pattern, unless [isCancelled] returns true first
+   *
+   * Use this overload when searching in the background, so a search that is no longer needed can be stopped.
+   *
+   * @throws kotlin.coroutines.cancellation.CancellationException if [isCancelled] returns true
+   */
+  fun findAll(
+    editor: VimEditor,
+    pattern: String,
+    startLine: Int,
+    endLine: Int,
+    ignoreCase: Boolean,
+    maxCount: Int,
+    isCancelled: () -> Boolean,
+  ): List<TextRange>
+
   fun findNextCharacterOnLine(
     editor: VimEditor,
     caret: ImmutableVimCaret,

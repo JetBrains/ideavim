@@ -412,6 +412,18 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     ignoreCase: Boolean,
     maxCount: Int,
   ): List<TextRange> {
+    return findAll(editor, pattern, startLine, endLine, ignoreCase, maxCount) { false }
+  }
+
+  override fun findAll(
+    editor: VimEditor,
+    pattern: String,
+    startLine: Int,
+    endLine: Int,
+    ignoreCase: Boolean,
+    maxCount: Int,
+    isCancelled: () -> Boolean,
+  ): List<TextRange> {
     val options = enumSetOf<VimRegexOptions>()
     // If we are explicitly asked to ignore case, assume that smartcase check has already taken place
     if (injector.globalOptions().smartcase && !ignoreCase) options.add(VimRegexOptions.SMART_CASE)
@@ -428,6 +440,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       editor.getLineEndOffset(if (endLine == -1) editor.lineCount() - 1 else endLine) + 1,
       options,
       maxCount,
+      isCancelled,
     ).map { it.range }
   }
 

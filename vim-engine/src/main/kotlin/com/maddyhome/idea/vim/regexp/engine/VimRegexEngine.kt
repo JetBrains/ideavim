@@ -28,8 +28,12 @@ internal object VimRegexEngine {
   // TODO: optimize by adding more strategies. The strategies should go from less powerful but faster, to more powerful but slower
   /**
    * The list of strategies that the engine has available. They should be ordered from less powerful to more powerful.
+   *
+   * Strategies keep the state of the simulation in progress, so each thread gets its own. Searches run on the EDT and,
+   * for the search count, in the background at the same time.
    */
-  private val strategies: List<SimulationStrategy> = listOf(BacktrackingStrategy())
+  private val strategies: ThreadLocal<List<SimulationStrategy>> =
+    ThreadLocal.withInitial { listOf(BacktrackingStrategy()) }
 
   /**
    * Simulate the nfa using the available strategies. The approach used is very simple: start with the least powerful
@@ -42,7 +46,7 @@ internal object VimRegexEngine {
     startIndex: Int = 0,
     isCaseInsensitive: Boolean = false,
   ): VimMatchResult {
-    for (strategy in strategies) {
+    for (strategy in strategies.get()) {
       val result = strategy.simulate(nfa, editor, startIndex, isCaseInsensitive)
       if (result is SimulationResult.Complete) return result.matchResult
     }
