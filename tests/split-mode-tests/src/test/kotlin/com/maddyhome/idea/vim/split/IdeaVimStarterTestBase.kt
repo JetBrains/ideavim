@@ -9,6 +9,9 @@
 package com.maddyhome.idea.vim.split
 
 import com.intellij.driver.client.Driver
+import com.intellij.driver.client.Remote
+import com.intellij.driver.model.OnDispatcher
+import com.intellij.driver.model.RdTarget
 import com.intellij.driver.sdk.invokeAction
 import com.intellij.driver.sdk.openFile
 import com.intellij.driver.sdk.singleProject
@@ -179,7 +182,13 @@ abstract class IdeaVimStarterTestBase {
     }
   }
 
-  /** Types vim keys in the active editor. */
+  /**
+   * Types vim keys in the active editor, and returns once no modal progress is shown
+   *
+   * Commands like `cc` ask the backend over RPC, and the frontend shows a modal progress while it waits. Keys typed
+   * meanwhile go to its Cancel button, and Escape cancels the command. A user waits for the progress to close before
+   * typing on, so the test does too: type such a command in a call of its own, and the keys after it in the next one.
+   */
   protected fun typeVim(keys: String) {
     driver.withContext {
       requestFocusFromIde(singleProject())
@@ -191,9 +200,10 @@ abstract class IdeaVimStarterTestBase {
         }
       }
     }
+    waitForNoModalProgress()
   }
 
-  /** Types vim keys followed by Escape. */
+  /** Types vim keys followed by Escape, see [typeVim] */
   protected fun typeVimAndEscape(keys: String) {
     driver.withContext {
       requestFocusFromIde(singleProject())
@@ -205,6 +215,16 @@ abstract class IdeaVimStarterTestBase {
         }
       }
     }
+    waitForNoModalProgress()
+  }
+
+  private fun waitForNoModalProgress() {
+    val closed = waitUntil(timeoutMs = 30_000) {
+      driver.withContext(OnDispatcher.EDT) {
+        !utility(LaterInvocator::class, RdTarget.FRONTEND).isInModalContext()
+      }
+    }
+    check(closed) { "The modal progress was still shown after 30s" }
   }
 
   /** Types an ex command (without the leading `:`). */
@@ -542,4 +562,9 @@ abstract class IdeaVimStarterTestBase {
       return Path(pathStr)
     }
   }
+}
+
+@Remote("com.intellij.openapi.application.impl.LaterInvocator")
+interface LaterInvocator {
+  fun isInModalContext(): Boolean
 }

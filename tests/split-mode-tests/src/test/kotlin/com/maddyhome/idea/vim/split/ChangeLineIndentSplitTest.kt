@@ -31,7 +31,8 @@ class ChangeLineIndentSplitTest : IdeaVimStarterTestBase() {
   fun `cc on empty line in method body indents to the statements`() {
     openFile(javaFile("ChangeLine1"))
     goToLine(5)
-    typeVimAndEscape("ccy")
+    typeVim("cc")
+    typeVimAndEscape("y")
 
     assertEditorContains("{\n        y\n    }", "`cc` should indent line 5 to the method body")
   }
@@ -40,7 +41,8 @@ class ChangeLineIndentSplitTest : IdeaVimStarterTestBase() {
   fun `cc on empty line in class body indents to the members`() {
     openFile(javaFile("ChangeLine2"))
     goToLine(3)
-    typeVimAndEscape("ccy")
+    typeVim("cc")
+    typeVimAndEscape("y")
 
     assertEditorContains(";\n    y\n    void", "`cc` should indent line 3 to the class members")
   }
@@ -49,7 +51,8 @@ class ChangeLineIndentSplitTest : IdeaVimStarterTestBase() {
   fun `S on blank line with wrong indent fixes the indent`() {
     openFile(javaFile("ChangeLine3", bodyGap = "  "))
     goToLine(5)
-    typeVimAndEscape("Sy")
+    typeVim("S")
+    typeVimAndEscape("y")
 
     assertEditorContains("{\n        y\n    }", "`S` should replace the wrong indent of line 5")
   }
@@ -58,7 +61,8 @@ class ChangeLineIndentSplitTest : IdeaVimStarterTestBase() {
   fun `cc and immediate escape leaves an empty line`() {
     openFile(javaFile("ChangeLine4", bodyGap = "  "))
     goToLine(5)
-    typeVimAndEscape("cc")
+    typeVim("cc")
+    typeVimAndEscape("")
 
     assertEditorContains("{\n\n    }", "Leaving Insert mode right away should remove the indent `cc` added")
   }
@@ -67,7 +71,8 @@ class ChangeLineIndentSplitTest : IdeaVimStarterTestBase() {
   fun `repeating cc indents every line by its own context`() {
     openFile(javaFile("ChangeLine6"))
     goToLine(3)
-    typeVimAndEscape("ccy")
+    typeVim("cc")
+    typeVimAndEscape("y")
 
     assertEditorContains(";\n    y\n    void", "`cc` should indent line 3 to the class members")
 
