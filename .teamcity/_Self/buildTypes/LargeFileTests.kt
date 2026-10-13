@@ -10,12 +10,14 @@ package _Self.buildTypes
 
 import _Self.AgentSize
 import _Self.IdeaVimBuildType
+import jetbrains.buildServer.configs.kotlin.v2019_2.BuildStep
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
 object LargeFileTests : IdeaVimBuildType({
+  id("IdeaVimLargeFileTests")
   name = "Large file tests"
   description = "Tests for IdeaVim in a full IDE with large files (search, search count)"
 
@@ -45,6 +47,13 @@ object LargeFileTests : IdeaVimBuildType({
         export PATH="${'$'}JAVA_HOME/bin:${'$'}PATH"
         xvfb-run -a -s '-screen 0 1920x1080x24' ./gradlew :tests:large-file-tests:testLargeFiles --console=plain --build-cache --configuration-cache --stacktrace
       """.trimIndent()
+    }
+    // The tests write their timings as service messages. Printing them publishes them as build statistics, charted in
+    // the project's Statistics tab (see LargeFileCharts). Also for failed runs, so the tests that passed still count
+    script {
+      name = "Publish metrics"
+      executionMode = BuildStep.ExecutionMode.ALWAYS
+      scriptContent = "cat tests/large-file-tests/build/metrics/*.txt || true"
     }
   }
 
