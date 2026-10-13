@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.group.jump
 
 import com.intellij.platform.project.ProjectId
-import com.intellij.platform.rpc.RemoteApiProviderService
+import com.maddyhome.idea.vim.group.rpc.VimRemoteApiResolver
 import fleet.rpc.RemoteApi
 import fleet.rpc.Rpc
 import fleet.rpc.remoteApiDescriptor
@@ -29,7 +29,7 @@ interface JumpRemoteApi : RemoteApi<Unit> {
   companion object {
     @JvmStatic
     suspend fun getInstance(): JumpRemoteApi {
-      return RemoteApiProviderService.resolve(remoteApiDescriptor<JumpRemoteApi>())
+      return VimRemoteApiResolver.resolve(remoteApiDescriptor<JumpRemoteApi>())
     }
   }
 }

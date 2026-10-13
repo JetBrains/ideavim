@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.group.format
 
 import com.intellij.openapi.editor.impl.EditorId
-import com.intellij.platform.rpc.RemoteApiProviderService
+import com.maddyhome.idea.vim.group.rpc.VimRemoteApiResolver
 import fleet.rpc.RemoteApi
 import fleet.rpc.Rpc
 import fleet.rpc.remoteApiDescriptor
@@ -33,7 +33,7 @@ interface FormatRemoteApi : RemoteApi<Unit> {
   companion object {
     @JvmStatic
     suspend fun getInstance(): FormatRemoteApi {
-      return RemoteApiProviderService.resolve(remoteApiDescriptor<FormatRemoteApi>())
+      return VimRemoteApiResolver.resolve(remoteApiDescriptor<FormatRemoteApi>())
     }
   }
 }

@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.group.comment
 
 import com.intellij.openapi.editor.impl.EditorId
-import com.intellij.platform.rpc.RemoteApiProviderService
+import com.maddyhome.idea.vim.group.rpc.VimRemoteApiResolver
 import fleet.rpc.RemoteApi
 import fleet.rpc.Rpc
 import fleet.rpc.remoteApiDescriptor
@@ -55,7 +55,7 @@ interface CommentaryRemoteApi : RemoteApi<Unit> {
   companion object {
     @JvmStatic
     suspend fun getInstance(): CommentaryRemoteApi {
-      return RemoteApiProviderService.resolve(remoteApiDescriptor<CommentaryRemoteApi>())
+      return VimRemoteApiResolver.resolve(remoteApiDescriptor<CommentaryRemoteApi>())
     }
   }
 }

@@ -134,6 +134,7 @@ dependencies {
     pluginModule(runtimeOnly(project(":ideavim-rider")))
     pluginModule(runtimeOnly(project(":ideavim-clion-nova")))
     pluginModule(runtimeOnly(project(":ideavim-terminal")))
+    pluginModule(runtimeOnly(project(":ideavim-rpc")))
 
     bundledModule("intellij.spellchecker")
     if (bookmarksIsSeparatePlugin) bundledPlugin("intellij.bookmarks.plugin")
