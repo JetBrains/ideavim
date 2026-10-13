@@ -128,7 +128,7 @@ interface VimHistory {
         if ("input".startsWith(value)) return Input
         return when (value) {
           ":" -> Command
-          "/" -> Search
+          "/", "?" -> Search
           "=" -> Expression
           "@" -> Input
           else -> null
