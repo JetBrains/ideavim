@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.group.bookmark
 
 import com.intellij.ide.vfs.VirtualFileId
 import com.intellij.platform.project.ProjectId
-import com.intellij.platform.rpc.RemoteApiProviderService
+import com.maddyhome.idea.vim.group.rpc.VimRemoteApiResolver
 import fleet.rpc.RemoteApi
 import fleet.rpc.Rpc
 import fleet.rpc.remoteApiDescriptor
@@ -78,7 +78,7 @@ interface BookmarkRemoteApi : RemoteApi<Unit> {
   companion object {
     @JvmStatic
     suspend fun getInstance(): BookmarkRemoteApi {
-      return RemoteApiProviderService.resolve(remoteApiDescriptor<BookmarkRemoteApi>())
+      return VimRemoteApiResolver.resolve(remoteApiDescriptor<BookmarkRemoteApi>())
     }
   }
 }

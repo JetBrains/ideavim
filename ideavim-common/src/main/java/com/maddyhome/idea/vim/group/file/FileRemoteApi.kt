@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.group.file
 import com.intellij.ide.vfs.VirtualFileId
 import com.intellij.openapi.editor.impl.EditorId
 import com.intellij.platform.project.ProjectId
-import com.intellij.platform.rpc.RemoteApiProviderService
+import com.maddyhome.idea.vim.group.rpc.VimRemoteApiResolver
 import fleet.rpc.RemoteApi
 import fleet.rpc.Rpc
 import fleet.rpc.remoteApiDescriptor
@@ -62,7 +62,7 @@ interface FileRemoteApi : RemoteApi<Unit> {
   companion object {
     @JvmStatic
     suspend fun getInstance(): FileRemoteApi {
-      return RemoteApiProviderService.resolve(remoteApiDescriptor<FileRemoteApi>())
+      return VimRemoteApiResolver.resolve(remoteApiDescriptor<FileRemoteApi>())
     }
   }
 }

@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.group.process
 
-import com.intellij.platform.rpc.RemoteApiProviderService
+import com.maddyhome.idea.vim.group.rpc.VimRemoteApiResolver
 import fleet.rpc.RemoteApi
 import fleet.rpc.Rpc
 import fleet.rpc.remoteApiDescriptor
@@ -50,7 +50,7 @@ interface ProcessRemoteApi : RemoteApi<Unit> {
   companion object {
     @JvmStatic
     suspend fun getInstance(): ProcessRemoteApi {
-      return RemoteApiProviderService.resolve(remoteApiDescriptor<ProcessRemoteApi>())
+      return VimRemoteApiResolver.resolve(remoteApiDescriptor<ProcessRemoteApi>())
     }
   }
 }

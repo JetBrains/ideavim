@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.group.change
 
 import com.intellij.openapi.editor.impl.EditorId
-import com.intellij.platform.rpc.RemoteApiProviderService
+import com.maddyhome.idea.vim.group.rpc.VimRemoteApiResolver
 import fleet.rpc.RemoteApi
 import fleet.rpc.Rpc
 import fleet.rpc.remoteApiDescriptor
@@ -34,7 +34,7 @@ interface ChangeRemoteApi : RemoteApi<Unit> {
   companion object {
     @JvmStatic
     suspend fun getInstance(): ChangeRemoteApi {
-      return RemoteApiProviderService.resolve(remoteApiDescriptor<ChangeRemoteApi>())
+      return VimRemoteApiResolver.resolve(remoteApiDescriptor<ChangeRemoteApi>())
     }
   }
 }

@@ -60,6 +60,8 @@
     <module name="IdeaVIM.ideavim-rider"/>
     <module name="IdeaVIM.ideavim-clion-nova"/>
     <module name="IdeaVIM.ideavim-terminal"/>
+    <!-- Depends on intellij.platform.rpc, which doesn't exist in 2025.3. loading="optional" so it's a clean skip. -->
+    <module name="IdeaVIM.ideavim-rpc" loading="optional"/>
   </content>
 
   <extensions defaultExtensionNs="com.intellij">
