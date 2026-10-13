@@ -73,6 +73,7 @@ import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.group.LastTabService
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.SearchCountService
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.getGuiCursorMode
 import com.maddyhome.idea.vim.helper.isVimCurrentSearchMatch
@@ -93,7 +94,6 @@ import com.maddyhome.idea.vim.state.mode.inBlockSelection
 import com.maddyhome.idea.vim.ui.OutputPanel
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import org.jetbrains.annotations.ApiStatus
 import org.junit.jupiter.api.AfterEach
@@ -829,8 +829,24 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
   }
 
   fun assertStatusLineText(expected: String) {
+    waitForSearchCount()
     val actual = readOutputPanel { it.statusText }
     assertEquals(expected, actual)
+  }
+
+  /** Waits until the count of the latest search has been shown. It's computed in the background */
+  fun waitForSearchCount() {
+    val searchCount = SearchCountService.getInstance()
+    val deadline = System.currentTimeMillis() + 10_000
+    while (searchCount.isSearchCountActive()) {
+      check(System.currentTimeMillis() < deadline) { "The search count was not shown within 10s" }
+      // Showing the count needs the EDT, so don't block it
+      if (ApplicationManager.getApplication().isDispatchThread) {
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+      } else {
+        Thread.sleep(5)
+      }
+    }
   }
 
   fun assertPluginError(isError: Boolean) {

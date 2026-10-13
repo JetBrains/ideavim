@@ -9,6 +9,7 @@
 package _Self
 
 import _Self.buildTypes.Compatibility
+import _Self.buildTypes.LargeFileTests
 import _Self.buildTypes.LongRunning
 import _Self.buildTypes.Nvim
 import _Self.buildTypes.PluginVerifier
@@ -43,6 +44,7 @@ object Project : Project({
   buildType(LongRunning)
   buildType(RandomOrderTests)
   buildType(SplitModeTests)
+  buildType(LargeFileTests)
 
   buildType(Nvim)
   buildType(PluginVerifier)

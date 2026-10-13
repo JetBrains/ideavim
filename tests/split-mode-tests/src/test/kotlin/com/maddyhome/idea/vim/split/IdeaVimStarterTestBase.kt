@@ -469,6 +469,30 @@ abstract class IdeaVimStarterTestBase {
     }
   }
 
+  /**
+   * Reads the search count shown in IdeaVim's output panel, e.g. `[2/3]`, or `[?/??]` while it's still counting.
+   * Returns an empty string if no count is shown.
+   */
+  protected fun searchCountText(): String {
+    var result = ""
+    driver.withContext {
+      ideFrame {
+        val panel = x("//div[@class='OutputPanel']")
+        if (panel.present()) {
+          result = panel.getAllTexts().map { it.text.trim() }.firstOrNull { SEARCH_COUNT.matches(it) } ?: ""
+        }
+      }
+    }
+    return result
+  }
+
+  /** Asserts the output panel shows the given search count, polling until timeout. */
+  protected fun assertSearchCount(expected: String, timeoutMs: Long = 5000, message: String? = null) {
+    var actual = ""
+    val found = waitUntil(timeoutMs = timeoutMs) { actual = searchCountText(); actual == expected }
+    assertTrue(found) { (message ?: "Search count should be $expected") + ". Actual: '$actual'" }
+  }
+
   /** Asserts the caret is at the given line (1-based), polling until timeout. */
   protected fun assertCaretAtLine(expected: Int, message: String? = null) {
     var actual = 0
@@ -497,6 +521,8 @@ abstract class IdeaVimStarterTestBase {
   }
 
   companion object {
+    private val SEARCH_COUNT = Regex("""\[[^/\]]+/[^/\]]+]""")
+
     // Inlined IdeInfo for IntelliJ IDEA Ultimate. Avoids the IdeProductProvider/IdeInfo.IdeaUltimate
     // API that varies across IntelliJ build numbers (renamed/removed in 262 EAP).
     private val IDEA_ULTIMATE = IdeInfo(

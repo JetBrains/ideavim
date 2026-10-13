@@ -38,6 +38,7 @@ import com.maddyhome.idea.vim.regexp.parser.visitors.PatternVisitor
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import java.util.*
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Represents a compiled Vim pattern. Provides methods to
@@ -273,10 +274,29 @@ class VimRegex(pattern: String) {
     maxIndex: Int = editor.text().length,
     options: EnumSet<VimRegexOptions> = noneOfEnum(),
     maxMatches: Int = Int.MAX_VALUE,
+  ): List<VimMatchResult.Success> = findAll(editor, startIndex, maxIndex, options, maxMatches) { false }
+
+  /**
+   * Returns all occurrences of a pattern within the editor, beginning at the specified index, unless [isCancelled]
+   * returns true first
+   *
+   * Use this overload when searching in the background. [isCancelled] is checked before each match attempt, so a long
+   * search, such as one with no matches in a large file, stops soon after the caller has lost interest in the result.
+   *
+   * @throws CancellationException if [isCancelled] returns true
+   */
+  fun findAll(
+    editor: VimEditor,
+    startIndex: Int,
+    maxIndex: Int,
+    options: EnumSet<VimRegexOptions>,
+    maxMatches: Int,
+    isCancelled: () -> Boolean,
   ): List<VimMatchResult.Success> {
     var index = startIndex
     val foundMatches: MutableList<VimMatchResult.Success> = emptyList<VimMatchResult.Success>().toMutableList()
     while (index < maxIndex && foundMatches.size < maxMatches) {
+      if (isCancelled()) throw CancellationException("Search cancelled")
       val result = simulateNonExactNFA(editor, index, options)
       when (result) {
         /**

@@ -23,7 +23,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.inCommandLineModeWithVisual
@@ -41,6 +40,9 @@ fun updateSearchHighlights(
   updateSearchHighlights(null, pattern, 1, shouldIgnoreSmartCase, showHighlights, -1, null, true, forceUpdate)
 }
 
+/**
+ * Shows the search count, e.g. `[3/120]`, for the selected editor. See [SearchCountService]
+ */
 fun updateSearchCount(
   pattern: String?,
   shouldIgnoreSmartCase: Boolean,
@@ -48,14 +50,14 @@ fun updateSearchCount(
 ) {
   if (pattern == null) return
   val selectedEditor = injector.editorGroup.getSelectedEditor() ?: return
-  updateSearchCount(
-    selectedEditor,
+  val editor = selectedEditor.ij
+  SearchCountService.getInstance().updateSearchCount(
+    editor,
     pattern,
     0,
     selectedEditor.lineCount() - 1,
-    shouldIgnoreSmartCase,
-    currentMatchOffset,
-    selectedEditor.ij,
+    shouldIgnoreCase(pattern, shouldIgnoreSmartCase),
+    if (currentMatchOffset != -1) currentMatchOffset else editor.caretModel.offset,
   )
 }
 
@@ -188,16 +190,6 @@ private fun updateSearchHighlights(
     if (isCurrentEditor) {
       currentEditorCurrentMatchOffset = currentMatchOffset
     }
-
-    updateSearchCount(
-      vimEditor,
-      pattern,
-      searchStartLine,
-      searchEndLine,
-      shouldIgnoreSmartCase,
-      currentMatchOffset,
-      editor
-    )
   }
 
   return currentEditorCurrentMatchOffset
@@ -244,87 +236,6 @@ private fun findIncsearchMatch(
   if (!forwards) searchOptions.add(SearchOptions.BACKWARDS)
 
   return injector.searchHelper.findPattern(editor, pattern, initialOffset, count1, searchOptions)
-}
-
-fun updateSearchCount(
-  vimEditor: VimEditor,
-  pattern: String,
-  searchStartLine: Int,
-  searchEndLine: Int,
-  shouldIgnoreSmartCase: Boolean,
-  currentMatchOffset: Int,
-  editor: Editor,
-) {
-  val matchOffset = if (currentMatchOffset != -1) currentMatchOffset else editor.caretModel.offset
-  val maxSearchCount = injector.globalOptions().maxsearchcount
-  val searchCount = computeSearchCount(
-    vimEditor,
-    pattern,
-    searchStartLine,
-    searchEndLine,
-    shouldIgnoreCase(pattern, shouldIgnoreSmartCase),
-    matchOffset,
-    maxSearchCount,
-  )
-  if (searchCount.current <= 0) {
-    return
-  }
-  injector.outputPanel.getOrCreate(
-    IjVimEditor(editor),
-    injector.executionContextManager.getEditorExecutionContext(IjVimEditor(editor))
-  ).statusText = formatSearchCountText(searchCount, maxSearchCount)
-}
-
-private data class SearchCount(val current: Int, val total: Int, val exceededMaxCount: Boolean)
-
-private fun computeSearchCount(
-  vimEditor: VimEditor,
-  pattern: String,
-  searchStartLine: Int,
-  searchEndLine: Int,
-  ignoreCase: Boolean,
-  matchOffset: Int,
-  maxSearchCount: Int,
-): SearchCount {
-  val maxMatchesToFind = if (maxSearchCount > 0) maxSearchCount + 1 else Int.MAX_VALUE
-  val results = injector.searchHelper.findAll(
-    vimEditor,
-    pattern,
-    searchStartLine,
-    searchEndLine,
-    ignoreCase,
-    maxMatchesToFind,
-  )
-  var current = 0
-  var total = 0
-  var exceededMaxCount = false
-  for (range in results) {
-    total++
-    if (range.startOffset <= matchOffset) {
-      current = total
-    }
-    if (maxSearchCount > 0 && total > maxSearchCount) {
-      exceededMaxCount = true
-      break
-    }
-  }
-  if (current == 0 && total > 0) {
-    current = total
-  }
-  return SearchCount(current, total, exceededMaxCount)
-}
-
-private fun formatSearchCountText(searchCount: SearchCount, maxSearchCount: Int): String {
-  val current = searchCount.current
-  val total = searchCount.total
-  if (!searchCount.exceededMaxCount || total <= maxSearchCount) {
-    return "[$current/$total]"
-  }
-  return if (current > maxSearchCount) {
-    "[>$maxSearchCount/>$maxSearchCount]"
-  } else {
-    "[$current/>$maxSearchCount]"
-  }
 }
 
 /**
