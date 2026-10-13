@@ -23,6 +23,9 @@ class GotoDeclarationVisibleEditorsTest : IdeaVimLargeFileTestBase() {
 
   private val results = linkedMapOf<Int, List<Long>>()
 
+  // Go to Declaration is Ctrl+B outside macOS, which IdeaVim handles as <C-B> (scroll back) unless told otherwise
+  override fun ideaVimRcContent(): String = "sethandler <C-B> a:ide"
+
   override fun createProjectFiles() {
     createJavaModule()
     (1..LARGE_FILES).forEach { createFile("src/${largeName(it)}", largeJavaClass(largeClass(it))) }
