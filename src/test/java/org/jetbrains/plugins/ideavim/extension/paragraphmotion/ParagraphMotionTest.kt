@@ -83,7 +83,7 @@ class ParagraphMotionTest : VimTestCase() {
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
     val after = """Lorem ipsum dolor sit amet,
-        |....${c}
+        |...${c}.
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
