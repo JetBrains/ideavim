@@ -60,6 +60,13 @@ class HistNrFunctionTest : VimTestCase("\n") {
   }
 
   @Test
+  fun `test histnr returns entry number from search history using question mark shortcut`() {
+    // `:help hist-names` lists "?" as an alias for the search history, alongside "/"
+    enterCommand("call histadd('search', 'foo')")
+    assertCommandOutput("echo histnr('?')", "1")
+  }
+
+  @Test
   fun `test histnr returns entry number from search history using abbreviated name`() {
     enterCommand("call histadd('search', 'foo')")
     assertCommandOutput("echo histnr('s')", "1")
