@@ -30,6 +30,8 @@ class SearchLargeFileTest : IdeaVimLargeFileTestBase() {
 
   private val results = linkedMapOf<String, Timings>()
 
+  override fun ideaVimRcContent(): String = "set messagesopt=hit-enter,history:500,wait:0"
+
   override fun createProjectFiles() {
     createFile(SMALL, (0 until SMALL_LINES).joinToString("\n", postfix = "\n") { i ->
       if (i in SMALL_MATCHES) "line $i haystack" else "line $i of plain text"
