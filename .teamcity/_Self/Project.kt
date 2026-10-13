@@ -49,6 +49,10 @@ object Project : Project({
   buildType(Nvim)
   buildType(PluginVerifier)
   buildType(Compatibility)
+
+  features {
+    largeFileCharts()
+  }
 })
 
 // Agent size configurations (CPU count)

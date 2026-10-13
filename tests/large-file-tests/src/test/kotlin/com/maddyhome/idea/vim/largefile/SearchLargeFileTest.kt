@@ -47,7 +47,8 @@ class SearchLargeFileTest : IdeaVimLargeFileTestBase() {
       LOG_SIZES.forEach { lines ->
         openFile(logPath(lines))
         setHlsearch(hlsearch)
-        measure("${hlsearchName(hlsearch)} | in ${logName(lines)}") { record -> searchInLog(lines, record) }
+        val scenario = "${hlsearchName(hlsearch)} | in ${logName(lines)}"
+        measure(scenario, "search.${hlsearchName(hlsearch)}.${logKey(lines)}") { record -> searchInLog(lines, record) }
       }
     }
   }
@@ -61,7 +62,9 @@ class SearchLargeFileTest : IdeaVimLargeFileTestBase() {
       var shownLog: String? = null
       LOG_SIZES.forEach { lines ->
         shownLog = showInOtherSplit(logPath(lines), shownLog)
-        measure("${hlsearchName(hlsearch)} | $SMALL_NAME next to ${logName(lines)}") { record -> searchInSmall(record) }
+        val scenario = "${hlsearchName(hlsearch)} | $SMALL_NAME next to ${logName(lines)}"
+        val metric = "search.${hlsearchName(hlsearch)}.smallNextTo.${logKey(lines)}"
+        measure(scenario, metric) { record -> searchInSmall(record) }
       }
       typeVim(":only\n")
     }
@@ -74,11 +77,15 @@ class SearchLargeFileTest : IdeaVimLargeFileTestBase() {
     results.forEach { (scenario, timings) -> println("%-48s %s".format(scenario, timings)) }
   }
 
-  /** Runs [searches] once to warm up, then [ITERATIONS] times recording the timings under [scenario] */
-  private fun measure(scenario: String, searches: (record: Record) -> Unit) {
+  /**
+   * Runs [searches] once to warm up, then [ITERATIONS] times recording the timings under [scenario], and publishes
+   * their medians as metrics starting with [metric]
+   */
+  private fun measure(scenario: String, metric: String, searches: (record: Record) -> Unit) {
     repeat(WARMUP) { searches { _, _ -> } }
     val timings = results.getOrPut(scenario) { Timings() }
     repeat(ITERATIONS) { searches(timings::add) }
+    timings.medians().forEach { (key, median) -> publishMetric("$metric.$key", median) }
   }
 
   private fun searchInLog(lines: Int, record: Record) {
@@ -121,20 +128,29 @@ class SearchLargeFileTest : IdeaVimLargeFileTestBase() {
   }
 
   private class Timings {
-    private val samples = linkedMapOf<String, MutableList<Long>>()
+    private val caret = linkedMapOf<String, MutableList<Long>>()
+    private val count = linkedMapOf<String, MutableList<Long>>()
 
     fun add(op: String, timing: SearchTiming) {
-      samples.getOrPut(op) { mutableListOf() } += timing.caretMs
-      timing.countMs?.let { samples.getOrPut("$op count") { mutableListOf() } += it }
+      caret.getOrPut(op) { mutableListOf() } += timing.caretMs
+      timing.countMs?.let { count.getOrPut(op) { mutableListOf() } += it }
     }
 
-    override fun toString(): String =
-      samples.entries.joinToString("  ") { (op, values) -> "%-16s %-16s".format(op, minMedianMax(values)) }
+    /** Medians by metric key, e.g. `next.caretMs` */
+    fun medians(): Map<String, Long> =
+      caret.mapKeys { "${metricKey(it.key)}.caretMs" }.mapValues { median(it.value) } +
+        count.mapKeys { "${metricKey(it.key)}.countMs" }.mapValues { median(it.value) }
 
-    private fun minMedianMax(values: List<Long>): String {
-      val sorted = values.sorted()
-      return "${sorted.first()}/${sorted[sorted.size / 2]}/${sorted.last()}"
+    override fun toString(): String = caret.keys.joinToString("  ") { op ->
+      val countSamples = count[op]?.let { "  %-16s %-16s".format("$op count", minMedianMax(it)) } ?: ""
+      "%-16s %-16s".format(op, minMedianMax(caret.getValue(op))) + countSamples
     }
+
+    private fun minMedianMax(values: List<Long>): String = "${values.min()}/${median(values)}/${values.max()}"
+
+    private fun median(values: List<Long>): Long = values.sorted()[values.size / 2]
+
+    private fun metricKey(op: String): String = OP_METRIC_KEYS.getValue(op)
   }
 
   companion object {
@@ -148,10 +164,19 @@ class SearchLargeFileTest : IdeaVimLargeFileTestBase() {
     private const val WARMUP = 1
     private const val ITERATIONS = 2
 
-    private fun logName(lines: Int) = "log${lines / 1000}k.txt"
+    private fun logName(lines: Int) = "${logKey(lines)}.txt"
     private fun logPath(lines: Int) = "src/${logName(lines)}"
     private fun needleLines(lines: Int) = listOf(lines / 4, lines / 2, lines * 3 / 4)
+    private fun logKey(lines: Int) = "log${lines / 1000}k"
     private fun hlsearchName(hlsearch: Boolean) = if (hlsearch) "hlsearch" else "nohlsearch"
+
+    private val OP_METRIC_KEYS = mapOf(
+      "/needle" to "search",
+      "/haystack" to "search",
+      "/LogTemp" to "searchCommon",
+      "n" to "next",
+      "*" to "star",
+    )
 
     // Every line but the needles matches, so in large files the count stops at 'maxsearchcount'
     private fun logTempTotal(lines: Int): String {

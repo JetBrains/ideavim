@@ -72,19 +72,33 @@ tasks {
     // Resolve the distributions dir at configuration time to avoid capturing Project references
     // (which break the configuration cache).
     // `-PideavimPluginZip=/path/to/IdeaVIM.zip` runs the tests against another build, e.g. a released version, to
-    // compare performance across versions.
+    // compare performance across versions. `-PideavimPluginZip=none` runs them without IdeaVim, as a baseline.
     val distDir = project(":").layout.buildDirectory.dir("distributions")
     val customPluginZip = providers.gradleProperty("ideavimPluginZip")
     if (!customPluginZip.isPresent) {
       dependsOn(project(":").tasks.named("buildPlugin"))
     }
     jvmArgumentProviders.add(CommandLineArgumentProvider {
-      val pluginZip = customPluginZip.orNull?.let { File(it) } ?: run {
+      val pluginPath = customPluginZip.orNull?.let { if (it == "none") it else File(it).absolutePath } ?: run {
         val dir = distDir.get().asFile
-        dir.listFiles()?.firstOrNull { it.name.endsWith(".zip") }
+        val pluginZip = dir.listFiles()?.firstOrNull { it.name.endsWith(".zip") }
           ?: error("No plugin ZIP found in ${dir.absolutePath}. Run :buildPlugin first.")
+        pluginZip.absolutePath
       }
-      listOf("-Dideavim.plugin.path=${pluginZip.absolutePath}")
+      listOf("-Dideavim.plugin.path=$pluginPath")
+    })
+
+    // `-PrustProject=/path/to/ash` enables the RustRover tests, which run on a checkout of https://github.com/ash-rs/ash
+    val rustProject = providers.gradleProperty("rustProject")
+    jvmArgumentProviders.add(CommandLineArgumentProvider {
+      rustProject.orNull?.let { listOf("-Dideavim.rust.project=${File(it).absolutePath}") } ?: emptyList()
+    })
+
+    // Metrics for TeamCity, see IdeaVimLargeFileTestBase.publishMetric
+    val metricsDir = layout.buildDirectory.dir("metrics")
+    doFirst { metricsDir.get().asFile.deleteRecursively() }
+    jvmArgumentProviders.add(CommandLineArgumentProvider {
+      listOf("-Dideavim.metrics.dir=${metricsDir.get().asFile.absolutePath}")
     })
 
     // Always run, never use cache
