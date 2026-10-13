@@ -219,16 +219,6 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(
-    """
-                A Discovery
-                ${s}${c}
-                ${se}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-      """
-  )
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   @Test
   fun `test switch to visual mode characterwise empty line`() {
@@ -244,8 +234,8 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       """.trimIndent(),
       """
                 A Discovery
-                ${c}
-                I found it in a legendary land
+                ${s}${c}
+                ${se}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
@@ -304,16 +294,6 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(
-    originalVimAfter = """
-                A Discovery
-
-                ${s}${c}I${se} found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-    """,
-  )
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   @Test
   fun `test switch to visual mode characterwise line start`() {
@@ -330,7 +310,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       """
                 A Discovery
 
-                ${s}${c}${se}I found it in a legendary land
+                ${s}${c}I${se} found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
