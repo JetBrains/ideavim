@@ -171,7 +171,10 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
         editor.nativeCarets().forEach {
           // If caret offset matches the exclusive selection end offset, then it's positioned after the selection, so
           // move it to the actual end of the selection. Make sure there's enough room on this line to do so
-          if (it.offset == it.selectionEnd && it.visualLineStart < it.offset) {
+          if (it.selectionStart == it.selectionEnd) {
+            it.vimSelectionStart = it.offset
+            it.vimUpdateEditorSelection()
+          } else if (it.offset == it.selectionEnd && it.visualLineStart < it.offset) {
             it.moveToInlayAwareOffset(it.selectionEnd - 1)
           }
         }

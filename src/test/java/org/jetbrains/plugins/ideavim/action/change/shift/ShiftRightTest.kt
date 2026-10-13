@@ -209,6 +209,22 @@ class ShiftRightTest : VimTestCase() {
     )
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.TABS)
+  @Test
+  fun `test shift characterwise selection ending on newline`() {
+    doTest(
+      "vj\$>",
+      """${c}Lorem ipsum dolor sit amet,
+          |consectetur adipiscing elit
+          |Sed in orci mauris.
+    """.trimMargin(),
+      """    ${c}Lorem ipsum dolor sit amet,
+          |    consectetur adipiscing elit
+          |Sed in orci mauris.
+    """.trimMargin(),
+    )
+  }
+
   @Test
   fun `test undo after shift right single line`() {
     configureByText(

@@ -364,4 +364,120 @@ class RepeatChangeActionTest : VimTestCase() {
     """.trimIndent()
     )
   }
+
+    @Test
+    fun `test repeat multiline ending on newline`() {
+        val keys = listOf("vj\$rXj", ".")
+        val before = """
+                A Discovery
+
+                I ${c}found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+    """.trimIndent()
+        val after = """
+                A Discovery
+
+                I XXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                XX${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                hard by the torrent of a mountain pass.
+    """.trimIndent()
+        doTest(keys, before, after, Mode.NORMAL())
+      }
+
+    @Test
+    fun `test repeat block starting at column zero`() {
+        val keys = listOf("<C-V>jrXj^", ".")
+        val before = """
+                A Discovery
+
+                ${c}I found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+    """.trimIndent()
+        val after = """
+                A Discovery
+
+                X found it in a legendary land
+                ${c}Xll rocks and lavender and tufted grass,
+                Xhere it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+    """.trimIndent()
+        doTest(keys, before, after, Mode.NORMAL())
+      }
+
+    @Test
+    fun `test repeat line motion ending on empty line`() {
+        val keys = listOf("VjrXjj", ".")
+        val before = """
+                Lorem Ipsum
+                ${c}Lorem ipsum dolor sit amet,
+
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
+    """.trimIndent()
+        val after = """
+                Lorem Ipsum
+                XXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+                ${c}XXXXXXXXXXXXXXXXXXX
+                XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    """.trimIndent()
+        doTest(keys, before, after, Mode.NORMAL())
+      }
+
+  @Test
+  fun `test repeat characterwise delete`() {
+    val keys = listOf("vlld", "j", ".")
+    val before = """
+                      ${c}Lorem ipsum dolor sit amet,
+                      consectetur adipiscing elit
+                      Sed in orci mauris.
+                      Cras id tellus in ex imperdiet egestas.
+          """.trimIndent()
+    val after = """
+                      em ipsum dolor sit amet,
+                      ${c}sectetur adipiscing elit
+                      Sed in orci mauris.
+                      Cras id tellus in ex imperdiet egestas.
+          """.trimIndent()
+    doTest(keys, before, after, Mode.NORMAL())
+  }
+
+  @Test
+  fun `test repeat block delete`() {
+    val keys = listOf("<C-V>jlld", "j", ".")
+    val before = """
+                      ${c}Lorem ipsum dolor sit amet,
+                      consectetur adipiscing elit
+                      Sed in orci mauris.
+                      Cras id tellus in ex imperdiet egestas.
+          """.trimIndent()
+    val after = """
+                      em ipsum dolor sit amet,
+                      ${c}tetur adipiscing elit
+                       in orci mauris.
+                      Cras id tellus in ex imperdiet egestas.
+          """.trimIndent()
+    doTest(keys, before, after, Mode.NORMAL())
+  }
+
+  @Test
+  fun `test repeat line delete`() {
+    val keys = listOf("Vjd", ".")
+    val before = """
+                      ${c}Lorem ipsum dolor sit amet,
+                      consectetur adipiscing elit
+                      Sed in orci mauris.
+                      Cras id tellus in ex imperdiet egestas.
+                      Nulla facilisi.
+          """.trimIndent()
+    val after = """
+                      ${c}Nulla facilisi.
+          """.trimIndent()
+    doTest(keys, before, after, Mode.NORMAL())
+  }
 }
