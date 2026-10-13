@@ -40,4 +40,27 @@ class DeleteJoinVisualLinesSpacesActionTest : VimTestCase() {
       enterCommand("set ideajoin")
     }
   }
+
+  @Test
+    fun `test join characterwise selection ending on newline`() {
+      doTest(
+          "vj\$J",
+          """
+              Lorem Ipsum
+
+              ${c}Lorem ipsum dolor sit amet,
+              consectetur adipiscing elit
+              Sed in orci mauris.
+              Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+            """
+                Lorem Ipsum
+
+                Lorem ipsum dolor sit amet,${c} consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+            Mode.NORMAL(),
+          )
+      }
 }
