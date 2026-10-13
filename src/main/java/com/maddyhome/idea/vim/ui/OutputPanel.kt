@@ -48,6 +48,9 @@ import com.maddyhome.idea.vim.register.RegisterConstants
 import com.maddyhome.idea.vim.ui.ex.GlassPaneManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.annotations.TestOnly
 import org.jetbrains.annotations.VisibleForTesting
@@ -132,6 +135,8 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
 
   private var autoCloseJob: Job? = null
 
+  private val clearTimerRefreshes = MutableStateFlow(0)
+
   var active: Boolean = false
 
   @get:VisibleForTesting
@@ -188,28 +193,34 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
 
     // This is usually called in EDT, except for TabmoveTest
     runInEdt {
-      launchOnShow("IdeaVim::HideOutputPanel") {
-        // Remember, Vim uses the pager for messages and command output only, not for external commands (e.g. "!ls -l")
-        // IdeaVim does not distinguish between messages and external command output.
-        // The 'more' option controls showing the "-- MORE --" prompt in the pager.
-        // The 'messagesopt' "hit-enter" value shows the "press ENTER" prompt regardless of pager use.
-        // The 'messagesopt' "wait" value is used when "hit-enter" is not set. Instead of showing "press ENTER", it
-        // waits before redrawing the message area. This applies messages, command and external command output. Wait can
-        // be mixed with 'nomore'.
-        // IdeaVim extends the "wait" value to automatically clear single-line output. Vim doesn't do this because the
-        // message area is less intrusive.
-        // Setting "mopt=wait:0" will disable the wait at the end of the output, closing it immediately.
-        // Setting "hit-enter,wait:0" will show the hit-enter prompt (Vim states that hit-enter takes precedence), and
-        // will disable the wait in single-line messages, leaving it open.
-        if (isSingleLine) {
-          val wait = injector.globalOptions().messagesopt["wait"]?.toIntOrNull()?.milliseconds
-          if (wait != null && wait > 0.milliseconds) {
-            delay(wait)
-            if (active) close()
-          }
-        }
+      launchOnShow("IdeaVim::HideOutputPanel") { runClearTimer() }
+    }
+  }
+
+  /**
+   * Clears single-line output after the 'messagesopt' "wait", counted from the last [refreshClearTimer]
+   *
+   * Vim keeps a single-line message until the next redraw. IdeaVim clears it, because the output panel covers the
+   * editor. Neovim's ui2 does the same with its "timeout", restarting it whenever the message is updated. "wait:0" keeps
+   * it open.
+   */
+  @VisibleForTesting
+  internal suspend fun runClearTimer() {
+    clearTimerRefreshes.collectLatest { clearSingleLineOutputAfterWait() }
+  }
+
+  private suspend fun clearSingleLineOutputAfterWait() {
+    if (isSingleLine) {
+      val wait = injector.globalOptions().messagesopt["wait"]?.toIntOrNull()?.milliseconds
+      if (wait != null && wait > 0.milliseconds) {
+        delay(wait)
+        if (active) close()
       }
     }
+  }
+
+  private fun refreshClearTimer() {
+    clearTimerRefreshes.update { it + 1 }
   }
 
   override fun updateUI() {
@@ -245,6 +256,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       statusComponent.font = selectEditorFont(editor, value)
       if (active) {
         positionPanel(isInitialPosition = false)
+        refreshClearTimer()
       }
     }
 
@@ -335,6 +347,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     } else {
       positionPanel(isInitialPosition = false)
     }
+    refreshClearTimer()
 
     // Don't immediately clear the message if the action that caused it also (indirectly) causes a redraw
     allowClose = false
@@ -619,6 +632,11 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     }
   }
 
+  /**
+   * Shows the "-- More --" or "Press ENTER" prompt for multi-line output, or closes it after the 'messagesopt' "wait"
+   *
+   * Like Vim, "hit-enter" takes precedence over "wait", and "wait:0" closes the output as soon as its end is shown.
+   */
   private fun updatePrompt() {
     autoCloseJob?.cancel()
     autoCloseJob = null
