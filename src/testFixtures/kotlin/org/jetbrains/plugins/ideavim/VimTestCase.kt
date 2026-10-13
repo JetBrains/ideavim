@@ -282,9 +282,9 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
 
   protected fun enableExtensionsNewApi(vararg extensionNames: String) {
     for (name in extensionNames) {
-      injector.jsonExtensionProvider.getBundledExtensions().find { it.extensionName == name }?.let { extension ->
-        injector.extensionLoader.enableExtension(extension)
-      }
+      val extension = injector.jsonExtensionProvider.getBundledExtensions().find { it.extensionName == name }
+        ?: error("Bundled extension '$name' not found in ksp-generated/ideavim_extensions.json")
+      injector.extensionLoader.enableExtension(extension)
     }
   }
 
