@@ -93,7 +93,6 @@ import com.maddyhome.idea.vim.state.mode.inBlockSelection
 import com.maddyhome.idea.vim.ui.OutputPanel
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import org.jetbrains.annotations.ApiStatus
 import org.junit.jupiter.api.AfterEach
@@ -282,9 +281,9 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
 
   protected fun enableExtensionsNewApi(vararg extensionNames: String) {
     for (name in extensionNames) {
-      injector.jsonExtensionProvider.getBundledExtensions().find { it.extensionName == name }?.let { extension ->
-        injector.extensionLoader.enableExtension(extension)
-      }
+      val extension = injector.jsonExtensionProvider.getBundledExtensions().find { it.extensionName == name }
+        ?: error("Bundled extension '$name' not found in ksp-generated/ideavim_extensions.json")
+      injector.extensionLoader.enableExtension(extension)
     }
   }
 

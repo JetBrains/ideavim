@@ -91,7 +91,6 @@ ksp {
   arg("vimscript_functions_file", "intellij_vimscript_functions.json")
   arg("ex_commands_file", "intellij_ex_commands.json")
   arg("commands_file", "intellij_commands.json")
-  arg("extensions_file", "ideavim_extensions.json")
 }
 
 afterEvaluate {
