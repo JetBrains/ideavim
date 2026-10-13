@@ -194,3 +194,9 @@ class VimBlockSelection(
     }
   }
 }
+
+fun VimSelection.toJoinRange(): TextRange {
+  val textRange = toVimTextRange(true).normalize()
+  val lastCoveredOffset = (textRange.endOffset - 1).coerceAtLeast(textRange.startOffset)
+  return TextRange(textRange.startOffset, lastCoveredOffset)
+}
