@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimRedrawService
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ModeChangeListener
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.Mode
 
 class IjVimRedrawService : VimRedrawService {
@@ -44,6 +45,7 @@ class IjVimRedrawService : VimRedrawService {
     override fun documentChanged(event: DocumentEvent) {
       if (VimPlugin.isNotEnabled()) return
       if (event.newFragment.contains("\n") || event.oldFragment.contains("\n")) {
+        if (event.document != injector.editorGroup.getSelectedEditor()?.ij?.document) return
         injector.redrawService.redraw()
       }
     }
