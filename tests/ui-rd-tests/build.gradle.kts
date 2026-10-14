@@ -1,33 +1,58 @@
-plugins {
-  java
-  kotlin("jvm")
-}
+/*
+ * Copyright 2003-2026 The IdeaVim authors
+ *
+ * Use of this source code is governed by an MIT-style
+ * license that can be found in the LICENSE.txt file or at
+ * https://opensource.org/licenses/MIT.
+ */
 
-repositories {
-  maven { url = uri("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2") }
-  maven { url = uri("https://cache-redirector.jetbrains.com/intellij-dependencies") }
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+
+plugins {
+  id("java")
+  kotlin("jvm")
+  id("org.jetbrains.intellij.platform.module")
 }
 
 val kotlinVersion: String by project
+val ideaType: String by project
 val ideaVersion: String by project
 val javaVersion: String by project
-val remoteRobotVersion: String by project
+
+repositories {
+  maven { url = uri("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2") }
+  intellijPlatform {
+    defaultRepositories()
+  }
+}
 
 dependencies {
   testImplementation("org.junit.jupiter:junit-jupiter")
   compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
   testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
-  testImplementation(testFixtures(project(":"))) // The root project
-  testImplementation(testFixtures(project(":tests:ui-fixtures")))
+  testRuntimeOnly("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-  testImplementation("com.intellij.remoterobot:remote-robot:$remoteRobotVersion")
-  testImplementation("com.intellij.remoterobot:remote-fixtures:$remoteRobotVersion")
-  testImplementation("com.intellij.remoterobot:ide-launcher:$remoteRobotVersion")
+  testImplementation("org.kodein.di:kodein-di-jvm:7.33.0")
+  testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.2")
+
+  intellijPlatform {
+    var useInstaller = "EAP-SNAPSHOT" !in ideaVersion
+    if (ideaType == "RD") {
+      useInstaller = false
+    }
+
+    create(ideaType, ideaVersion) { this.useInstaller = useInstaller }
+    testFramework(TestFrameworkType.Starter)
+  }
+}
+
+intellijPlatform {
+  buildSearchableOptions = false
 }
 
 tasks {
-  // This task is disabled because it should be excluded from `gradle test` run (because it's slow)
-  // I didn't find a better way to exclude except disabling and defining a new task with a different name
+  // Disabled so Rider tests are excluded from `gradle test` (they're slow and need a full Rider with a .NET SDK)
   test {
     useJUnitPlatform()
     enabled = false
@@ -37,17 +62,38 @@ tasks {
     group = "verification"
     useJUnitPlatform()
 
-    // Gradle 9+ requires explicit test source set configuration for custom Test tasks
     testClassesDirs = sourceSets["test"].output.classesDirs
-    classpath = sourceSets["test"].runtimeClasspath
+    // Include both the standard test classpath and the intellijPlatform test classpath
+    // (which contains ide-starter, driver-sdk, driver-client, etc.)
+    classpath = sourceSets["test"].runtimeClasspath +
+            configurations.getByName("intellijPlatformTestClasspath")
 
-    // This is needed for the robot to access the message of the exception
-    // Usually these opens are provided by the intellij gradle plugin
-    // https://github.com/JetBrains/gradle-intellij-plugin/blob/b21e3f382e9885948a6427001d5e64234c602613/src/main/kotlin/org/jetbrains/intellij/utils/OpenedPackages.kt#L26
-    jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
+    // Pass the plugin ZIP path so tests can install IdeaVim into the launched IDE.
+    // Resolve the distributions dir at configuration time to avoid capturing Project references
+    // (which break the configuration cache).
+    val distDir = project(":").layout.buildDirectory.dir("distributions")
+    dependsOn(project(":").tasks.named("buildPlugin"))
+    jvmArgumentProviders.add(CommandLineArgumentProvider {
+      val dir = distDir.get().asFile
+      val pluginZip = dir.listFiles()?.firstOrNull { it.name.endsWith(".zip") }
+        ?: error("No plugin ZIP found in ${dir.absolutePath}. Run :buildPlugin first.")
+      listOf("-Dideavim.plugin.path=${pluginZip.absolutePath}")
+    })
 
-    // Always run UI tests, never use cache - we want to verify stability
+    // `-PriderVersion=2026.1` runs the tests in another Rider release
+    val riderVersion = providers.gradleProperty("riderVersion")
+    jvmArgumentProviders.add(CommandLineArgumentProvider {
+      riderVersion.orNull?.let { listOf("-Dideavim.rider.version=$it") } ?: emptyList()
+    })
+
+    // Always run, never use cache
     outputs.cacheIf { false }
+    outputs.upToDateWhen { false }
+
+    testLogging {
+      events("passed", "skipped", "failed")
+      showStandardStreams = true
+    }
   }
 }
 
