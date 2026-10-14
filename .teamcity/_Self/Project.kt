@@ -15,6 +15,7 @@ import _Self.buildTypes.Nvim
 import _Self.buildTypes.PluginVerifier
 import _Self.buildTypes.PropertyBased
 import _Self.buildTypes.RandomOrderTests
+import _Self.buildTypes.RiderTests
 import _Self.buildTypes.SplitModeTests
 
 import _Self.buildTypes.TestingBuildType
@@ -45,6 +46,7 @@ object Project : Project({
   buildType(RandomOrderTests)
   buildType(SplitModeTests)
   buildType(LargeFileTests)
+  buildType(RiderTests)
 
   buildType(Nvim)
   buildType(PluginVerifier)
