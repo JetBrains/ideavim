@@ -40,6 +40,9 @@ usual beta standards.
 
 ### Fixes:
 
+* [VIM-4341](https://youtrack.jetbrains.com/issue/VIM-4341) Fixed the IDE freezing when searching with `/`, `n` or `*` in large files. The search count is now worked out in the background and shown when it is ready
+* Fixed a single-line message, such as the search pattern shown by `n`, closing while it was still being updated. The [`'messagesopt'`](https://vimhelp.org/options.txt.html#%27messagesopt%27) `wait` delay now restarts each time the message changes, so pressing `n` repeatedly keeps the message open
+* Fixed [`histadd()`](https://vimhelp.org/builtin.txt.html#histadd%28%29), `histdel()`, `histget()` and `histnr()` failing with `"?"` as the history name. As in Vim, `"?"` now refers to the search history, the same as `"/"`
 * [VIM-1153](https://youtrack.jetbrains.com/issue/VIM-1153) [`.`](https://vimhelp.org/repeat.txt.html#.) now replays
   the keys you typed, as Vim does, instead of the recorded edits. Repeating a tag rename such as `cwdiv<Esc>` on
   another HTML tag now renames its closing tag too, and a completion accepted with `<C-Y>` or a mapping, or
