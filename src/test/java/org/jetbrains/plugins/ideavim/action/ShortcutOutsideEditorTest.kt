@@ -17,11 +17,13 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.PlatformCoreDataKeys
 import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
-import com.intellij.openapi.actionSystem.impl.Utils
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.popup.JBPopup
+import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.openapi.util.Disposer
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.action.OutsideEditorKeyDispatcher
 import com.maddyhome.idea.vim.api.injector
@@ -318,12 +320,14 @@ class ShortcutOutsideEditorTest : VimTestCase() {
   @Test
   fun `test mapping is not claimed in a modal dialog`() {
     configureByText("")
-    enterCommand("let mapleader = \" \"")
-    enterCommand("map <leader>ws <Action>($GOTO_SYMBOL_ID)")
     closeAllFiles()
-
-    assertFalse(isKeyClaimedOutsideEditor(' ', modal = true), "Space must keep toggling checkboxes in Settings")
-    assertTrue(isKeyClaimedOutsideEditor(' ', modal = false))
+    ApplicationManager.getApplication().invokeAndWait {
+      assertFalse(
+        OutsideEditorKeyDispatcher.shouldHandle(JPanel(), fixture.project, isModalContext = true),
+        "Shortcuts registered in a dialog hide its local actions",
+      )
+      assertTrue(OutsideEditorKeyDispatcher.shouldHandle(JPanel(), fixture.project, isModalContext = false))
+    }
   }
 
   // endregion
@@ -445,6 +449,26 @@ class ShortcutOutsideEditorTest : VimTestCase() {
   }
 
   @Test
+  fun `test dispatcher is not active inside a popup`() {
+    configureByText("")
+    closeAllFiles()
+    ApplicationManager.getApplication().invokeAndWait {
+      val list = JPanel()
+      val popupContent = JPanel().apply { add(list) }
+      val popup = JBPopupFactory.getInstance().createComponentPopupBuilder(popupContent, null).createPopup()
+      try {
+        popupContent.putClientProperty(JBPopup.KEY, popup)
+        assertFalse(
+          OutsideEditorKeyDispatcher.shouldHandle(list, fixture.project),
+          "Shortcuts registered inside a popup hide its own ones, e.g. Escape closing Search Everywhere"
+        )
+      } finally {
+        Disposer.dispose(popup)
+      }
+    }
+  }
+
+  @Test
   fun `test dispatcher is not active without a project`() {
     ApplicationManager.getApplication().invokeAndWait {
       assertFalse(OutsideEditorKeyDispatcher.shouldHandle(JPanel(), null))
@@ -470,13 +494,13 @@ class ShortcutOutsideEditorTest : VimTestCase() {
    * window): each character is a KEY_TYPED event whose data context carries the project but no editor, handed to
    * [OutsideEditorKeyDispatcher] exactly as the keymap dispatcher would do for a registered custom shortcut.
    */
-  private fun typeKeysOutsideEditor(keys: String, modal: Boolean = false) {
+  private fun typeKeysOutsideEditor(keys: String) {
     val action = OutsideEditorKeyDispatcher.getInstance()
 
     ApplicationManager.getApplication().invokeAndWait {
       for (char in keys) {
         // Like IdeKeyEventDispatcher: the action is asked whether it wants the key, and only then performed
-        val actionEvent = outsideEditorKeyEvent(char, modal)
+        val actionEvent = outsideEditorKeyEvent(char)
         action.update(actionEvent)
         if (actionEvent.presentation.isEnabled) {
           ActionUtil.performActionDumbAwareWithCallbacks(action, actionEvent)
@@ -487,15 +511,12 @@ class ShortcutOutsideEditorTest : VimTestCase() {
   }
 
   /** Must be called on the EDT */
-  private fun outsideEditorKeyEvent(char: Char, modal: Boolean = false): AnActionEvent =
-    outsideEditorKeyEvent(KeyStroke.getKeyStroke(char), modal)
+  private fun outsideEditorKeyEvent(char: Char): AnActionEvent =
+    outsideEditorKeyEvent(KeyStroke.getKeyStroke(char))
 
   /** Must be called on the EDT. A typed character becomes a KEY_TYPED event, anything else a KEY_PRESSED one */
-  private fun outsideEditorKeyEvent(keyStroke: KeyStroke, modal: Boolean = false): AnActionEvent {
+  private fun outsideEditorKeyEvent(keyStroke: KeyStroke): AnActionEvent {
     val nonEditorComponent = JPanel()
-    // IS_MODAL_CONTEXT is derived by the platform from the component (Utils.isModalContext), never taken from the
-    // data context, and a component without a window counts as modal. Mark the panel the way a dialog or frame would.
-    Utils.markAsModalContext(nonEditorComponent, modal)
     val dataContext = SimpleDataContext.builder()
       .add(CommonDataKeys.PROJECT, fixture.project)
       .add(PlatformCoreDataKeys.CONTEXT_COMPONENT, nonEditorComponent)
@@ -529,13 +550,12 @@ class ShortcutOutsideEditorTest : VimTestCase() {
     )
   }
 
-  private fun isKeyClaimedOutsideEditor(char: Char, modal: Boolean = false): Boolean =
-    isKeyClaimedOutsideEditor(KeyStroke.getKeyStroke(char), modal)
+  private fun isKeyClaimedOutsideEditor(char: Char): Boolean = isKeyClaimedOutsideEditor(KeyStroke.getKeyStroke(char))
 
-  private fun isKeyClaimedOutsideEditor(keyStroke: KeyStroke, modal: Boolean = false): Boolean {
+  private fun isKeyClaimedOutsideEditor(keyStroke: KeyStroke): Boolean {
     var enabled = false
     ApplicationManager.getApplication().invokeAndWait {
-      val event = outsideEditorKeyEvent(keyStroke, modal)
+      val event = outsideEditorKeyEvent(keyStroke)
       OutsideEditorKeyDispatcher.getInstance().update(event)
       enabled = event.presentation.isEnabled
     }

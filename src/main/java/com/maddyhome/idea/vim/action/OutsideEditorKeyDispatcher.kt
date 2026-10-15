@@ -23,6 +23,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.popup.JBPopup
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
@@ -48,65 +49,72 @@ import javax.swing.KeyStroke
 import javax.swing.text.JTextComponent
 
 /**
- * Makes user mappings work when no editor is open.
+ * Makes user mappings to IDE actions work when no editor is open.
  */
 @Service
 class OutsideEditorKeyDispatcher : DumbAwareAction() {
   private val keyStrokeExtractor = ActionEventKeyStrokeExtractor()
   private var registeredComponent: JComponent? = null
 
-  init {
-    templatePresentation.isEnabledInModalContext = true
-  }
-
   override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.EDT
 
   override fun update(e: AnActionEvent) {
-    e.presentation.isEnabled = isEnabled(e)
+    e.presentation.isEnabled = isActive() && isOutsideEditor(e) && claimsKey(e)
   }
 
-  private fun isEnabled(e: AnActionEvent): Boolean {
-    if (VimPlugin.isNotEnabled()) return false
-    if (!injector.globalIjOptions().ideaoutsideeditor) return false
-    if (e.getData(PlatformDataKeys.EDITOR) != null) return false
-    if (e.getData(PlatformDataKeys.SPEED_SEARCH_TEXT) != null) return false
-    if (e.getData(PlatformDataKeys.IS_MODAL_CONTEXT) == true) return false
-    val keyStroke = keyStrokeExtractor.getKeyStroke(e)?.normalized() ?: return false
-    val pendingKeys = KeyHandler.getInstance().keyHandlerState.mappingState.keys.toList()
-    if (keyStroke.isEscape) return pendingKeys.isNotEmpty()
+  private fun isActive(): Boolean = VimPlugin.isEnabled() && injector.globalIjOptions().ideaoutsideeditor
 
-    // Only keys that continue (or complete) a user mapping are taken. Anything else is left to the IDE, so unmapped
-    // Vim commands like `dd` never reach the hidden fallback window.
-    val keys = pendingKeys + keyStroke
-    return userMappingKeys().any { it.size >= keys.size && it.subList(0, keys.size) == keys }
+  private fun isOutsideEditor(e: AnActionEvent): Boolean =
+    e.getData(PlatformDataKeys.EDITOR) == null && e.getData(PlatformDataKeys.SPEED_SEARCH_TEXT) == null
+
+  /**
+   * Only keys that continue a user mapping are claimed. Anything else is left to the IDE, so unmapped Vim commands
+   * like `dd` never reach the hidden fallback window.
+   */
+  private fun claimsKey(e: AnActionEvent): Boolean {
+    val keyStroke = keyStrokeExtractor.getKeyStroke(e)?.normalized() ?: return false
+    if (keyStroke.isEscape) return hasPendingSequence()
+    val typed = pendingKeys() + keyStroke
+    return userMappingKeys().any { it.startsWith(typed) }
   }
 
   override fun actionPerformed(e: AnActionEvent) {
     val keyStroke = keyStrokeExtractor.getKeyStroke(e)?.normalized() ?: return
-    val keyHandler = KeyHandler.getInstance()
-    val fallbackWindow = injector.fallbackWindow
     if (keyStroke.isEscape) {
-      injector.listenersNotifier.notifyKeyTyped(fallbackWindow, keyStroke)
-      resetToNormal()
-      return
+      cancelPendingSequence(keyStroke)
+    } else {
+      handleMappedKey(keyStroke, e)
     }
+  }
+
+  private fun cancelPendingSequence(escape: KeyStroke) {
+    injector.listenersNotifier.notifyKeyTyped(injector.fallbackWindow, escape)
+    resetToNormal()
+  }
+
+  private fun handleMappedKey(keyStroke: KeyStroke, e: AnActionEvent) {
+    val keyHandler = KeyHandler.getInstance()
     try {
       forceNormalModeSilently()
       keyHandler.withoutRecording {
-        keyHandler.handleUserKey(fallbackWindow, keyStroke, e.dataContext.vim)
+        keyHandler.handleUserKey(injector.fallbackWindow, keyStroke, e.dataContext.vim)
       }
     } catch (ex: ProcessCanceledException) {
       throw ex
     } catch (ex: Exception) {
       LOG.error(ex)
     } finally {
-      // An unfinished sequence must survive: MappingProcessor completes it on 'timeout'. A finished one leaves the
-      // hidden editor in whatever mode the mapping produced, and Normal is the only mode that makes sense without an
-      // editor. Note that fullReset also clears the selected register and the current error message.
-      if (keyHandler.keyHandlerState.mappingState.keys.none()) resetToNormal()
+      // An unfinished sequence is kept for MappingProcessor to complete on 'timeout'. Without an editor, Normal is the
+      // only mode that makes sense once the mapping is done.
+      if (!hasPendingSequence()) resetToNormal()
     }
   }
 
+  private fun pendingKeys(): List<KeyStroke> = KeyHandler.getInstance().keyHandlerState.mappingState.keys.toList()
+
+  private fun hasPendingSequence(): Boolean = KeyHandler.getInstance().keyHandlerState.mappingState.keys.any()
+
+  /** Also clears the selected register and the current error message */
   private fun resetToNormal() {
     KeyHandler.getInstance().fullReset(injector.fallbackWindow)
   }
@@ -115,10 +123,12 @@ class OutsideEditorKeyDispatcher : DumbAwareAction() {
     (injector.vimState as VimStateMachineImpl).mode = Mode.NORMAL()
   }
 
+  /**
+   * The shortcut set is rebuilt on every registration to pick up `:map`/`:unmap`. Escape is always included, because
+   * the focus doesn't change when a sequence starts, so it couldn't be added later to cancel it.
+   */
   private fun register(component: JComponent) {
     if (!injector.globalIjOptions().ideaoutsideeditor) return
-    // The shortcut set is rebuilt on every registration, so `:map`/`:unmap` executed since the last focus change are
-    // picked up. Escape is always included so that a pending sequence can be cancelled.
     val keys = userMappingKeys().flatten().toMutableSet()
     if (keys.isEmpty()) return
     keys += ESCAPE
@@ -131,13 +141,12 @@ class OutsideEditorKeyDispatcher : DumbAwareAction() {
     unregisterCustomShortcutSet(component)
     registeredComponent = null
     // Half of a sequence typed outside the editor must not change what the next keys do inside it
-    if (KeyHandler.getInstance().keyHandlerState.mappingState.keys.any()) resetToNormal()
+    if (hasPendingSequence()) resetToNormal()
   }
 
   /**
-   * The mappings that make sense without an editor: defined by the user and executing nothing but IDE actions. A
-   * mapping to Vim keys, e.g. `nmap j gj`, would run on the hidden fallback window, where the command is invisible and
-   * most of them fail, while stealing the key from the focused component (e.g. `j` starting speed search in a tree).
+   * User mappings that run nothing but IDE actions. A mapping to Vim keys, e.g. `nmap j gj`, would run invisibly on the
+   * fallback window and steal the key from the focused component (e.g. `j` starting speed search in a tree).
    */
   private fun userMappingKeys(): Sequence<List<KeyStroke>> =
     injector.keyGroup.getKeyMapping(MappingMode.NORMAL).getAll(emptyList())
@@ -175,16 +184,21 @@ class OutsideEditorKeyDispatcher : DumbAwareAction() {
     fun getInstance(): OutsideEditorKeyDispatcher = service()
 
     private fun shouldHandle(component: Component): Boolean {
-      val project = CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext(component))
-      return shouldHandle(component, project)
+      val dataContext = DataManager.getInstance().getDataContext(component)
+      val project = CommonDataKeys.PROJECT.getData(dataContext)
+      return shouldHandle(component, project, PlatformDataKeys.IS_MODAL_CONTEXT.getData(dataContext) == true)
     }
 
     /**
-     * The dispatcher is active only for the scenario of the issue: focus is on a non-text component of a project that
-     * has no open editor. Text components (e.g. the Search Everywhere field) must keep receiving typed characters.
+     * Whether to register the shortcuts on the focused [component]: a non-text component of a project with no open
+     * editor. Text components (e.g. the Search Everywhere field) keep their typed characters.
+     *
+     * Modal dialogs and popups are skipped, because a registered shortcut hides the local actions of the parent
+     * components for the same key, e.g. Escape closing Search Everywhere, even while [update] disables it.
      */
-    fun shouldHandle(component: Component, project: Project?): Boolean {
+    fun shouldHandle(component: Component, project: Project?, isModalContext: Boolean = false): Boolean {
       if (component is EditorComponentImpl || component is JTextComponent) return false
+      if (isModalContext || component.isInPopup) return false
       if (project == null || project.isDisposed) return false
       return FileEditorManager.getInstance(project).selectedTextEditor == null
     }
@@ -206,17 +220,25 @@ class OutsideEditorKeyDispatcher : DumbAwareAction() {
       while (i < size) {
         if (this[i].keyCode != actionKey.keyCode || getOrNull(i + 1)?.keyChar != '(') return false
         val close = (i + 2 until size).firstOrNull { this[it].keyChar == ')' } ?: return false
-        if (close == i + 2) return false // empty action name
+        val isEmptyActionName = close == i + 2
+        if (isEmptyActionName) return false
         i = close + 1
       }
       return true
     }
 
-    // Typed characters arrive with the shift modifier for upper case letters; mappings are stored as plain typed keys
+    private fun List<KeyStroke>.startsWith(prefix: List<KeyStroke>): Boolean =
+      size >= prefix.size && subList(0, prefix.size) == prefix
+
+    // Upper case letters arrive with the shift modifier, while mappings store plain typed keys
     private fun KeyStroke.normalized(): KeyStroke =
       if (keyChar != KeyEvent.CHAR_UNDEFINED && keyChar != ESCAPE_CHAR) KeyStroke.getKeyStroke(keyChar) else this
 
     private val KeyStroke.isEscape: Boolean
       get() = keyCode == KeyEvent.VK_ESCAPE || keyChar == ESCAPE_CHAR
+
+    // PopupUtil.getPopupContainerFor recognises only JWindow popups and misses the ones shown in a dialog window
+    private val Component.isInPopup: Boolean
+      get() = generateSequence(this) { it.parent }.any { (it as? JComponent)?.getClientProperty(JBPopup.KEY) != null }
   }
 }
