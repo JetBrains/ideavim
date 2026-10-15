@@ -257,7 +257,9 @@ abstract class IdeaVimRiderTestBase {
 
   protected fun caretOffset(): Int = onEdt { getCaretModel().getOffset() }
 
-  protected fun selectedText(): String? = onEdt { getSelectionModel().getSelectedText(false) }
+  protected fun selectedText(): String? = onEdt {
+    driver.cast(getSelectionModel(), SelectionModelRef::class).getSelectedText(false)
+  }
 
   protected data class SelectionState(val start: Int, val end: Int, val caret: Int, val text: String?)
 
@@ -267,7 +269,7 @@ abstract class IdeaVimRiderTestBase {
       selection.getSelectionStart(),
       selection.getSelectionEnd(),
       getCaretModel().getOffset(),
-      getSelectionModel().getSelectedText(false),
+      selection.getSelectedText(false),
     )
   }
 
@@ -355,9 +357,11 @@ interface LocalFileSystem {
 }
 
 @Remote("com.intellij.openapi.editor.SelectionModel")
+// The driver SDK's SelectionModel only has getSelectedText() without arguments in 2025.3
 interface SelectionModelRef {
   fun getSelectionStart(): Int
   fun getSelectionEnd(): Int
+  fun getSelectedText(allCarets: Boolean): String?
 }
 
 @Remote("com.intellij.openapi.ide.CopyPasteManager")
