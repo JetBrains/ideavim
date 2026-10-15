@@ -60,6 +60,8 @@ usual beta standards.
 * Fixed [`:tags`](https://vimhelp.org/tagsrch.txt.html#%3Atags) reporting an error when the line a tag jump was made from has since been deleted
 * Fixed searching for a pattern containing `\<` throwing an exception while the [command-line window](https://vimhelp.org/cmdline.txt.html#cmdline-window) opened by `q:`, `q/` or `q?` is open
 * Fixed the `ReplaceWithRegister` extension's `gr` in Visual mode deleting whole lines when the selection spans lines — with `vj` selecting from the middle of one line into the next, `gr` now replaces only the selected text and keeps the rest of both lines
+* [VIM-841](https://youtrack.jetbrains.com/issue/VIM-841) Characterwise Visual mode can now select the end of line character, as in Vim. `v$` takes in the line break, so `v$x` deletes to the end of the line and joins the next line onto it, `v$y` yanks the text together with its trailing new line, and `vy` on an empty line yanks the new line
+* [VIM-4228](https://youtrack.jetbrains.com/issue/VIM-4228) Fixed Expand Selection (`EditorSelectWord`) in Rider stopping at the current word when used in Visual mode with the caret on the last character of the word
 
 ### Merged PRs:
 * [2082](https://github.com/JetBrains/ideavim/pull/2082) by [1grzyb1](https://github.com/1grzyb1): VIM-748 changing multiple commands with |
@@ -77,6 +79,7 @@ usual beta standards.
 * [2119](https://github.com/JetBrains/ideavim/pull/2119) by [1grzyb1](https://github.com/1grzyb1): VIM-2524 calculate indent after cc
 * [2103](https://github.com/JetBrains/ideavim/pull/2103) by [citizenmatt](https://github.com/citizenmatt): Implement :function command to list functions
 * [2086](https://github.com/JetBrains/ideavim/pull/2086) by [valis](https://github.com/valis): Don't treat quotes inside non-string tokens as string delimiters in %
+* [2035](https://github.com/JetBrains/ideavim/pull/2035) by [AndDe-gourav](https://github.com/AndDe-gourav): Todo removing not selecting new line char
 
 ## 2.47.3, 2026-10-05
 
