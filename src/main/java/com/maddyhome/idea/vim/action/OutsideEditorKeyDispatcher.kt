@@ -42,6 +42,7 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.annotations.VisibleForTesting
 import java.awt.Component
 import java.awt.KeyboardFocusManager
+import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import java.beans.PropertyChangeListener
 import javax.swing.JComponent
@@ -72,13 +73,13 @@ class OutsideEditorKeyDispatcher : DumbAwareAction() {
    * like `dd` never reach the hidden fallback window.
    */
   private fun claimsKey(e: AnActionEvent): Boolean {
-    val keyStroke = keyStrokeExtractor.getKeyStroke(e)?.normalized() ?: return false
+    val keyStroke = typedKey(e) ?: return false
     val typed = pendingKeys() + keyStroke
     return userMappingKeys().any { it.startsWith(typed) }
   }
 
   override fun actionPerformed(e: AnActionEvent) {
-    val keyStroke = keyStrokeExtractor.getKeyStroke(e)?.normalized() ?: return
+    val keyStroke = typedKey(e) ?: return
     val keyHandler = KeyHandler.getInstance()
     try {
       forceNormalModeSilently()
@@ -94,6 +95,15 @@ class OutsideEditorKeyDispatcher : DumbAwareAction() {
       // only mode that makes sense once the mapping is done.
       if (!hasPendingSequence()) resetToNormal()
     }
+  }
+
+  /** The key the way mappings store it, whether it arrived as KEY_PRESSED or KEY_TYPED */
+  private fun typedKey(e: AnActionEvent): KeyStroke? {
+    val keyEvent = e.inputEvent as? KeyEvent
+    if (keyEvent != null && keyEvent.id == KeyEvent.KEY_PRESSED && keyEvent.isPrintable) {
+      return KeyStroke.getKeyStroke(keyEvent.keyChar)
+    }
+    return keyStrokeExtractor.getKeyStroke(e)?.normalized()
   }
 
   private fun pendingKeys(): List<KeyStroke> = KeyHandler.getInstance().keyHandlerState.mappingState.keys.toList()
@@ -112,7 +122,7 @@ class OutsideEditorKeyDispatcher : DumbAwareAction() {
   /** The shortcut set is rebuilt on every registration to pick up `:map`/`:unmap` */
   private fun register(component: JComponent) {
     if (!injector.globalIjOptions().ideaoutsideeditor) return
-    val keys = userMappingKeys().flatten().toSet()
+    val keys = userMappingKeys().flatten().flatMap { listOfNotNull(it, it.pressedForm()) }.toSet()
     if (keys.isEmpty()) return
     registerCustomShortcutSet(CustomShortcutSet(*keys.map { KeyboardShortcut(it, null) }.toTypedArray()), component)
     registeredComponent = component
@@ -214,6 +224,24 @@ class OutsideEditorKeyDispatcher : DumbAwareAction() {
     // Upper case letters arrive with the shift modifier, while mappings store plain typed keys
     private fun KeyStroke.normalized(): KeyStroke =
       if (keyChar != KeyEvent.CHAR_UNDEFINED && keyChar != ESCAPE_CHAR) KeyStroke.getKeyStroke(keyChar) else this
+
+    private val KeyEvent.isPrintable: Boolean
+      get() = keyChar != KeyEvent.CHAR_UNDEFINED && !keyChar.isISOControl() &&
+        !isControlDown && !isAltDown && !isMetaDown
+
+    /**
+     * Mappings store typed characters, but a component may bind an action to the same key as KEY_PRESSED, e.g. the
+     * Project view opening a preview on Space. KEY_PRESSED comes first, and once an action takes it, the platform drops
+     * the KEY_TYPED event, so the pressed form has to be registered too. Only letters, digits and Space are covered:
+     * the key code of other characters depends on the keyboard layout.
+     */
+    private fun KeyStroke.pressedForm(): KeyStroke? {
+      val char = keyChar
+      if (char == KeyEvent.CHAR_UNDEFINED || !(char.isLetterOrDigit() || char == ' ')) return null
+      val keyCode = KeyEvent.getExtendedKeyCodeForChar(char.lowercaseChar().code)
+      if (keyCode == KeyEvent.VK_UNDEFINED) return null
+      return KeyStroke.getKeyStroke(keyCode, if (char.isUpperCase()) InputEvent.SHIFT_DOWN_MASK else 0)
+    }
 
     // PopupUtil.getPopupContainerFor recognises only JWindow popups and misses the ones shown in a dialog window
     private val Component.isInPopup: Boolean
