@@ -14,6 +14,7 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.actionSystem.PlatformCoreDataKeys
 import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
@@ -120,6 +121,40 @@ class ShortcutOutsideEditorTest : VimTestCase() {
         "Turning the option off must unregister the shortcuts without waiting for a focus change",
       )
     }
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test Escape is not registered when no mapping uses it`() {
+    configureByText("")
+    enterCommand("map <leader>ws <Action>($GOTO_SYMBOL_ID)")
+    closeAllFiles()
+
+    val dispatcher = OutsideEditorKeyDispatcher.getInstance()
+    ApplicationManager.getApplication().invokeAndWait {
+      dispatcher.focusListener.propertyChange(focusOwnerChange(from = null, to = JPanel()))
+      assertFalse(
+        dispatcher.registeredKeys().contains(ESCAPE),
+        "A registered Escape hides the local Escape actions of the parent components, e.g. closing a popup",
+      )
+    }
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test mapping to action on Escape runs when no file is open`() {
+    configureByText("")
+    enterCommand("nmap <Esc> <Action>($GOTO_SYMBOL_ID)")
+    closeAllFiles()
+
+    val dispatcher = OutsideEditorKeyDispatcher.getInstance()
+    ApplicationManager.getApplication().invokeAndWait {
+      dispatcher.focusListener.propertyChange(focusOwnerChange(from = null, to = JPanel()))
+      assertTrue(dispatcher.registeredKeys().contains(ESCAPE), "Precondition: the mapped Escape is registered")
+    }
+    pressKeyOutsideEditor(ESCAPE)
+
+    assertEquals(1, gotoSymbol.invocations.size, "Escape mapped by the user must run its action like any other key")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
@@ -495,24 +530,24 @@ class ShortcutOutsideEditorTest : VimTestCase() {
    * [OutsideEditorKeyDispatcher] exactly as the keymap dispatcher would do for a registered custom shortcut.
    */
   private fun typeKeysOutsideEditor(keys: String) {
-    val action = OutsideEditorKeyDispatcher.getInstance()
+    for (char in keys) pressKeyOutsideEditor(KeyStroke.getKeyStroke(char))
+  }
 
+  private fun pressKeyOutsideEditor(keyStroke: KeyStroke) {
+    val action = OutsideEditorKeyDispatcher.getInstance()
     ApplicationManager.getApplication().invokeAndWait {
-      for (char in keys) {
-        // Like IdeKeyEventDispatcher: the action is asked whether it wants the key, and only then performed
-        val actionEvent = outsideEditorKeyEvent(char)
-        action.update(actionEvent)
-        if (actionEvent.presentation.isEnabled) {
-          ActionUtil.performActionDumbAwareWithCallbacks(action, actionEvent)
-        }
-        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+      // Like IdeKeyEventDispatcher: the action is asked whether it wants the key, and only then performed
+      val actionEvent = outsideEditorKeyEvent(keyStroke)
+      action.update(actionEvent)
+      if (actionEvent.presentation.isEnabled) {
+        ActionUtil.performActionDumbAwareWithCallbacks(action, actionEvent)
       }
+      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     }
   }
 
-  /** Must be called on the EDT */
-  private fun outsideEditorKeyEvent(char: Char): AnActionEvent =
-    outsideEditorKeyEvent(KeyStroke.getKeyStroke(char))
+  private fun OutsideEditorKeyDispatcher.registeredKeys(): List<KeyStroke> =
+    shortcutSet.shortcuts.filterIsInstance<KeyboardShortcut>().map { it.firstKeyStroke }
 
   /** Must be called on the EDT. A typed character becomes a KEY_TYPED event, anything else a KEY_PRESSED one */
   private fun outsideEditorKeyEvent(keyStroke: KeyStroke): AnActionEvent {
@@ -577,6 +612,7 @@ class ShortcutOutsideEditorTest : VimTestCase() {
   private companion object {
     const val GOTO_SYMBOL_ID = "IdeaVimTest.GotoSymbol"
     const val GOTO_FILE_ID = "IdeaVimTest.GotoFile"
+    val ESCAPE: KeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)
     var globalOrder = 0
   }
 }
