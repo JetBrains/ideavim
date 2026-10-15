@@ -73,26 +73,12 @@ class OutsideEditorKeyDispatcher : DumbAwareAction() {
    */
   private fun claimsKey(e: AnActionEvent): Boolean {
     val keyStroke = keyStrokeExtractor.getKeyStroke(e)?.normalized() ?: return false
-    if (keyStroke.isEscape) return hasPendingSequence()
     val typed = pendingKeys() + keyStroke
     return userMappingKeys().any { it.startsWith(typed) }
   }
 
   override fun actionPerformed(e: AnActionEvent) {
     val keyStroke = keyStrokeExtractor.getKeyStroke(e)?.normalized() ?: return
-    if (keyStroke.isEscape) {
-      cancelPendingSequence(keyStroke)
-    } else {
-      handleMappedKey(keyStroke, e)
-    }
-  }
-
-  private fun cancelPendingSequence(escape: KeyStroke) {
-    injector.listenersNotifier.notifyKeyTyped(injector.fallbackWindow, escape)
-    resetToNormal()
-  }
-
-  private fun handleMappedKey(keyStroke: KeyStroke, e: AnActionEvent) {
     val keyHandler = KeyHandler.getInstance()
     try {
       forceNormalModeSilently()
@@ -123,15 +109,11 @@ class OutsideEditorKeyDispatcher : DumbAwareAction() {
     (injector.vimState as VimStateMachineImpl).mode = Mode.NORMAL()
   }
 
-  /**
-   * The shortcut set is rebuilt on every registration to pick up `:map`/`:unmap`. Escape is always included, because
-   * the focus doesn't change when a sequence starts, so it couldn't be added later to cancel it.
-   */
+  /** The shortcut set is rebuilt on every registration to pick up `:map`/`:unmap` */
   private fun register(component: JComponent) {
     if (!injector.globalIjOptions().ideaoutsideeditor) return
-    val keys = userMappingKeys().flatten().toMutableSet()
+    val keys = userMappingKeys().flatten().toSet()
     if (keys.isEmpty()) return
-    keys += ESCAPE
     registerCustomShortcutSet(CustomShortcutSet(*keys.map { KeyboardShortcut(it, null) }.toTypedArray()), component)
     registeredComponent = component
   }
@@ -177,7 +159,6 @@ class OutsideEditorKeyDispatcher : DumbAwareAction() {
 
   companion object {
     private val LOG = logger<OutsideEditorKeyDispatcher>()
-    private val ESCAPE: KeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)
     private const val ESCAPE_CHAR = '\u001B'
 
     @JvmStatic
@@ -233,9 +214,6 @@ class OutsideEditorKeyDispatcher : DumbAwareAction() {
     // Upper case letters arrive with the shift modifier, while mappings store plain typed keys
     private fun KeyStroke.normalized(): KeyStroke =
       if (keyChar != KeyEvent.CHAR_UNDEFINED && keyChar != ESCAPE_CHAR) KeyStroke.getKeyStroke(keyChar) else this
-
-    private val KeyStroke.isEscape: Boolean
-      get() = keyCode == KeyEvent.VK_ESCAPE || keyChar == ESCAPE_CHAR
 
     // PopupUtil.getPopupContainerFor recognises only JWindow popups and misses the ones shown in a dialog window
     private val Component.isInPopup: Boolean
