@@ -10,14 +10,17 @@ package org.jetbrains.plugins.ideavim.action
 
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
+import com.intellij.openapi.actionSystem.ActionPromoter
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.actionSystem.CustomShortcutSet
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.actionSystem.PlatformCoreDataKeys
 import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
+import com.intellij.openapi.actionSystem.impl.rearrangeByPromotersImpl
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.DumbAware
@@ -26,6 +29,7 @@ import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.util.Disposer
 import com.intellij.testFramework.PlatformTestUtil
+import com.intellij.ui.KeyStrokeAdapter
 import com.maddyhome.idea.vim.action.OutsideEditorKeyDispatcher
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.globalIjOptions
@@ -37,10 +41,12 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
+import java.awt.Component
 import java.awt.KeyboardFocusManager
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import java.beans.PropertyChangeEvent
+import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTextField
 import javax.swing.KeyStroke
@@ -349,6 +355,41 @@ class ShortcutOutsideEditorTest : VimTestCase() {
 
   // endregion
 
+  // region Keys bound to IDE actions of the focused component
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test mapping on Space wins over an IDE action bound to Space`() {
+    configureByText("")
+    enterCommand("nmap <Space><Space> <Action>($GOTO_FILE_ID)")
+    closeAllFiles()
+
+    val preview = RecordingAction()
+    val projectView = focusedComponentWithActionOn(KeyEvent.VK_SPACE, preview)
+    pressKeyOn(projectView, ' ')
+    pressKeyOn(projectView, ' ')
+
+    assertEquals(1, gotoFile.invocations.size, "The user mapping must run")
+    assertEquals(0, preview.invocations.size, "Space is mapped by the user, so the IDE action must not get it")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test Space that does not start a mapping is left to the IDE action bound to it`() {
+    configureByText("")
+    enterCommand("nmap a<Space> <Action>($GOTO_FILE_ID)")
+    closeAllFiles()
+
+    val preview = RecordingAction()
+    val projectView = focusedComponentWithActionOn(KeyEvent.VK_SPACE, preview)
+    pressKeyOn(projectView, ' ')
+
+    assertEquals(1, preview.invocations.size)
+    assertEquals(0, gotoFile.invocations.size)
+  }
+
+  // endregion
+
   // region Modal dialogs
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
@@ -544,6 +585,63 @@ class ShortcutOutsideEditorTest : VimTestCase() {
       }
       PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     }
+  }
+
+  /** A component like the Project view tree, which opens a preview on Space, focused while no editor is open */
+  private fun focusedComponentWithActionOn(keyCode: Int, action: AnAction): JPanel {
+    val component = JPanel()
+    ApplicationManager.getApplication().invokeAndWait {
+      action.registerCustomShortcutSet(CustomShortcutSet(KeyStroke.getKeyStroke(keyCode, 0)), component)
+      OutsideEditorKeyDispatcher.getInstance().focusListener.propertyChange(focusOwnerChange(from = null, to = component))
+    }
+    return component
+  }
+
+  /**
+   * Presses a key the way the IDE delivers it: KEY_PRESSED first, then KEY_TYPED, which the platform drops when an
+   * action already took the KEY_PRESSED event.
+   */
+  private fun pressKeyOn(component: JComponent, char: Char) {
+    ApplicationManager.getApplication().invokeAndWait {
+      val now = System.currentTimeMillis()
+      val pressed = KeyEvent(component, KeyEvent.KEY_PRESSED, now, 0, KeyEvent.getExtendedKeyCodeForChar(char.code), char)
+      if (!dispatchToActions(component, pressed)) {
+        dispatchToActions(component, KeyEvent(component, KeyEvent.KEY_TYPED, now, 0, KeyEvent.VK_UNDEFINED, char))
+      }
+      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    }
+  }
+
+  /**
+   * Mirrors IdeKeyEventDispatcher: the local actions come from the first component up the hierarchy that has any for
+   * the shortcut, are ordered by the promoters, and the first enabled one is performed and consumes the event.
+   */
+  private fun dispatchToActions(component: JComponent, event: KeyEvent): Boolean {
+    val shortcut = KeyboardShortcut(KeyStrokeAdapter.getDefaultKeyStroke(event), null)
+    val candidates = generateSequence<Component>(component) { it.parent }
+      .filterIsInstance<JComponent>()
+      .map { c -> ActionUtil.getActions(c).filter { action -> action.shortcutSet.shortcuts.any { it.startsWith(shortcut) } } }
+      .firstOrNull { it.isNotEmpty() } ?: return false
+    val dataContext = SimpleDataContext.builder()
+      .add(CommonDataKeys.PROJECT, fixture.project)
+      .add(PlatformCoreDataKeys.CONTEXT_COMPONENT, component)
+      .build()
+    for (action in rearrangeByPromotersImpl(candidates, dataContext, ActionPromoter.EP_NAME.extensionList)) {
+      val actionEvent = AnActionEvent(
+        event,
+        dataContext,
+        ActionPlaces.KEYBOARD_SHORTCUT,
+        action.templatePresentation.clone(),
+        ActionManager.getInstance(),
+        0,
+      )
+      action.update(actionEvent)
+      if (actionEvent.presentation.isEnabled) {
+        ActionUtil.performActionDumbAwareWithCallbacks(action, actionEvent)
+        return true
+      }
+    }
+    return false
   }
 
   private fun OutsideEditorKeyDispatcher.registeredKeys(): List<KeyStroke> =

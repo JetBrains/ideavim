@@ -17,6 +17,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.intellij.openapi.editor.actions.TabAction
+import com.maddyhome.idea.vim.action.OutsideEditorKeyDispatcher
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.getFirstMappingInfoMatch
 import com.maddyhome.idea.vim.api.injector
@@ -54,6 +55,9 @@ import com.maddyhome.idea.vim.state.mode.Mode
  */
 internal class VimActionsPromoter : ActionPromoter {
   override fun promote(actions: List<AnAction>, context: DataContext): List<AnAction>? {
+    // Registered only while no editor is open, and disables itself for keys that don't continue a user mapping
+    actions.firstOrNull { it is OutsideEditorKeyDispatcher }?.let { return listOf(it) }
+
     val vimIndex = actions.indexOfFirst { it is AnActionWrapper && it.delegate is VimShortcutKeyAction }
     if (vimIndex == -1) return null
 
