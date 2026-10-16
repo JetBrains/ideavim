@@ -64,6 +64,7 @@ public class EditorHelper {
   private static final String AI_ASSISTANT_INPUT_FILE_NAME_PREFIX = "AIAssistantInput-";
 
   private static final int BLOCK_INLAY_MAX_LINE_HEIGHT = 3;
+  private static final int MAX_CENTRING_ATTEMPTS = 3;
 
   public static @NotNull Rectangle getVisibleArea(final @NotNull Editor editor) {
     final Rectangle area = editor.getScrollingModel().getVisibleAreaOnScrollingFinished();
@@ -384,26 +385,58 @@ public class EditorHelper {
   public static void scrollVisualLineToMiddleOfScreen(@NotNull Editor editor,
                                                       int visualLine,
                                                       boolean allowVirtualSpace) {
-    final int y = editor.visualLineToY(EngineEditorHelperKt.normalizeVisualLine(new IjVimEditor(editor), visualLine));
-    final Rectangle visibleArea = getVisibleArea(editor);
-    final int screenHeight = visibleArea.height;
-    final int lineHeight = editor.getLineHeight();
+    final int lineY = editor.visualLineToY(EngineEditorHelperKt.normalizeVisualLine(new IjVimEditor(editor), visualLine));
 
-    final int offset =
-      y - getStickyLinesPanelHeight(editor) - ((screenHeight - lineHeight) / lineHeight / 2 * lineHeight);
-    final @NotNull VimEditor editor1 = new IjVimEditor(editor);
-    final int lastVisualLine = EngineEditorHelperKt.getVisualLineCount(editor1) - 1;
-    final int offsetForLastLineAtBottom = getOffsetToScrollVisualLineToBottomOfScreen(editor, lastVisualLine);
+    // Scrolling changes which lines are sticky, so the sticky lines panel, and the middle below it, can be different
+    // after we scroll. Adjust for the new panel straight away, otherwise the next keystroke scrolls again
+    for (int attempt = 0; attempt < MAX_CENTRING_ATTEMPTS; attempt++) {
+      if (!scrollTowardsMiddle(editor, lineY, allowVirtualSpace)) {
+        return;
+      }
+    }
+  }
+
+  private static boolean scrollTowardsMiddle(@NotNull Editor editor, int lineY, boolean allowVirtualSpace) {
+    final int offset = getOffsetToCentreBelowStickyLines(editor, lineY);
 
     // For `zz`, we want to use virtual space and move any line, including the last one, to the middle of the screen.
     // For `G` or `zb`, do not allow virtual space, so only scroll far enough to keep the last line at the bottom of the
     // screen
-    if (!allowVirtualSpace && offset > offsetForLastLineAtBottom) {
-      scrollVertically(editor, offsetForLastLineAtBottom);
+    if (!allowVirtualSpace) {
+      final int offsetForLastLineAtBottom = getOffsetToScrollLastLineToBottomOfScreen(editor);
+      if (offset > offsetForLastLineAtBottom) {
+        return scrollVertically(editor, offsetForLastLineAtBottom);
+      }
     }
-    else {
-      scrollVertically(editor, offset);
+
+    if (isAlreadyCentred(editor, lineY, offset)) {
+      return false;
     }
+    return scrollVertically(editor, offset);
+  }
+
+  // The middle below the sticky lines panel moves when the panel changes height, and the panel changes height when we
+  // scroll. Accept anything up to the middle of the whole viewport, or with scrolloff=999 we scroll back and forth on
+  // every keystroke (VIM-4329)
+  private static boolean isAlreadyCentred(@NotNull Editor editor, int lineY, int offsetBelowStickyLines) {
+    final Rectangle viewport = editor.getScrollingModel().getVisibleAreaOnScrollingFinished();
+    final int offsetInViewport = getOffsetToCentre(editor, lineY, viewport.height);
+    return viewport.y >= min(offsetBelowStickyLines, offsetInViewport) &&
+           viewport.y <= max(offsetBelowStickyLines, offsetInViewport);
+  }
+
+  private static int getOffsetToCentreBelowStickyLines(@NotNull Editor editor, int lineY) {
+    return getOffsetToCentre(editor, lineY, getVisibleArea(editor).height) - getStickyLinesPanelHeight(editor);
+  }
+
+  private static int getOffsetToCentre(@NotNull Editor editor, int lineY, int areaHeight) {
+    final int lineHeight = editor.getLineHeight();
+    return lineY - (areaHeight - lineHeight) / lineHeight / 2 * lineHeight;
+  }
+
+  private static int getOffsetToScrollLastLineToBottomOfScreen(@NotNull Editor editor) {
+    final int lastVisualLine = EngineEditorHelperKt.getVisualLineCount(new IjVimEditor(editor)) - 1;
+    return getOffsetToScrollVisualLineToBottomOfScreen(editor, lastVisualLine);
   }
 
   /**
