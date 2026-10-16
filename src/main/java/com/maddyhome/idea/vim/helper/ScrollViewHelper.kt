@@ -161,7 +161,11 @@ internal object ScrollViewHelper {
     height: Int,
     scrollOffset: Int,
     inlayAwareMinHeightFudge: Int,
-  ): Boolean = isScreenHeightReliableForCentering(height, inlayAwareMinHeightFudge) && scrollOffset > height / 2
+  ): Boolean = if (isScreenHeightReliableForCentering(height, inlayAwareMinHeightFudge)) {
+    scrollOffset > height / 2
+  } else {
+    scrollOffset > inlayAwareMinHeightFudge
+  }
 
   private fun shouldScrollUpToShowCaret(
     editor: Editor,
