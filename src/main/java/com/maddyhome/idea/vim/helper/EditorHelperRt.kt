@@ -1,0 +1,183 @@
+/*
+ * Copyright 2003-2026 The IdeaVim authors
+ *
+ * Use of this source code is governed by an MIT-style
+ * license that can be found in the LICENSE.txt file or at
+ * https://opensource.org/licenses/MIT.
+ */
+
+@file:JvmName("EditorHelperRt")
+
+package com.maddyhome.idea.vim.helper
+
+import com.intellij.codeWithMe.ClientId
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.EditorKind
+import com.intellij.openapi.editor.ex.util.EditorUtil
+import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
+import com.intellij.util.ui.table.JBTableRowEditor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.StringListOptionValue
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.group.IjOptionConstants
+import com.maddyhome.idea.vim.key.IdeaVimDisablerExtensionPoint
+import com.maddyhome.idea.vim.newapi.globalIjOptions
+import java.awt.Component
+import javax.swing.JComponent
+import javax.swing.JTable
+
+/**
+ * Get caret line in vim notation (1-based)
+ */
+internal val Caret.vimLine: Int
+  get() = this.logicalPosition.line + 1
+
+/**
+ * Get current caret line in vim notation (1-based)
+ */
+internal val Editor.vimLine: Int
+  get() = this.caretModel.currentCaret.vimLine
+
+/**
+ * There is a problem with one-line editors. At the moment of the editor creation, this property is always set to false.
+ *   So, we should enable IdeaVim for such editors and disable it on the first interaction
+ */
+internal val Editor.isIdeaVimDisabledHere: Boolean
+  get() {
+    val ideaVimSupportValue = injector.globalIjOptions().ideavimsupport
+    return (ideaVimDisabledInDialog(ideaVimSupportValue) && isInDialog()) ||
+      !ClientId.isCurrentlyUnderLocalId || // CWM-927
+      (ideaVimDisabledForSingleLine(ideaVimSupportValue) && isSingleLine()) ||
+      IdeaVimDisablerExtensionPoint.isDisabledForEditor(this) ||
+      !isAllowedFileEditor()
+  }
+
+/**
+ * Almost every non-file-based editor should not use Vim mode. These editors are debug watch, AI chats,
+ *   and other fields that are smart.
+ *
+ * We may support IdeaVim in these editors, but this will require a focused work and a lot of testing.
+ *
+ * Here are issues when non-file editors were supported:
+ * AI Chat – VIM-3786
+ * Debug evaluate console – VIM-3929
+ *
+ * We do want to support Vim actions in some windows, such as the commit window, diff windows and decompiled Java
+ * files. The consoles are opt-out via the 'ideaeditor' option. Note that the Python console still needs special
+ * handling so it doesn't lose the Enter and arrow keys (see KeyGroup and ToolWindowNavEverywhere).
+ *
+ * VIM-3929 was about the debugger's expression editors, which stay disabled. The run/debug configuration console is
+ * allowed again, because blocking every non-file editor also took Vim away from the process console.
+ *
+ * AI chat prompt inputs  are opt-in via the `chat` value of 'ideaeditor'.
+ */
+private fun Editor.isAllowedFileEditor(): Boolean {
+  return EditorHelper.isCommitWindowEditor(this)
+    || EditorHelper.isKotlinClassDecompiledToJavaFile(this)
+    || EditorHelper.isDiffEditor(this)
+    || EditorHelper.isFileEditor(this)
+    || EditorHelper.isCommandHistoryWindow(this)
+    || isEnabledConsole()
+    || isEnabledMainEditor()
+    || isEnabledChatInput()
+}
+
+/**
+ * Checks if this editor is a console that the user has enabled via the 'ideaeditor' option.
+ */
+internal fun Editor.isEnabledConsole(): Boolean {
+  val enabledEditors = injector.globalIjOptions().ideaeditor
+  return (EditorHelper.isPythonConsole(this) && enabledEditors.contains(IjOptionConstants.ideaeditor_python))
+    || (EditorHelper.isRunConsole(this) && enabledEditors.contains(IjOptionConstants.ideaeditor_debug))
+}
+
+/**
+ * Checks if this is a non-file editor opened as a tab in the main editor area (e.g. a plugin's `LightVirtualFile`)
+ * that the user has enabled via the 'ideaeditor' option.
+ */
+internal fun Editor.isEnabledMainEditor(): Boolean {
+  val enabledEditors = injector.globalIjOptions().ideaeditor
+  return enabledEditors.contains(IjOptionConstants.ideaeditor_main)
+    && editorKind == EditorKind.MAIN_EDITOR
+    && isPrimaryEditor()
+}
+
+/**
+ * Checks if this editor is an AI chat prompt input (see [EditorHelper.isChatInput]) that the user has enabled via the
+ * 'ideaeditor' option.
+ */
+internal fun Editor.isEnabledChatInput(): Boolean {
+  return injector.globalIjOptions().ideaeditor.contains(IjOptionConstants.ideaeditor_chat)
+    && EditorHelper.isChatInput(this)
+}
+
+private fun ideaVimDisabledInDialog(ideaVimSupportValue: StringListOptionValue): Boolean {
+  return !ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_dialog)
+    && !ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_dialoglegacy)
+}
+
+private fun ideaVimDisabledForSingleLine(ideaVimSupportValue: StringListOptionValue): Boolean {
+  return !ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_singleline)
+}
+
+private fun Editor.isInDialog(): Boolean {
+  return !this.isPrimaryEditor() && !EditorHelper.isFileEditor(this) && !EditorHelper.isCommandHistoryWindow(this)
+}
+
+private fun Editor.isSingleLine(): Boolean {
+  return isTableCellEditor(this.component) || isOneLineMode
+}
+
+/**
+ * Checks if the editor is a primary editor in the main editing area.
+ */
+internal fun Editor.isPrimaryEditor(): Boolean {
+  val project = project ?: return false
+  val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
+  return fileEditorManager.allEditors.any { fileEditor -> this == EditorUtil.getEditorEx(fileEditor) }
+}
+
+
+/**
+ * Checks if the editor should be treated like a terminal. I.e. switch to Insert mode automatically
+ *
+ * A "terminal" editor is an editor used for purposes other than mainstream editing, such as a terminal, console, log
+ * viewer, etc. In this instance, the editor is writable, the document is writable, but it's not backed by a real file
+ * and it's not the diff viewer. We also check that if it's an injected language fragment backed by a real file.
+ */
+internal fun Editor.isTerminalEditor(): Boolean {
+  return !isViewer
+    && document.isWritable
+    && !EditorHelper.isFileEditor(this)
+    && !EditorHelper.isDiffEditor(this)
+    && !EditorHelper.isCommandHistoryWindow(this)
+    && !EditorHelper.isPythonConsole(this)
+}
+
+// Optimized clone of com.intellij.ide.ui.laf.darcula.DarculaUIUtil.isTableCellEditor
+private fun isTableCellEditor(c: Component): Boolean {
+  return (java.lang.Boolean.TRUE == (c as JComponent).getClientProperty("JComboBox.isTableCellEditor")) ||
+    (findParentByCondition(c) { it is JTable } != null) &&
+    (findParentByCondition(c) { it is JBTableRowEditor } == null)
+}
+
+private const val PARENT_BY_CONDITION_DEPTH = 10
+
+private inline fun findParentByCondition(c: Component?, condition: (Component?) -> Boolean): Component? {
+  var eachParent = c
+  var goDeep = PARENT_BY_CONDITION_DEPTH
+  while (eachParent != null && --goDeep > 0) {
+    if (condition(eachParent)) return eachParent
+    eachParent = eachParent.parent
+  }
+  return null
+}
+
+internal fun vimDisabled(editor: Editor?): Boolean = !vimEnabled(editor)
+
+private fun vimEnabled(editor: Editor?): Boolean {
+  if (VimPlugin.isNotEnabled()) return false
+  if (editor != null && editor.isIdeaVimDisabledHere) return false
+  return true
+}
