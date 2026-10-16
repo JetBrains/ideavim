@@ -10,11 +10,24 @@
 
 package org.jetbrains.plugins.ideavim.group.motion
 
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.EditorFactory
+import com.intellij.openapi.editor.EditorKind
+import com.intellij.openapi.editor.impl.stickyLines.StickyLinesModel
+import com.intellij.testFramework.EditorTestUtil
+import com.maddyhome.idea.vim.api.getOffset
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
+import kotlin.math.roundToInt
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 // These tests are sanity tests for scrolloff and scrolljump, with actions that move the cursor. Other actions that are
 // affected by scrolloff or scrolljump should include that in the action specific tests
@@ -366,6 +379,58 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertPosition(50, 0)
     assertVisibleArea(33, 67)
   }
+
+  // VIM-4329
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
+  @Test
+  fun `test scrolloff=999 keeps cursor on screen when block inlays take up most of the screen`() {
+    // Screen is 35 rows. Lines 20-29 (10 rows), then a 20 row inlay (e.g. rendered doc comment), then lines 30-34.
+    // Only 15 lines of text are visible, which is less than half the screen height
+    configureByLines(2000, "    I found it in a legendary land")
+    addBlockInlay(fixture.editor.vim.getOffset(30, 0), true, 20)
+    setPositionAndScroll(20, 25)
+
+    enterCommand("set scrolloff=999")
+    assertCaretOnScreen()
+
+    typeText("j")
+    assertPosition(26, 0)
+    assertCaretOnScreen()
+
+    typeText("j")
+    assertPosition(27, 0)
+    assertCaretOnScreen()
+  }
+
+  // VIM-4329
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test scrolloff=999 does not scroll when changing line`() {
+    configureByPages(5)
+    enterCommand("set scrolloff=999")
+    setPositionAndScroll(43, 60)
+    assertVisibleArea(43, 77)
+
+    typeText("cc")
+    assertPosition(60, 0)
+    assertVisibleArea(43, 77)
+
+    typeText("x")
+    assertVisibleArea(43, 77)
+
+    typeText("<Esc>")
+    assertVisibleArea(43, 77)
+  }
+
+  private fun assertCaretOnScreen() {
+    ApplicationManager.getApplication().invokeAndWait {
+      val editor = fixture.editor
+      val caretLine = editor.caretModel.visualPosition.line
+      val topLine = EditorHelper.getVisualLineAtTopOfScreen(editor)
+      val bottomLine = EditorHelper.getVisualLineAtBottomOfScreen(editor)
+      assertTrue(caretLine in topLine..bottomLine, "Caret line $caretLine is outside of screen $topLine..$bottomLine")
+    }
+  }
 }
 
 class MotionGroup_scrolljump_Test : VimTestCase() {
@@ -481,5 +546,71 @@ class MotionGroup_scrolloff_scrolljump_Test : VimTestCase() {
     typeText("j")
     assertPosition(80, 0)
     assertVisibleArea(60, 94)
+  }
+}
+
+class MotionGroup_scrolloff_stickyLines_Test : VimTestCase() {
+  // VIM-4329
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test scrolloff=999 does not scroll when typing with sticky lines near top of screen`() {
+    configureByLines(1000, "    I found it in a legendary land")
+    enterCommand("set scrolloff=999")
+
+    // Sticky lines panel is only created for main editors, the fixture's editor doesn't have one
+    withMainEditor { editor ->
+      // Two nested scopes starting just above the top line when the caret is centred. Depending on the scroll position,
+      // the sticky lines panel is either 0 or 2 lines high
+      addStickyLine(editor, 42, 500)
+      addStickyLine(editor, 43, 500)
+      ApplicationManager.getApplication().invokeAndWait {
+        editor.scrollingModel.scrollVertically(30 * editor.lineHeight)
+        editor.caretModel.moveToOffset(editor.document.getLineStartOffset(60))
+      }
+
+      // Let scrolloff centre the caret before we start typing
+      typeText(editor, "jki")
+      val scrollOffset = verticalScrollOffset(editor)
+      for (c in "abcd") {
+        typeText(editor, c.toString())
+        assertEquals(scrollOffset, verticalScrollOffset(editor), "Editor scrolled after typing '$c'")
+      }
+    }
+  }
+
+  private fun withMainEditor(action: (Editor) -> Unit) {
+    var editor: Editor? = null
+    ApplicationManager.getApplication().invokeAndWait {
+      editor = EditorFactory.getInstance()
+        .createEditor(fixture.editor.document, fixture.project, EditorKind.MAIN_EDITOR)
+      EditorTestUtil.setEditorVisibleSizeInPixels(
+        editor,
+        (screenWidth * EditorHelper.getPlainSpaceWidthFloat(editor!!)).roundToInt(),
+        screenHeight * editor.lineHeight,
+      )
+    }
+    try {
+      action(editor!!)
+    } finally {
+      ApplicationManager.getApplication().invokeAndWait { EditorFactory.getInstance().releaseEditor(editor!!) }
+    }
+  }
+
+  private fun addStickyLine(editor: Editor, primaryLine: Int, scopeLine: Int) {
+    ApplicationManager.getApplication().invokeAndWait {
+      val document = editor.document
+      val model = StickyLinesModel.getModel(fixture.project, document)!!
+      model.addStickyLine(document.getLineStartOffset(primaryLine), document.getLineEndOffset(scopeLine), null)
+      model.notifyLinesUpdate()
+    }
+  }
+
+  private fun typeText(editor: Editor, keys: String) =
+    typeText(injector.parser.parseKeys(keys), editor, fixture.project)
+
+  private fun verticalScrollOffset(editor: Editor): Int {
+    var offset = 0
+    ApplicationManager.getApplication().invokeAndWait { offset = editor.scrollingModel.verticalScrollOffset }
+    return offset
   }
 }
