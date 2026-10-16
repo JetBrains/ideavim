@@ -64,7 +64,7 @@ public class EditorHelper {
   private static final String AI_ASSISTANT_INPUT_FILE_NAME_PREFIX = "AIAssistantInput-";
 
   private static final int BLOCK_INLAY_MAX_LINE_HEIGHT = 3;
-  private static final int MAX_CENTRING_ATTEMPTS = 3;
+  private static final int MAX_SCROLL_ATTEMPTS = 3;
 
   public static @NotNull Rectangle getVisibleArea(final @NotNull Editor editor) {
     final Rectangle area = editor.getScrollingModel().getVisibleAreaOnScrollingFinished();
@@ -351,7 +351,16 @@ public class EditorHelper {
    * @return Returns true if the window was moved
    */
   public static boolean scrollVisualLineToTopOfScreen(final @NotNull Editor editor, int visualLine) {
+    boolean scrolled = scrollVertically(editor, getOffsetToScrollVisualLineToTopOfScreen(editor, visualLine));
 
+    // Scrolling changes which lines are sticky. If the sticky lines panel is now taller, the line is hidden under it
+    for (int attempt = 1; attempt < MAX_SCROLL_ATTEMPTS && isHiddenUnderStickyLines(editor, visualLine); attempt++) {
+      scrolled |= scrollVertically(editor, getOffsetToScrollVisualLineToTopOfScreen(editor, visualLine));
+    }
+    return scrolled;
+  }
+
+  private static int getOffsetToScrollVisualLineToTopOfScreen(final @NotNull Editor editor, int visualLine) {
     final int inlayHeight = EditorUtil.getInlaysHeight(editor, visualLine, true);
     final int maxInlayHeight = BLOCK_INLAY_MAX_LINE_HEIGHT * editor.getLineHeight();
     int y = editor.visualLineToY(visualLine) - Math.min(inlayHeight, maxInlayHeight);
@@ -370,7 +379,11 @@ public class EditorHelper {
       final int yLastLine = editor.visualLineToY(new IjVimEditor(editor).lineCount());  // last line + 1
       y = Math.min(y, yLastLine + virtualSpaceHeight - editorHeight);
     }
-    return scrollVertically(editor, y);
+    return y;
+  }
+
+  private static boolean isHiddenUnderStickyLines(final @NotNull Editor editor, int visualLine) {
+    return editor.visualLineToY(visualLine) < getVisibleArea(editor).y;
   }
 
   /**
@@ -389,7 +402,7 @@ public class EditorHelper {
 
     // Scrolling changes which lines are sticky, so the sticky lines panel, and the middle below it, can be different
     // after we scroll. Adjust for the new panel straight away, otherwise the next keystroke scrolls again
-    for (int attempt = 0; attempt < MAX_CENTRING_ATTEMPTS; attempt++) {
+    for (int attempt = 0; attempt < MAX_SCROLL_ATTEMPTS; attempt++) {
       if (!scrollTowardsMiddle(editor, lineY, allowVirtualSpace)) {
         return;
       }
