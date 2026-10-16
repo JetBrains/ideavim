@@ -14,6 +14,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.EditorKind
+import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.editor.impl.stickyLines.StickyLinesModel
 import com.intellij.testFramework.EditorTestUtil
 import com.maddyhome.idea.vim.api.getOffset
@@ -578,7 +579,53 @@ class MotionGroup_scrolloff_stickyLines_Test : VimTestCase() {
     }
   }
 
-  private fun withMainEditor(action: (Editor) -> Unit) {
+  // VIM-4329
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test scrolloff=999 does not scroll when typing after a jump changes the sticky lines panel`() {
+    configureByLines(1000, "    I found it in a legendary land")
+    enterCommand("set scrolloff=999")
+
+    withMainEditor(rows = 40) { editor ->
+      addNestedScopes(editor)
+      typeText(editor, "101G")
+
+      // The jump is centred with the sticky lines panel of the old position. At the new position the panel has a
+      // different height, so we need to recalculate the centre straight away, not on the next keystroke
+      typeText(editor, "500Gi")
+      val scrollOffset = verticalScrollOffset(editor)
+      for (c in "abcd") {
+        typeText(editor, c.toString())
+        assertEquals(scrollOffset, verticalScrollOffset(editor), "Editor scrolled after typing '$c'")
+      }
+    }
+  }
+
+  // VIM-4329
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test scrolloff close to half screen keeps scroll offset below sticky lines panel`() {
+    configureByLines(1000, "    I found it in a legendary land")
+    enterCommand("set scrolloff=15")
+
+    withMainEditor(rows = 30) { editor ->
+      addNestedScopes(editor)
+      typeText(editor, "101G")
+      typeText(editor, "300G")
+
+      // 30 rows with a 3 line panel leaves 27 rows, so scrolloff is effectively (27 - 1) / 2 = 13
+      ApplicationManager.getApplication().invokeAndWait {
+        val caretLine = editor.caretModel.visualPosition.line
+        val topLine = EditorHelper.getVisualLineAtTopOfScreen(editor)
+        val bottomLine = EditorHelper.getVisualLineAtBottomOfScreen(editor)
+        assertEquals(3 * editor.lineHeight, (editor as EditorImpl).stickyLinesPanelHeight)
+        assertTrue(caretLine - topLine >= 13, "Caret line $caretLine is too close to top line $topLine")
+        assertTrue(bottomLine - caretLine >= 13, "Caret line $caretLine is too close to bottom line $bottomLine")
+      }
+    }
+  }
+
+  private fun withMainEditor(rows: Int = screenHeight, action: (Editor) -> Unit) {
     var editor: Editor? = null
     ApplicationManager.getApplication().invokeAndWait {
       editor = EditorFactory.getInstance()
@@ -586,7 +633,7 @@ class MotionGroup_scrolloff_stickyLines_Test : VimTestCase() {
       EditorTestUtil.setEditorVisibleSizeInPixels(
         editor,
         (screenWidth * EditorHelper.getPlainSpaceWidthFloat(editor!!)).roundToInt(),
-        screenHeight * editor.lineHeight,
+        rows * editor.lineHeight,
       )
     }
     try {
@@ -602,6 +649,17 @@ class MotionGroup_scrolloff_stickyLines_Test : VimTestCase() {
       val model = StickyLinesModel.getModel(fixture.project, document)!!
       model.addStickyLine(document.getLineStartOffset(primaryLine), document.getLineEndOffset(scopeLine), null)
       model.notifyLinesUpdate()
+    }
+  }
+
+  // A class every 40 lines, with a method every 10 lines and a nested block in the first method
+  private fun addNestedScopes(editor: Editor) {
+    for (classLine in 0 until 960 step 40) {
+      addStickyLine(editor, classLine, classLine + 39)
+      for (methodLine in classLine + 2 until classLine + 38 step 10) {
+        addStickyLine(editor, methodLine, methodLine + 8)
+      }
+      addStickyLine(editor, classLine + 3, classLine + 9)
     }
   }
 
