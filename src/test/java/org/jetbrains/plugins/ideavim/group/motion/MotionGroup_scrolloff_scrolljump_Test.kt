@@ -423,6 +423,45 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(43, 77)
   }
 
+  // VIM-4329
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test scrolloff=999 does not scroll when substituting line`() {
+    configureByPages(5)
+    enterCommand("set scrolloff=999")
+    setPositionAndScroll(43, 60)
+
+    typeText("S")
+    assertPosition(60, 0)
+    assertVisibleArea(43, 77)
+  }
+
+  // VIM-4329
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test scrolloff=999 does not scroll when changing multiple lines`() {
+    configureByPages(5)
+    enterCommand("set scrolloff=999")
+    setPositionAndScroll(43, 60)
+
+    typeText("3cc")
+    assertPosition(60, 0)
+    assertVisibleArea(43, 77)
+  }
+
+  // VIM-4329
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test scrolloff=999 does not scroll when changing linewise selection`() {
+    configureByPages(5)
+    enterCommand("set scrolloff=999")
+    setPositionAndScroll(43, 60)
+
+    typeText("Vc")
+    assertPosition(60, 0)
+    assertVisibleArea(43, 77)
+  }
+
   private fun assertCaretOnScreen() {
     ApplicationManager.getApplication().invokeAndWait {
       val editor = fixture.editor
