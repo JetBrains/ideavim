@@ -381,6 +381,66 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(33, 67)
   }
 
+  // VIM-2501
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
+  @Test
+  fun `test typing does not scroll when block inlays take up most of the screen`() {
+    // Screen is 35 rows. Lines 20-29 (10 rows), then a 20 row inlay, then lines 30-34
+    configureByLines(2000, "    I found it in a legendary land")
+    addBlockInlay(fixture.editor.vim.getOffset(30, 0), true, 20)
+    setPositionAndScroll(20, 25)
+
+    typeText("i")
+    for (c in "abcd") {
+      typeText(c.toString())
+      assertTopLogicalLine(20)
+    }
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
+  @Test
+  fun `test move down scrolls with scrolloff when block inlays take up most of the screen`() {
+    configureByLines(2000, "    I found it in a legendary land")
+    enterCommand("set scrolloff=3")
+    addBlockInlay(fixture.editor.vim.getOffset(30, 0), true, 20)
+    setPositionAndScroll(20, 31)
+
+    typeText("j")
+    assertPosition(32, 0)
+    assertTopLogicalLine(20)
+
+    typeText("j")
+    assertPosition(33, 0)
+    assertVisibleArea(22, 36)
+  }
+
+  // VIM-4282
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
+  @Test
+  fun `test move below screen scrolls down when block inlays take up most of the screen`() {
+    configureByLines(2000, "    I found it in a legendary land")
+    enterCommand("set scrolloff=3")
+    addBlockInlay(fixture.editor.vim.getOffset(30, 0), true, 20)
+    setPositionAndScroll(20, 31)
+
+    typeText("5j")
+    assertPosition(36, 0)
+    assertVisibleArea(25, 39)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
+  @Test
+  fun `test move above screen scrolls up with scrolloff when block inlays take up most of the screen`() {
+    configureByLines(2000, "    I found it in a legendary land")
+    enterCommand("set scrolloff=3")
+    addBlockInlay(fixture.editor.vim.getOffset(30, 0), true, 20)
+    setPositionAndScroll(20, 20)
+
+    typeText("k")
+    assertPosition(19, 0)
+    assertTopLogicalLine(16)
+  }
+
   // VIM-4329
   @TestWithoutNeovim(SkipNeovimReason.INLAYS)
   @Test
