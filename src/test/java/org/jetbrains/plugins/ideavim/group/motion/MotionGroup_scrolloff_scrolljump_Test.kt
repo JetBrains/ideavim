@@ -434,11 +434,24 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     configureByLines(2000, "    I found it in a legendary land")
     enterCommand("set scrolloff=3")
     addBlockInlay(fixture.editor.vim.getOffset(30, 0), true, 20)
-    setPositionAndScroll(20, 20)
+    setPositionAndScroll(20, 23)
 
-    typeText("k")
+    typeText("4k")
     assertPosition(19, 0)
     assertTopLogicalLine(16)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
+  @Test
+  fun `test move up keeps scrolloff at top of screen when block inlays take up most of the screen`() {
+    configureByLines(2000, "    I found it in a legendary land")
+    enterCommand("set scrolloff=3")
+    addBlockInlay(fixture.editor.vim.getOffset(30, 0), true, 20)
+    setPositionAndScroll(20, 23)
+
+    typeText("k")
+    assertPosition(22, 0)
+    assertTopLogicalLine(19)
   }
 
   // VIM-4329

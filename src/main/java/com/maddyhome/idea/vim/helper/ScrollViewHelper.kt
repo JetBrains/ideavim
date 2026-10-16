@@ -176,8 +176,7 @@ internal object ScrollViewHelper {
     inlayAwareMinHeightFudge: Int,
   ): Boolean {
     if (!isScreenHeightReliableForCentering(height, inlayAwareMinHeightFudge)) {
-      if (isCaretBelowVisibleArea(editor, caretLine, scrollOffset)) return false
-      return !isCaretWithinVerticalScrollBounds(editor, caretLine, scrollOffset)
+      return isCaretAboveScrollOffsetAtTop(editor, caretLine, scrollOffset)
     }
 
     return caretLine < topBound
@@ -196,24 +195,21 @@ internal object ScrollViewHelper {
     if (bottomLine >= lastLine) return false
 
     if (!isScreenHeightReliableForCentering(height, inlayAwareMinHeightFudge)) {
-      return !isCaretWithinVerticalScrollBounds(editor, caretLine, scrollOffset)
+      return isCaretBelowScrollOffsetAtBottom(editor, caretLine, scrollOffset)
     }
 
     return caretLine > bottomBound
   }
 
-  private fun isCaretWithinVerticalScrollBounds(editor: Editor, caretLine: Int, scrollOffset: Int): Boolean {
-    val visibleArea = getVisibleArea(editor)
-    val caretY = editor.visualLineToY(caretLine)
-    val bottomLimit = visibleArea.y + visibleArea.height - scrollOffset * editor.lineHeight
-    return caretY >= visibleArea.y && caretY <= bottomLimit
+  private fun isCaretAboveScrollOffsetAtTop(editor: Editor, caretLine: Int, scrollOffset: Int): Boolean {
+    val topLimit = getVisibleArea(editor).y + scrollOffset * editor.lineHeight
+    return editor.visualLineToY(caretLine) < topLimit
   }
 
-  private fun isCaretBelowVisibleArea(editor: Editor, caretLine: Int, scrollOffset: Int): Boolean {
+  private fun isCaretBelowScrollOffsetAtBottom(editor: Editor, caretLine: Int, scrollOffset: Int): Boolean {
     val visibleArea = getVisibleArea(editor)
-    val caretY = editor.visualLineToY(caretLine)
     val bottomLimit = visibleArea.y + visibleArea.height - scrollOffset * editor.lineHeight
-    return caretY > bottomLimit
+    return editor.visualLineToY(caretLine) > bottomLimit
   }
 
   // Scrolling up, put the cursor at the top of the window (minus scrolloff)
