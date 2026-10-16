@@ -1544,7 +1544,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     if (editor.isOneLineMode()) return
     var firstLiner = false
     var newCaret = if (caret.getVisualPosition().line == 0) {
-      val newCaret = caret.moveToOffset(
+      val newCaret = caret.moveToInlayAwareOffset(
         injector.motion.moveCaretToCurrentLineStart(
           editor,
           caret,
@@ -1556,8 +1556,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       // TODO: getVerticalMotionOffset returns a visual line, not the expected logical line
       // Also address the unguarded upcast
       val motion = injector.motion.getVerticalMotionOffset(editor, caret, -1)
-      val updated = caret.moveToOffset((motion as AbsoluteOffset).offset)
-      updated.moveToOffset(injector.motion.moveCaretToCurrentLineEnd(editor, updated))
+      val updated = caret.moveToInlayAwareOffset((motion as AbsoluteOffset).offset)
+      updated.moveToInlayAwareOffset(injector.motion.moveCaretToCurrentLineEnd(editor, updated))
     }
     editor.vimChangeActionSwitchMode = Mode.INSERT
     newCaret = insertText(
