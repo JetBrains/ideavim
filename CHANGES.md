@@ -62,6 +62,7 @@ usual beta standards.
 * Fixed the `ReplaceWithRegister` extension's `gr` in Visual mode deleting whole lines when the selection spans lines — with `vj` selecting from the middle of one line into the next, `gr` now replaces only the selected text and keeps the rest of both lines
 * [VIM-841](https://youtrack.jetbrains.com/issue/VIM-841) Characterwise Visual mode can now select the end of line character, as in Vim. `v$` takes in the line break, so `v$x` deletes to the end of the line and joins the next line onto it, `v$y` yanks the text together with its trailing new line, and `vy` on an empty line yanks the new line
 * [VIM-4228](https://youtrack.jetbrains.com/issue/VIM-4228) Fixed Expand Selection (`EditorSelectWord`) in Rider stopping at the current word when used in Visual mode with the caret on the last character of the word
+* [VIM-4343](https://youtrack.jetbrains.com/issue/VIM-4343) Fixed `<Enter>` and `<Esc>` not working in popups such as the Recent Files switcher (`Cmd+E`/`Ctrl+E`) or Search Everywhere when no file is open. Mappings to IDE actions that start with Space, such as `map <leader>sf <Action>(GotoFile)` with `let mapleader = " "`, now also work in the Project tool window when no file is open, instead of Space opening a preview
 
 ### Merged PRs:
 * [2082](https://github.com/JetBrains/ideavim/pull/2082) by [1grzyb1](https://github.com/1grzyb1): VIM-748 changing multiple commands with |
