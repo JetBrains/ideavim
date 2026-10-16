@@ -737,6 +737,27 @@ class MotionGroup_scrolloff_stickyLines_Test : VimTestCase() {
     }
   }
 
+  // VIM-3301
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test caret is not hidden under sticky lines panel when moving up`() {
+    configureByLines(1000, "    I found it in a legendary land")
+    enterCommand("set scrolloff=0")
+
+    withMainEditor { editor ->
+      addNestedScopes(editor)
+      typeText(editor, "331Gzt")
+      repeat(10) {
+        typeText(editor, "k")
+        ApplicationManager.getApplication().invokeAndWait {
+          val caretLine = editor.caretModel.visualPosition.line
+          val topLine = EditorHelper.getVisualLineAtTopOfScreen(editor)
+          assertTrue(caretLine >= topLine, "Caret line $caretLine is hidden under sticky lines panel, top line $topLine")
+        }
+      }
+    }
+  }
+
   private fun withMainEditor(rows: Int = screenHeight, action: (Editor) -> Unit) {
     var editor: Editor? = null
     ApplicationManager.getApplication().invokeAndWait {
