@@ -63,6 +63,8 @@ usual beta standards.
 * [VIM-841](https://youtrack.jetbrains.com/issue/VIM-841) Characterwise Visual mode can now select the end of line character, as in Vim. `v$` takes in the line break, so `v$x` deletes to the end of the line and joins the next line onto it, `v$y` yanks the text together with its trailing new line, and `vy` on an empty line yanks the new line
 * [VIM-4228](https://youtrack.jetbrains.com/issue/VIM-4228) Fixed Expand Selection (`EditorSelectWord`) in Rider stopping at the current word when used in Visual mode with the caret on the last character of the word
 * [VIM-4343](https://youtrack.jetbrains.com/issue/VIM-4343) Fixed `<Enter>` and `<Esc>` not working in popups such as the Recent Files switcher (`Cmd+E`/`Ctrl+E`) or Search Everywhere when no file is open. Mappings to IDE actions that start with Space, such as `map <leader>sf <Action>(GotoFile)` with `let mapleader = " "`, now also work in the Project tool window when no file is open, instead of Space opening a preview
+* [VIM-4329](https://youtrack.jetbrains.com/issue/VIM-4329) Fixed `set scrolloff=999` not keeping the caret in the middle of the screen. Typing in Insert mode no longer scrolls the editor when [sticky lines](https://www.jetbrains.com/help/idea/sticky-lines.html) are shown, `cc`, `3cc` and `S` no longer scroll the screen, and the caret no longer moves off screen with `j` when rendered doc comments or other block inlays take up most of the window
+* [VIM-3301](https://youtrack.jetbrains.com/issue/VIM-3301) Fixed the caret going under the [sticky lines](https://www.jetbrains.com/help/idea/sticky-lines.html) panel when moving up with `k` past the top of the screen
 
 ### Merged PRs:
 * [2082](https://github.com/JetBrains/ideavim/pull/2082) by [1grzyb1](https://github.com/1grzyb1): VIM-748 changing multiple commands with |
@@ -78,6 +80,7 @@ usual beta standards.
 * [2115](https://github.com/JetBrains/ideavim/pull/2115) by [1grzyb1](https://github.com/1grzyb1): VIM-2372 Add missing mappings for navigation keys
 * [2117](https://github.com/JetBrains/ideavim/pull/2117) by [1grzyb1](https://github.com/1grzyb1): VIM-2293 Implement Vim visual multi plugin
 * [2119](https://github.com/JetBrains/ideavim/pull/2119) by [1grzyb1](https://github.com/1grzyb1): VIM-2524 calculate indent after cc
+* [2139](https://github.com/JetBrains/ideavim/pull/2139) by [1grzyb1](https://github.com/1grzyb1): VIM-4329 Fix issues with high scrolloff value
 * [2103](https://github.com/JetBrains/ideavim/pull/2103) by [citizenmatt](https://github.com/citizenmatt): Implement :function command to list functions
 * [2086](https://github.com/JetBrains/ideavim/pull/2086) by [valis](https://github.com/valis): Don't treat quotes inside non-string tokens as string delimiters in %
 * [2035](https://github.com/JetBrains/ideavim/pull/2035) by [AndDe-gourav](https://github.com/AndDe-gourav): Todo removing not selecting new line char
