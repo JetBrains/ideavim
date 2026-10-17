@@ -91,6 +91,7 @@ class LangMapConsumer : KeyConsumer {
     KeySource.NORMAL_COMMAND -> false
     KeySource.NORMAL_COMMAND_NOT_MAPPED -> false
     KeySource.MAPPING_PREFIX_REPLAY -> false
+    KeySource.MAPPING_REPLAY -> false
     KeySource.SYNTHETIC_TYPED_NOT_MAPPED -> false
 
     KeySource.MAPPED -> injector.globalOptions().langremap

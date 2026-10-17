@@ -51,6 +51,14 @@ enum class KeySource(val allowsKeyMapping: Boolean) {
   MAPPING_PREFIX_REPLAY(false),
 
   /**
+   * The key is being replayed from the a mapping that failed to match
+   *
+   * For example, given a mapping `dwxxx`, typing `dwy` will replay `dw`. The first `d` must not be mapped, or we'll get
+   * stuck in an endless loop. The remaining characters can be mapped, but should not be langmapped.
+   */
+  MAPPING_REPLAY(true),
+
+  /**
    * The key was generated from a digraph with `<C-K>` or `<C-Q>`
    *
    * The key will be mapped.
