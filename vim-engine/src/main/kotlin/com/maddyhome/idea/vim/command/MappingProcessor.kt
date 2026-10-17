@@ -326,8 +326,7 @@ internal object MappingProcessor : KeyConsumer {
 
         // If we have any keys left unprocessed, replay them, with mappings, as though they were typed
         unhandledKeys.subList(keys.size, unhandledKeys.size).forEach {
-          // TODO: This isn't always typed by a user. Is there a scenario where this matters? Langmap perhaps?
-          KeyHandler.getInstance().handleKey(editor, it, KeySource.TYPED, context, keyState)
+          KeyHandler.getInstance().handleKey(editor, it, KeySource.MAPPING_REPLAY, context, keyState)
         }
         return
       }
@@ -342,7 +341,7 @@ internal object MappingProcessor : KeyConsumer {
     // though they were typed.
     val keyHandler = KeyHandler.getInstance()
     unhandledKeys.forEachIndexed { index, it ->
-      val keySource = if (index == 0) KeySource.MAPPING_PREFIX_REPLAY else KeySource.TYPED
+      val keySource = if (index == 0) KeySource.MAPPING_PREFIX_REPLAY else KeySource.MAPPING_REPLAY
       keyHandler.handleKey(editor, it, keySource, context, keyState)
     }
   }

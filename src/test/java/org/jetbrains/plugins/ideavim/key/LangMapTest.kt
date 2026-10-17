@@ -394,6 +394,34 @@ class LangMapTest : VimTestCase() {
   }
 
   @Test
+  fun `test langmap does not convert replayed abandoned map`() {
+    // `i` is langmapped to `g,` which is a prefix in a user map, so IdeaVim buffers waiting for next key.
+    // Second `i` is also langmapped to `g`. This is added to the buffer, but `gg` isn't a map, so the map is abandoned
+    // and replayed. We replay the first `g` with "no remap" - it's not langmapped, and we don't try to match it against
+    // a user map (which would cause an infinite loop). We also need to make sure that the second `g` is not langmapped,
+    // because it's already been langmapped.
+    // If this fails, we're langmapping the second `g` to `E`, which results in a `gE` command that moves the caret
+    doTest(
+      "ii",
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |${c}Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+      """
+        |${c}Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas. 
+      """.trimMargin(),
+    ) {
+      enterCommand("nmap gp ll")
+      enterCommand("set langmap=ig,gE")
+    }
+  }
+
+  @Test
   fun `test langremap reports recursive mapping`() {
     doTest(
       "b",  // 'b' -> '~' (nmap) '~' -> 'x' (langmap) -> 'b' (nmap) -> ...
