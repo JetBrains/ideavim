@@ -48,7 +48,8 @@ import kotlin.math.min
  * click still moves the caret even when `'mouse'` is empty, and a shift+click additionally creates a native selection
  * that IdeaVim turns into Visual mode. We accept this: those gestures are IDE navigation rather than Vim's use of the
  * mouse, and disabling them (as consuming every press used to) breaks the context menu, breakpoints and go-to-declaration
- * for no benefit Vim asks for.
+ * for no benefit Vim asks for. Middle-click paste in Insert mode is the exception: it never moves the caret. See
+ * [VimPasteFromX11Handler].
  */
 internal object ModelessSelection {
   /**

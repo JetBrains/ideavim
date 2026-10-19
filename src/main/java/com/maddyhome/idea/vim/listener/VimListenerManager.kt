@@ -951,6 +951,10 @@ object VimListenerManager {
       } else {
         ModelessSelection.endGesture(event.editor)
       }
+
+      if (VimPasteFromX11Handler.shouldKeepCaretOnPress(event)) {
+        event.consume()
+      }
     }
 
     /**
