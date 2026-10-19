@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.extension.visualmulti
+package com.maddyhome.idea.vim.extension.multiplecursors
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -14,7 +14,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
-import com.maddyhome.idea.vim.extension.multiplecursors.leaveVisualMode
 import com.maddyhome.idea.vim.newapi.ij
 
 /**

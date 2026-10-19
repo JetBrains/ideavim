@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
+import com.maddyhome.idea.vim.extension.multiplecursors.NativeKeysHandler
 import com.maddyhome.idea.vim.extension.multiplecursors.VimMultipleCursorsExtensionBase
 import javax.swing.KeyStroke
 
