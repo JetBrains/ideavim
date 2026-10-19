@@ -770,4 +770,151 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
     """.trimMargin()
     assertState(after)
   }
+
+  // Visual `I` and `A` are special in vim-multiple-cursors: they insert at the start or append after each selection,
+  // not at the start or end of the line as in plain Vim. Ported from spec/multiple_cursors_spec.rb (VIM-2374)
+  @Test
+  fun `test I inserts at start of each selection`() {
+    configureByText(
+      """${c}hello world jan
+      |hello world feb
+      |hello world mar
+      """.trimMargin(),
+    )
+
+    typeText(injector.parser.parseKeys("w<C-n><C-n><C-n>" + "Ibefore<Esc>"))
+
+    assertState(
+      """hello befor${c}eworld jan
+      |hello befor${c}eworld feb
+      |hello befor${c}eworld mar
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test A appends after each selection`() {
+    configureByText(
+      """${c}hello world jan
+      |hello world feb
+      |hello world mar
+      """.trimMargin(),
+    )
+
+    typeText(injector.parser.parseKeys("w<C-n><C-n><C-n>" + "Aafter<Esc>"))
+
+    assertState(
+      """hello worldafte${c}r jan
+      |hello worldafte${c}r feb
+      |hello worldafte${c}r mar
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test I inserts at start of each resized selection`() {
+    configureByText(
+      """${c}hello world jan
+      |hello world feb
+      |hello world mar
+      """.trimMargin(),
+    )
+
+    typeText(injector.parser.parseKeys("w<C-n><C-n><C-n>hhh" + "Ibefore<Esc>"))
+
+    assertState(
+      """hello befor${c}eworld jan
+      |hello befor${c}eworld feb
+      |hello befor${c}eworld mar
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test A appends after each resized selection`() {
+    configureByText(
+      """${c}hello world jan
+      |hello world feb
+      |hello world mar
+      """.trimMargin(),
+    )
+
+    typeText(injector.parser.parseKeys("w<C-n><C-n><C-n>hhh" + "Abefore<Esc>"))
+
+    assertState(
+      """hello wobefor${c}erld jan
+      |hello wobefor${c}erld feb
+      |hello wobefor${c}erld mar
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test I inserts at start of each not whole word selection`() {
+    configureByText(
+      """hello hi${c}bye world
+      |hello hibye world
+      |hello hibye world
+      """.trimMargin(),
+    )
+
+    typeText(injector.parser.parseKeys("ve" + "g<C-n>".repeat(2)))
+    typeText(injector.parser.parseKeys("Ibefore<Esc>"))
+
+    assertState(
+      """hello hibefor${c}ebye world
+      |hello hibefor${c}ebye world
+      |hello hibefor${c}ebye world
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test I inserts at start of each selection on the same line`() {
+    configureByText("foo ${c}qwe bar qwe")
+
+    typeText(injector.parser.parseKeys("<C-n><C-n>" + "Ix<Esc>"))
+
+    assertState("foo ${c}xqwe bar ${c}xqwe")
+  }
+
+  @Test
+  fun `test I inserts at start of a single selection`() {
+    configureByText("foo ${c}qwe bar")
+
+    typeText(injector.parser.parseKeys("<C-n>" + "Ix<Esc>"))
+
+    assertState("foo ${c}xqwe bar")
+  }
+
+  @Test
+  fun `test I without multiple cursors keeps Vim meaning`() {
+    configureByText("foo ${c}qwe bar")
+
+    typeText(injector.parser.parseKeys("vl" + "Ix<Esc>"))
+
+    assertState("${c}xfoo qwe bar")
+  }
+
+  @Test
+  fun `test A without multiple cursors keeps Vim meaning`() {
+    configureByText("foo ${c}qwe bar")
+
+    typeText(injector.parser.parseKeys("vl" + "Ax<Esc>"))
+
+    assertState("foo qwe bar${c}x")
+  }
+
+  @Test
+  fun `test I does not override user mapping`() {
+    configureByText("foo ${c}qwe bar")
+    enterCommand("set nomultiple-cursors")
+    enterCommand("xmap I <Esc>")
+    enterCommand("set multiple-cursors")
+
+    typeText(injector.parser.parseKeys("<C-n>" + "I"))
+
+    assertState("foo qw${c}e bar")
+    assertMode(Mode.NORMAL())
+  }
 }

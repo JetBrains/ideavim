@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.multiplecursors.AllOccurrencesHandler
+import com.maddyhome.idea.vim.extension.multiplecursors.InsertHandler
 import com.maddyhome.idea.vim.extension.multiplecursors.NewSelection
 import com.maddyhome.idea.vim.extension.multiplecursors.NextOccurrenceHandler
 import com.maddyhome.idea.vim.extension.multiplecursors.RemoveOccurrenceHandler

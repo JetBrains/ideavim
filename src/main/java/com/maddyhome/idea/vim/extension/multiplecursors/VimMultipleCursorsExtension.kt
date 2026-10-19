@@ -9,7 +9,10 @@
 package com.maddyhome.idea.vim.extension.multiplecursors
 
 import com.intellij.openapi.util.NlsSafe
+import com.maddyhome.idea.vim.api.getMappingInfo
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 
 @NlsSafe
 private const val NEXT_WHOLE_OCCURRENCE = "<Plug>NextWholeOccurrence"
@@ -63,5 +66,18 @@ internal class VimMultipleCursorsExtension : VimMultipleCursorsExtensionBase() {
       putDefaultMapping(MappingMode.X, "<C-x>", SKIP_OCCURRENCE)
       putDefaultMapping(MappingMode.X, "<C-p>", REMOVE_OCCURRENCE)
     }
+
+    putVisualInsertMapping("I", "i")
+    putVisualInsertMapping("A", "a")
+  }
+
+  /**
+   * vim-multiple-cursors handles `I` and `A` itself, regardless of `g:multi_cursor_use_default_mapping`. The mappings
+   * of the user are not overridden.
+   */
+  private fun putVisualInsertMapping(keys: String, command: String) {
+    val fromKeys = injector.parser.parseKeys(keys)
+    if (injector.keyGroup.getMappingInfo(fromKeys, MappingMode.VISUAL) != null) return
+    putExtensionHandlerMapping(MappingMode.X, fromKeys, owner, VisualInsertHandler(keys, command), false)
   }
 }

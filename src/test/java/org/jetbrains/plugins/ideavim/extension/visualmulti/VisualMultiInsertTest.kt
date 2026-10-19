@@ -77,4 +77,31 @@ class VisualMultiInsertTest : VisualMultiTestCase() {
 
     assertState("foo ${s}ba${c}r$se")
   }
+
+  // vim-visual-multi `I` runs `^` before Insert mode (`vm#commands#merge_to_beol(0)`), not the start of the region
+  @Test
+  fun `test I on regions in the middle of the line inserts at first non-blank character`() {
+    configureByText(
+      """  foo ${c}qwe bar
+      |  foo qwe bar
+      """.trimMargin(),
+    )
+
+    typeText("<C-n><C-n>" + "Ix<Esc>")
+
+    assertState(
+      """  ${c}xfoo qwe bar
+      |  ${c}xfoo qwe bar
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test I merges regions on the same line into one cursor`() {
+    configureByText("foo ${c}qwe bar qwe")
+
+    typeText("<C-n><C-n>" + "Ix<Esc>")
+
+    assertState("${c}xfoo qwe bar qwe")
+  }
 }
