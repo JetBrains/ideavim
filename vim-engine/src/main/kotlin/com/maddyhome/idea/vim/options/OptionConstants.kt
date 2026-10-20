@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.options
 
 class OptionConstants {
   companion object {
+    const val clipboard_autoselect: String = "autoselect"
     const val clipboard_ideaput: String = "ideaput"
     const val clipboard_unnamed: String = "unnamed"
     const val clipboard_unnamedplus: String = "unnamedplus"
