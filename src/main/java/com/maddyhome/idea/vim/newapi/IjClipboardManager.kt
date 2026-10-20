@@ -26,12 +26,14 @@ import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.OwnedPrimaryContent
 import com.maddyhome.idea.vim.api.VimClipboardManager
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimCopiedText
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.state.mode.selectionType
@@ -47,8 +49,10 @@ import java.util.concurrent.atomic.AtomicReference
 // Disposable so the PRIMARY writer's background thread and helper process are released when the
 // service goes away. That covers plugin unload as well as shutdown: IdeaVim's extension points are
 // all dynamic, so an un-disposed executor would pin the plugin classloader across a reload.
-internal class IjClipboardManager : VimClipboardManager, Disposable {
-  private val primaryWriter: PrimarySelectionWriter = primarySelectionWriter()
+internal class IjClipboardManager(
+  private val primaryWriter: PrimarySelectionWriter = primarySelectionWriter(),
+  private val isPrimarySupported: () -> Boolean = { injector.registerGroup.isPrimaryRegisterSupported() },
+) : VimClipboardManager, Disposable {
   private val publishedToPrimary = AtomicReference<OwnedPrimaryContent?>()
 
   override fun dispose() {
@@ -144,8 +148,9 @@ internal class IjClipboardManager : VimClipboardManager, Disposable {
   // handlers, and put-with-selection too — pushing those would corrupt PRIMARY mid-operation.
   private fun shouldRepublishVisualSelection(editor: VimEditor): Boolean {
     if (!editor.inVisualMode) return false
+    if (OptionConstants.clipboard_autoselect !in injector.globalOptions().clipboard) return false
     if (injector.vimState.executingCommand?.type in OPERATORS_SKIPPING_PRIMARY_PUSH) return false
-    return injector.registerGroup.isPrimaryRegisterSupported()
+    return isPrimarySupported()
   }
 
   private fun readVisualSelectionText(editor: VimEditor, caret: ImmutableVimCaret): String? {

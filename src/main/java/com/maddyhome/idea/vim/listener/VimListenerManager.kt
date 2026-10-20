@@ -88,6 +88,7 @@ import com.maddyhome.idea.vim.autocmd.AutoCmdEvent
 import com.maddyhome.idea.vim.autocmd.IjFileTypeMapping
 import com.maddyhome.idea.vim.common.ModeChangeListener
 import com.maddyhome.idea.vim.common.ModeWillChangeListener
+import com.maddyhome.idea.vim.group.ClipboardAutoselectChangeListener
 import com.maddyhome.idea.vim.group.CommentsOptionInitializer
 import com.maddyhome.idea.vim.group.ConsoleOptionChangeListener
 import com.maddyhome.idea.vim.group.ControlCharsEditorHighlighter
@@ -257,12 +258,14 @@ object VimListenerManager {
       optionGroup.addEffectiveOptionValueChangeListener(Options.keymap, KeymapChangeListener)
       optionGroup.addGlobalOptionChangeListener(Options.ideawindowjumps, WindowJumpsChangeListener)
       optionGroup.addGlobalOptionChangeListener(IjOptions.ideaeditor, ConsoleOptionChangeListener)
+      optionGroup.addGlobalOptionChangeListener(Options.clipboard, ClipboardAutoselectChangeListener)
 
       // The listeners are registered _after_ ideavimrc has been evaluated, so trigger these listeners to ensure we're
       // up to date
       // TODO: Why do we register listeners after evaluating ideavimrc?
       modeWidgetOptionListener.onGlobalOptionChanged()
       macroWidgetOptionListener.onGlobalOptionChanged()
+      ClipboardAutoselectChangeListener.onGlobalOptionChanged()
 
       // Listen for and initialise new editors
       EventFacade.getInstance()
@@ -310,6 +313,8 @@ object VimListenerManager {
       optionGroup.removeGlobalOptionChangeListener(Options.showmode, macroWidgetOptionListener)
       optionGroup.removeGlobalOptionChangeListener(Options.ideawindowjumps, WindowJumpsChangeListener)
       optionGroup.removeGlobalOptionChangeListener(IjOptions.ideaeditor, ConsoleOptionChangeListener)
+      optionGroup.removeGlobalOptionChangeListener(Options.clipboard, ClipboardAutoselectChangeListener)
+      ClipboardAutoselectChangeListener.restore()
 
       BufNewFileTracker.clear()
     }
