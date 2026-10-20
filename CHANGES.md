@@ -65,6 +65,8 @@ usual beta standards.
 * [VIM-4343](https://youtrack.jetbrains.com/issue/VIM-4343) Fixed `<Enter>` and `<Esc>` not working in popups such as the Recent Files switcher (`Cmd+E`/`Ctrl+E`) or Search Everywhere when no file is open. Mappings to IDE actions that start with Space, such as `map <leader>sf <Action>(GotoFile)` with `let mapleader = " "`, now also work in the Project tool window when no file is open, instead of Space opening a preview
 * [VIM-4329](https://youtrack.jetbrains.com/issue/VIM-4329) Fixed `set scrolloff=999` not keeping the caret in the middle of the screen. Typing in Insert mode no longer scrolls the editor when [sticky lines](https://www.jetbrains.com/help/idea/sticky-lines.html) are shown, `cc`, `3cc` and `S` no longer scroll the screen, and the caret no longer moves off screen with `j` when rendered doc comments or other block inlays take up most of the window
 * [VIM-3301](https://youtrack.jetbrains.com/issue/VIM-3301) Fixed the caret going under the [sticky lines](https://www.jetbrains.com/help/idea/sticky-lines.html) panel when moving up with `k` past the top of the screen
+* [VIM-2374](https://youtrack.jetbrains.com/issue/VIM-2374) In the `multiple-cursors` extension, `I` and `A` on occurrences selected with `<C-n>` now insert before or append after each selection, as in [vim-multiple-cursors](https://github.com/terryma/vim-multiple-cursors), instead of at the start or end of each line. `I` and `A` in plain Visual mode keep their Vim meaning, and your own mappings for them are not overridden
+* Fixed [`'langmap'`](https://vimhelp.org/options.txt.html#%27langmap%27) being applied twice to keys typed after the start of a mapping that did not match. With `set langmap=ig,gE` and a mapping starting with `g`, typing `ii` now runs `gg` instead of `gE`
 
 ### Merged PRs:
 * [2082](https://github.com/JetBrains/ideavim/pull/2082) by [1grzyb1](https://github.com/1grzyb1): VIM-748 changing multiple commands with |
@@ -81,7 +83,9 @@ usual beta standards.
 * [2117](https://github.com/JetBrains/ideavim/pull/2117) by [1grzyb1](https://github.com/1grzyb1): VIM-2293 Implement Vim visual multi plugin
 * [2119](https://github.com/JetBrains/ideavim/pull/2119) by [1grzyb1](https://github.com/1grzyb1): VIM-2524 calculate indent after cc
 * [2139](https://github.com/JetBrains/ideavim/pull/2139) by [1grzyb1](https://github.com/1grzyb1): VIM-4329 Fix issues with high scrolloff value
+* [2142](https://github.com/JetBrains/ideavim/pull/2142) by [1grzyb1](https://github.com/1grzyb1): VIM-2374 I and A move to begginig/end of multi selection
 * [2103](https://github.com/JetBrains/ideavim/pull/2103) by [citizenmatt](https://github.com/citizenmatt): Implement :function command to list functions
+* [2141](https://github.com/JetBrains/ideavim/pull/2141) by [citizenmatt](https://github.com/citizenmatt): Fix incorrect langmap when replaying failed map
 * [2086](https://github.com/JetBrains/ideavim/pull/2086) by [valis](https://github.com/valis): Don't treat quotes inside non-string tokens as string delimiters in %
 * [2035](https://github.com/JetBrains/ideavim/pull/2035) by [AndDe-gourav](https://github.com/AndDe-gourav): Todo removing not selecting new line char
 
