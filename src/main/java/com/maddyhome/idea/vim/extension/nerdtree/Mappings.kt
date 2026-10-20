@@ -9,6 +9,8 @@
 package com.maddyhome.idea.vim.extension.nerdtree
 
 import com.intellij.openapi.options.advanced.AdvancedSettings
+import com.intellij.ui.SpeedSearchBase
+import com.intellij.ui.speedSearch.SpeedSearchSupply
 import com.intellij.util.ui.tree.TreeUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
@@ -154,9 +156,10 @@ fun createNavigationMappings(): Map<List<KeyStroke>, NerdTreeAction> = mutableMa
   register("NERDTreeMapJumpNextSibling", "<C-J>", NerdTreeAction.swing("selectNextSibling"))
   register("NERDTreeMapJumpPrevSibling", "<C-K>", NerdTreeAction.swing("selectPreviousSibling"))
 
-  register("NERDTreeMapSpeedSearch", "/", NerdTreeAction { event, tree ->
+  register("NERDTreeMapSpeedSearch", "/", NerdTreeAction { _, tree ->
+    val speedSearch = SpeedSearchSupply.getSupply(tree, true) as? SpeedSearchBase<*> ?: return@NerdTreeAction
     armSelectionRestoreOnEscape(tree)
-    NerdTreeAction.callAction(null, "SpeedSearch")
+    speedSearch.showPopup()
   })
   register("<ESC>", NerdTreeAction { _, _ -> })
 }

@@ -15,6 +15,7 @@ import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.options.advanced.AdvancedSettings
 import com.intellij.testFramework.PlatformTestUtil
+import com.intellij.ui.TreeSpeedSearch
 import com.intellij.ui.treeStructure.Tree
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
@@ -84,6 +85,25 @@ class NerdTreeTest : VimTestCase() {
       PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
 
       assertEquals(pathB, tree.selectionPath, "ENTER after `/` speed search should keep the matched selection")
+    }
+  }
+
+  // `/` must open the speed search of the tree it was pressed in, also when the tree is not inside a tool window
+  // (e.g. the File Structure popup)
+  @Test
+  fun `test slash opens speed search of a tree outside of a tool window`() {
+    onEdt {
+      val tree = createSampleTree()
+      var shownPopups = 0
+      object : TreeSpeedSearch(tree, null as Void?) {
+        override fun showPopup(searchText: String?) {
+          shownPopups++
+        }
+      }.setupListeners()
+
+      tree.perform("/")
+
+      assertEquals(1, shownPopups, "`/` should open the speed search of the tree")
     }
   }
 
