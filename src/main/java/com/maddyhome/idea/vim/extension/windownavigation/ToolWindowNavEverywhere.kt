@@ -27,17 +27,20 @@ internal class ToolWindowNavEverywhere : VimExtension {
 
   override fun getName() = PLUGIN_NAME
 
+  private var registeredComponent: JComponent? = null
+
   val focusListener = PropertyChangeListener { evt ->
     val newFocusOwner = evt.newValue as? JComponent
-    val oldFocusOwner = evt.oldValue as? JComponent
     val dispatcher = service<ToolWindowNavDispatcher>()
+
+    // Unregister the component we registered on, even if its tool window was hidden in the meantime. Otherwise
+    // `<C-W>` stays captured there.
+    registeredComponent?.let { dispatcher.unregisterCustomShortcutSet(it) }
+    registeredComponent = null
 
     if (newFocusOwner != null && isInsideToolWindow(newFocusOwner) && !isPythonConsoleComponent(newFocusOwner)) {
       dispatcher.register(newFocusOwner)
-    }
-
-    if (oldFocusOwner != null && isInsideToolWindow(oldFocusOwner)) {
-      dispatcher.unregisterCustomShortcutSet(oldFocusOwner)
+      registeredComponent = newFocusOwner
     }
   }
 
@@ -49,6 +52,9 @@ internal class ToolWindowNavEverywhere : VimExtension {
   override fun dispose() {
     KeyboardFocusManager.getCurrentKeyboardFocusManager()
       .removePropertyChangeListener("focusOwner", focusListener)
+    // The focus listener is gone, so it can no longer unregister the shortcut from the focused component
+    registeredComponent?.let { service<ToolWindowNavDispatcher>().unregisterCustomShortcutSet(it) }
+    registeredComponent = null
     super.dispose()
   }
 
