@@ -1533,6 +1533,10 @@ zf                      Create a closed fold over the Visual selection.
 <C-E> <End>             In Command-line mode, move the cursor to the end of
                         the command line.
 
+                                                                    *c_CTRL-F*
+<C-F>                   Open the command-line window to edit the command line
+                        being typed.
+
                                                                     *c_CTRL-G*
 <C-G>                   While entering a search pattern with 'incsearch', move
                         to the next match.
