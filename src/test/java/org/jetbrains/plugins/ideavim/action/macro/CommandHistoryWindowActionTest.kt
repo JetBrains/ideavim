@@ -16,7 +16,9 @@ import com.maddyhome.idea.vim.api.VirtualBufferKind
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.helper.CmdwinKeys
+import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,6 +26,7 @@ import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class CommandHistoryWindowActionTest : VimTestCase() {
@@ -106,13 +109,7 @@ class CommandHistoryWindowActionTest : VimTestCase() {
       FileEditorManager.getInstance(fixture.project).openFiles.any { it.name == "[Command Line]" },
       "cmdwin should be closed after <CR>",
     )
-    assertFalse(
-      injector.optionGroup.getOptionValue(
-        injector.optionGroup.getOption("digraph")!!,
-        com.maddyhome.idea.vim.options.OptionAccessScope.EFFECTIVE(fixture.editor.vim),
-      ).toVimNumber().booleanValue,
-      "set nodigraph from the cmdwin should have been executed",
-    )
+    assertFalse(isDigraphEnabled(), "set nodigraph from the cmdwin should have been executed")
   }
 
   @Test
@@ -216,12 +213,91 @@ class CommandHistoryWindowActionTest : VimTestCase() {
   }
 
   @Test
+  fun `ctrl-f in command line opens command history window with the typed text as the last line`() {
+    enterCommand("set nodigraph")
+
+    typeText(":set dig<C-F>")
+
+    val cmdwin = openedCmdwin()
+    assertEquals(VirtualBufferKind.Command, cmdwin.getUserData(CmdwinKeys.KIND))
+    assertEquals("set nodigraph\nset dig", cmdwin.readContent())
+  }
+
+  @Test
+  fun `ctrl-f in forward search opens forward search history window with the typed pattern as the last line`() {
+    enterSearch("alpha")
+
+    typeText("/bra<C-F>")
+
+    val cmdwin = openedCmdwin()
+    assertEquals(VirtualBufferKind.Search(Direction.FORWARDS), cmdwin.getUserData(CmdwinKeys.KIND))
+    assertEquals("alpha\nbra", cmdwin.readContent())
+  }
+
+  @Test
+  fun `ctrl-f in backward search opens backward search history window`() {
+    typeText("?bra<C-F>")
+
+    val cmdwin = openedCmdwin()
+    assertEquals(VirtualBufferKind.Search(Direction.BACKWARDS), cmdwin.getUserData(CmdwinKeys.KIND))
+    assertEquals("bra", cmdwin.readContent())
+  }
+
+  @Test
+  fun `ctrl-f closes the command line and does not add the typed text to history`() {
+    typeText(":set dig<C-F>")
+
+    openedCmdwin()
+    assertNull(injector.commandLine.getActiveCommandLine())
+    assertTrue(injector.historyGroup.getEntries(VimHistory.Type.Command, 0, 0).isEmpty())
+  }
+
+  // Like Vim, the cursor goes to the last line, on the character before the command line cursor (`:help c_CTRL-F`)
+  @Test
+  fun `ctrl-f puts the cursor on the last line before the command line cursor`() {
+    enterCommand("set nodigraph")
+
+    typeText(":abcdef<Left><Left><C-F>")
+
+    assertEquals("set nodigraph\n".length + "abc".length, caretOffsetIn(openedCmdwin()))
+  }
+
+  @Test
+  fun `enter on the line opened by ctrl-f executes it against the original editor`() {
+    enterCommand("set digraph")
+
+    typeText(":set nodigraph<C-F>")
+    typeInCmdwin(openedCmdwin(), "<CR>")
+
+    assertEquals(0, openCmdwinCount(), "cmdwin should be closed after <CR>")
+    assertFalse(isDigraphEnabled(), "set nodigraph from the cmdwin should have been executed")
+  }
+
+  @Test
   fun `qa still starts macro recording`() {
     typeText("qa")
     assertTrue(injector.registerGroup.isRecording)
     typeText("q")
     assertFalse(injector.registerGroup.isRecording)
   }
+
+  private fun typeInCmdwin(cmdwin: VirtualFile, keys: String) {
+    ApplicationManager.getApplication().invokeAndWait {
+      VimTestCase.typeText(injector.parser.parseKeys(keys), openTextEditor(cmdwin), fixture.project)
+    }
+  }
+
+  private fun caretOffsetIn(file: VirtualFile): Int {
+    var offset = -1
+    ApplicationManager.getApplication().invokeAndWait { offset = openTextEditor(file).caretModel.offset }
+    return offset
+  }
+
+  private fun isDigraphEnabled(): Boolean =
+    injector.optionGroup.getOptionValue(
+      injector.optionGroup.getOption("digraph")!!,
+      OptionAccessScope.EFFECTIVE(fixture.editor.vim),
+    ).toVimNumber().booleanValue
 
   private fun openCmdwinCount(): Int =
     FileEditorManager.getInstance(fixture.project).openFiles

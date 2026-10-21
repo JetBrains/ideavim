@@ -237,6 +237,11 @@
   },
   {
     "keys": "<C-F>",
+    "class": "com.maddyhome.idea.vim.action.ex.OpenCommandLineWindowAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-F>",
     "class": "com.maddyhome.idea.vim.action.lookup.CycleFilePathCompletionLookupAction",
     "modes": "I",
     "lookup": true

@@ -22,6 +22,7 @@ interface VirtualBufferGroup {
    * substitute preview is transient and does not participate in that restriction.
    *
    * @param focus when false, the buffer is shown without stealing focus (used by `inccommand=split`).
+   * @return the editor hosting the opened buffer, or null if it wasn't opened or was opened without focus.
    */
   fun open(
     context: ExecutionContext,
@@ -29,7 +30,7 @@ interface VirtualBufferGroup {
     kind: VirtualBufferKind,
     content: String,
     focus: Boolean = true,
-  )
+  ): VimEditor?
 
   /** Closes the virtual buffer hosted in [editor] (typically the cmdwin editor itself). */
   fun close(editor: VimEditor)
