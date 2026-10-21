@@ -7,6 +7,7 @@
  */
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.common.Direction
 
 /**
@@ -19,6 +20,9 @@ interface SearchWindowGroup {
 
   /** `q/` and `q?` — open the cmdwin populated with `/` search history. */
   fun openSearchHistoryWindow(editor: VimEditor, context: ExecutionContext, direction: Direction)
+
+  /** `c_CTRL-F` — open the cmdwin with the history of [commandLine]'s type, and what was typed in it as the last line. */
+  fun openFromCommandLine(editor: VimEditor, context: ExecutionContext, commandLine: Argument.ExString)
 
   /**
    * Closes the cmdwin and runs the line at the caret against the editor that was active

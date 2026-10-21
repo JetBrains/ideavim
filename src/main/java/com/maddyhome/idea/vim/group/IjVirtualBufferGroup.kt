@@ -38,10 +38,12 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
     kind: VirtualBufferKind,
     content: String,
     focus: Boolean,
-  ) {
-    if (kind != VirtualBufferKind.SubstitutePreview && refuseIfAlreadyOpen(context, editor)) return
-    val project = projectOf(context) ?: (editor as IjVimEditor).editor.project ?: return
-    showFile(project, createBufferFile(editor, kind, content), kind, focus)
+  ): VimEditor? {
+    if (kind != VirtualBufferKind.SubstitutePreview && refuseIfAlreadyOpen(context, editor)) return null
+    val project = projectOf(context) ?: (editor as IjVimEditor).editor.project ?: return null
+    val file = createBufferFile(editor, kind, content)
+    showFile(project, file, kind, focus)
+    return if (focus) focusedEditorOf(project, file) else null
   }
 
   override fun close(editor: VimEditor) {
@@ -80,7 +82,7 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
 
     // Like in Vim, this moves to the window that already shows the help instead of opening it once more. It also waits
     // for the editor of a just opened split to be created.
-    val helpEditor = fem.openFile(file, true, true).filterIsInstance<TextEditor>().firstOrNull()?.editor?.vim ?: return
+    val helpEditor = focusedEditorOf(project, file) ?: return
     helpEditor.primaryCaret().moveToOffset(helpEditor.getLineStartOffset(line))
     // `:help` shows the tag at the top of the window
     injector.scroll.scrollCurrentLineToDisplayTop(helpEditor, line + 1, false)
@@ -133,6 +135,11 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
         .forEach { (it.editor as? EditorEx)?.isViewer = true }
     }
   }
+
+  /** Also waits for the editor of a just opened split to be created */
+  private fun focusedEditorOf(project: Project, file: VirtualFile): VimEditor? =
+    FileEditorManagerEx.getInstanceEx(project).openFile(file, true, true)
+      .filterIsInstance<TextEditor>().firstOrNull()?.editor?.vim
 
   private fun openSplitFile(
     fem: FileEditorManagerEx,
