@@ -9,8 +9,13 @@
 package org.jetbrains.plugins.ideavim.action.macro
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent
+import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.fileEditor.TextEditor
+import com.intellij.openapi.fileEditor.ex.FileEditorWithProvider
+import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider
 import com.intellij.openapi.vfs.VirtualFile
 import com.maddyhome.idea.vim.api.VirtualBufferKind
 import com.maddyhome.idea.vim.api.injector
@@ -273,6 +278,23 @@ class CommandHistoryWindowActionTest : VimTestCase() {
     assertFalse(isDigraphEnabled(), "set nodigraph from the cmdwin should have been executed")
   }
 
+  // Closing the cmdwin moves the selection back to the original editor, but the platform reports that asynchronously,
+  // after the command has already run, and in two steps: from the cmdwin to no editor, and then to the original editor.
+  // The redraw for these selection changes must not close the command's output
+  @Test
+  fun `selection change from closing the cmdwin keeps the output of the executed command`() {
+    typeText(":echo 'hello'<C-F>")
+    val cmdwin = openedCmdwin()
+
+    val cmdwinEditor = selectedFileEditor(cmdwin)
+    typeInCmdwin(cmdwin, "<CR>")
+
+    fireSelectionChanged(from = cmdwinEditor, to = null)
+    fireSelectionChanged(from = null, to = selectedFileEditor(fixture.file.virtualFile))
+
+    assertExOutput("hello")
+  }
+
   @Test
   fun `qa still starts macro recording`() {
     typeText("qa")
@@ -298,6 +320,22 @@ class CommandHistoryWindowActionTest : VimTestCase() {
       injector.optionGroup.getOption("digraph")!!,
       OptionAccessScope.EFFECTIVE(fixture.editor.vim),
     ).toVimNumber().booleanValue
+
+  private fun selectedFileEditor(file: VirtualFile): FileEditor =
+    FileEditorManager.getInstance(fixture.project).getSelectedEditor(file)!!
+
+  /** Sends the selection change in its own EDT event, the way the platform does */
+  private fun fireSelectionChanged(from: FileEditor?, to: FileEditor?) {
+    val provider = TextEditorProvider.getInstance()
+    val event = FileEditorManagerEvent(
+      FileEditorManager.getInstance(fixture.project),
+      from?.let { FileEditorWithProvider(it, provider) },
+      to?.let { FileEditorWithProvider(it, provider) },
+    )
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.project.messageBus.syncPublisher(FileEditorManagerListener.FILE_EDITOR_MANAGER).selectionChanged(event)
+    }
+  }
 
   private fun openCmdwinCount(): Int =
     FileEditorManager.getInstance(fixture.project).openFiles

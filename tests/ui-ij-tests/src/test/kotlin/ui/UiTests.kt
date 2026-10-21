@@ -100,6 +100,7 @@ class UiTests {
       testMilticaretEnterInSelectMode(editor)
       reenableIdeaVim(editor)
       reenablingIdeaVimKeepsMappings(editor)
+      testEchoFromCommandLineWindow()
 
       createFile("MyTest.java", this@uiTest)
       val javaEditor = editor("MyTest.java") {
@@ -394,6 +395,36 @@ class UiTests {
 
     vimExit()
   }
+
+  // VIM-2200
+  private fun IdeaFrame.testEchoFromCommandLineWindow() {
+    println("Run testEchoFromCommandLineWindow...")
+
+    keyboard {
+      escape()
+      enterText(":echo 'from cmdwin'")
+      hotKey(KeyEvent.VK_CONTROL, KeyEvent.VK_F)
+    }
+    val cmdwin = editor("[Command Line]")
+    waitFor { cmdwin.text.endsWith("echo 'from cmdwin'") }
+
+    keyboard { enter() }
+
+    // The platform reports the selection changes from closing the cmdwin after the command has already shown its
+    // output. Their redraw used to close that output right away, so check that it's still there a moment later
+    waitFor { isOutputShown("from cmdwin") }
+    Thread.sleep(1000)
+    assertTrue(isOutputShown("from cmdwin"))
+
+    keyboard { escape() }
+    waitFor { !isOutputShown("from cmdwin") }
+    vimExit()
+  }
+
+  private fun IdeaFrame.isOutputShown(text: String): Boolean =
+    findAll<ComponentFixture>(
+      byXpath("//div[@class='OutputPanel']//div[@class='JTextPane' and @visible_text='$text']"),
+    ).isNotEmpty()
 
   // VIM-4172
   private fun IdeaFrame.testVisualSort(editor: Editor) {
