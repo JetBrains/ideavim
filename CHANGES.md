@@ -37,6 +37,7 @@ usual beta standards.
 * [VIM-2293](https://youtrack.jetbrains.com/issue/VIM-2293) New `visual-multi` extension emulates [vim-visual-multi](https://github.com/mg979/vim-visual-multi) using the IDE's native carets. Enable it with `Plug 'mg979/vim-visual-multi'`. Press `<C-n>` to select the word under the cursor and add its next occurrence, `\\A` to select all occurrences, or `<C-Down>`/`<C-Up>` to add cursors on the lines below/above. During a session, `n`/`N` find the next/previous occurrence, `q`/`Q` skip or remove a region, `<Tab>` switches between regions and cursors, and `\\z`, `\\@`, `\\C` and `\\a` run a `:normal` command, run a macro, convert case and align the cursors. Keys can be changed with `g:VM_maps` and `g:VM_leader`. See the [documentation](https://github.com/JetBrains/ideavim/blob/master/doc/IdeaVim%20Plugins.md) for all keys and options
 * Added the [`:function`](https://vimhelp.org/userfunc.txt.html#%3Afunction) command for listing user-defined functions. `:function` lists every global function with its arguments and flags. `:function MyFunc` shows a single function, and `:function /pattern` lists the functions whose names match the pattern
 * [VIM-1975](https://youtrack.jetbrains.com/issue/VIM-1975) New `clever-f` extension emulates [clever-f.vim](https://github.com/rhysd/clever-f.vim). Enable it with `Plug 'rhysd/clever-f.vim'`. After `f{char}`, pressing `f` again jumps to the next `{char}` and `F` to the previous one, so `;` and `,` are not needed. The same works for `F`, `t` and `T`. Searches cross line boundaries, and the characters the search can jump to on the cursor line are highlighted. Behaviour can be changed with `g:clever_f_*` variables such as `g:clever_f_smart_case` or `g:clever_f_across_no_line`. See the [documentation](https://github.com/JetBrains/ideavim/blob/master/doc/IdeaVim%20Plugins.md) for all options
+* [VIM-3113](https://youtrack.jetbrains.com/issue/VIM-3113) Added the `autoselect` flag of the [`'clipboard'`](https://vimhelp.org/options.txt.html#%27clipboard%27) option. It is on by default; `:set clipboard-=autoselect` stops Visual and mouse selections from being copied to the X11 PRIMARY selection (the `*` register)
 
 ### Fixes:
 
@@ -67,6 +68,8 @@ usual beta standards.
 * [VIM-3301](https://youtrack.jetbrains.com/issue/VIM-3301) Fixed the caret going under the [sticky lines](https://www.jetbrains.com/help/idea/sticky-lines.html) panel when moving up with `k` past the top of the screen
 * [VIM-2374](https://youtrack.jetbrains.com/issue/VIM-2374) In the `multiple-cursors` extension, `I` and `A` on occurrences selected with `<C-n>` now insert before or append after each selection, as in [vim-multiple-cursors](https://github.com/terryma/vim-multiple-cursors), instead of at the start or end of each line. `I` and `A` in plain Visual mode keep their Vim meaning, and your own mappings for them are not overridden
 * Fixed [`'langmap'`](https://vimhelp.org/options.txt.html#%27langmap%27) being applied twice to keys typed after the start of a mapping that did not match. With `set langmap=ig,gE` and a mapping starting with `g`, typing `ii` now runs `gg` instead of `gE`
+* [VIM-1309](https://youtrack.jetbrains.com/issue/VIM-1309) Middle-click paste on Linux (X11) in Insert mode now pastes the `*` register at the caret, as in Vim, instead of moving the caret to the mouse position first
+* [VIM-4269](https://youtrack.jetbrains.com/issue/VIM-4269) Fixed `/` in [NERDTree](https://github.com/JetBrains/ideavim/blob/master/doc/NERDTree-support.md) not opening speed search in trees outside tool windows, such as the File Structure popup
 
 ### Merged PRs:
 * [2082](https://github.com/JetBrains/ideavim/pull/2082) by [1grzyb1](https://github.com/1grzyb1): VIM-748 changing multiple commands with |
@@ -84,6 +87,9 @@ usual beta standards.
 * [2119](https://github.com/JetBrains/ideavim/pull/2119) by [1grzyb1](https://github.com/1grzyb1): VIM-2524 calculate indent after cc
 * [2139](https://github.com/JetBrains/ideavim/pull/2139) by [1grzyb1](https://github.com/1grzyb1): VIM-4329 Fix issues with high scrolloff value
 * [2142](https://github.com/JetBrains/ideavim/pull/2142) by [1grzyb1](https://github.com/1grzyb1): VIM-2374 I and A move to begginig/end of multi selection
+* [2143](https://github.com/JetBrains/ideavim/pull/2143) by [1grzyb1](https://github.com/1grzyb1): VIM-1309 Don't move caret on middle paste in x11
+* [2146](https://github.com/JetBrains/ideavim/pull/2146) by [1grzyb1](https://github.com/1grzyb1): VIM-3113 support autoselect option
+* [2147](https://github.com/JetBrains/ideavim/pull/2147) by [1grzyb1](https://github.com/1grzyb1): VIM-4269 speed search on popups with nerdtree
 * [2103](https://github.com/JetBrains/ideavim/pull/2103) by [citizenmatt](https://github.com/citizenmatt): Implement :function command to list functions
 * [2141](https://github.com/JetBrains/ideavim/pull/2141) by [citizenmatt](https://github.com/citizenmatt): Fix incorrect langmap when replaying failed map
 * [2086](https://github.com/JetBrains/ideavim/pull/2086) by [valis](https://github.com/valis): Don't treat quotes inside non-string tokens as string delimiters in %
