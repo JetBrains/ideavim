@@ -12,35 +12,28 @@ package com.maddyhome.idea.vim.api
  * The quickfix list: places filled by a command like `:Ggrep` and walked with `:cnext`.
  *
  * Like Vim, there is a single list for the whole application, and it is not persisted.
+ * Every jump records the position it leaves in the jump list.
  */
 interface QuickFixService {
-  val size: Int
-
   /**
-   * 0-based index of the current item. Meaningless while the list is empty.
-   */
-  val currentIndex: Int
-
-  val currentItem: QuickFixItem?
-
-  /**
-   * Replaces the list and makes its first item current.
+   * Replaces the list. Its first item becomes the current one, without jumping to it.
    */
   fun replaceList(items: List<QuickFixItem>)
 
   /**
-   * Moves up to [count] items forward, stopping at the last one.
-   *
-   * @return false if the current item already is the last one
+   * Jumps to the first item, like `:cfirst`.
    */
-  fun moveForward(count: Int): Boolean
+  fun jumpToFirst(editor: VimEditor): QuickFixJump
 
   /**
-   * Opens the file of the current item and puts the caret on it, recording a jump first.
-   *
-   * @return the editor showing the item, or null if there is no current item or its file can't be opened
+   * Jumps [count] items forward, like `:cnext`. A count past the end stops at the last item.
    */
-  fun jumpToCurrentItem(editor: VimEditor): VimEditor?
+  fun jumpForward(editor: VimEditor, count: Int): QuickFixJump
+
+  /**
+   * Jumps [count] items backward, like `:cprevious`. A count past the start stops at the first item.
+   */
+  fun jumpBackward(editor: VimEditor, count: Int): QuickFixJump
 
   fun reset()
 }
@@ -51,3 +44,21 @@ interface QuickFixService {
  * @param text the text shown for the item, e.g. the matching line
  */
 data class QuickFixItem(val line: Int, val col: Int, val filepath: String, val protocol: String, val text: String)
+
+sealed interface QuickFixJump {
+  data object EmptyList : QuickFixJump
+
+  /**
+   * The current item already is the last one (or the first one, when going backward).
+   */
+  data object NoMoreItems : QuickFixJump
+
+  /**
+   * [item] became the current one.
+   *
+   * @param editor the editor showing [item], or null if its file couldn't be opened
+   * @param number 1-based position of [item] in the list
+   * @param size number of items in the list
+   */
+  data class Moved(val editor: VimEditor?, val item: QuickFixItem, val number: Int, val size: Int) : QuickFixJump
+}
