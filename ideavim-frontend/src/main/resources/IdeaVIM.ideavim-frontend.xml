@@ -350,6 +350,14 @@
       </aliases>
     </vimExtension>
 
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.fugitive.FugitiveExtension" name="fugitive">
+      <aliases>
+        <alias name="https://github.com/tpope/vim-fugitive"/>
+        <alias name="tpope/vim-fugitive"/>
+        <alias name="vim-fugitive"/>
+      </aliases>
+    </vimExtension>
+
     <vimExtension implementation="com.maddyhome.idea.vim.extension.visualstarsearch.VisualStarSearchExtension"
                   name="visual-star-search">
       <aliases>

@@ -56,6 +56,11 @@
          core (<=2026.1). loading="optional" so an unmet dependency is a clean skip. -->
     <module name="IdeaVIM.ideavim-backend-bookmarks" loading="optional"/>
     <module name="IdeaVIM.ideavim-backend-bookmarks-core" loading="optional"/>
+    <!-- Two variants of the Git plugin integration, see GitPluginExecutableLocator:
+         -git depends on intellij.vcs.git.backend (newer IDEs), -git-legacy on the Git4Idea plugin (2026.1).
+         loading="optional" so an IDE without the Git plugin is a clean skip. -->
+    <module name="IdeaVIM.ideavim-backend-git" loading="optional"/>
+    <module name="IdeaVIM.ideavim-backend-git-legacy" loading="optional"/>
     <module name="IdeaVIM.ideavim-acejump"/>
     <module name="IdeaVIM.ideavim-rider"/>
     <module name="IdeaVIM.ideavim-clion-nova"/>

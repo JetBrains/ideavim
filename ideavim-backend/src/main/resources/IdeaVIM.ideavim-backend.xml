@@ -12,6 +12,12 @@
     <module name="IdeaVIM.ideavim-common"/>
   </dependencies>
 
+  <extensionPoints>
+    <!-- Implemented by ideavim-backend-git when the Git plugin is available -->
+    <extensionPoint interface="com.maddyhome.idea.vim.group.git.GitExecutableLocator" dynamic="true"
+                    name="gitExecutableLocator"/>
+  </extensionPoints>
+
   <!-- Backend registrations: IdeDocumentHistory, Bookmarks, ProjectView, PSI.
        These load in backend + monolith mode only. -->
 
@@ -24,6 +30,8 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.process.ProcessGroup"/>
+    <projectService serviceInterface="com.maddyhome.idea.vim.group.git.GitClient"
+                    serviceImplementation="com.maddyhome.idea.vim.group.git.GitCliClient"/>
 
     <!-- RPC: expose ProcessGroup to thin-client frontend -->
     <platform.rpc.backend.remoteApiProvider
@@ -40,6 +48,10 @@
     <!-- RPC: expose commenting operations to thin-client frontend -->
     <platform.rpc.backend.remoteApiProvider
         implementation="com.maddyhome.idea.vim.group.comment.CommentaryRemoteApiProvider"/>
+
+    <!-- RPC: expose project-wide text search (:Ggrep) to thin-client frontend -->
+    <platform.rpc.backend.remoteApiProvider
+        implementation="com.maddyhome.idea.vim.group.grep.GrepRemoteApiProvider"/>
 
     <!-- RPC: expose format/auto-indent operations to thin-client frontend -->
     <platform.rpc.backend.remoteApiProvider
