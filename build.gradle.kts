@@ -130,6 +130,8 @@ dependencies {
     pluginModule(runtimeOnly(project(":ideavim-backend")))
     pluginModule(runtimeOnly(project(":ideavim-backend-bookmarks")))
     pluginModule(runtimeOnly(project(":ideavim-backend-bookmarks-core")))
+    pluginModule(runtimeOnly(project(":ideavim-backend-git")))
+    pluginModule(runtimeOnly(project(":ideavim-backend-git-legacy")))
     pluginModule(runtimeOnly(project(":ideavim-acejump")))
     pluginModule(runtimeOnly(project(":ideavim-rider")))
     pluginModule(runtimeOnly(project(":ideavim-clion-nova")))
