@@ -181,6 +181,8 @@ interface VimInjector {
 
   /** Opens the URL or file under the cursor for the `gx` command. See [VimExternalOpener]. */
   val externalOpener: VimExternalOpener
+
+  val quickFixService: QuickFixService
 }
 
 lateinit var injector: VimInjector

@@ -8,46 +8,18 @@
 
 package org.jetbrains.plugins.ideavim.extension.fugitive
 
-import com.intellij.openapi.Disposable
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.LogicalPosition
-import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.testFramework.junit5.TestDisposable
-import com.intellij.testFramework.replaceService
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.group.git.GitClient
 import com.maddyhome.idea.vim.group.git.GitExecutableStatus
 import com.maddyhome.idea.vim.group.git.GitOutput
-import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 /**
  * Behaviour spec for `:Ggrep`, modelled on tpope/vim-fugitive (`s:GrepSubcommand`
  * in `autoload/fugitive.vim`). `:Ggrep {args}` runs `git grep {args}` in the work tree
  * of the current file and jumps to the first match (`:cfirst`); `:Ggrep!` doesn't jump.
- *
- * Git is replaced with [FakeGitClient], so each test states what git would print.
- * The fake work tree is `/src`, where the light fixture puts its files.
  */
-class FugitiveGrepTest : VimTestCase() {
-
-  @TestDisposable
-  lateinit var disposable: Disposable
-
-  private val git = FakeGitClient()
-
-  @BeforeEach
-  override fun setUp(testInfo: TestInfo) {
-    super.setUp(testInfo)
-    fixture.project.replaceService(GitClient::class.java, git, disposable)
-    enableExtensions("fugitive")
-  }
+class FugitiveGrepTest : FugitiveTestCase() {
 
   @Test
   fun `test Ggrep runs git grep in work tree`() {
@@ -253,34 +225,5 @@ class FugitiveGrepTest : VimTestCase() {
 
     assertPluginError(true)
     assertPluginErrorMessage("E492: Not an editor command: Ggrep foo")
-  }
-
-  private fun addFile(path: String, content: String) {
-    ApplicationManager.getApplication().invokeAndWait {
-      fixture.addFileToProject(path, content)
-    }
-  }
-
-  /**
-   * [typeText] types into the editor the test was configured with, which is no longer selected after a jump.
-   */
-  private fun typeInCurrentEditor(keys: String) {
-    ApplicationManager.getApplication().invokeAndWait {
-      typeText(currentEditor(), injector.parser.parseKeys(keys))
-    }
-  }
-
-  private fun currentEditor(): Editor {
-    val editor = FileEditorManager.getInstance(fixture.project).selectedTextEditor
-    assertNotNull(editor, "No editor is selected")
-    return editor
-  }
-
-  private fun assertCurrentFile(name: String) {
-    assertEquals(name, currentEditor().virtualFile?.name)
-  }
-
-  private fun assertCurrentPosition(line: Int, column: Int) {
-    assertEquals(LogicalPosition(line, column), currentEditor().caretModel.logicalPosition)
   }
 }

@@ -10,8 +10,8 @@ package com.maddyhome.idea.vim.extension.fugitive
 
 import com.intellij.platform.project.projectId
 import com.intellij.util.execution.ParametersListUtil
-import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.QuickFixItem
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CommandAliasHandler
@@ -34,9 +34,15 @@ internal class GrepCommand : CommandAliasHandler {
 
     val errorMessage = result.errorMessage
     if (errorMessage != null) {
+      // Like fugitive when git or the repository is missing, keep the previous quickfix list.
+      // When git itself fails, fugitive lists its error lines instead, which isn't supported yet.
       injector.messages.showErrorMessage(editor, errorMessage)
-    } else if (invocation.jumpToFirstMatch) {
-      result.matches.firstOrNull()?.let { jumpTo(editor, it) }
+      return
+    }
+    injector.quickFixService.replaceList(result.matches.map { it.toQuickFixItem() })
+    if (invocation.jumpToFirstMatch) {
+      // fugitive runs `silent cfirst`, so no "(1 of N)" message
+      injector.quickFixService.jumpToCurrentItem(editor)
     }
   }
 
@@ -46,16 +52,9 @@ internal class GrepCommand : CommandAliasHandler {
       GrepRemoteApi.getInstance().grep(project.projectId(), editor.getPath(), editor.extractProtocol(), gitArgs)
     }
   }
-
-  /**
-   * Like `:cfirst`, remembers the current position in the jump list first.
-   */
-  private fun jumpTo(editor: VimEditor, match: GrepMatch) {
-    injector.jumpService.saveJumpLocation(editor)
-    val target = injector.file.selectEditor(editor.projectId, match.filepath, match.protocol) ?: return
-    target.currentCaret().moveToOffset(target.bufferPositionToOffset(BufferPosition(match.line, match.col)))
-  }
 }
+
+private fun GrepMatch.toQuickFixItem() = QuickFixItem(line, col, filepath, protocol, text)
 
 /**
  * The parsed `:Ggrep[!] {args}` command line.
