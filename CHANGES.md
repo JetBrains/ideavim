@@ -38,6 +38,7 @@ usual beta standards.
 * Added the [`:function`](https://vimhelp.org/userfunc.txt.html#%3Afunction) command for listing user-defined functions. `:function` lists every global function with its arguments and flags. `:function MyFunc` shows a single function, and `:function /pattern` lists the functions whose names match the pattern
 * [VIM-1975](https://youtrack.jetbrains.com/issue/VIM-1975) New `clever-f` extension emulates [clever-f.vim](https://github.com/rhysd/clever-f.vim). Enable it with `Plug 'rhysd/clever-f.vim'`. After `f{char}`, pressing `f` again jumps to the next `{char}` and `F` to the previous one, so `;` and `,` are not needed. The same works for `F`, `t` and `T`. Searches cross line boundaries, and the characters the search can jump to on the cursor line are highlighted. Behaviour can be changed with `g:clever_f_*` variables such as `g:clever_f_smart_case` or `g:clever_f_across_no_line`. See the [documentation](https://github.com/JetBrains/ideavim/blob/master/doc/IdeaVim%20Plugins.md) for all options
 * [VIM-3113](https://youtrack.jetbrains.com/issue/VIM-3113) Added the `autoselect` flag of the [`'clipboard'`](https://vimhelp.org/options.txt.html#%27clipboard%27) option. It is on by default; `:set clipboard-=autoselect` stops Visual and mouse selections from being copied to the X11 PRIMARY selection (the `*` register)
+* [VIM-2200](https://youtrack.jetbrains.com/issue/VIM-2200) [`<C-F>`](https://vimhelp.org/cmdline.txt.html#c_CTRL-F) in the command line or in a `/` or `?` search now opens the [command-line window](https://vimhelp.org/cmdline.txt.html#cmdline-window) with the text typed so far as its last line, so a long command or pattern can be edited with Normal mode motions. Press `<CR>` on a line to run it
 
 ### Fixes:
 
@@ -89,6 +90,7 @@ usual beta standards.
 * [2142](https://github.com/JetBrains/ideavim/pull/2142) by [1grzyb1](https://github.com/1grzyb1): VIM-2374 I and A move to begginig/end of multi selection
 * [2143](https://github.com/JetBrains/ideavim/pull/2143) by [1grzyb1](https://github.com/1grzyb1): VIM-1309 Don't move caret on middle paste in x11
 * [2146](https://github.com/JetBrains/ideavim/pull/2146) by [1grzyb1](https://github.com/1grzyb1): VIM-3113 support autoselect option
+* [2149](https://github.com/JetBrains/ideavim/pull/2149) by [1grzyb1](https://github.com/1grzyb1): VIM-2200 Open the command-line window with <C-F> from the command line
 * [2147](https://github.com/JetBrains/ideavim/pull/2147) by [1grzyb1](https://github.com/1grzyb1): VIM-4269 speed search on popups with nerdtree
 * [2103](https://github.com/JetBrains/ideavim/pull/2103) by [citizenmatt](https://github.com/citizenmatt): Implement :function command to list functions
 * [2141](https://github.com/JetBrains/ideavim/pull/2141) by [citizenmatt](https://github.com/citizenmatt): Fix incorrect langmap when replaying failed map
