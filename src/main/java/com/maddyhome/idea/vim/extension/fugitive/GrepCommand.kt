@@ -42,7 +42,7 @@ internal class GrepCommand : CommandAliasHandler {
     injector.quickFixService.replaceList(result.matches.map { it.toQuickFixItem() })
     if (invocation.jumpToFirstMatch) {
       // fugitive runs `silent cfirst`, so no "(1 of N)" message
-      injector.quickFixService.jumpToCurrentItem(editor)
+      injector.quickFixService.jumpToFirst(editor)
     }
   }
 

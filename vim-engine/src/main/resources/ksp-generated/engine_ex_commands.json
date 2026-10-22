@@ -65,6 +65,9 @@
   "bro[wse]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.EditFileCommand"
   },
+  "cN[ext]": {
+    "className": "com.maddyhome.idea.vim.vimscript.model.commands.quickfix.CpreviousCommand"
+  },
   "ca[bbrev]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.AbbrevCommand"
   },
@@ -104,6 +107,9 @@
   },
   "comc[lear]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.CmdClearCommand"
+  },
+  "cp[revious]": {
+    "className": "com.maddyhome.idea.vim.vimscript.model.commands.quickfix.CpreviousCommand"
   },
   "cu[nmap]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.UnMapCommand"
