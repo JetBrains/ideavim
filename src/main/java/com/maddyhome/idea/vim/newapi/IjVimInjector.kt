@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.api.EngineEditorHelper
 import com.maddyhome.idea.vim.api.ExecutionContextManager
 import com.maddyhome.idea.vim.api.LocalOptionInitialisationScenario
 import com.maddyhome.idea.vim.api.NativeActionManager
+import com.maddyhome.idea.vim.api.QuickFixService
 import com.maddyhome.idea.vim.api.SearchWindowGroup
 import com.maddyhome.idea.vim.api.SpellcheckerService
 import com.maddyhome.idea.vim.api.SystemInfoService
@@ -247,6 +248,8 @@ internal class IjVimInjector : VimInjectorBase() {
   override val pluginActivator: VimPluginActivator
     get() = service()
   override val externalOpener: VimExternalOpener
+    get() = service()
+  override val quickFixService: QuickFixService
     get() = service()
 
   override val autoCmd: AutoCmdService get() = service<AutoCmdService>()

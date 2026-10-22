@@ -239,6 +239,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     VimPlugin.getRegister().resetRegisters()
     (VimPlugin.getSearch() as VimSearchGroupBase).resetState()
     injector.markService.resetAllMarks()
+    injector.quickFixService.reset()
     injector.jumpService.resetJumps()
     injector.tagService.resetTagStacks()
     ApplicationManager.getApplication()

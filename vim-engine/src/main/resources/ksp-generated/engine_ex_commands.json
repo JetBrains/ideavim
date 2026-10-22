@@ -86,6 +86,9 @@
   "cmapc[lear]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapClearCommand"
   },
+  "cn[ext]": {
+    "className": "com.maddyhome.idea.vim.vimscript.model.commands.quickfix.CnextCommand"
+  },
   "cno[remap]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand"
   },
