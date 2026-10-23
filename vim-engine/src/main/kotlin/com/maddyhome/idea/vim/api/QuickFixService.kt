@@ -37,6 +37,12 @@ interface QuickFixService {
   fun jumpBackward(editor: VimEditor, count: Int): QuickFixJump
 
   /**
+   * Jumps to the first item of the [count]th next file, like `:cnfile`. A count past the last
+   * file stops at the first item of the last file.
+   */
+  fun jumpToNextFile(editor: VimEditor, count: Int): QuickFixJump
+
+  /**
    * Forgets the list of a project, e.g. when it's closed.
    */
   fun removeList(projectId: String)

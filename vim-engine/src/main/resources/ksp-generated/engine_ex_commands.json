@@ -92,6 +92,9 @@
   "cn[ext]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.quickfix.CnextCommand"
   },
+  "cnf[ile]": {
+    "className": "com.maddyhome.idea.vim.vimscript.model.commands.quickfix.CnfileCommand"
+  },
   "cno[remap]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand"
   },
