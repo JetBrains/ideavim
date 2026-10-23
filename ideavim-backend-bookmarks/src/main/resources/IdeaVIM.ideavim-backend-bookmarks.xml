@@ -20,7 +20,6 @@
 <idea-plugin>
   <dependencies>
     <module name="intellij.platform.backend"/>
-    <module name="intellij.platform.kernel.backend"/>
     <module name="IdeaVIM.ideavim-common"/>
     <module name="intellij.platform.bookmarks"/>
   </dependencies>

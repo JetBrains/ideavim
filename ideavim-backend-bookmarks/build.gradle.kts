@@ -60,7 +60,6 @@ dependencies {
 
     create(ideaType, ideaVersion) { this.useInstaller = useInstaller }
 
-    bundledModule("intellij.platform.kernel.backend")
     bundledModule("intellij.platform.rpc.backend")
     if (bookmarksIsSeparatePlugin) bundledModule("intellij.platform.bookmarks")
   }
