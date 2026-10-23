@@ -138,7 +138,6 @@ dependencies {
 
     bundledModule("intellij.spellchecker")
     if (bookmarksIsSeparatePlugin) bundledPlugin("intellij.bookmarks.plugin")
-    bundledModule("intellij.platform.kernel.impl")
   }
 
   moduleSources(project(":vim-engine", "sourcesJarArtifacts"))
