@@ -30,6 +30,8 @@
               topic="com.intellij.ide.plugins.DynamicPluginListener"/>
     <listener class="com.maddyhome.idea.vim.PyNotebooksCloseWorkaround"
               topic="com.intellij.openapi.project.ProjectManagerListener"/>
+    <listener class="com.maddyhome.idea.vim.group.QuickFixProjectCloseListener"
+              topic="com.intellij.openapi.project.ProjectManagerListener"/>
     <listener class="com.maddyhome.idea.vim.ui.ex.ExEntryPanel$LafListener"
               topic="com.intellij.ide.ui.LafManagerListener"/>
     <listener class="com.maddyhome.idea.vim.ui.ex.ExEntryPanel$ColorSchemeListener"

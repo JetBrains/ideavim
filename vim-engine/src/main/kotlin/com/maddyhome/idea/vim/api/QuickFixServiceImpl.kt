@@ -13,36 +13,39 @@ package com.maddyhome.idea.vim.api
  */
 class QuickFixServiceImpl : QuickFixService {
 
-  private var items: List<QuickFixItem> = emptyList()
-  private var currentIndex = 0
+  private val listsByProject = mutableMapOf<String, QuickFixList>()
 
-  override fun replaceList(items: List<QuickFixItem>) {
-    this.items = items.toList()
-    currentIndex = 0
+  override fun replaceList(editor: VimEditor, items: List<QuickFixItem>) {
+    listsByProject[editor.projectId] = QuickFixList(items.toList())
   }
 
   override fun jumpToFirst(editor: VimEditor): QuickFixJump = jumpTo(editor) { 0 }
 
-  override fun jumpForward(editor: VimEditor, count: Int): QuickFixJump = jumpTo(editor) {
-    if (currentIndex == items.lastIndex) null else minOf(currentIndex + count, items.lastIndex)
+  override fun jumpForward(editor: VimEditor, count: Int): QuickFixJump = jumpTo(editor) { list ->
+    if (list.isOnLast) null else minOf(list.currentIndex + count, list.lastIndex)
   }
 
-  override fun jumpBackward(editor: VimEditor, count: Int): QuickFixJump = jumpTo(editor) {
-    if (currentIndex == 0) null else maxOf(currentIndex - count, 0)
+  override fun jumpBackward(editor: VimEditor, count: Int): QuickFixJump = jumpTo(editor) { list ->
+    if (list.isOnFirst) null else maxOf(list.currentIndex - count, 0)
+  }
+
+  override fun removeList(projectId: String) {
+    listsByProject.remove(projectId)
   }
 
   override fun reset() {
-    replaceList(emptyList())
+    listsByProject.clear()
   }
 
   /**
-   * @param newIndex the index to make current, or null if there's no item to move to
+   * @param newIndex the index to make current in the editor's list, or null if there's no item to move to
    */
-  private fun jumpTo(editor: VimEditor, newIndex: () -> Int?): QuickFixJump {
-    if (items.isEmpty()) return QuickFixJump.EmptyList
-    currentIndex = newIndex() ?: return QuickFixJump.NoMoreItems
-    val item = items[currentIndex]
-    return QuickFixJump.Moved(openItem(editor, item), item, number = currentIndex + 1, size = items.size)
+  private fun jumpTo(editor: VimEditor, newIndex: (QuickFixList) -> Int?): QuickFixJump {
+    val list = listsByProject[editor.projectId]
+    if (list == null || list.items.isEmpty()) return QuickFixJump.EmptyList
+    list.currentIndex = newIndex(list) ?: return QuickFixJump.NoMoreItems
+    val item = list.currentItem
+    return QuickFixJump.Moved(openItem(editor, item), item, number = list.currentIndex + 1, size = list.items.size)
   }
 
   private fun openItem(editor: VimEditor, item: QuickFixItem): VimEditor? {
@@ -51,4 +54,13 @@ class QuickFixServiceImpl : QuickFixService {
     target.currentCaret().moveToOffset(target.bufferPositionToOffset(BufferPosition(item.line, item.col)))
     return target
   }
+}
+
+private class QuickFixList(val items: List<QuickFixItem>) {
+  var currentIndex = 0
+
+  val lastIndex: Int get() = items.lastIndex
+  val isOnFirst: Boolean get() = currentIndex == 0
+  val isOnLast: Boolean get() = currentIndex == lastIndex
+  val currentItem: QuickFixItem get() = items[currentIndex]
 }
