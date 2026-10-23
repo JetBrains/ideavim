@@ -8,8 +8,8 @@
 
 package org.jetbrains.plugins.ideavim.extension.fugitive
 
+import com.maddyhome.idea.vim.group.git.GitCannotExecuteException
 import com.maddyhome.idea.vim.group.git.GitClient
-import com.maddyhome.idea.vim.group.git.GitExecutableStatus
 import com.maddyhome.idea.vim.group.git.GitOutput
 
 /**
@@ -18,7 +18,10 @@ import com.maddyhome.idea.vim.group.git.GitOutput
 class FakeGitClient : GitClient {
   override var executable = "git"
 
-  var executableStatus = GitExecutableStatus.OK
+  var executableFound = true
+
+  /** When false, git is found but starting it fails */
+  var canExecute = true
 
   /** Work tree returned for every directory, or null to act as if there's no repository */
   var workTree: String? = "/src"
@@ -30,11 +33,15 @@ class FakeGitClient : GitClient {
   var lastArgs: List<String>? = null
     private set
 
-  override fun checkExecutable(): GitExecutableStatus = executableStatus
+  override fun isExecutableFound(): Boolean = executableFound
 
-  override fun findWorkTree(directory: String): String? = workTree
+  override fun findWorkTree(directory: String): String? {
+    if (!canExecute) throw GitCannotExecuteException(executable)
+    return workTree
+  }
 
   override fun run(workTree: String, args: List<String>): GitOutput {
+    if (!canExecute) throw GitCannotExecuteException(executable)
     lastWorkTree = workTree
     lastArgs = args
     return output

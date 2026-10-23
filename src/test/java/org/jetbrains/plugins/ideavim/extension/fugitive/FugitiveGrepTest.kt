@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.extension.fugitive
 
-import com.maddyhome.idea.vim.group.git.GitExecutableStatus
 import com.maddyhome.idea.vim.group.git.GitOutput
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -28,7 +27,7 @@ class FugitiveGrepTest : FugitiveTestCase() {
     enterCommand("Ggrep foo")
 
     assertEquals("/src", git.lastWorkTree)
-    assertEquals(listOf("grep", "--no-color", "--full-name", "-n", "--column", "foo"), git.lastArgs)
+    assertEquals(listOf("-c", "core.quotePath=false", "grep", "--no-color", "--full-name", "-n", "--column", "foo"), git.lastArgs)
   }
 
   @Test
@@ -38,7 +37,7 @@ class FugitiveGrepTest : FugitiveTestCase() {
     enterCommand("Ggrep -i 'foo bar' -- '*.kt'")
 
     assertEquals(
-      listOf("grep", "--no-color", "--full-name", "-n", "--column", "-i", "foo bar", "--", "*.kt"),
+      listOf("-c", "core.quotePath=false", "grep", "--no-color", "--full-name", "-n", "--column", "-i", "foo bar", "--", "*.kt"),
       git.lastArgs,
     )
   }
@@ -159,7 +158,7 @@ class FugitiveGrepTest : FugitiveTestCase() {
   @Test
   fun `test Ggrep reports missing git`() {
     configureByText("${c}foo")
-    git.executableStatus = GitExecutableStatus.NOT_FOUND
+    git.executableFound = false
 
     enterCommand("Ggrep foo")
 
@@ -172,7 +171,7 @@ class FugitiveGrepTest : FugitiveTestCase() {
   fun `test Ggrep reports missing git with configured path`() {
     configureByText("${c}foo")
     git.executable = "/opt/git/bin/git"
-    git.executableStatus = GitExecutableStatus.NOT_FOUND
+    git.executableFound = false
 
     enterCommand("Ggrep foo")
 
@@ -183,7 +182,7 @@ class FugitiveGrepTest : FugitiveTestCase() {
   @Test
   fun `test Ggrep reports git that cannot be executed`() {
     configureByText("${c}foo")
-    git.executableStatus = GitExecutableStatus.CANNOT_EXECUTE
+    git.canExecute = false
 
     enterCommand("Ggrep foo")
 
