@@ -17,7 +17,6 @@
 <idea-plugin>
   <dependencies>
     <module name="intellij.platform.backend"/>
-    <module name="intellij.platform.kernel.backend"/>
     <module name="IdeaVIM.ideavim-common"/>
   </dependencies>
 

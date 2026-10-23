@@ -61,7 +61,6 @@ dependencies {
     create(ideaType, ideaVersion) { this.useInstaller = useInstaller }
 
     bundledModule("intellij.spellchecker")
-    bundledModule("intellij.platform.kernel.impl")
     if (rpcModuleExists) bundledModule("intellij.platform.rpc")
   }
 }
