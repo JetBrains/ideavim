@@ -39,7 +39,7 @@ internal class GrepCommand : CommandAliasHandler {
       injector.messages.showErrorMessage(editor, errorMessage)
       return
     }
-    injector.quickFixService.replaceList(result.matches.map { it.toQuickFixItem() })
+    injector.quickFixService.replaceList(editor, result.matches.map { it.toQuickFixItem() })
     if (invocation.jumpToFirstMatch) {
       // fugitive runs `silent cfirst`, so no "(1 of N)" message
       injector.quickFixService.jumpToFirst(editor)

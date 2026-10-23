@@ -11,14 +11,15 @@ package com.maddyhome.idea.vim.api
 /**
  * The quickfix list: places filled by a command like `:Ggrep` and walked with `:cnext`.
  *
- * Like Vim, there is a single list for the whole application, and it is not persisted.
+ * Every project has its own list, as if each IDE window were a separate Vim. The project is
+ * the one of the editor passed in. Lists are not persisted, as in Vim.
  * Every jump records the position it leaves in the jump list.
  */
 interface QuickFixService {
   /**
-   * Replaces the list. Its first item becomes the current one, without jumping to it.
+   * Replaces the list of the editor's project. Its first item becomes the current one, without jumping to it.
    */
-  fun replaceList(items: List<QuickFixItem>)
+  fun replaceList(editor: VimEditor, items: List<QuickFixItem>)
 
   /**
    * Jumps to the first item, like `:cfirst`.
@@ -35,6 +36,14 @@ interface QuickFixService {
    */
   fun jumpBackward(editor: VimEditor, count: Int): QuickFixJump
 
+  /**
+   * Forgets the list of a project, e.g. when it's closed.
+   */
+  fun removeList(projectId: String)
+
+  /**
+   * Forgets the lists of all projects.
+   */
   fun reset()
 }
 
