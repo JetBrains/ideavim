@@ -45,6 +45,38 @@ abstract class FugitiveTestCase : VimTestCase() {
     enableExtensions("fugitive")
   }
 
+  /**
+   * Greps two matches in `aaa.txt`, two in `b.txt` and one in `c.txt`, and lands on the first:
+   *
+   * ```
+   * 1. aaa.txt (0, 6)  first foo
+   * 2. aaa.txt (2, 4)  third foo
+   * 3. b.txt   (0, 0)  foo b1
+   * 4. b.txt   (1, 0)  foo b2
+   * 5. c.txt   (0, 2)  x foo c
+   * ```
+   */
+  protected fun grepFiveMatches() {
+    configureByText(
+      """
+        |${c}first foo
+        |second line
+        |  third foo
+      """.trimMargin()
+    )
+    addFile("b.txt", "foo b1\nfoo b2\n")
+    addFile("c.txt", "x foo c\n")
+    git.respondWith(
+      "aaa.txt:1:7:first foo",
+      "aaa.txt:3:5:  third foo",
+      "b.txt:1:1:foo b1",
+      "b.txt:2:1:foo b2",
+      "c.txt:1:3:x foo c",
+    )
+    enterCommand("Ggrep foo")
+    assertCurrentPosition(0, 6)
+  }
+
   protected fun addFile(path: String, content: String) {
     ApplicationManager.getApplication().invokeAndWait {
       fixture.addFileToProject(path, content)

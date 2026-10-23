@@ -14,8 +14,8 @@ import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
- * Reports a quickfix jump the way Vim does: E42 for an empty list, E553 when there's no item
- * to move to, otherwise `(2 of 3): text` in the editor that was jumped to.
+ * Reports a quickfix jump: E42 for an empty list, E553 when there's no item to move to,
+ * otherwise `(2 of 3): text` in the editor that was jumped to.
  */
 internal fun reportQuickFixJump(jump: QuickFixJump): ExecutionResult {
   when (jump) {
@@ -27,7 +27,7 @@ internal fun reportQuickFixJump(jump: QuickFixJump): ExecutionResult {
 }
 
 /**
- * Like Vim's `qf_jump_print_msg`, skips the leading whitespace of the text.
+ * Skips the leading whitespace of the text.
  */
 private fun positionMessage(jump: QuickFixJump.Moved): String =
   "(${jump.number} of ${jump.size}): ${jump.item.text.trimStart()}"

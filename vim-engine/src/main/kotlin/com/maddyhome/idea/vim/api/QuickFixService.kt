@@ -11,8 +11,8 @@ package com.maddyhome.idea.vim.api
 /**
  * The quickfix list: places filled by a command like `:Ggrep` and walked with `:cnext`.
  *
- * Every project has its own list, as if each IDE window were a separate Vim. The project is
- * the one of the editor passed in. Lists are not persisted, as in Vim.
+ * Every project has its own list. The project is the one of the editor passed in.
+ * Lists are not persisted.
  * Every jump records the position it leaves in the jump list.
  */
 interface QuickFixService {
@@ -41,6 +41,12 @@ interface QuickFixService {
    * file stops at the first item of the last file.
    */
   fun jumpToNextFile(editor: VimEditor, count: Int): QuickFixJump
+
+  /**
+   * Jumps to the last item of the [count]th previous file, like `:cpfile`. A count past the first
+   * file stops at the last item of the first file.
+   */
+  fun jumpToPreviousFile(editor: VimEditor, count: Int): QuickFixJump
 
   /**
    * Forgets the list of a project, e.g. when it's closed.

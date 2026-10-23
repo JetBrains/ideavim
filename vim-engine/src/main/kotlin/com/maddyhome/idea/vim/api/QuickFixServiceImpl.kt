@@ -29,17 +29,11 @@ class QuickFixServiceImpl : QuickFixService {
     if (list.isOnFirst) null else maxOf(list.currentIndex - count, 0)
   }
 
-  /**
-   * Like Vim's `get_nth_valid_entry`, stops at the last file it reaches, and reports
-   * no more items only when not even one file could be skipped.
-   */
-  override fun jumpToNextFile(editor: VimEditor, count: Int): QuickFixJump = jumpTo(editor) { list ->
-    var index = list.currentIndex
-    repeat(count) {
-      index = list.firstIndexInNextFile(index) ?: return@jumpTo index.takeIf { it != list.currentIndex }
-    }
-    index
-  }
+  override fun jumpToNextFile(editor: VimEditor, count: Int): QuickFixJump =
+    jumpAcrossFiles(editor, count, QuickFixList::firstIndexInNextFile)
+
+  override fun jumpToPreviousFile(editor: VimEditor, count: Int): QuickFixJump =
+    jumpAcrossFiles(editor, count, QuickFixList::lastIndexInPreviousFile)
 
   override fun removeList(projectId: String) {
     listsByProject.remove(projectId)
@@ -47,6 +41,24 @@ class QuickFixServiceImpl : QuickFixService {
 
   override fun reset() {
     listsByProject.clear()
+  }
+
+  /**
+   * Stops at the last file it reaches, and reports no more items only when not even one file
+   * could be skipped.
+   *
+   * @param indexInOtherFile index of the item to land on in the file next to the one at the given index
+   */
+  private fun jumpAcrossFiles(
+    editor: VimEditor,
+    count: Int,
+    indexInOtherFile: QuickFixList.(Int) -> Int?,
+  ): QuickFixJump = jumpTo(editor) { list ->
+    var index = list.currentIndex
+    repeat(count) {
+      index = list.indexInOtherFile(index) ?: return@jumpTo index.takeIf { it != list.currentIndex }
+    }
+    index
   }
 
   /**
@@ -82,5 +94,13 @@ private class QuickFixList(val items: List<QuickFixItem>) {
   fun firstIndexInNextFile(index: Int): Int? {
     val file = items[index].filepath
     return (index + 1..lastIndex).firstOrNull { items[it].filepath != file }
+  }
+
+  /**
+   * Index of the last item before [index] that is in another file than the item at [index].
+   */
+  fun lastIndexInPreviousFile(index: Int): Int? {
+    val file = items[index].filepath
+    return (index - 1 downTo 0).firstOrNull { items[it].filepath != file }
   }
 }
