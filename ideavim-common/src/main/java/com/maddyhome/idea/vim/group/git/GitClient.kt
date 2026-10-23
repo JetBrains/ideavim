@@ -26,18 +26,23 @@ interface GitClient {
   val executable: String
 
   /**
-   * Checks that [executable] exists and can be started.
+   * Checks that [executable] is on PATH or exists, without starting it.
+   * Whether it actually starts shows only when [findWorkTree] or [run] is called.
    */
-  fun checkExecutable(): GitExecutableStatus
+  fun isExecutableFound(): Boolean
 
   /**
    * Returns the root of the work tree containing [directory] (`git rev-parse --show-toplevel`),
    * or null if [directory] is not inside a Git work tree.
+   *
+   * @throws GitCannotExecuteException if git can't be started
    */
   fun findWorkTree(directory: String): String?
 
   /**
    * Runs `git [args]` with [workTree] as the working directory.
+   *
+   * @throws GitCannotExecuteException if git can't be started
    */
   fun run(workTree: String, args: List<String>): GitOutput
 
@@ -48,11 +53,8 @@ interface GitClient {
 }
 
 @ApiStatus.Internal
-enum class GitExecutableStatus {
-  OK,
-  NOT_FOUND,
-  CANNOT_EXECUTE,
-}
+class GitCannotExecuteException(executable: String, cause: Throwable? = null) :
+  Exception("Cannot execute $executable", cause)
 
 @ApiStatus.Internal
 data class GitOutput(

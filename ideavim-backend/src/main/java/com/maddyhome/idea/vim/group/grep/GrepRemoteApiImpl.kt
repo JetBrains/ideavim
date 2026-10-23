@@ -14,15 +14,15 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.project.ProjectId
 import com.intellij.platform.project.findProjectOrNull
 import com.maddyhome.idea.vim.group.findVirtualFile
+import com.maddyhome.idea.vim.group.git.GitCannotExecuteException
 import com.maddyhome.idea.vim.group.git.GitClient
-import com.maddyhome.idea.vim.group.git.GitExecutableStatus
+import com.maddyhome.idea.vim.group.git.GitOutput
 import com.maddyhome.idea.vim.helper.EngineMessageHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
- * RPC handler for [GrepRemoteApi]. Runs `git grep` the way fugitive's `s:GrepSubcommand` does:
- * in the work tree of the current file, with paths relative to the work tree root.
+ * RPC handler for [GrepRemoteApi]. Turns every way `:Ggrep` can fail into a message for the user.
  *
  * Note: Must NOT use [com.maddyhome.idea.vim.api.injector] — it is not initialized on the backend
  * in split mode. Uses platform [ProjectId.findProjectOrNull] instead.
@@ -38,37 +38,43 @@ internal class GrepRemoteApiImpl : GrepRemoteApi {
     try {
       val project = projectId.findProjectOrNull() ?: throw GrepFailure(notInRepository(file = null))
       val file = filepath?.let { findVirtualFile(it, protocol) }
-      GitGrep(GitClient.getInstance(project)).run(file, project, args)
+      GrepResult(matches = GitGrep(GitClient.getInstance(project)).search(file, project, args))
     } catch (e: GrepFailure) {
       GrepResult(errorMessage = e.message)
+    } catch (_: GitCannotExecuteException) {
+      GrepResult(errorMessage = EngineMessageHelper.message("fugitive.error.git.cannot.execute"))
     }
   }
 }
 
+/**
+ * Runs `git grep` the way fugitive's `s:GrepSubcommand` does: in the work tree of the current
+ * file, with paths relative to the work tree root.
+ */
 private class GitGrep(private val git: GitClient) {
 
-  fun run(file: VirtualFile?, project: Project, args: List<String>): GrepResult {
-    requireExecutable()
-    val directory = file?.parent ?: project.guessProjectDir()
-    val workTree = directory?.let { git.findWorkTree(it.path) } ?: throw GrepFailure(notInRepository(file))
+  fun search(file: VirtualFile?, project: Project, args: List<String>): List<GrepMatch> {
+    requireGitFound()
+    val directory = file?.parent ?: project.guessProjectDir() ?: throw GrepFailure(notInRepository(file))
+    val workTree = git.findWorkTree(directory.path) ?: throw GrepFailure(notInRepository(file))
     val output = git.run(workTree, GREP_COMMAND + args)
-    // Exit code 1 means no matches
-    if (output.exitCode !in 0..1) throw GrepFailure(output.stderr.trim())
-    val protocol = directory.fileSystem.protocol
-    return GrepResult(matches = GitGrepOutputParser.parse(output.stdout, workTree, protocol))
+    if (output.isError()) throw GrepFailure(output.stderr.trim())
+    return GitGrepOutputParser.parse(output.stdout, workTree, directory.fileSystem.protocol)
   }
 
-  private fun requireExecutable() {
-    val message = when (git.checkExecutable()) {
-      GitExecutableStatus.OK -> return
-      GitExecutableStatus.NOT_FOUND -> EngineMessageHelper.message("fugitive.error.git.not.found", git.executable)
-      GitExecutableStatus.CANNOT_EXECUTE -> EngineMessageHelper.message("fugitive.error.git.cannot.execute")
+  private fun requireGitFound() {
+    if (!git.isExecutableFound()) {
+      throw GrepFailure(EngineMessageHelper.message("fugitive.error.git.not.found", git.executable))
     }
-    throw GrepFailure(message)
   }
+
+  /**
+   * `git grep` exits with 1 when nothing matches, which isn't an error.
+   */
+  private fun GitOutput.isError(): Boolean = exitCode > 1
 
   private companion object {
-    val GREP_COMMAND = listOf("grep", "--no-color", "--full-name", "-n", "--column")
+    val GREP_COMMAND = listOf("-c", "core.quotePath=false", "grep", "--no-color", "--full-name", "-n", "--column")
   }
 }
 

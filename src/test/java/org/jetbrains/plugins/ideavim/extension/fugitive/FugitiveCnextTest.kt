@@ -9,7 +9,6 @@
 package org.jetbrains.plugins.ideavim.extension.fugitive
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.group.git.GitExecutableStatus
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -169,7 +168,7 @@ class FugitiveCnextTest : FugitiveTestCase() {
   @Test
   fun `test failed Ggrep keeps the previous list`() {
     grepThreeMatches()
-    git.executableStatus = GitExecutableStatus.NOT_FOUND
+    git.executableFound = false
     enterCommandInCurrentEditor("Ggrep bar")
 
     enterCommandInCurrentEditor("cnext")
