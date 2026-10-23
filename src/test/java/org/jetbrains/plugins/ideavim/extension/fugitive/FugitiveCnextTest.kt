@@ -14,8 +14,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 /**
- * `:[count]cn[ext]` walking the quickfix list that `:Ggrep` fills, following Vim's
- * `get_nth_valid_entry` in `quickfix.c`:
+ * `:[count]cn[ext]` walking the quickfix list that `:Ggrep` fills:
  *
  *  - it moves by list position, not by cursor position
  *  - a count larger than the rest of the list stops at the last entry

@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 /**
- * `:[count]cp[revious]` / `:[count]cN[ext]` walking back the quickfix list that `:Ggrep` fills,
- * following Vim's `get_prev_valid_entry` in `quickfix.c`. It mirrors `:cnext`:
+ * `:[count]cp[revious]` / `:[count]cN[ext]` walking back the quickfix list that `:Ggrep` fills.
+ * It mirrors `:cnext`:
  *
  *  - a count larger than the items before the current one stops at the first item
  *  - `E553` only when the current item already is the first one, `E42` when the list is empty

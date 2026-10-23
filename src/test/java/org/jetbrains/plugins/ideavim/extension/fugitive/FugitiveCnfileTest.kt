@@ -14,14 +14,14 @@ import kotlin.test.assertEquals
 
 /**
  * `:[count]cnf[ile]` jumping to the first match in the next file of the quickfix list that
- * `:Ggrep` fills, following Vim's `get_next_valid_entry` with `FORWARD_FILE` in `quickfix.c`:
+ * `:Ggrep` fills:
  *
  *  - it skips the rest of the matches in the current file
  *  - a count larger than the remaining files stops at the first match of the last file
  *  - `E553` only when already in the last file, `E42` when the list is empty
  *  - every jump prints `(N of M): text` and is recorded in the jump list
  *
- * The list has five matches: two in `aaa.txt`, two in `b.txt`, one in `c.txt`.
+ * Most tests use [grepFiveMatches]: two in `aaa.txt`, two in `b.txt`, one in `c.txt`.
  */
 class FugitiveCnfileTest : FugitiveTestCase() {
 
@@ -100,10 +100,6 @@ class FugitiveCnfileTest : FugitiveTestCase() {
     assertCurrentFile("c.txt")
   }
 
-  /**
-   * `:help :cnfile` says it goes to the next error when there's no next file, but neither Vim's
-   * code nor Neovim 0.12 does that: it's E553 even with matches left in the last file.
-   */
   @Test
   fun `test cnfile in last file with matches left reports no more items`() {
     grepLastFileWithTwoMatches()
@@ -178,30 +174,6 @@ class FugitiveCnfileTest : FugitiveTestCase() {
 
     assertPluginError(true)
     assertPluginErrorMessage("E42: No Errors")
-  }
-
-  /**
-   * Greps two matches in `aaa.txt`, two in `b.txt` and one in `c.txt`, and lands on the first.
-   */
-  private fun grepFiveMatches() {
-    configureByText(
-      """
-        |${c}first foo
-        |second line
-        |  third foo
-      """.trimMargin()
-    )
-    addFile("b.txt", "foo b1\nfoo b2\n")
-    addFile("c.txt", "x foo c\n")
-    git.respondWith(
-      "aaa.txt:1:7:first foo",
-      "aaa.txt:3:5:  third foo",
-      "b.txt:1:1:foo b1",
-      "b.txt:2:1:foo b2",
-      "c.txt:1:3:x foo c",
-    )
-    enterCommand("Ggrep foo")
-    assertCurrentPosition(0, 6)
   }
 
   /**

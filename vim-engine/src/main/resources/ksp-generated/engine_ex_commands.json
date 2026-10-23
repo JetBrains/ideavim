@@ -68,6 +68,9 @@
   "cN[ext]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.quickfix.CpreviousCommand"
   },
+  "cNf[ile]": {
+    "className": "com.maddyhome.idea.vim.vimscript.model.commands.quickfix.CpfileCommand"
+  },
   "ca[bbrev]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.AbbrevCommand"
   },
@@ -113,6 +116,9 @@
   },
   "cp[revious]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.quickfix.CpreviousCommand"
+  },
+  "cpf[ile]": {
+    "className": "com.maddyhome.idea.vim.vimscript.model.commands.quickfix.CpfileCommand"
   },
   "cu[nmap]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.UnMapCommand"
