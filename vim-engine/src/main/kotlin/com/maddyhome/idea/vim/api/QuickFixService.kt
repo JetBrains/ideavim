@@ -27,6 +27,16 @@ interface QuickFixService {
   fun jumpToFirst(editor: VimEditor): QuickFixJump
 
   /**
+   * Jumps to the last item, like `:clast`.
+   */
+  fun jumpToLast(editor: VimEditor): QuickFixJump
+
+  /**
+   * Jumps to the item with the 1-based [number], like `:cfirst 3`. A number past the end jumps to the last item.
+   */
+  fun jumpToItem(editor: VimEditor, number: Int): QuickFixJump
+
+  /**
    * Jumps [count] items forward, like `:cnext`. A count past the end stops at the last item.
    */
   fun jumpForward(editor: VimEditor, count: Int): QuickFixJump

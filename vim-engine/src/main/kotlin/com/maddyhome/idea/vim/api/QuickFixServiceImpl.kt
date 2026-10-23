@@ -21,6 +21,12 @@ class QuickFixServiceImpl : QuickFixService {
 
   override fun jumpToFirst(editor: VimEditor): QuickFixJump = jumpTo(editor) { 0 }
 
+  override fun jumpToLast(editor: VimEditor): QuickFixJump = jumpTo(editor) { list -> list.lastIndex }
+
+  override fun jumpToItem(editor: VimEditor, number: Int): QuickFixJump = jumpTo(editor) { list ->
+    (number - 1).coerceIn(0, list.lastIndex)
+  }
+
   override fun jumpForward(editor: VimEditor, count: Int): QuickFixJump = jumpTo(editor) { list ->
     if (list.isOnLast) null else minOf(list.currentIndex + count, list.lastIndex)
   }
