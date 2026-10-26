@@ -12,7 +12,9 @@ import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
+import com.maddyhome.idea.vim.api.QuickFixJump
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VirtualBufferKind
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
@@ -20,6 +22,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
+import com.maddyhome.idea.vim.vimscript.model.commands.quickfix.showPosition
 
 @CommandOrMotion(
   keys = ["+", "<C-M>"],
@@ -56,6 +59,10 @@ class EnterNormalAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
+    if (editor.getVirtualBufferKind() == VirtualBufferKind.QuickFix) {
+      if (caret.id == editor.primaryCaret().id) jumpToQuickFixItemOnLine(editor, caret)
+      return Motion.NoMotion
+    }
     if (editor.isInHistoryWindow()) {
       // Vim's cmdwin has a single caret. Multi-caret on the cmdwin must not re-dispatch.
       if (caret.id == editor.primaryCaret().id) {
@@ -75,4 +82,15 @@ class EnterNormalAction : MotionActionHandler.ForEachCaret() {
       injector.motion.moveCaretToRelativeLineStartSkipLeading(editor, caret, operatorArguments.count1).toMotion()
     }
   }
+}
+
+/**
+ * `<CR>` in the quickfix window jumps to the item on the caret line, in the window the quickfix window was opened from.
+ */
+private fun jumpToQuickFixItemOnLine(editor: VimEditor, caret: ImmutableVimCaret) {
+  // Read the line before moving to the other window
+  val number = caret.getBufferPosition().line + 1
+  val from = injector.virtualBufferGroup.selectOriginalWindow(editor) ?: editor.getCmdwinOriginalEditor() ?: editor
+  val jump = injector.quickFixService.jumpToItem(from, number)
+  if (jump is QuickFixJump.Moved) showPosition(jump)
 }

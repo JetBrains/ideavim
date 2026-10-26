@@ -54,7 +54,7 @@ internal class GrepCommand : CommandAliasHandler {
   }
 }
 
-private fun GrepMatch.toQuickFixItem() = QuickFixItem(line, col, filepath, protocol, text)
+private fun GrepMatch.toQuickFixItem() = QuickFixItem(line, col, filepath, protocol, relativePath, text)
 
 /**
  * The parsed `:Ggrep[!] {args}` command line.

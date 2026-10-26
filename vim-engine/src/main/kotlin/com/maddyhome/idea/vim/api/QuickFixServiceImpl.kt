@@ -16,7 +16,9 @@ class QuickFixServiceImpl : QuickFixService {
   private val listsByProject = mutableMapOf<String, QuickFixList>()
 
   override fun replaceList(editor: VimEditor, items: List<QuickFixItem>) {
-    listsByProject[editor.projectId] = QuickFixList(items.toList())
+    val list = QuickFixList(items.toList())
+    listsByProject[editor.projectId] = list
+    QuickFixWindow.refresh(editor, list.items, list.currentIndex)
   }
 
   override fun jumpToFirst(editor: VimEditor): QuickFixJump = jumpTo(editor) { 0 }
@@ -40,6 +42,11 @@ class QuickFixServiceImpl : QuickFixService {
 
   override fun jumpToPreviousFile(editor: VimEditor, count: Int): QuickFixJump =
     jumpAcrossFiles(editor, count, QuickFixList::lastIndexInPreviousFile)
+
+  override fun openWindow(editor: VimEditor) {
+    val list = listsByProject[editor.projectId]
+    QuickFixWindow.open(editor, list?.items.orEmpty(), list?.currentIndex ?: 0)
+  }
 
   override fun removeList(projectId: String) {
     listsByProject.remove(projectId)
@@ -74,6 +81,7 @@ class QuickFixServiceImpl : QuickFixService {
     val list = listsByProject[editor.projectId]
     if (list == null || list.items.isEmpty()) return QuickFixJump.EmptyList
     list.currentIndex = newIndex(list) ?: return QuickFixJump.NoMoreItems
+    QuickFixWindow.refresh(editor, list.items, list.currentIndex)
     val item = list.currentItem
     return QuickFixJump.Moved(openItem(editor, item), item, number = list.currentIndex + 1, size = list.items.size)
   }

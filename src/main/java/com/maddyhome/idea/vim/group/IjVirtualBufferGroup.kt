@@ -73,19 +73,68 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
   }
 
   override fun openHelp(context: ExecutionContext, editor: VimEditor, content: String, line: Int) {
-    val project = projectOf(context) ?: (editor as IjVimEditor).editor.project ?: return
-    val fem = FileEditorManagerEx.getInstanceEx(project)
-    val file = findOpenFile(project, VirtualBufferKind.Help)
-      // Like Vim's help buffer, the help can't be modified
-      ?: createBufferFile(editor, VirtualBufferKind.Help, content).apply { isWritable = false }
-        .also { openSplitFile(fem, it, focus = true) }
-
-    // Like in Vim, this moves to the window that already shows the help instead of opening it once more. It also waits
-    // for the editor of a just opened split to be created.
-    val helpEditor = focusedEditorOf(project, file) ?: return
-    helpEditor.primaryCaret().moveToOffset(helpEditor.getLineStartOffset(line))
+    val helpEditor = openReadOnly(context, editor, VirtualBufferKind.Help, content, line) ?: return
     // `:help` shows the tag at the top of the window
     injector.scroll.scrollCurrentLineToDisplayTop(helpEditor, line + 1, false)
+  }
+
+  override fun openQuickFix(context: ExecutionContext, editor: VimEditor, content: String, line: Int) {
+    openReadOnly(context, editor, VirtualBufferKind.QuickFix, content, line)
+    refreshQuickFix(context, content, line)
+  }
+
+  override fun refreshQuickFix(context: ExecutionContext, content: String, line: Int) {
+    val project = projectOf(context) ?: return
+    val file = findOpenFile(project, VirtualBufferKind.QuickFix) ?: return
+    val document = FileDocumentManager.getInstance().getDocument(file) ?: return
+    if (!document.immutableCharSequence.contentEquals(content)) {
+      CommandProcessor.getInstance().runUndoTransparentAction {
+        ApplicationManager.getApplication().runWriteAction {
+          document.setReadOnly(false)
+          document.setText(content)
+          document.setReadOnly(true)
+        }
+      }
+    }
+    FileEditorManager.getInstance(project).getEditors(file).filterIsInstance<TextEditor>().forEach {
+      val quickFixEditor = it.editor.vim
+      quickFixEditor.primaryCaret().moveToOffset(quickFixEditor.getLineStartOffset(line))
+    }
+  }
+
+  override fun selectOriginalWindow(buffer: VimEditor): VimEditor? {
+    val bufferEditor = (buffer as IjVimEditor).editor
+    val project = bufferEditor.project ?: return null
+    val bufferFile = bufferEditor.virtualFile ?: return null
+    val originalFile = bufferFile.getUserData(CmdwinKeys.ORIGINAL_FILE)
+    val otherWindows = FileEditorManagerEx.getInstanceEx(project).windows.filter { it.selectedComposite?.file != bufferFile }
+    val window = otherWindows.firstOrNull { it.selectedComposite?.file == originalFile } ?: otherWindows.firstOrNull()
+      ?: return null
+    window.setAsCurrentWindow(true)
+    return (window.selectedComposite?.selectedEditor as? TextEditor)?.editor?.vim
+  }
+
+  /**
+   * Moves to the window that already shows the buffer of [kind], or opens a read-only one with [content].
+   *
+   * @return the editor showing the buffer, with the caret at the start of [line]
+   */
+  private fun openReadOnly(
+    context: ExecutionContext,
+    editor: VimEditor,
+    kind: VirtualBufferKind,
+    content: String,
+    line: Int,
+  ): VimEditor? {
+    val project = projectOf(context) ?: (editor as IjVimEditor).editor.project ?: return null
+    val fem = FileEditorManagerEx.getInstanceEx(project)
+    val file = findOpenFile(project, kind)
+      ?: createBufferFile(editor, kind, content).apply { isWritable = false }
+        .also { openSplitFile(fem, it, focus = true) }
+
+    val bufferEditor = focusedEditorOf(project, file) ?: return null
+    bufferEditor.primaryCaret().moveToOffset(bufferEditor.getLineStartOffset(line))
+    return bufferEditor
   }
 
   /**
@@ -103,6 +152,7 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
     VirtualBufferKind.ControlCharsEditor -> "A control characters editor is already open"
     VirtualBufferKind.SubstitutePreview -> "A substitute preview is already open"
     VirtualBufferKind.Help -> "A help window is already open"
+    VirtualBufferKind.QuickFix -> "A quickfix window is already open"
   }
 
   /** The kind of the currently open (nesting-restricted) virtual buffer, or null if none is open. */
@@ -110,8 +160,9 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
     val project = projectOf(context) ?: return null
     return FileEditorManager.getInstance(project).openFiles
       .mapNotNull { it.getUserData(CmdwinKeys.KIND) }
-      // The inccommand=split preview is transient and the help is a regular read-only window, neither blocks cmdwin
-      .firstOrNull { it != VirtualBufferKind.SubstitutePreview && it != VirtualBufferKind.Help }
+      // The inccommand=split preview is transient, the help and the quickfix list are regular read-only windows.
+      // None of them blocks cmdwin
+      .firstOrNull { it !in NON_BLOCKING_KINDS }
   }
 
   private fun findOpenFile(project: Project?, kind: VirtualBufferKind): VirtualFile? {
@@ -174,4 +225,8 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
 
   private fun projectOf(context: ExecutionContext): Project? =
     PlatformDataKeys.PROJECT.getData((context as IjEditorExecutionContext).context)
+
+  private companion object {
+    val NON_BLOCKING_KINDS = setOf(VirtualBufferKind.SubstitutePreview, VirtualBufferKind.Help, VirtualBufferKind.QuickFix)
+  }
 }

@@ -59,6 +59,12 @@ interface QuickFixService {
   fun jumpToPreviousFile(editor: VimEditor, count: Int): QuickFixJump
 
   /**
+   * Opens the quickfix window showing the list of the editor's project, or moves to it if it's already open, like
+   * `:copen`. While it's open, it follows changes of the list and of the current item.
+   */
+  fun openWindow(editor: VimEditor)
+
+  /**
    * Forgets the list of a project, e.g. when it's closed.
    */
   fun removeList(projectId: String)
@@ -70,11 +76,19 @@ interface QuickFixService {
 }
 
 /**
+ * @param name the file name shown in the quickfix window, e.g. a path relative to the project
  * @param line 0-based line
  * @param col 0-based character column
  * @param text the text shown for the item, e.g. the matching line
  */
-data class QuickFixItem(val line: Int, val col: Int, val filepath: String, val protocol: String, val text: String)
+data class QuickFixItem(
+  val line: Int,
+  val col: Int,
+  val filepath: String,
+  val protocol: String,
+  val name: String,
+  val text: String,
+)
 
 sealed interface QuickFixJump {
   data object EmptyList : QuickFixJump

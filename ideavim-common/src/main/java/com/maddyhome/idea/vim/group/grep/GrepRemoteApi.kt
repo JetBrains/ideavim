@@ -19,6 +19,7 @@ import org.jetbrains.annotations.ApiStatus
 /**
  * A single `git grep` match.
  *
+ * @param relativePath the path relative to the Git work tree, as `git grep` prints it
  * @param line 0-based line of the match
  * @param col 0-based character column of the match start
  * @param text the whole line containing the match
@@ -27,6 +28,7 @@ import org.jetbrains.annotations.ApiStatus
 data class GrepMatch(
   val filepath: String,
   val protocol: String,
+  val relativePath: String,
   val line: Int,
   val col: Int,
   val text: String,
