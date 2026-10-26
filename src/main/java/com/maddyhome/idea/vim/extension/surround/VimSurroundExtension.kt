@@ -191,13 +191,11 @@ internal class VimSurroundExtension : VimExtension {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       val selectionStart = editor.ij.caretModel.primaryCaret.selectionStart
       // NB: Operator ignores SelectionType anyway
-      if (!Operator().apply(editor, context, editor.mode.selectionType)) {
-        return
-      }
+      val isSurrounded = Operator().apply(editor, context, editor.mode.selectionType)
       runWriteAction {
-        // Leave visual mode
+        // Leave visual mode, also when the surround is cancelled, e.g. with <Esc> in the tag prompt
         editor.exitVisualMode()
-        editor.ij.caretModel.moveToOffset(selectionStart)
+        if (isSurrounded) editor.ij.caretModel.moveToOffset(selectionStart)
 
         // Reset the key handler so that the command trie is updated for the new mode (Normal)
         // TODO: This should probably be handled by ToHandlerMapping.execute
@@ -376,7 +374,8 @@ private const val REGISTER = '"'
 
 private const val OPERATOR_FUNC = "SurroundOperatorFunc"
 
-private val tagNameAndAttributesCapturePattern = "(\\S+)([^>]*)>".toPattern()
+// The tag is finished either with `>` or with <CR>, so the closing `>` is optional and the name stops before it
+private val tagNameAndAttributesCapturePattern = "([^\\s>]+)([^>]*)>?".toPattern()
 
 private data class SurroundPair(val first: String, val second: String, val shouldTrim: Boolean)
 

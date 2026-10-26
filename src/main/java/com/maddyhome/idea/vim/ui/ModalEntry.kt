@@ -8,15 +8,16 @@
 
 package com.maddyhome.idea.vim.ui
 
+import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
+import com.intellij.openapi.util.Disposer
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.isCloseKeyStroke
-import java.awt.KeyEventDispatcher
-import java.awt.KeyboardFocusManager
+import java.awt.AWTEvent
 import java.awt.Toolkit
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -47,8 +48,12 @@ object ModalEntry {
     val systemQueue = Toolkit.getDefaultToolkit().systemEventQueue
     val loop = systemQueue.createSecondaryLoop()
 
-    KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(object : KeyEventDispatcher {
-      override fun dispatchKeyEvent(e: KeyEvent): Boolean {
+    // The dispatcher gets the keys before the keymap. Otherwise a key that is also a shortcut, e.g. <CR> or <Esc>, would
+    // first run the IdeaVim or IDE action bound to it, and only then reach the processor (VIM-2796)
+    val dispatcherDisposable = Disposer.newDisposable("ModalEntry")
+    IdeEventQueue.getInstance().addDispatcher(object : IdeEventQueue.NonLockedEventDispatcher {
+      override fun dispatch(e: AWTEvent): Boolean {
+        if (e !is KeyEvent) return false
         val stroke: KeyStroke
         if (e.id == KeyEvent.KEY_RELEASED) {
           stroke = KeyStroke.getKeyStrokeForEvent(e)
@@ -57,6 +62,10 @@ object ModalEntry {
           }
         } else if (e.id == KeyEvent.KEY_TYPED) {
           stroke = KeyStroke.getKeyStrokeForEvent(e)
+          // <Esc> and <CR> are taken when the key is released. Their typed character would be read as text
+          if (stroke.isCloseKeyStroke() || stroke.keyChar == '\n') {
+            return true
+          }
         } else {
           return true
         }
@@ -65,12 +74,12 @@ object ModalEntry {
         }
         if (!processor(stroke)) {
           LOG.trace("Got char from keyboard input: $stroke. Event: $e")
-          KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(this)
+          Disposer.dispose(dispatcherDisposable)
           loop.exit()
         }
         return true
       }
-    })
+    }, dispatcherDisposable)
 
     loop.enter()
   }
