@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inVisualMode
@@ -20,6 +21,7 @@ abstract class VimCommandLineServiceBase : VimCommandLineService {
   abstract fun createPanel(
     editor: VimEditor,
     context: ExecutionContext,
+    type: CommandLineType,
     label: String,
     initText: String,
   ): VimCommandLine
@@ -27,15 +29,18 @@ abstract class VimCommandLineServiceBase : VimCommandLineService {
   private fun createCommandLinePrompt(
     editor: VimEditor,
     context: ExecutionContext,
-    removeSelections: Boolean,
+    type: CommandLineType,
     label: String,
     initialText: String,
   ): VimCommandLine {
     if (!isCommandLineSupported(editor)) throw ExException("Command line is not allowed in one line editors")
+    enterCommandLineMode(editor, type)
+    return createPanel(editor, context, type, label, initialText)
+  }
 
+  private fun enterCommandLineMode(editor: VimEditor, type: CommandLineType) {
     val currentMode = editor.mode
-
-    if (removeSelections) {
+    if (type == CommandLineType.Command) {
       // Make sure the Visual selection marks are up to date before we use them.
       injector.markService.setVisualSelectionMarks(editor)
       // Note that we should remove selection and reset caret offset before we switch back to Normal mode and then enter
@@ -49,7 +54,6 @@ abstract class VimCommandLineServiceBase : VimCommandLineService {
       editor.mode = Mode.NORMAL()
     }
     editor.mode = Mode.CMD_LINE(currentMode)
-    return createPanel(editor, context, label, initialText)
   }
 
   override fun createSearchPrompt(
@@ -58,7 +62,25 @@ abstract class VimCommandLineServiceBase : VimCommandLineService {
     label: String,
     initialText: String,
   ): VimCommandLine {
-    return createCommandLinePrompt(editor, context, removeSelections = false, label, initialText)
+    return createCommandLinePrompt(editor, context, CommandLineType.fromLabel(label), label, initialText)
+  }
+
+  override fun createSearchPrompt(
+    editor: VimEditor,
+    context: ExecutionContext,
+    direction: Direction,
+    initialText: String,
+  ): VimCommandLine {
+    val type = CommandLineType.Search(direction)
+    return createCommandLinePrompt(editor, context, type, type.cmdType.toString(), initialText)
+  }
+
+  override fun createInputPrompt(
+    editor: VimEditor,
+    context: ExecutionContext,
+    prompt: String,
+  ): VimCommandLine {
+    return createCommandLinePrompt(editor, context, CommandLineType.Input, prompt, initialText = "")
   }
 
   override fun createCommandPrompt(
@@ -68,7 +90,7 @@ abstract class VimCommandLineServiceBase : VimCommandLineService {
     initialText: String,
   ): VimCommandLine {
     val rangeText = getRange(editor, count0)
-    return createCommandLinePrompt(editor, context, removeSelections = true, label = ":", rangeText + initialText)
+    return createCommandLinePrompt(editor, context, CommandLineType.Command, label = ":", rangeText + initialText)
   }
 
   protected fun getRange(editor: VimEditor, count0: Int) = when {

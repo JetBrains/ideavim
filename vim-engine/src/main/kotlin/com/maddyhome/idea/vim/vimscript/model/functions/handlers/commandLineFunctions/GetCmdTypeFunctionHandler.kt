@@ -23,12 +23,12 @@ Return the current command-line type. Possible return values are:
     /	forward search command
     ?	backward search command
     =	i_CTRL-R_=
+    @	input() command
 
 Returns an empty string otherwise.
 
 Not yet implemented:
     >	debug mode command debug-mode
-    @	input() command
     -	:insert or :append command
  */
 @VimscriptFunction(name = "getcmdtype")
@@ -41,7 +41,7 @@ internal class GetCmdTypeFunctionHandler : BuiltinFunctionHandler<VimString>() {
   ): VimString {
     val mode = editor.mode
     return when (mode) {
-      is Mode.CMD_LINE -> VimString(injector.commandLine.getActiveCommandLine()?.getLabel() ?: "")
+      is Mode.CMD_LINE -> VimString(injector.commandLine.getActiveCommandLine()?.type?.cmdType?.toString() ?: "")
       else -> VimString.EMPTY
     }
   }

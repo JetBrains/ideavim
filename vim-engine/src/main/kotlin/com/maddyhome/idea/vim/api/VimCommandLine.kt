@@ -24,12 +24,22 @@ interface VimCommandLine {
   val editor: VimEditor
   val caret: VimCommandLineCaret
 
+  /**
+   * The prompt shown before the text. Use [type] to decide how the command line behaves
+   */
   fun getLabel(): String
+
+  /**
+   * The kind of command line. The default guesses it from [getLabel] for implementations that don't track it
+   */
+  val type: CommandLineType
+    get() = CommandLineType.fromLabel(getLabel())
+
   val isReplaceMode: Boolean
 
   var lastEntry: String?
   val historyType: VimHistory.Type
-    get() = VimHistory.Type.getTypeByLabel(getLabel())
+    get() = type.historyType
 
   fun toggleReplaceMode()
 
@@ -45,7 +55,7 @@ interface VimCommandLine {
   /** Called when the completion bar should be hidden */
   fun hideCompletionBar() {}
 
-  fun isExCommand(): Boolean
+  fun isExCommand(): Boolean = type == CommandLineType.Command
 
   /**
    * The entered text. It does not include any rendered text such as `<80>` or prompts such as `^` or `?`

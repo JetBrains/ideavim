@@ -257,6 +257,14 @@ class CommandHistoryWindowActionTest : VimTestCase() {
     assertTrue(injector.historyGroup.getEntries(VimHistory.Type.Command, 0, 0).isEmpty())
   }
 
+  @Test
+  fun `ctrl-f in an expression prompt does not open a cmdwin`() {
+    typeText("i<C-R>=1+1<C-F>")
+
+    assertEquals(0, openCmdwinCount())
+    assertNull(injector.commandLine.getActiveCommandLine())
+  }
+
   // Like Vim, the cursor goes to the last line, on the character before the command line cursor (`:help c_CTRL-F`)
   @Test
   fun `ctrl-f puts the cursor on the last line before the command line cursor`() {

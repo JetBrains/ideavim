@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
@@ -34,7 +35,7 @@ class SearchEntryFwdAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    startSearchCommand('/', editor, context)
+    startSearchCommand(Direction.FORWARDS, editor, context)
     return true
   }
 }
@@ -54,11 +55,11 @@ class SearchEntryRevAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    startSearchCommand('?', editor, context)
+    startSearchCommand(Direction.BACKWARDS, editor, context)
     return true
   }
 }
 
-private fun startSearchCommand(label: Char, editor: VimEditor, context: ExecutionContext) {
-  injector.commandLine.createSearchPrompt(editor, context, label.toString(), "")
+private fun startSearchCommand(direction: Direction, editor: VimEditor, context: ExecutionContext) {
+  injector.commandLine.createSearchPrompt(editor, context, direction, "")
 }
