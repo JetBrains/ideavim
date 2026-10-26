@@ -96,6 +96,38 @@ class VimSurroundExtensionTest : VimTestCase() {
     assertState("Hello <em>World</em>!\n")
   }
 
+  // VIM-2796
+  @Test
+  fun testSurroundTagFinishedWithEnter() {
+    configureByText("Hello ${c}World!\n")
+    typeText(injector.parser.parseKeys("ysiwtem<CR>"))
+    assertState("Hello <em>World</em>!\n")
+  }
+
+  // VIM-2796
+  @Test
+  fun testSurroundTagWithAttributesFinishedWithEnter() {
+    configureByText("Hello ${c}World!")
+    typeText(injector.parser.parseKeys("ysiwtspan class=\"important\"<CR>"))
+    assertState("Hello <span class=\"important\">World</span>!")
+  }
+
+  // VIM-2796
+  @Test
+  fun testVisualSurroundTagFinishedWithEnter() {
+    configureByText("<div><p>${c}content</p></div>")
+    typeText(injector.parser.parseKeys("vt<Sti<CR>"))
+    assertState("<div><p><i>content</i></p></div>")
+  }
+
+  @Test
+  fun testVisualSurroundTagCancelledWithEscape() {
+    configureByText("<div><p>${c}content</p></div>")
+    typeText(injector.parser.parseKeys("vt<Sti<Esc>"))
+    assertMode(Mode.NORMAL())
+    assertState("<div><p>conten${c}t</p></div>")
+  }
+
   // VIM-1569
   @Test
   fun testSurroundTagWithAttributes() {
