@@ -45,12 +45,12 @@ abstract class VimStringParserBase : VimStringParser {
           (key.keyCode - 'A'.code + 1).toChar().toString()
         }
       } else {
-        "^" + key.keyCode.toChar()
+        "^" + keyCodeToChar(key.keyCode)
       }
     } else if (key.keyChar == KeyEvent.CHAR_UNDEFINED && key.keyCode == KeyEvent.VK_ENTER) {
       return "\n"
     }
-    return key.keyCode.toChar().toString()
+    return keyCodeToChar(key.keyCode).toString()
   }
 
   override fun toKeyNotation(keyStrokes: List<KeyStroke>): String {
@@ -68,7 +68,8 @@ abstract class VimStringParserBase : VimStringParser {
     val c = keyStroke.keyChar
     val keyCode = keyStroke.keyCode
     val modifiers = keyStroke.modifiers
-    if (c != KeyEvent.CHAR_UNDEFINED && !isControlCharacter(c)) {
+    val isTyped = c != KeyEvent.CHAR_UNDEFINED && !isControlCharacter(c)
+    if (isTyped && modifiers and NON_SHIFT_MODIFIERS == 0) {
       return c.toString()
     }
     var prefix = ""
@@ -84,6 +85,9 @@ abstract class VimStringParserBase : VimStringParser {
     if (modifiers and InputEvent.SHIFT_DOWN_MASK != 0) {
       prefix += "S-"
     }
+    if (isTyped) {
+      return "<$prefix$c>"
+    }
     var name = getVimKeyValue(keyCode)
     if (name != null) {
       name = if (containsDisplayUppercaseKeyNames(name)) {
@@ -98,7 +102,11 @@ abstract class VimStringParserBase : VimStringParser {
         return escape
       }
       try {
-        name = String(Character.toChars(keyCode))
+        name = if (keyCode in PUNCTUATION_KEY_CODES) {
+          keyCodeToChar(keyCode).toString()
+        } else {
+          String(Character.toChars(keyCode))
+        }
       } catch (_: IllegalArgumentException) {
       }
     }
@@ -623,8 +631,30 @@ abstract class VimStringParserBase : VimStringParser {
     } else if (modifiers == InputEvent.SHIFT_DOWN_MASK && Character.isLetter(c)) {
       KeyStroke.getKeyStroke(Character.toUpperCase(c))
     } else {
-      KeyStroke.getKeyStroke(Character.toUpperCase(c).code, modifiers)
+      val keyCode = getKeyCode(c, modifiers)
+      if (keyCode != null) KeyStroke.getKeyStroke(keyCode, modifiers) else KeyStroke.getKeyStroke(c, modifiers)
     }
+  }
+
+  /**
+   * Returns the key code of the key that types [c], or null for ASCII punctuation that only a shifted key types.
+   * Such characters are kept as typed keystrokes with modifiers, which never alias an unrelated key like Alt+Right.
+   */
+  private fun getKeyCode(c: Char, modifiers: Int): Int? {
+    if (c.code !in ASCII_PUNCTUATION) return Character.toUpperCase(c).code
+    // Ctrl-(? @ [\]^_) are ASCII control characters, stored by their character code
+    if (modifiers and InputEvent.CTRL_DOWN_MASK != 0 && c in '?'..'_') return c.code
+    return KeyEvent.getExtendedKeyCodeForChar(c.code).takeIf { it in PUNCTUATION_KEY_CODES }
+  }
+
+  /**
+   * Returns the character typed by a punctuation key without Shift. Only these key codes differ from the character
+   * code, all other key codes are converted directly.
+   */
+  private fun keyCodeToChar(keyCode: Int): Char = when (keyCode) {
+    KeyEvent.VK_QUOTE -> '\''
+    KeyEvent.VK_BACK_QUOTE -> '`'
+    else -> keyCode.toChar()
   }
 
   private enum class KeyParserState {
@@ -640,6 +670,17 @@ abstract class VimStringParserBase : VimStringParser {
     private const val VK_PLUG = KeyEvent.CHAR_UNDEFINED.code - 1
     private const val VK_ACTION = KeyEvent.CHAR_UNDEFINED.code - 2
 
+    private const val NON_SHIFT_MODIFIERS =
+      InputEvent.CTRL_DOWN_MASK or InputEvent.ALT_DOWN_MASK or InputEvent.META_DOWN_MASK
+
     private val nlKeyNames = setOf("nl", "newline", "linefeed", "lf")
+
+    private val ASCII_PUNCTUATION = ('!'.code..'~'.code).filterNot { it.toChar().isLetterOrDigit() }.toSet()
+
+    private val PUNCTUATION_KEY_CODES = setOf(
+      KeyEvent.VK_MINUS, KeyEvent.VK_EQUALS, KeyEvent.VK_OPEN_BRACKET, KeyEvent.VK_CLOSE_BRACKET,
+      KeyEvent.VK_BACK_SLASH, KeyEvent.VK_SEMICOLON, KeyEvent.VK_QUOTE, KeyEvent.VK_COMMA, KeyEvent.VK_PERIOD,
+      KeyEvent.VK_SLASH, KeyEvent.VK_BACK_QUOTE,
+    )
   }
 }

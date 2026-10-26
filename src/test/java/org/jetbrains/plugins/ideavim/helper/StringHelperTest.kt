@@ -7,10 +7,12 @@
  */
 package org.jetbrains.plugins.ideavim.helper
 
+import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import java.awt.event.InputEvent
+import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 import kotlin.test.assertEquals
 
@@ -94,6 +96,45 @@ class StringHelperTest : VimTestCase() {
   fun testControlBoundCharacters() {
     assertKeyStroke(KeyStroke.getKeyStroke('@'.code, InputEvent.CTRL_DOWN_MASK), "\u0000")
     assertKeyStroke(KeyStroke.getKeyStroke('_'.code, InputEvent.CTRL_DOWN_MASK), "\u001F")
+  }
+
+  @TestFor(issues = ["VIM-4349"])
+  @Test
+  fun testParseModifiedPunctuationAsItsKey() {
+    assertKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_QUOTE, InputEvent.ALT_DOWN_MASK), "<A-'>")
+    assertKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_QUOTE, InputEvent.ALT_DOWN_MASK), "<A-`>")
+    assertKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_QUOTE, InputEvent.CTRL_DOWN_MASK), "<C-'>")
+    assertKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_QUOTE, InputEvent.META_DOWN_MASK), "<D-`>")
+    assertKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SEMICOLON, InputEvent.ALT_DOWN_MASK), "<A-;>")
+    assertKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SLASH, InputEvent.CTRL_DOWN_MASK), "<C-/>")
+  }
+
+  @TestFor(issues = ["VIM-4349"])
+  @Test
+  fun testParseModifiedShiftedPunctuationAsTyped() {
+    assertKeyStroke(KeyStroke.getKeyStroke('%', InputEvent.ALT_DOWN_MASK), "<A-%>")
+    assertKeyStroke(KeyStroke.getKeyStroke('&', InputEvent.ALT_DOWN_MASK), "<A-&>")
+    assertKeyStroke(KeyStroke.getKeyStroke('{', InputEvent.ALT_DOWN_MASK), "<A-{>")
+    assertKeyStroke(KeyStroke.getKeyStroke('?', InputEvent.ALT_DOWN_MASK), "<A-?>")
+    assertKeyStroke(KeyStroke.getKeyStroke('|', InputEvent.ALT_DOWN_MASK), "<A-Bar>")
+  }
+
+  @TestFor(issues = ["VIM-4349"])
+  @Test
+  fun testParseControlCharactersByCharacterCode() {
+    assertKeyStroke(KeyStroke.getKeyStroke('^'.code, InputEvent.CTRL_DOWN_MASK), "<C-^>")
+    assertKeyStroke(KeyStroke.getKeyStroke('@'.code, InputEvent.CTRL_DOWN_MASK), "<C-@>")
+    assertKeyStroke(KeyStroke.getKeyStroke('_'.code, InputEvent.CTRL_DOWN_MASK), "<C-_>")
+    assertKeyStroke(KeyStroke.getKeyStroke('?'.code, InputEvent.CTRL_DOWN_MASK), "<C-?>")
+    assertKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_OPEN_BRACKET, InputEvent.CTRL_DOWN_MASK), "<C-[>")
+  }
+
+  @TestFor(issues = ["VIM-4349"])
+  @Test
+  fun testModifiedPunctuationKeyNotation() {
+    assertEquals("<A-'>", injector.parser.toKeyNotation(injector.parser.parseKeys("<A-'>")))
+    assertEquals("<C-`>", injector.parser.toKeyNotation(injector.parser.parseKeys("<C-`>")))
+    assertEquals("<A-%>", injector.parser.toKeyNotation(injector.parser.parseKeys("<A-%>")))
   }
 
   @Test
