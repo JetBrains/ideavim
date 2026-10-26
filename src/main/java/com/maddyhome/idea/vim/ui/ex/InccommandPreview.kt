@@ -35,7 +35,8 @@ import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand
  * single undo-transparent write action so the editor repaints once (only the net difference is visible - no flicker)
  * and the throwaway edits never pollute the user's undo stack.
  *
- * One instance is held per command-line panel. It is not thread-safe; all calls must happen on the EDT.
+ * One instance is created for each activation of an Ex command line (see [ExCommandPreview]), so no state is left over
+ * from a previous activation. It is not thread-safe; all calls must happen on the EDT.
  */
 internal class InccommandPreview {
   /** The replacements currently applied to the document as a preview, in the order they were made. */
@@ -109,19 +110,6 @@ internal class InccommandPreview {
         val text = document.getText(TextRange(document.getLineStartOffset(line), document.getLineEndOffset(line)))
         "${line + 1}: $text"
       }
-  }
-
-  /**
-   * Drop any tracked preview state *without* reverting it.
-   *
-   * Used when a command-line panel is (re)activated: the panel is a reused singleton, so it may still hold preview
-   * state from a previous activation that was abandoned without a clean [clear] (e.g. the editor was disposed). Those
-   * offsets refer to a now-stale document and must not be replayed, so we simply forget them.
-   */
-  fun reset() {
-    changes = emptyList()
-    snapshot = null
-    highlighters = emptyList()
   }
 
   /**
