@@ -19,7 +19,6 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.history.VimHistory
 import java.util.*
 
 @CommandOrMotion(
@@ -38,8 +37,7 @@ class LeaveCommandLineAction : VimActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     val argument = cmd.argument as? Argument.ExString ?: return true
-    val historyType = VimHistory.Type.getTypeByLabel(argument.label.toString())
-    injector.historyGroup.addEntry(historyType, argument.string)
+    injector.historyGroup.addEntry(argument.type.historyType, argument.string)
     return true
   }
 }

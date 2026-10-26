@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.CommandLineCompletion
+import com.maddyhome.idea.vim.api.CommandLineType
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.api.VimCommandLineCaret
@@ -33,6 +34,7 @@ import com.maddyhome.idea.vim.api.VimSearchGroupBase
 import com.maddyhome.idea.vim.api.VirtualBufferKind
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.helper.ShortcutHelper
 import com.maddyhome.idea.vim.helper.exitVisualMode
@@ -98,10 +100,6 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   var inputInterceptor: VimInputInterceptor? = null
   var context: DataContext? = null
 
-  override fun isExCommand(): Boolean {
-    return getLabel().startsWith(":")
-  }
-
   override fun getIncsearchMatchOffset(): Int {
     return incsearchMatchOffset
   }
@@ -161,16 +159,21 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     }
   }
 
+  override var type: CommandLineType = CommandLineType.Input
+    private set
+
   /**
    * Turns on the ex entry field for the given editor
    *
    * @param editor   The editor to use for display
    * @param context  The data context
-   * @param label    The label for the ex entry (i.e. :, /, or ?)
+   * @param type     The kind of command line
+   * @param label    The prompt shown before the text
    * @param initText The initial text for the entry
    */
-  fun activate(editor: Editor, context: DataContext?, label: String, initText: String) {
+  fun activate(editor: Editor, context: DataContext?, type: CommandLineType, label: String, initText: String) {
     logger.info("Activate ex entry panel")
+    this.type = type
     this.myLabel.setText(label)
     this.myLabel.setFont(selectEditorFont(editor, label))
     entry.reset()
@@ -358,7 +361,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   private sealed interface CommandLineUpdate {
     /** A renderable search (`/`, `?`) or ex command (`:s`, `:g`) with a usable pattern. */
     class Renderable(
-      val labelText: String,
+      val forwards: Boolean,
       val separator: Char,
       val searchText: String,
       val isExCommand: Boolean,
@@ -374,13 +377,15 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   }
 
   private fun parseCommandLineForPreview(editor: Editor): CommandLineUpdate {
-    val labelText = myLabel.text
-    if (labelText == "/" || labelText == "?") {
+    when (val type = type) {
       // A search: '/' (forwards) or '?' (backwards). The whole entry is the pattern.
-      return CommandLineUpdate.Renderable(labelText, labelText[0], text, isExCommand = false, null, null)
+      is CommandLineType.Search -> return CommandLineUpdate.Renderable(
+        type.direction == Direction.FORWARDS, type.cmdType, text, isExCommand = false, null, null
+      )
+      // The text of an input prompt (e.g. `input()`, the surround tag prompt or `<C-R>=`) is not a pattern
+      CommandLineType.Expression, CommandLineType.Input -> return CommandLineUpdate.ClearPreview
+      CommandLineType.Command -> Unit
     }
-    // Any other label is an input prompt (e.g. `input()`, the surround tag prompt or `<C-R>=`), not a pattern
-    if (labelText != ":") return CommandLineUpdate.ClearPreview
 
     if (text.isEmpty()) return CommandLineUpdate.ClearPreview
     val command = getIncsearchCommand(text) ?: return CommandLineUpdate.ClearPreview
@@ -388,7 +393,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     // The argument is e.g. `/foo/bar/g` for `:%s/foo/bar/g`: the first char is the separator, the rest is the pattern
     // (plus replacement and flags). `%` is the range, `s` the command, `/` the argument separator.
     val argument = command.commandArgument
-    var separator = labelText[0]
+    var separator = type.cmdType
     var searchText = ""
     if (argument.length > 1) {
       separator = argument[0]
@@ -400,8 +405,9 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
       // `whatever`. A null range means the user typed an invalid range (e.g. an unset mark).
       return CommandLineUpdate.ResetIncsearch
     }
+    // :s, :g, :v are treated as forwards
     return CommandLineUpdate.Renderable(
-      labelText, separator, searchText, isExCommand = true, searchRange, command as? SubstituteCommand
+      forwards = true, separator, searchText, isExCommand = true, searchRange, command as? SubstituteCommand
     )
   }
 
@@ -410,7 +416,6 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     // components - selecting register(s), operator and motions. E.g. `2"a3"b4"c5d6/` will return 720. If we're showing
     // highlights for an Ex command like `:s`, the command builder will be empty, but we'll still get a valid value.
     // Include any `c_CTRL-G`/`c_CTRL-T` advancement so the current match moves as the user presses <C-G>/<C-T>.
-    val forwards = update.labelText != "?" // :s, :g, :v are treated as forwards
     val patternEnd = injector.searchGroup.findEndOfPattern(update.searchText, update.separator, 0)
     val pattern = update.searchText.take(patternEnd)
     val count1 = normalizeIncsearchCount(
@@ -427,7 +432,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     injector.editorGroup.closeEditorSearchSession(IjVimEditor(editor))
     // A substitute/global command highlights every match in its range, even without 'hlsearch'.
     val matchOffset = updateIncsearchHighlights(
-      editor, pattern, count1, forwards, caretOffset, update.searchRange, forceShowAllMatches = update.isExCommand
+      editor, pattern, count1, update.forwards, caretOffset, update.searchRange, forceShowAllMatches = update.isExCommand
     )
     if (matchOffset == -1) {
       resetCaretOffsetAndScroll(editor)
@@ -530,7 +535,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   }
 
   /**
-   * Gets the label for the ex entry. This should be one of ":", "/", or "?"
+   * Gets the label for the ex entry, e.g. ":", "/", "?" or the prompt of an input. See [type] for the kind of entry
    *
    * @return The ex entry label
    */

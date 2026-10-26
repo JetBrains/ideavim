@@ -12,6 +12,7 @@ import com.intellij.vim.api.VimApi
 import com.intellij.vim.api.scopes.commandline.CommandLineRead
 import com.intellij.vim.api.scopes.commandline.CommandLineScope
 import com.intellij.vim.api.scopes.commandline.CommandLineTransaction
+import com.maddyhome.idea.vim.api.CommandLineType
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -32,7 +33,7 @@ class CommandLineScopeImpl(
 
   override fun input(prompt: String, finishOn: Char?, callback: suspend VimApi.(String) -> Unit) {
     val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
-    injector.commandLine.readInputAndProcess(vimEditor, vimContext, prompt, finishOn) {
+    injector.commandLine.readInputAndProcess(vimEditor, vimContext, CommandLineType.Input, prompt, finishOn) {
       kotlinx.coroutines.runBlocking { vimApi.callback(it) }
     }
   }

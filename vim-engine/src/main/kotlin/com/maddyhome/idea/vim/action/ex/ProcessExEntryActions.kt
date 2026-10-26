@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.action.ex
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.api.CommandLineType
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -19,7 +20,6 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
@@ -39,7 +39,12 @@ class ProcessExEntryAction : MotionActionHandler.AmbiguousExecution() {
   override fun getMotionActionHandler(argument: Argument?): MotionActionHandler {
     check(argument is Argument.ExString)
     if (argument.processing != null) return ExecuteDefinedInputProcessingAction()
-    return if (argument.label == ':') ProcessExCommandEntryAction() else ProcessSearchEntryAction(this)
+    return when (argument.type) {
+      CommandLineType.Command -> ProcessExCommandEntryAction()
+      is CommandLineType.Search -> ProcessSearchEntryAction(this)
+      // Nothing to execute: the text of an input prompt is only passed to its processing
+      CommandLineType.Expression, CommandLineType.Input -> IgnoreInputEntryAction()
+    }
   }
 }
 
@@ -106,6 +111,17 @@ class ExecuteDefinedInputProcessingAction : MotionActionHandler.SingleExecution(
   }
 }
 
+class IgnoreInputEntryAction : MotionActionHandler.SingleExecution() {
+  override val motionType: MotionType = MotionType.EXCLUSIVE
+
+  override fun getOffset(
+    editor: VimEditor,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
+  ): Motion = Motion.NoMotion
+}
+
 class ProcessSearchEntryAction(private val parentAction: ProcessExEntryAction) : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType
     get() = throw RuntimeException("Parent motion type should be used, as only it is accessed by other code")
@@ -118,7 +134,7 @@ class ProcessSearchEntryAction(private val parentAction: ProcessExEntryAction) :
     operatorArguments: OperatorArguments,
   ): Motion {
     if (argument !is Argument.ExString) return Motion.Error
-    val originalDirection = if (argument.label == '/') Direction.FORWARDS else Direction.BACKWARDS
+    val originalDirection = (argument.type as? CommandLineType.Search)?.direction ?: return Motion.Error
 
     val effectiveCount = operatorArguments.count1 + argument.incSearchOffset
     val direction = if (effectiveCount >= 1) originalDirection else originalDirection.reverse()

@@ -9,6 +9,7 @@ package com.maddyhome.idea.vim.action.change.insert
 
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
+import com.maddyhome.idea.vim.api.CommandLineType
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -41,7 +42,7 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
   ): Boolean {
     val argument = cmd.argument as? Argument.Character ?: return false
     if (argument.character == '=') {
-      injector.commandLine.readInputAndProcess(editor, context, "=", finishOn = null) { input ->
+      injector.commandLine.readInputAndProcess(editor, context, CommandLineType.Expression, "=", finishOn = null) { input ->
         try {
           if (input.isNotEmpty()) {
             val expression =

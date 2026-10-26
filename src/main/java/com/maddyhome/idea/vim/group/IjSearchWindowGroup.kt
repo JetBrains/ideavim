@@ -7,6 +7,7 @@
  */
 package com.maddyhome.idea.vim.group
 
+import com.maddyhome.idea.vim.api.CommandLineType
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.SearchWindowGroup
@@ -44,7 +45,7 @@ class IjSearchWindowGroup : SearchWindowGroup {
   }
 
   override fun openFromCommandLine(editor: VimEditor, context: ExecutionContext, commandLine: Argument.ExString) {
-    val kind = cmdwinKindOf(commandLine.label)
+    val kind = cmdwinKindOf(commandLine.type) ?: return
     val content = withLastLine(historyContent(historyTypeOf(kind)), commandLine.string)
     val cmdwin = injector.virtualBufferGroup.open(context, editor, kind, content) ?: return
     val lastLineStart = content.length - commandLine.string.length
@@ -88,11 +89,11 @@ class IjSearchWindowGroup : SearchWindowGroup {
     }
   }
 
-  private fun cmdwinKindOf(commandLineLabel: Char): VirtualBufferKind = when (commandLineLabel) {
-    ':' -> VirtualBufferKind.Command
-    '/' -> VirtualBufferKind.Search(Direction.FORWARDS)
-    '?' -> VirtualBufferKind.Search(Direction.BACKWARDS)
-    else -> error("No command-line window for the command line '$commandLineLabel'")
+  /** There is no command-line window for an expression or an input prompt */
+  private fun cmdwinKindOf(type: CommandLineType): VirtualBufferKind? = when (type) {
+    CommandLineType.Command -> VirtualBufferKind.Command
+    is CommandLineType.Search -> VirtualBufferKind.Search(type.direction)
+    CommandLineType.Expression, CommandLineType.Input -> null
   }
 
   private fun historyTypeOf(kind: VirtualBufferKind): VimHistory.Type =

@@ -36,6 +36,21 @@ class IncsearchTests : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @Test
+  fun `test incsearch does not search the text of an expression prompt`() {
+    configureByText(
+      """I found it in a legendary land
+         |${c}all rocks and lavender and tufted grass,
+         |where it was settled on some sodden sand
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
+    )
+    enterCommand("set incsearch")
+    typeText("i<C-R>=", "la")
+    assertPosition(1, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test incsearch + hlsearch moves caret to start of first match`() {
     configureByText(
       """I found it in a legendary land

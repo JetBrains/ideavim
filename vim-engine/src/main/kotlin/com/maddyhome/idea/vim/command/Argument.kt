@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.command
 
+import com.maddyhome.idea.vim.api.CommandLineType
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.handler.ExternalActionHandler
 import com.maddyhome.idea.vim.handler.MotionActionHandler
@@ -29,7 +30,8 @@ sealed class Argument {
   /**
    * An argument representing the user's input from the Ex command line, typically a search string
    *
-   * [caretOffset] is the position of the command line caret in [string] when the command line was closed.
+   * [caretOffset] is the position of the command line caret in [string] when the command line was closed. [type] is the
+   * kind of command line. [label] is only the first character of its prompt.
    */
   class ExString(
     val label: Char,
@@ -37,6 +39,7 @@ sealed class Argument {
     val incSearchOffset: Int,
     val processing: ((String) -> Unit)?,
     val caretOffset: Int = string.length,
+    val type: CommandLineType = CommandLineType.fromLabel(label.toString()),
   ) : Argument()
 
   /**

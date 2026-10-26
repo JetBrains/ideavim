@@ -9,6 +9,7 @@ package com.maddyhome.idea.vim.ui.ex
 
 import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.action.change.Extension
+import com.maddyhome.idea.vim.api.CommandLineType
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.api.VimCommandLineServiceBase
@@ -60,7 +61,7 @@ class ExEntryPanelService : VimCommandLineServiceBase() {
     } else {
       var text: String? = null
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for input()
-      val commandLine = injector.commandLine.createSearchPrompt(vimEditor, context, prompt.ifEmpty { " " }, "")
+      val commandLine = injector.commandLine.createInputPrompt(vimEditor, context, prompt.ifEmpty { " " })
       ModalEntry.activate(editor.vim) { key: KeyStroke ->
         return@activate when {
           key.isCloseKeyStroke() -> {
@@ -97,6 +98,7 @@ class ExEntryPanelService : VimCommandLineServiceBase() {
   override fun readInputAndProcess(
     vimEditor: VimEditor,
     context: ExecutionContext,
+    type: CommandLineType,
     prompt: String,
     finishOn: Char?,
     processing: (String) -> Unit,
@@ -120,17 +122,18 @@ class ExEntryPanelService : VimCommandLineServiceBase() {
     val panel = ExEntryPanel.getOrCreatePanelInstance()
     panel.finishOn = finishOn
     panel.inputProcessing = processing
-    panel.activate(vimEditor.ij, context.ij, prompt, "")
+    panel.activate(vimEditor.ij, context.ij, type, prompt, "")
   }
 
   override fun createPanel(
     editor: VimEditor,
     context: ExecutionContext,
+    type: CommandLineType,
     label: String,
     initText: String,
   ): VimCommandLine {
     val panel = ExEntryPanel.getOrCreatePanelInstance()
-    panel.activate(editor.ij, context.ij, label, initText)
+    panel.activate(editor.ij, context.ij, type, label, initText)
     return panel
   }
 
