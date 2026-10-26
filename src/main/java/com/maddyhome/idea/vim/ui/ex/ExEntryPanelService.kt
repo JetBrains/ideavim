@@ -53,6 +53,8 @@ class ExEntryPanelService : VimCommandLineServiceBase() {
         }
         key = inputModel.nextKeyStroke()
       }
+      // Cancelled, like closing the command line with <Esc>
+      if (key != null && key.isCloseKeyStroke()) return null
       if (finishOn != null && key != null && key.keyChar == finishOn) {
         builder.append(key.keyChar)
       }
@@ -80,6 +82,13 @@ class ExEntryPanelService : VimCommandLineServiceBase() {
             text = commandLine.text
             commandLine.deactivate(refocusOwningEditor = true, resetCaret = true)
             false
+          }
+
+          // The typed character of <BS> would be inserted as text
+          key.keyChar == '\b' -> {
+            val offset = commandLine.caret.offset
+            if (offset > 0) commandLine.deleteText(offset - 1, 1)
+            true
           }
 
           else -> {
