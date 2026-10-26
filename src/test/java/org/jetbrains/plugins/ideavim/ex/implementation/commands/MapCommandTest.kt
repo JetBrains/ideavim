@@ -1405,4 +1405,67 @@ class MapCommandTest : VimTestCase() {
       enterCommand("imap <S-Tab> hello")
     }
   }
+
+  @TestFor(issues = ["VIM-4349"])
+  @Test
+  fun `test map Alt+quote does not take Alt+Right`() {
+    configureByText("${c}foo bar\n")
+    enterCommand("nmap <A-'> w")
+    assertPluginError(false)
+
+    typeText("<A-Right>")
+    assertOffset(0)
+    typeText("<A-'>")
+    assertOffset(4)
+    assertCommandOutput("nmap", "n  <A-'>         w")
+  }
+
+  @TestFor(issues = ["VIM-4349"])
+  @Test
+  fun `test map Alt+backquote does not take keypad 0`() {
+    configureByText("${c}foo bar\n")
+    enterCommand("nmap <A-`> w")
+    assertPluginError(false)
+
+    typeText("<A-k0>")
+    assertOffset(0)
+    typeText("<A-`>")
+    assertOffset(4)
+  }
+
+  @TestFor(issues = ["VIM-4349"])
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Vim maps <A-%>, IdeaVim has no key code for it")
+  @Test
+  fun `test map of shifted punctuation with modifier reports error`() {
+    configureByText("${c}foo bar\n")
+    enterCommand("nmap <A-%> w")
+
+    assertPluginError(true)
+    assertPluginErrorMessage("Cannot map <A-%>: no key types this character, map the key itself, e.g. <A-S-5> instead of <A-%>")
+    assertCommandOutput("nmap", "No mapping found")
+    typeText("<A-Left>")
+    assertOffset(0)
+  }
+
+  @TestFor(issues = ["VIM-4349"])
+  @Test
+  fun `test map of shifted punctuation by its key`() {
+    configureByText("${c}foo bar\n")
+    enterCommand("nmap <A-S-5> w")
+    assertPluginError(false)
+
+    typeText("<A-S-5>")
+    assertOffset(4)
+  }
+
+  @TestFor(issues = ["VIM-4349"])
+  @Test
+  fun `test map of control character with caret`() {
+    configureByText("${c}foo bar\n")
+    enterCommand("nmap <C-^> w")
+    assertPluginError(false)
+
+    typeText("<C-^>")
+    assertOffset(4)
+  }
 }

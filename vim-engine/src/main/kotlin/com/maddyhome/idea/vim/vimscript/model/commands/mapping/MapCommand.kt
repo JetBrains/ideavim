@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand.Specia
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import org.jetbrains.annotations.NonNls
+import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
@@ -209,7 +210,12 @@ data class MapCommand(val range: Range, val cmd: String, val modifier: CommandMo
         if (specialArgument != null) {
           specialArguments.add(specialArgument)
         } else {
-          fromKeys = injector.parser.parseKeys(processBars(part))
+          fromKeys = injector.parser.parseKeys(processBars(part)).also { keys ->
+            // A modified character without its own key, e.g. <A-%>, is parsed as a typed keystroke no key press matches
+            if (keys.any { it.keyChar != KeyEvent.CHAR_UNDEFINED && it.modifiers != 0 }) {
+              throw exExceptionMessage("command.map.no.key.for.character", part)
+            }
+          }
         }
       }
     }
