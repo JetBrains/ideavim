@@ -48,6 +48,10 @@ class QuickFixServiceImpl : QuickFixService {
     QuickFixWindow.open(editor, list?.items.orEmpty(), list?.currentIndex ?: 0)
   }
 
+  override fun closeWindow(editor: VimEditor) {
+    QuickFixWindow.close(editor)
+  }
+
   override fun removeList(projectId: String) {
     listsByProject.remove(projectId)
   }

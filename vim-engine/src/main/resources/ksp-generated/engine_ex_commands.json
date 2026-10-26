@@ -80,6 +80,9 @@
   "cal[l]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.CallCommand"
   },
+  "ccl[ose]": {
+    "className": "com.maddyhome.idea.vim.vimscript.model.commands.quickfix.CcloseCommand"
+  },
   "cfir[st]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.quickfix.CfirstCommand"
   },

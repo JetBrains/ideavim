@@ -65,6 +65,11 @@ interface QuickFixService {
   fun openWindow(editor: VimEditor)
 
   /**
+   * Closes the quickfix window of the editor's project, like `:cclose`. The list stays.
+   */
+  fun closeWindow(editor: VimEditor)
+
+  /**
    * Forgets the list of a project, e.g. when it's closed.
    */
   fun removeList(projectId: String)

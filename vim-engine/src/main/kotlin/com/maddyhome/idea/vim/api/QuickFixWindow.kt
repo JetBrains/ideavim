@@ -19,6 +19,26 @@ internal object QuickFixWindow {
   }
 
   /**
+   * When [editor] is the quickfix window itself, moves back to the window it was opened from.
+   */
+  fun close(editor: VimEditor) {
+    val group = injector.virtualBufferGroup
+    val returnTo = if (editor.getVirtualBufferKind() == VirtualBufferKind.QuickFix) {
+      group.selectOriginalWindow(editor) ?: editor.getCmdwinOriginalEditor()
+    } else {
+      null
+    }
+    group.close(contextOf(editor), VirtualBufferKind.QuickFix)
+    returnTo?.let { selectEditor(it) }
+  }
+
+  private fun selectEditor(editor: VimEditor) {
+    val path = editor.getPath() ?: return
+    val protocol = editor.extractProtocol() ?: return
+    injector.file.selectEditor(editor.projectId, path, protocol)
+  }
+
+  /**
    * Shows the new list and current item if the window is open.
    */
   fun refresh(editor: VimEditor, items: List<QuickFixItem>, currentIndex: Int) {
