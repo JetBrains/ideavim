@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 /**
  * See `:help :cclose`.
  */
-@ExCommand(command = "ccl[ose]", description = "Close the quickfix window")
+@ExCommand(command = "ccl[ose]", description = "Close the quickfix window.")
 data class CcloseCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

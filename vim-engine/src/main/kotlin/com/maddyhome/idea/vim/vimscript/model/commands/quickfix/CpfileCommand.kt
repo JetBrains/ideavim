@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
  */
 @ExCommand(
   command = "cpf[ile],cNf[ile]",
-  description = "Jump to the last item of the [count]th previous file in the quickfix list",
+  description = "Jump to the last item of the [count]th previous file in the quickfix list.",
 )
 data class CpfileCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {

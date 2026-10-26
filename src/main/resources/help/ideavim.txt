@@ -1738,8 +1738,26 @@ zf                      Create a closed fold over the Visual selection.
 :cal[l]                 Call the function {name} with the given arguments and
                         discard the result, optionally for a [range] of lines.
 
+                                                              *:ccl* *:cclose*
+:ccl[ose]               Close the quickfix window.
+
+                                            *:cfir* *:cfirst* *:cr* *:crewind*
+:cfir[st] :cr[ewind]    Jump to the [count]th item of the quickfix list, or to
+                        the first one.
+
+                                                               *:cla* *:clast*
+:cla[st]                Jump to the [count]th item of the quickfix list, or to
+                        the last one.
+
                                                           *:cle* *:clearjumps*
 :cle[arjumps]           Clear the jump list of the current window.
+
+                                                                *:cn* *:cnext*
+:cn[ext]                Jump to the [count]th next item in the quickfix list.
+
+                                                              *:cnf* *:cnfile*
+:cnf[ile]               Jump to the first item of the [count]th next file in
+                        the quickfix list.
 
                                                              *:com* *:command*
 :com[mand]              Define the user command {cmd} that executes {rep}.
@@ -1747,6 +1765,17 @@ zf                      Create a closed fold over the Visual selection.
 
                                                            *:comc* *:comclear*
 :comc[lear]             Delete all user-defined commands.
+
+                                                              *:cope* *:copen*
+:cope[n]                Open a window showing the quickfix list.
+
+                                             *:cp* *:cprevious* *:cN* *:cNext*
+:cp[revious] :cN[ext]   Jump to the [count]th previous item in the quickfix
+                        list.
+
+                                             *:cpf* *:cpfile* *:cNf* *:cNfile*
+:cpf[ile] :cNf[ile]     Jump to the last item of the [count]th previous file
+                        in the quickfix list.
 
                                                                 *:d* *:delete*
 :d[elete]               Delete the lines in [range] (default current line)

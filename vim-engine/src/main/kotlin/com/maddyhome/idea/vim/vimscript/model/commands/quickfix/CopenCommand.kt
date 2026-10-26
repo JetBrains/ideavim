@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 /**
  * See `:help :copen`. The optional height is accepted but ignored: the window size is left to the IDE.
  */
-@ExCommand(command = "cope[n]", description = "Open a window showing the quickfix list")
+@ExCommand(command = "cope[n]", description = "Open a window showing the quickfix list.")
 data class CopenCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 
