@@ -16,6 +16,7 @@ import com.intellij.execution.process.ProcessOutput
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.io.FileUtil
 import java.nio.charset.StandardCharsets
 import kotlin.io.path.Path
 import kotlin.io.path.isExecutable
@@ -33,10 +34,15 @@ internal class GitCliClient(private val project: Project) : GitClient {
     return if (isBareName(git)) isOnPath(git) else Path(git).isExecutable()
   }
 
+  /**
+   * Resolves `--show-cdup` against [directory] rather than using `--show-toplevel`, which resolves symlinks, e.g.
+   * `/tmp` to `/private/tmp` on macOS. Paths built from it then match the files already open in the IDE.
+   */
   override fun findWorkTree(directory: String): String? {
-    val output = execute(directory, listOf("rev-parse", "--show-toplevel"))
+    val output = execute(directory, listOf("rev-parse", "--show-cdup"))
     if (output.exitCode != 0) return null
-    return output.stdout.firstOrNull()?.takeIf { it.isNotBlank() }
+    val pathToRoot = output.stdout.firstOrNull().orEmpty().trim()
+    return FileUtil.toSystemIndependentName(Path(directory).resolve(pathToRoot).normalize().toString())
   }
 
   override fun run(workTree: String, args: List<String>): GitOutput = execute(workTree, args)

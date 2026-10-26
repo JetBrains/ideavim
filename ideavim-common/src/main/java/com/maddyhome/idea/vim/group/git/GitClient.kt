@@ -32,8 +32,8 @@ interface GitClient {
   fun isExecutableFound(): Boolean
 
   /**
-   * Returns the root of the work tree containing [directory] (`git rev-parse --show-toplevel`),
-   * or null if [directory] is not inside a Git work tree.
+   * Returns the root of the work tree containing [directory], in the same path form as [directory] (symlinks are not
+   * resolved), or null if [directory] is not inside a Git work tree.
    *
    * @throws GitCannotExecuteException if git can't be started
    */
