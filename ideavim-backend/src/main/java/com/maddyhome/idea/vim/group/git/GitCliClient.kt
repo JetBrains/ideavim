@@ -12,6 +12,9 @@ import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.configurations.PathEnvironmentVariableUtil
 import com.intellij.execution.process.CapturingProcessHandler
+import com.intellij.execution.process.ProcessOutput
+import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import java.nio.charset.StandardCharsets
 import kotlin.io.path.Path
@@ -45,11 +48,20 @@ internal class GitCliClient(private val project: Project) : GitClient {
       .withCharset(StandardCharsets.UTF_8)
       .withWorkingDirectory(Path(workDirectory))
     val output = try {
-      CapturingProcessHandler(commandLine).runProcess()
+      runCancellably(CapturingProcessHandler(commandLine))
     } catch (e: ExecutionException) {
       throw GitCannotExecuteException(git, e)
     }
+    if (output.isCancelled) throw ProcessCanceledException()
     return GitOutput(output.exitCode, output.stdoutLines, output.stderr)
+  }
+
+  /**
+   * With a progress indicator, cancelling it kills the process.
+   */
+  private fun runCancellably(handler: CapturingProcessHandler): ProcessOutput {
+    val indicator = ProgressManager.getGlobalProgressIndicator() ?: return handler.runProcess()
+    return handler.runProcessWithProgressIndicator(indicator)
   }
 
   private companion object {

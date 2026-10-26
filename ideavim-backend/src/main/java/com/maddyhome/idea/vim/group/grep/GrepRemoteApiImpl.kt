@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.group.grep
 
+import com.intellij.openapi.progress.coroutineToIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VirtualFile
@@ -38,7 +39,9 @@ internal class GrepRemoteApiImpl : GrepRemoteApi {
     try {
       val project = projectId.findProjectOrNull() ?: throw GrepFailure(notInRepository(file = null))
       val file = filepath?.let { findVirtualFile(it, protocol) }
-      GrepResult(matches = GitGrep(GitClient.getInstance(project)).search(file, project, args))
+      // Lets git be killed when the user cancels a slow search
+      val matches = coroutineToIndicator { _ -> GitGrep(GitClient.getInstance(project)).search(file, project, args) }
+      GrepResult(matches = matches)
     } catch (e: GrepFailure) {
       GrepResult(errorMessage = e.message)
     } catch (_: GitCannotExecuteException) {
