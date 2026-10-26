@@ -20,7 +20,9 @@ import com.maddyhome.idea.vim.group.grep.GrepMatch
 import com.maddyhome.idea.vim.group.grep.GrepRemoteApi
 import com.maddyhome.idea.vim.group.grep.GrepResult
 import com.maddyhome.idea.vim.group.rpc
+import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.newapi.ij
+import kotlinx.coroutines.CancellationException
 
 /**
  * `:Ggrep[!] {args}` — runs `git grep {args}` and jumps to the first match, like fugitive's
@@ -46,10 +48,17 @@ internal class GrepCommand : CommandAliasHandler {
     }
   }
 
+  /**
+   * @return null if there's no project or the user cancelled a slow search
+   */
   private fun grep(editor: VimEditor, gitArgs: List<String>): GrepResult? {
     val project = editor.ij.project ?: return null
-    return rpc(project) {
-      GrepRemoteApi.getInstance().grep(project.projectId(), editor.getPath(), editor.extractProtocol(), gitArgs)
+    return try {
+      rpc(project, MessageHelper.message("fugitive.progress.grep")) {
+        GrepRemoteApi.getInstance().grep(project.projectId(), editor.getPath(), editor.extractProtocol(), gitArgs)
+      }
+    } catch (_: CancellationException) {
+      null
     }
   }
 }

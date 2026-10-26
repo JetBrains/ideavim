@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.group
 
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.NlsContexts.ProgressTitle
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.platform.ide.progress.runWithModalProgressBlocking
 import com.intellij.util.PlatformUtils
@@ -22,12 +23,14 @@ import com.intellij.util.PlatformUtils
  * Works in both monolith and split mode:
  * - **Monolith**: RPC resolves to the backend handler locally.
  * - **Split**: RPC sends to the backend process.
+ *
+ * @param title shown in the modal progress dialog if the call takes long, e.g. for a slow search
  */
-internal fun <T> rpc(project: Project? = null, block: suspend () -> T): T {
+internal fun <T> rpc(project: Project? = null, @ProgressTitle title: String = "", block: suspend () -> T): T {
   val resolvedProject = project
     ?: ProjectManager.getInstance().openProjects.firstOrNull()
     ?: error("No open project available for RPC call")
-  return runWithModalProgressBlocking(resolvedProject, "") { block() }
+  return runWithModalProgressBlocking(resolvedProject, title) { block() }
 }
 
 /**
@@ -40,6 +43,6 @@ internal fun <T> rpc(project: Project? = null, block: suspend () -> T): T {
  */
 internal fun rpcSplitModeOnly(project: Project? = null, block: suspend () -> Unit) {
   if (PlatformUtils.isJetBrainsClient()) {
-    rpc(project, block)
+    rpc(project, block = block)
   }
 }
