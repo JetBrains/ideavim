@@ -51,4 +51,26 @@ interface VirtualBufferGroup {
    * the nesting restriction of the other virtual buffers.
    */
   fun openHelp(context: ExecutionContext, editor: VimEditor, content: String, line: Int)
+
+  /**
+   * Shows [content] in the read-only quickfix window with the cursor at the start of [line], the way `:copen` does.
+   *
+   * An already open quickfix window is reused. It doesn't take part in the nesting restriction of the other virtual
+   * buffers.
+   */
+  fun openQuickFix(context: ExecutionContext, editor: VimEditor, content: String, line: Int)
+
+  /**
+   * Replaces the content of the open quickfix window and puts its cursor at the start of [line].
+   * Does nothing when the window isn't open.
+   */
+  fun refreshQuickFix(context: ExecutionContext, content: String, line: Int)
+
+  /**
+   * Makes the window [buffer] was opened from the current one, so files open there rather than next to the buffer.
+   * When that window doesn't show the original file anymore, another window not showing [buffer] is used.
+   *
+   * @return the editor of that window, or null if there's no other window
+   */
+  fun selectOriginalWindow(buffer: VimEditor): VimEditor? = null
 }

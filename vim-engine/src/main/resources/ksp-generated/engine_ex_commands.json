@@ -120,6 +120,9 @@
   "comc[lear]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.CmdClearCommand"
   },
+  "cope[n]": {
+    "className": "com.maddyhome.idea.vim.vimscript.model.commands.quickfix.CopenCommand"
+  },
   "cp[revious]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.quickfix.CpreviousCommand"
   },

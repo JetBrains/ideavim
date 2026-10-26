@@ -36,4 +36,9 @@ sealed class VirtualBufferKind {
   data object Help : VirtualBufferKind() {
     override val fileName: String = "ideavim.txt"
   }
+
+  /** The read-only window `:copen` opens to show the quickfix list */
+  data object QuickFix : VirtualBufferKind() {
+    override val fileName: String = "[Quickfix List]"
+  }
 }

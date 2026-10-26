@@ -33,6 +33,7 @@ internal object GitGrepOutputParser {
     return GrepMatch(
       filepath = "$root/$path",
       protocol = protocol,
+      relativePath = path,
       line = lineNumber.toInt() - 1,
       col = if (byteColumn.isEmpty()) 0 else charColumn(text, byteColumn.toInt() - 1),
       text = text,

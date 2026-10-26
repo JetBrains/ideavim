@@ -103,6 +103,6 @@ class FugitiveQuickFixPerProjectTest : FugitiveTestCase() {
   }
 
   private companion object {
-    val OTHER_PROJECT_ITEM = QuickFixItem(0, 0, "/elsewhere/x.txt", "file", "x")
+    val OTHER_PROJECT_ITEM = QuickFixItem(0, 0, "/elsewhere/x.txt", "file", "x.txt", "x")
   }
 }
