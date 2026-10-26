@@ -374,11 +374,13 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   }
 
   private fun parseCommandLineForPreview(editor: Editor): CommandLineUpdate {
-    val labelText = myLabel.text // Either '/', '?' or ':'
-    if (labelText != ":") {
+    val labelText = myLabel.text
+    if (labelText == "/" || labelText == "?") {
       // A search: '/' (forwards) or '?' (backwards). The whole entry is the pattern.
       return CommandLineUpdate.Renderable(labelText, labelText[0], text, isExCommand = false, null, null)
     }
+    // Any other label is an input prompt (e.g. `input()`, the surround tag prompt or `<C-R>=`), not a pattern
+    if (labelText != ":") return CommandLineUpdate.ClearPreview
 
     if (text.isEmpty()) return CommandLineUpdate.ClearPreview
     val command = getIncsearchCommand(text) ?: return CommandLineUpdate.ClearPreview

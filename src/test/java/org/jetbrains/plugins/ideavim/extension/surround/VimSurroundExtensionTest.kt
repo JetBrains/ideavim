@@ -10,8 +10,10 @@
 
 package org.jetbrains.plugins.ideavim.extension.surround
 
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.extension.sneak.IdeaVimSneakExtension
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -21,6 +23,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import javax.swing.KeyStroke
 
 /**
  * @author dhleong
@@ -230,6 +233,28 @@ class VimSurroundExtensionTest : VimTestCase() {
       Mode.NORMAL(),
     )
     assertMode(Mode.NORMAL())
+  }
+
+  // VIM-4346
+  @Test
+  fun testVisualSurroundTagPromptDoesNotTriggerIncsearch() {
+    configureByText("<div><p>${c}content</p></div>")
+    enterCommand("set incsearch")
+    typeText("vt<")
+
+    // In unit test mode, inputString reads keys from TestInputModel and never opens the command line, so drive the
+    // same prompt that inputTagPair opens in the IDE
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    ApplicationManager.getApplication().invokeAndWait {
+      val commandLine = injector.commandLine.createSearchPrompt(vimEditor, context, "<", "")
+      commandLine.handleKey(KeyStroke.getKeyStroke('i'))
+
+      assertState("<div><p>${s}conten${c}t${se}</p></div>")
+
+      commandLine.deactivate(refocusOwningEditor = true, resetCaret = true)
+      assertState("<div><p>${s}conten${c}t${se}</p></div>")
+    }
   }
 
   /* Delete surroundings */

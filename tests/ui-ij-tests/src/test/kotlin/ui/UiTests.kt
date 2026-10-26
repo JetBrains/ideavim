@@ -101,6 +101,7 @@ class UiTests {
       reenableIdeaVim(editor)
       reenablingIdeaVimKeepsMappings(editor)
       testEchoFromCommandLineWindow()
+      testVisualSurroundTagWithEnter(editor)
 
       createFile("MyTest.java", this@uiTest)
       val javaEditor = editor("MyTest.java") {
@@ -418,6 +419,34 @@ class UiTests {
 
     keyboard { escape() }
     waitFor { !isOutputShown("from cmdwin") }
+    vimExit()
+  }
+
+  // VIM-2796
+  private fun IdeaFrame.testVisualSurroundTagWithEnter(editor: Editor) {
+    println("Run testVisualSurroundTagWithEnter...")
+
+    editor.injectText("<div><p>content</p></div>")
+
+    keyboard {
+      escape()
+      enterText(":set surround")
+      enter()
+      enterText("gg0f>;l")
+      enterText("vt<")
+      enterText("St")
+      enterText("i")
+      enter()
+    }
+
+    assertEquals("<div><p><i>content</i></p></div>", editor.text)
+
+    keyboard {
+      escape()
+      enterText(":set nosurround")
+      enter()
+    }
+    editor.injectText(testTextForEditor)
     vimExit()
   }
 
