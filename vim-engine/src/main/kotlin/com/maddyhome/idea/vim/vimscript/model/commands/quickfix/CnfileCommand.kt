@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 /**
  * See `:help :cnfile`.
  */
-@ExCommand(command = "cnf[ile]", description = "Jump to the first item of the [count]th next file in the quickfix list")
+@ExCommand(command = "cnf[ile]", description = "Jump to the first item of the [count]th next file in the quickfix list.")
 data class CnfileCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

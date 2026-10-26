@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 /**
  * See `:help :cprevious`.
  */
-@ExCommand(command = "cp[revious],cN[ext]", description = "Jump to the [count]th previous item in the quickfix list")
+@ExCommand(command = "cp[revious],cN[ext]", description = "Jump to the [count]th previous item in the quickfix list.")
 data class CpreviousCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 /**
  * See `:help :cnext`.
  */
-@ExCommand(command = "cn[ext]", description = "Jump to the [count]th next item in the quickfix list")
+@ExCommand(command = "cn[ext]", description = "Jump to the [count]th next item in the quickfix list.")
 data class CnextCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

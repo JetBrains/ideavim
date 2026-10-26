@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 /**
  * See `:help :cfirst`. The item number comes from the argument (`:cfirst 3`) or the count (`:3cfirst`).
  */
-@ExCommand(command = "cfir[st],cr[ewind]", description = "Jump to the [count]th item of the quickfix list, or to the first one")
+@ExCommand(command = "cfir[st],cr[ewind]", description = "Jump to the [count]th item of the quickfix list, or to the first one.")
 data class CfirstCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

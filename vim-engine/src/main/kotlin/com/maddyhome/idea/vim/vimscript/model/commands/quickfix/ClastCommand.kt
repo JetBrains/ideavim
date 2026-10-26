@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 /**
  * See `:help :clast`. The item number comes from the argument (`:clast 3`) or the count (`:3clast`).
  */
-@ExCommand(command = "cla[st]", description = "Jump to the [count]th item of the quickfix list, or to the last one")
+@ExCommand(command = "cla[st]", description = "Jump to the [count]th item of the quickfix list, or to the last one.")
 data class ClastCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

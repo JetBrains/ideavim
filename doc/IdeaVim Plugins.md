@@ -393,6 +393,42 @@ https://github.com/tommcdo/vim-exchange/blob/master/doc/exchange.txt
 </details>
 
 <details>
+<summary><h2>fugitive: Search the files tracked by Git and walk the matches</h2></summary>
+
+Original plugin: [vim-fugitive](https://github.com/tpope/vim-fugitive).
+
+### Summary:
+`:Ggrep {args}` runs `git grep {args}` in the work tree of the current file, fills the quickfix list
+with the matches and jumps to the first one. `:Ggrep!` fills the list without jumping. Only files
+tracked by Git are searched, and every `git grep` flag works, e.g. `:Ggrep -i 'foo bar' -- '*.kt'`.
+
+The quickfix commands work on that list: `:cnext`/`:cprevious`, `:cnfile`/`:cpfile`, `:cfirst`/`:clast`,
+and `:copen`/`:cclose` for a window listing all matches, where `<CR>` jumps to the match under the cursor.
+Every project has its own list.
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'tpope/vim-fugitive'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plugin 'tpope/vim-fugitive'</code>
+      <br/>
+      <code>Plug 'https://github.com/tpope/vim-fugitive'</code>
+      <br/>
+      <code>Plug 'vim-fugitive'</code>
+      <br/>
+      <code>set fugitive</code>
+      </details>
+
+### Instructions
+
+https://github.com/tpope/vim-fugitive/blob/master/doc/fugitive.txt
+
+Only `:Ggrep` is supported. Git is run from the path set in Settings | Version Control | Git, or from `PATH`
+when the Git plugin is disabled.
+
+</details>
+
+<details>
 <summary><h2>functextobj: Provides text objects for method/function definitions</h2></summary>
 
 Inspired by [vim-textobj-function](https://github.com/kana/vim-textobj-function).
