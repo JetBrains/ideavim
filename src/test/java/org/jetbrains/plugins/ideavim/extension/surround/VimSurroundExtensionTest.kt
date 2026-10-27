@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.extension.sneak.IdeaVimSneakExtension
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.AfterEach
@@ -124,11 +125,56 @@ class VimSurroundExtensionTest : VimTestCase() {
   }
 
   @Test
+  fun testSurroundTagEditedWithBackspace() {
+    configureByText("Hello ${c}World!\n")
+    typeText(injector.parser.parseKeys("ysiwtemx<BS><CR>"))
+    assertState("Hello ${c}<em>World</em>!\n")
+  }
+
+  @Test
+  fun testSurroundTagEditedWithDeleteWord() {
+    configureByText("Hello ${c}World!\n")
+    typeText(injector.parser.parseKeys("ysiwtfoo<C-W>em>"))
+    assertState("Hello ${c}<em>World</em>!\n")
+  }
+
+  @Test
+  fun testUndoSurroundTag() {
+    configureByText("Hello ${c}World!\n")
+    typeText(injector.parser.parseKeys("ysiwtem>"))
+    typeText(injector.parser.parseKeys("u"))
+    assertState("Hello ${c}World!\n")
+  }
+
+  @Test
   fun testVisualSurroundTagCancelledWithEscape() {
     configureByText("<div><p>${c}content</p></div>")
     typeText(injector.parser.parseKeys("vt<Sti<Esc>"))
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertState("<div><p>${s}conten${c}t${se}</p></div>")
+  }
+
+  @Test
+  fun testVisualSurroundCancelledWithEscape() {
+    configureByText("<div><p>${c}content</p></div>")
+    typeText(injector.parser.parseKeys("vt<S<Esc>"))
     assertMode(Mode.NORMAL())
     assertState("<div><p>conten${c}t</p></div>")
+  }
+
+  @Test
+  fun testVisualSurroundWithInvalidCharacter() {
+    configureByText("<div><p>${c}content</p></div>")
+    typeText(injector.parser.parseKeys("vt<Sx"))
+    assertMode(Mode.NORMAL())
+    assertState("<div><p>conten${c}t</p></div>")
+  }
+
+  @Test
+  fun testVisualSurroundKeepsSelectionWhileTagIsTyped() {
+    configureByText("<div><p>${c}content</p></div>")
+    typeText(injector.parser.parseKeys("vt<Sti"))
+    assertState("<div><p>${s}conten${c}t${se}</p></div>")
   }
 
   // VIM-1569
@@ -157,7 +203,7 @@ class VimSurroundExtensionTest : VimTestCase() {
   @Test
   fun testSurroundFunctionName() {
     configureByText("foo = b${c}ar")
-    typeText(injector.parser.parseKeys("ysiwfbaz"))
+    typeText(injector.parser.parseKeys("ysiwfbaz<CR>"))
     assertState("foo = ${c}baz(bar)")
   }
 
@@ -173,7 +219,7 @@ class VimSurroundExtensionTest : VimTestCase() {
   @Test
   fun testSurroundFunctionNameWithInnerSpacing() {
     configureByText("foo = b${c}ar")
-    typeText(injector.parser.parseKeys("ysiwFbaz"))
+    typeText(injector.parser.parseKeys("ysiwFbaz<CR>"))
     assertState("foo = ${c}baz( bar )")
   }
 

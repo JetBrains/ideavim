@@ -7,12 +7,13 @@
  */
 package com.maddyhome.idea.vim.extension.surround
 
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.change.Extension
+import com.maddyhome.idea.vim.api.CommandLineType
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -29,16 +30,15 @@ import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.getRegisterForCaret
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.inputString
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegisterForCaret
 import com.maddyhome.idea.vim.extension.exportOperatorFunction
 import com.maddyhome.idea.vim.group.findBlockRange
 import com.maddyhome.idea.vim.helper.exitVisualMode
+import com.maddyhome.idea.vim.helper.inRepeatMode
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.helpers.ClipboardOptionHelper
 import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -155,26 +155,24 @@ internal class VimSurroundExtension : VimExtension {
     override val isRepeatable = true
 
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      val ijEditor = editor.ij
       val c = injector.keyGroup.getChar(editor) ?: return
-      val pair = getOrInputPair(c, ijEditor, context.ij) ?: return
-
-      editor.forEachCaret {
-        val line = it.getBufferPosition().line
-        val lineStartOffset = editor.getLeadingCharacterOffset(line)
-        val lineEndOffset = editor.getLineEndOffset(line)
-        val lastNonWhiteSpaceOffset = getLastNonWhitespaceCharacterOffset(editor.text(), lineStartOffset, lineEndOffset)
-        if (lastNonWhiteSpaceOffset != null) {
-          val range = TextRange(lineStartOffset, lastNonWhiteSpaceOffset + 1)
-          performSurround(pair, range, it)
+      withSurroundPair(c, editor, context) { pair ->
+        editor.forEachCaret {
+          val line = it.getBufferPosition().line
+          val lineStartOffset = editor.getLeadingCharacterOffset(line)
+          val lineEndOffset = editor.getLineEndOffset(line)
+          val lastNonWhiteSpaceOffset = getLastNonWhitespaceCharacterOffset(editor.text(), lineStartOffset, lineEndOffset)
+          if (lastNonWhiteSpaceOffset != null) {
+            val range = TextRange(lineStartOffset, lastNonWhiteSpaceOffset + 1)
+            performSurround(pair, range, it)
+          }
         }
-//        it.moveToOffset(lineStartOffset)
+        // Jump back to start
+        if (editor.mode !is Mode.NORMAL) {
+          editor.mode = Mode.NORMAL()
+        }
+        executeNormalWithoutMapping(injector.parser.parseKeys("`["), editor.ij)
       }
-      // Jump back to start
-      if (editor.mode !is Mode.NORMAL) {
-        editor.mode = Mode.NORMAL()
-      }
-      executeNormalWithoutMapping(injector.parser.parseKeys("`["), ijEditor)
     }
 
     private fun getLastNonWhitespaceCharacterOffset(chars: CharSequence, startOffset: Int, endOffset: Int): Int? {
@@ -189,14 +187,24 @@ internal class VimSurroundExtension : VimExtension {
 
   private class VSurroundHandler : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      val selectionStart = editor.ij.caretModel.primaryCaret.selectionStart
-      // NB: Operator ignores SelectionType anyway
-      val isSurrounded = Operator().apply(editor, context, editor.mode.selectionType)
-      runWriteAction {
-        // Leave visual mode, also when the surround is cancelled, e.g. with <Esc> in the tag prompt
-        editor.exitVisualMode()
-        if (isSurrounded) editor.ij.caretModel.moveToOffset(selectionStart)
+      // XXX: Will it work with block-wise selections?
+      val caret = editor.currentCaret()
+      val range = TextRange(caret.selectionStart, caret.selectionEnd)
+      val isLineWise = editor.mode.selectionType == SelectionType.LINE_WISE
 
+      // Visual mode, and so the selection, stays while the surround character and the tag are read. <Esc> in the tag
+      // prompt returns to it, like <Esc> on the command line
+      val c = injector.keyGroup.getChar(editor) ?: return leaveVisualMode(editor)
+      withSurroundPair(c, editor, context, onInvalid = { leaveVisualMode(editor) }) { pair ->
+        performSurround(pair, range, caret, isLineWise)
+        leaveVisualMode(editor)
+        caret.moveToOffset(range.startOffset)
+      }
+    }
+
+    private fun leaveVisualMode(editor: VimEditor) {
+      runWriteAction {
+        editor.exitVisualMode()
         // Reset the key handler so that the command trie is updated for the new mode (Normal)
         // TODO: This should probably be handled by ToHandlerMapping.execute
         KeyHandler.getInstance().reset(editor)
@@ -212,8 +220,7 @@ internal class VimSurroundExtension : VimExtension {
 
       val charTo = injector.keyGroup.getChar(editor) ?: return
 
-      val newSurround = getOrInputPair(charTo, editor.ij, context.ij) ?: return
-      change(editor, context, charFrom, newSurround)
+      withSurroundPair(charTo, editor, context) { newSurround -> change(editor, context, charFrom, newSurround) }
     }
 
     companion object {
@@ -342,28 +349,16 @@ internal class VimSurroundExtension : VimExtension {
 
   private class Operator : OperatorFunction {
     override fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType?): Boolean {
-      val ijEditor = editor.ij
+      val caret = editor.currentCaret()
+      // The change marks are the text moved over by the motion of `g@`
+      val range = injector.markService.getChangeMarks(caret) ?: return false
       val c = injector.keyGroup.getChar(editor) ?: return true
-
-      val pair = getOrInputPair(c, ijEditor, context.ij) ?: return false
-      // XXX: Will it work with line-wise or block-wise selections?
-      val range = getSurroundRange(editor.currentCaret()) ?: return false
-      performSurround(pair, range, editor.currentCaret(), selectionType == SelectionType.LINE_WISE)
-      // Jump back to start
-      executeNormalWithoutMapping(injector.parser.parseKeys("`["), ijEditor)
+      withSurroundPair(c, editor, context) { pair ->
+        performSurround(pair, range, caret, selectionType == SelectionType.LINE_WISE)
+        // Jump back to start
+        executeNormalWithoutMapping(injector.parser.parseKeys("`["), editor.ij)
+      }
       return true
-    }
-
-    private fun getSurroundRange(caret: VimCaret): TextRange? {
-      val editor = caret.editor
-      if (editor.mode is Mode.CMD_LINE) {
-        editor.mode = editor.mode.returnTo
-      }
-      return when (editor.mode) {
-        is Mode.NORMAL -> injector.markService.getChangeMarks(caret)
-        is Mode.VISUAL -> caret.run { TextRange(selectionStart, selectionEnd) }
-        else -> null
-      }
     }
   }
 }
@@ -403,43 +398,69 @@ private fun getSurroundPair(c: Char): SurroundPair? = if (c in SURROUND_PAIRS) {
   null
 }
 
-private fun inputTagPair(editor: Editor, context: DataContext): SurroundPair? {
-  val tagInput = inputString(editor, context, "<", '>')
-  if (editor.vim.mode is Mode.CMD_LINE) {
-    editor.vim.mode = editor.vim.mode.returnTo
-  }
+private fun tagPair(tagInput: String): SurroundPair? {
   val matcher = tagNameAndAttributesCapturePattern.matcher(tagInput)
-  return if (matcher.find()) {
-    val tagName = matcher.group(1)
-    val tagAttributes = matcher.group(2)
-    SurroundPair("<$tagName$tagAttributes>", "</$tagName>", false)
-  } else {
-    null
-  }
+  if (!matcher.find()) return null
+  val tagName = matcher.group(1)
+  val tagAttributes = matcher.group(2)
+  return SurroundPair("<$tagName$tagAttributes>", "</$tagName>", false)
 }
 
-private fun inputFunctionName(
-  editor: Editor,
-  context: DataContext,
-  withInternalSpaces: Boolean,
-): SurroundPair? {
-  val functionNameInput = inputString(editor, context, "function: ", null)
-  if (editor.vim.mode is Mode.CMD_LINE) {
-    editor.vim.mode = editor.vim.mode.returnTo
-  }
-  if (functionNameInput.isEmpty()) return null
+private fun functionPair(functionName: String, withInternalSpaces: Boolean): SurroundPair? {
+  if (functionName.isEmpty()) return null
   return if (withInternalSpaces) {
-    SurroundPair("$functionNameInput( ", " )", false)
+    SurroundPair("$functionName( ", " )", false)
   } else {
-    SurroundPair("$functionNameInput(", ")", false)
+    SurroundPair("$functionName(", ")", false)
   }
 }
 
-private fun getOrInputPair(c: Char, editor: Editor, context: DataContext): SurroundPair? = when (c) {
-  '<', 't' -> inputTagPair(editor, context)
-  'f' -> inputFunctionName(editor, context, false)
-  'F' -> inputFunctionName(editor, context, true)
-  else -> getSurroundPair(c)
+/**
+ * Passes the surround pair for [c] to [action], asking for the tag or the function name first if needed
+ *
+ * The question is asked on the command line, so [action] runs after the user finishes it. If [c] isn't a valid surround
+ * character or the entered text isn't a valid tag or function name, [onInvalid] runs instead. Neither runs if the user
+ * cancels the question.
+ */
+private fun withSurroundPair(
+  c: Char,
+  editor: VimEditor,
+  context: ExecutionContext,
+  onInvalid: () -> Unit = {},
+  action: (SurroundPair) -> Unit,
+) {
+  fun handle(pair: SurroundPair?) = if (pair != null) action(pair) else onInvalid()
+  when (c) {
+    '<', 't' -> readInput(editor, context, "<", finishOn = '>') { handle(tagPair(it)) }
+    'f' -> readInput(editor, context, "function: ", finishOn = null) { handle(functionPair(it, false)) }
+    'F' -> readInput(editor, context, "function: ", finishOn = null) { handle(functionPair(it, true)) }
+    else -> handle(getSurroundPair(c))
+  }
+}
+
+/** Reads the text for a surround from the command line, or the text entered last time when repeating with `.` */
+private fun readInput(
+  editor: VimEditor,
+  context: ExecutionContext,
+  prompt: String,
+  finishOn: Char?,
+  processing: (String) -> Unit,
+) {
+  if (editor.inRepeatMode) {
+    processing(Extension.consumeString() ?: error("Not enough strings saved: ${Extension.lastExtensionHandler}"))
+    return
+  }
+  injector.commandLine.readInputAndProcess(editor, context, CommandLineType.Input, prompt, finishOn) { input ->
+    Extension.addString(input)
+    // The key that closes the command line is still being handled, and when it's typed into the command line's text
+    // field, without the IDE's read lock. The surround reads and changes the document, and runs Normal commands such as
+    // `[, so it runs after that key, in its own command
+    injector.application.invokeLater(editor) {
+      injector.actionExecutor.executeCommand(editor, { processing(input) }, "Vim surround", null)
+    }
+  }
+  // The keys typed next go to the command line, so the key handler has to use the Command-line commands
+  KeyHandler.getInstance().reset(editor)
 }
 
 
