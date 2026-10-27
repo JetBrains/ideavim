@@ -138,6 +138,45 @@ class ShiftLeftTest : VimTestCase() {
   }
 
   @Test
+  fun `test block shift left on line with less whitespace than shiftwidth`() {
+    configureByText(
+      """
+      |${c}    foo
+      |
+      |    bar
+    """.trimMargin()
+    )
+    typeText("<C-V>2j<")
+    assertState(
+      """
+      |${c}foo
+      |
+      |bar
+    """.trimMargin()
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test block shift left from middle of line skips short lines`() {
+    configureByText(
+      """
+      |a${c}      b
+      |c
+      |d      e
+    """.trimMargin()
+    )
+    typeText("<C-V>2j<")
+    assertState(
+      """
+      |a${c}  b
+      |c
+      |d  e
+    """.trimMargin()
+    )
+  }
+
+  @Test
   fun `test undo after shift left single line`() {
     configureByText(
       """
