@@ -3,6 +3,8 @@ name: PR Verification
 on:
   pull_request:
     branches: [ master ]
+  # Dispatched by updateChangelogClaude.yml: PRs opened with GITHUB_TOKEN don't trigger pull_request
+  workflow_dispatch:
 
 jobs:
   test:

@@ -16,13 +16,15 @@ jobs:
       pull-requests: write
       id-token: write
       issues: read
-      actions: read
+      actions: write  # Dispatch PR verification for the changelog branch
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Need full history to analyze commits and tags
+          # Keep the push token out of .git/config so Claude can't use it
+          persist-credentials: false
 
       - name: Get last processed commit
         id: last_commit
@@ -64,10 +66,55 @@ jobs:
             **Important**: The last processed commit is: ${{ steps.last_commit.outputs.sha || 'not set - analyze commits from the last documented version in CHANGES.md' }}
             Use `git log ${{ steps.last_commit.outputs.sha }}..HEAD --oneline` to see commits since the last changelog update (if the commit SHA is available).
 
-            If you find changes that need documenting, update CHANGES.md and create a pull request with:
-            - Title: "Update changelog: <super short summary>"
-              Example: "Update changelog: Add gn text object, fix visual mode issues"
-            - Body: Brief summary of what was added
+            If you find changes that need documenting, edit CHANGES.md and leave the edit
+            uncommitted. Do NOT create a branch, commit, push or open a pull request
+            (this overrides the skill's PR step) — the workflow does that after you finish.
+            Changes to any other file are rejected and nothing gets published.
 
-          # Allow Claude to use git, GitHub CLI, and web access for checking releases and tickets
-          claude_args: '--allowed-tools "Skill,Read,Edit,Bash(git:*),Bash(gh:*),WebSearch,WebFetch(domain:plugins.jetbrains.com),WebFetch(domain:youtrack.jetbrains.com),WebFetch(domain:github.com)"'
+            Return:
+            - `summary`: super short summary for the PR title "Update changelog: <summary>"
+              Example: "Add gn text object, fix visual mode issues"
+            - `body`: brief summary of what was added, for the PR description
+
+          # Changelog edits + changelog skill + read-only git/gh and web access for checking releases and tickets
+          claude_args: >-
+            --allowed-tools "Skill,Read,Glob,Grep,Edit(CHANGES.md),Bash(git log:*),Bash(git show:*),Bash(git diff:*),Bash(git tag --list:*),Bash(gh pr list:*),Bash(gh pr view:*),WebSearch,WebFetch(domain:plugins.jetbrains.com),WebFetch(domain:youtrack.jetbrains.com),WebFetch(domain:github.com)"
+            --json-schema '{"type":"object","properties":{"summary":{"type":"string"},"body":{"type":"string"}},"required":["summary","body"]}'
+
+      # Claude has no write access to GitHub, so the PR is opened here, and only if
+      # nothing but the changelog changed. PRs opened with GITHUB_TOKEN don't trigger
+      # pull_request workflows, so the required `test` check is dispatched manually.
+      - name: Open and auto-merge the changelog PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RESULT: ${{ steps.claude.outputs.structured_output }}
+          BRANCH: changelog/update-${{ github.run_id }}
+        run: |
+          set -e
+          changed=$(git status --porcelain --untracked-files=all | cut -c4-)
+          if [ -z "$changed" ]; then
+            echo "No changelog changes"
+            exit 0
+          fi
+          if [ "$changed" != "CHANGES.md" ]; then
+            echo "::error::Claude changed files other than CHANGES.md:"
+            echo "$changed"
+            exit 1
+          fi
+          summary=$(jq -r '.summary // empty' <<< "$RESULT" | head -n 1 | cut -c 1-100)
+          if [ -z "$summary" ]; then
+            echo "::error::Claude returned no PR summary"
+            exit 1
+          fi
+          jq -r '.body // empty' <<< "$RESULT" > "$RUNNER_TEMP/pr-body.md"
+
+          git config user.name "IdeaVim Bot"
+          git config user.email "maintainers@ideavim.dev"
+          git switch -c "$BRANCH"
+          git commit -q -m "Update changelog: $summary" CHANGES.md
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" "$BRANCH"
+          pr_url=$(gh pr create --base master --head "$BRANCH" \
+            --title "Update changelog: $summary" --body-file "$RUNNER_TEMP/pr-body.md")
+          gh workflow run pr-verification.yml --ref "$BRANCH"
+          gh pr merge --auto --rebase "$pr_url"
