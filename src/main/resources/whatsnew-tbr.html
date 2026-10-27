@@ -1,3 +1,4 @@
+<!-- whatsnew-release-commit: 38212a243c1e3afde8ede4975815d16efdea7e50 -->
 <!--
   ~ Copyright 2003-2026 The IdeaVim authors
   ~
@@ -378,7 +379,43 @@
     </p>
     <p class="out">Here's what landed in <span class="v">__VERSION__</span>.</p>
 
-    <!-- vim-visual-multi — the star -->
+    <!-- :help -->
+    <div class="section">
+      <p class="kicker">ex commands · help</p>
+      <h2><code>:help</code> right inside the IDE</h2>
+      <p><code>:help</code> now opens IdeaVim's own read-only help file in the editor instead of a web page. It
+        lists every supported command with a description of what it does in IdeaVim, and you can jump straight to
+        a topic.</p>
+      <pre>:help :s          <span class="cm">" how :substitute works in IdeaVim</span>
+:help i_CTRL-W    <span class="cm">" what &lt;C-W&gt; does in Insert mode</span></pre>
+    </div>
+
+    <!-- action ID completion -->
+    <div class="section">
+      <p class="kicker">ideavimrc · completion</p>
+      <h2>No more guessing action IDs</h2>
+      <p>On the command line, press <kbd>Tab</kbd> or <kbd>Shift+Tab</kbd> after <code>:action</code> or
+        <code>:actionlist</code> to cycle through the matching action IDs. In your <code>.ideavimrc</code>, code
+        completion suggests action IDs, along with their names and descriptions, inside
+        <code>&lt;Action(...)&gt;</code> and after <code>action</code>.</p>
+      <pre>:action Goto<span class="key">&lt;Tab&gt;</span>                <span class="cm">" cycle through matching IDs</span>
+<span class="str">map &lt;leader&gt;f &lt;Action&gt;(Goto</span>   <span class="cm">" in .ideavimrc, completion suggests IDs here</span></pre>
+    </div>
+
+    <!-- ideaeditor main / chat -->
+    <div class="section">
+      <p class="kicker">editors · ai chat</p>
+      <h2>Vim in AI Assistant chats and plugin editors</h2>
+      <p>The <code>'ideaeditor'</code> option has two new values. <code>chat</code> turns Vim on in the prompt
+        input of JetBrains AI Assistant chats, and <code>main</code> covers tabs in the main editor area that are
+        not backed by a regular file, such as editors that plugins open for in-memory or decrypted content.</p>
+      <pre><span class="str">set ideaeditor+=chat</span>   <span class="cm">" Vim keys in the AI chat input</span>
+<span class="str">set ideaeditor+=main</span>   <span class="cm">" ... and in plugin-provided editor tabs</span></pre>
+      <p class="note">Both are off by default. The chat input starts in Insert mode, so <kbd>Enter</kbd> still
+        sends the message.</p>
+    </div>
+
+    <!-- vim-visual-multi -->
     <div class="section">
       <p class="kicker">new plugin · multiple cursors</p>
       <h2>vim-visual-multi, on the IDE's own carets</h2>
@@ -430,41 +467,6 @@
         <code>:!</code> take the <code>|</code> as part of their argument.</p>
     </div>
 
-    <!-- :help -->
-    <div class="section">
-      <p class="kicker">ex commands · help</p>
-      <h2><code>:help</code> right inside the IDE</h2>
-      <p><code>:help</code> now opens IdeaVim's own read-only help file in the editor instead of a web page. It
-        lists every supported command with a description of what it does in IdeaVim, and you can jump straight to
-        a topic.</p>
-      <pre>:help :s          <span class="cm">" how :substitute works in IdeaVim</span>
-:help i_CTRL-W    <span class="cm">" what &lt;C-W&gt; does in Insert mode</span></pre>
-    </div>
-
-    <!-- action ID completion -->
-    <div class="section">
-      <p class="kicker">ideavimrc · completion</p>
-      <h2>No more guessing action IDs</h2>
-      <p>On the command line, press <kbd>Tab</kbd> or <kbd>Shift+Tab</kbd> after <code>:action</code> or
-        <code>:actionlist</code> to cycle through the matching action IDs. In your <code>.ideavimrc</code>, code
-        completion suggests action IDs, along with their names and descriptions, inside
-        <code>&lt;Action(...)&gt;</code> and after <code>action</code>.</p>
-      <pre>:action Goto<span class="key">&lt;Tab&gt;</span>                <span class="cm">" cycle through matching IDs</span>
-<span class="str">map &lt;leader&gt;f &lt;Action&gt;(Goto</span>   <span class="cm">" in .ideavimrc, completion suggests IDs here</span></pre>
-    </div>
-
-    <!-- ideaeditor main / chat -->
-    <div class="section">
-      <p class="kicker">editors · ai chat</p>
-      <h2>Vim in AI Assistant chats and plugin editors</h2>
-      <p>The <code>'ideaeditor'</code> option has two new values. <code>chat</code> turns Vim on in the prompt
-        input of JetBrains AI Assistant chats, and <code>main</code> covers tabs in the main editor area that are
-        not backed by a regular file, such as editors that plugins open for in-memory or decrypted content.</p>
-      <pre><span class="str">set ideaeditor+=chat</span>   <span class="cm">" Vim keys in the AI chat input</span>
-<span class="str">set ideaeditor+=main</span>   <span class="cm">" ... and in plugin-provided editor tabs</span></pre>
-      <p class="note">Both are off by default. The chat input starts in Insert mode, so <kbd>Enter</kbd> still
-        sends the message.</p>
-    </div>
 
     <!-- ideascrollcursor -->
     <div class="section">
