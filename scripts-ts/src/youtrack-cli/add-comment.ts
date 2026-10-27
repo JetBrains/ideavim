@@ -11,6 +11,7 @@
  *
  * Environment:
  *   YOUTRACK_TOKEN - Required. YouTrack API token.
+ *   YOUTRACK_FORCE_PRIVATE_COMMENTS - Optional. When "true", every comment is private, even without --private.
  */
 
 import { addComment } from "../tools/youtrack.js";
@@ -25,7 +26,7 @@ async function main() {
   }
 
   const ticketId = args[0];
-  const isPrivate = args.includes("--private");
+  const isPrivate = args.includes("--private") || process.env.YOUTRACK_FORCE_PRIVATE_COMMENTS === "true";
   const textArgs = args.filter((arg) => arg !== "--private" && arg !== ticketId);
   const text = textArgs.join(" ");
 

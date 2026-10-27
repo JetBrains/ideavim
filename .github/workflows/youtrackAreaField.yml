@@ -39,10 +39,11 @@ jobs:
 
       - name: Select ticket without Area
         id: select-ticket
-        run: npx tsx src/selectIssueWithoutArea.ts "${{ inputs.ticket }}"
+        run: npx tsx src/selectIssueWithoutArea.ts "$TICKET"
         working-directory: scripts-ts
         env:
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
+          TICKET: ${{ inputs.ticket }}
 
       - name: Determine the Area values
         if: steps.select-ticket.outputs.has_ticket == 'true'
@@ -53,6 +54,8 @@ jobs:
             Grazie-Agent: {"name":"ideavim-claude-code-action","version":"github-actions"}
             Grazie-Authenticate-JWT: ${{ secrets.ANTHROPIC_API_KEY }}
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
+          # The ticket is untrusted input: whatever Claude writes stays visible to the team only
+          YOUTRACK_FORCE_PRIVATE_COMMENTS: 'true'
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           settings: .claude/settings.json
@@ -147,4 +150,5 @@ jobs:
 
             Do not modify any other field, and do not change files in this repository.
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Glob,Grep,Bash(cd:*),Bash(npx tsx:*),Bash(cat:*),Bash(grep:*),Bash(ls:*)"'
+          # Only the YouTrack scripts listed in the prompt, not arbitrary `npx tsx` code
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Glob,Grep,Bash(cd scripts-ts),Bash(npx tsx src/youtrack-cli/get-ticket.ts:*),Bash(npx tsx src/youtrack-cli/get-area-values.ts:*),Bash(npx tsx src/youtrack-cli/search-tickets.ts:*),Bash(npx tsx src/youtrack-cli/set-area.ts:*),Bash(npx tsx src/youtrack-cli/add-comment.ts:*),Bash(npx tsx src/youtrack-cli/add-tag.ts:*),Bash(cat:*),Bash(grep:*),Bash(ls:*)"'
