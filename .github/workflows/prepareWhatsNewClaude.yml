@@ -168,6 +168,8 @@ jobs:
           marker="<!-- whatsnew-release-commit: $RELEASE_COMMIT -->"
           git config user.name "IdeaVim Bot"
           git config user.email "maintainers@ideavim.dev"
+          # claude-code-action points origin at its GitHub App token and revokes the token when it finishes
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git fetch origin master
           pr=$(gh pr list --head whatsnew-tbr --state open --json number --jq '.[0].number // empty')
           if [ -n "$pr" ]; then
