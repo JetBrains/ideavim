@@ -72,6 +72,7 @@ usual beta standards.
 * Fixed [`'langmap'`](https://vimhelp.org/options.txt.html#%27langmap%27) being applied twice to keys typed after the start of a mapping that did not match. With `set langmap=ig,gE` and a mapping starting with `g`, typing `ii` now runs `gg` instead of `gE`
 * [VIM-1309](https://youtrack.jetbrains.com/issue/VIM-1309) Middle-click paste on Linux (X11) in Insert mode now pastes the `*` register at the caret, as in Vim, instead of moving the caret to the mouse position first
 * [VIM-4269](https://youtrack.jetbrains.com/issue/VIM-4269) Fixed `/` in [NERDTree](https://github.com/JetBrains/ideavim/blob/master/doc/NERDTree-support.md) not opening speed search in trees outside tool windows, such as the File Structure popup
+* [VIM-4349](https://youtrack.jetbrains.com/issue/VIM-4349) Fixed mappings of `'` and `` ` `` with a modifier being triggered by unrelated keys — `nmap <A-'> w` no longer runs on `<A-Right>`, and ``nmap <A-`> w`` no longer runs on keypad `0` with Alt. Mapping a character that only a shifted key types, such as `<A-%>`, now reports an error suggesting to map the key itself, e.g. `<A-S-5>`
 
 ### Merged PRs:
 * [2082](https://github.com/JetBrains/ideavim/pull/2082) by [1grzyb1](https://github.com/1grzyb1): VIM-748 changing multiple commands with |
@@ -93,6 +94,8 @@ usual beta standards.
 * [2146](https://github.com/JetBrains/ideavim/pull/2146) by [1grzyb1](https://github.com/1grzyb1): VIM-3113 support autoselect option
 * [2149](https://github.com/JetBrains/ideavim/pull/2149) by [1grzyb1](https://github.com/1grzyb1): VIM-2200 Open the command-line window with <C-F> from the command line
 * [2147](https://github.com/JetBrains/ideavim/pull/2147) by [1grzyb1](https://github.com/1grzyb1): VIM-4269 speed search on popups with nerdtree
+* [2153](https://github.com/JetBrains/ideavim/pull/2153) by [1grzyb1](https://github.com/1grzyb1): VIM-2342 Add fugitive extension
+* [2154](https://github.com/JetBrains/ideavim/pull/2154) by [1grzyb1](https://github.com/1grzyb1): VIM-4349 parse ' and ` keycodes in mappings
 * [2103](https://github.com/JetBrains/ideavim/pull/2103) by [citizenmatt](https://github.com/citizenmatt): Implement :function command to list functions
 * [2141](https://github.com/JetBrains/ideavim/pull/2141) by [citizenmatt](https://github.com/citizenmatt): Fix incorrect langmap when replaying failed map
 * [2086](https://github.com/JetBrains/ideavim/pull/2086) by [valis](https://github.com/valis): Don't treat quotes inside non-string tokens as string delimiters in %
