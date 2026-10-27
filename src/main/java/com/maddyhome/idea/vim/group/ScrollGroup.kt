@@ -30,7 +30,11 @@ import kotlin.math.max
 
 internal class ScrollGroup : VimScrollGroup {
   override fun scrollCaretIntoView(editor: VimEditor) {
-    ScrollViewHelper.scrollCaretIntoView(editor.ij)
+    scrollCaretIntoView(editor, caretChangedLine = false)
+  }
+
+  override fun scrollCaretIntoView(editor: VimEditor, caretChangedLine: Boolean) {
+    ScrollViewHelper.scrollCaretIntoView(editor.ij, caretChangedLine)
   }
 
   override fun scrollFullPage(editor: VimEditor, caret: VimCaret, pages: Int): Boolean {

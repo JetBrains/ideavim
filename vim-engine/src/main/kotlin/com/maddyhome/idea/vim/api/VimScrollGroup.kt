@@ -10,6 +10,13 @@ package com.maddyhome.idea.vim.api
 
 interface VimScrollGroup {
   fun scrollCaretIntoView(editor: VimEditor)
+
+  /**
+   * @param caretChangedLine True if the caret has just moved to a different visual line. With a large 'scrolloff', a
+   * line that can't be put exactly in the middle of the screen still scrolls on every move, but not while typing
+   */
+  fun scrollCaretIntoView(editor: VimEditor, caretChangedLine: Boolean) = scrollCaretIntoView(editor)
+
   fun scrollFullPage(editor: VimEditor, caret: VimCaret, pages: Int): Boolean
   fun scrollHalfPage(editor: VimEditor, caret: VimCaret, rawCount: Int, down: Boolean): Boolean
   fun scrollLines(editor: VimEditor, lines: Int): Boolean
