@@ -40,6 +40,7 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
 import java.awt.Font
 import java.awt.Point
 import java.awt.Rectangle
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -240,14 +241,18 @@ object EditorHelper {
    * @param allowVirtualSpace For `zz`, we want to use virtual space and move any line, including the last one, to the
    * middle of the screen. For `G` or `zb`, do not allow virtual space, so only scroll far enough to keep the last line
    * at the bottom of the screen
+   * @param caretChangedLine True if the caret has just moved to this line, so we scroll even if the new position is
+   * only as close to the middle as the current one
    */
   @JvmStatic
-  fun scrollVisualLineToMiddleOfScreen(editor: Editor, visualLine: Int, allowVirtualSpace: Boolean) {
+  fun scrollVisualLineToMiddleOfScreen(
+    editor: Editor,
+    visualLine: Int,
+    allowVirtualSpace: Boolean,
+    caretChangedLine: Boolean = false,
+  ) {
     val lineY = editor.visualLineToY(IjVimEditor(editor).normalizeVisualLine(visualLine))
-    editor.scrollUntilStickyLinesSettle(
-      isInPlace = { editor.isCentred(lineY, allowVirtualSpace) },
-      targetOffset = { editor.offsetToCentre(lineY, allowVirtualSpace) },
-    )
+    editor.scrollToClosestToCentre(lineY, allowVirtualSpace, caretChangedLine)
   }
 
   /**
@@ -468,17 +473,42 @@ object EditorHelper {
     return scrolled
   }
 
+  /**
+   * Scrolls to the position that puts the line closest to the middle of the area below the sticky lines panel.
+   *
+   * The panel shows the scopes that start above the top of the screen, so the middle below it depends on where we
+   * scroll to, and there isn't always an exact middle. E.g. the middle below a two line panel scrolls a method out of
+   * the panel, and the middle below the remaining one line panel is back where we started. So we try the middle for
+   * each panel we find, and keep the position closest to its own middle.
+   *
+   * Between two equally close positions, we keep the current one, so typing doesn't scroll back and forth, unless the
+   * caret has moved to another line, which should scroll.
+   */
+  private fun Editor.scrollToClosestToCentre(lineY: Int, allowVirtualSpace: Boolean, caretChangedLine: Boolean) {
+    var closestOffset = viewport.y
+    var closestDistance = distanceFromCentre(lineY, allowVirtualSpace)
+    val triedOffsets = mutableSetOf(closestOffset)
+
+    while (closestDistance > 0 && triedOffsets.size <= MAX_STICKY_LINES_ADJUSTMENTS) {
+      val targetOffset = offsetToCentre(lineY, allowVirtualSpace)
+      if (targetOffset in triedOffsets || !scrollVertically(this, targetOffset)) break
+      triedOffsets += viewport.y
+
+      val distance = distanceFromCentre(lineY, allowVirtualSpace)
+      if (distance < closestDistance || distance == closestDistance && caretChangedLine) {
+        closestOffset = viewport.y
+        closestDistance = distance
+      }
+    }
+    scrollVertically(this, closestOffset)
+  }
+
+  // How far we are from where we'd scroll to centre the line, with the sticky lines panel at the current position
+  private fun Editor.distanceFromCentre(lineY: Int, allowVirtualSpace: Boolean): Int =
+    abs(viewport.y - offsetToCentre(lineY, allowVirtualSpace))
+
   private fun Editor.isHiddenUnderStickyLines(visualLine: Int): Boolean =
     visualLineToY(visualLine) < getVisibleArea(this).y
-
-  // The middle below the sticky lines panel moves when the panel changes height, and the panel changes height when we
-  // scroll. Accept anything between that and the middle of the whole viewport, or with scrolloff=999 we would scroll
-  // back and forth on every keystroke (VIM-4329)
-  private fun Editor.isCentred(lineY: Int, allowVirtualSpace: Boolean): Boolean {
-    val centreBelowStickyLines = offsetToCentre(lineY, allowVirtualSpace)
-    val centreOfViewport = limitToLastLine(offsetToCentreIn(viewport.height, lineY), allowVirtualSpace)
-    return viewport.y in min(centreBelowStickyLines, centreOfViewport)..max(centreBelowStickyLines, centreOfViewport)
-  }
 
   private fun Editor.offsetToCentre(lineY: Int, allowVirtualSpace: Boolean): Int =
     limitToLastLine(offsetToCentreIn(getVisibleArea(this).height, lineY) - stickyLinesHeight, allowVirtualSpace)
