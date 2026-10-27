@@ -14,8 +14,8 @@ import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.vimMoveBlockSelectionToOffset
 import com.maddyhome.idea.vim.group.visual.vimMoveSelectionToCaret
 import com.maddyhome.idea.vim.handler.Motion
-import com.maddyhome.idea.vim.helper.VimLockLabel
 import com.maddyhome.idea.vim.helper.StrictMode
+import com.maddyhome.idea.vim.helper.VimLockLabel
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.register.Register
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -100,13 +100,14 @@ per-caret marks.
 
     // Make sure to always reposition the caret, even if the offset hasn't changed. We might need to reposition due to
     // changes in surrounding text, especially with inline inlays.
-    val oldOffset = this.offset
+    val oldVisualLine = getVisualPosition().line
     var updatedCaret = moveToInlayAwareOffset(offset)
 
     // Similarly, always make sure the caret is positioned within the view. Adding or removing text could move the caret
     // position relative to the view, without changing offset.
     if (this == editor.primaryCaret()) {
-      injector.scroll.scrollCaretIntoView(editor)
+      val caretChangedLine = updatedCaret.getVisualPosition().line != oldVisualLine
+      injector.scroll.scrollCaretIntoView(editor, caretChangedLine)
     }
 
     // If we're in Visual or Select mode, update the selection. We also need to handle Command-line mode, with Visual

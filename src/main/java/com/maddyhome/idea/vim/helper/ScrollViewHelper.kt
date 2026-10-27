@@ -37,25 +37,31 @@ import kotlin.math.roundToInt
  * Scrolls the caret into view, the way Vim's move.c:update_topline does
  */
 internal object ScrollViewHelper {
+  /**
+   * @param caretChangedLine True if the caret has just moved to a different visual line, see
+   * [EditorHelper.scrollVisualLineToMiddleOfScreen]
+   */
   @JvmStatic
-  fun scrollCaretIntoView(editor: Editor) {
+  fun scrollCaretIntoView(editor: Editor, caretChangedLine: Boolean = false) {
     // TextComponentEditor doesn't support scrolling. We only support TextComponentEditor for the fallback window
     if (editor is TextComponentEditor) return
 
     val position = editor.caretModel.visualPosition
-    scrollCaretIntoViewVertically(editor, position.line)
+    scrollCaretIntoViewVertically(editor, position.line, caretChangedLine)
     scrollCaretIntoViewHorizontally(editor, position)
   }
 
-  private fun scrollCaretIntoViewVertically(editor: Editor, caretLine: Int) {
+  private fun scrollCaretIntoViewVertically(editor: Editor, caretLine: Int, caretChangedLine: Boolean) {
     val window = WindowLines(editor)
     val scrollOffset = injector.options(editor.vim).scrolloff
 
     // We need the raw scrolloff value here, so that so=999 keeps the caret centred
     when {
-      scrollOffset > window.halfHeight -> centre(editor, caretLine)
-      window.isAboveScrollOffset(caretLine, scrollOffset) -> scrollUpToCaret(editor, window, caretLine, scrollOffset)
-      window.isBelowScrollOffset(caretLine, scrollOffset) -> scrollDownToCaret(editor, window, caretLine, scrollOffset)
+      scrollOffset > window.halfHeight -> centre(editor, caretLine, caretChangedLine)
+      window.isAboveScrollOffset(caretLine, scrollOffset) ->
+        scrollUpToCaret(editor, window, caretLine, scrollOffset, caretChangedLine)
+      window.isBelowScrollOffset(caretLine, scrollOffset) ->
+        scrollDownToCaret(editor, window, caretLine, scrollOffset, caretChangedLine)
     }
   }
 
@@ -67,11 +73,17 @@ internal object ScrollViewHelper {
    * scrolljump. If the new caret line was already above the current top line, this counts as one scroll, and we scroll
    * from the caret line. Otherwise, we scroll from the current top line.
    */
-  private fun scrollUpToCaret(editor: Editor, window: WindowLines, caretLine: Int, scrollOffset: Int) {
+  private fun scrollUpToCaret(
+    editor: Editor,
+    window: WindowLines,
+    caretLine: Int,
+    scrollOffset: Int,
+    caretChangedLine: Boolean,
+  ) {
     // Initial approximation in move.c:update_topline (including same calculation for halfHeight)
     val linesToScroll = window.topLine + scrollOffset - caretLine
     if (window.countsLinesReliably && linesToScroll >= max(2, window.height / 2 - 1)) {
-      centre(editor, caretLine)
+      centre(editor, caretLine, caretChangedLine)
       return
     }
 
@@ -88,7 +100,7 @@ internal object ScrollViewHelper {
     val usedBelow = min(scrollOffset, editor.vim.getVisualLineCount() - caretLine)
     val used = 1 + usedAbove + usedBelow
     if (window.countsLinesReliably && used > window.height) {
-      centre(editor, caretLine)
+      centre(editor, caretLine, caretChangedLine)
     } else {
       scrollVisualLineToTopOfScreen(editor, newTopLine)
     }
@@ -105,12 +117,18 @@ internal object ScrollViewHelper {
    * the sj+1). Therefore, the new bottom line is (cln + max(so, sj - min(cln-bl, ceiling((sj + 1)/2))))
    * (where cln is caretLine, bl is bottomLine, so is scrolloff and sj is scrolljump)
    */
-  private fun scrollDownToCaret(editor: Editor, window: WindowLines, caretLine: Int, scrollOffset: Int) {
+  private fun scrollDownToCaret(
+    editor: Editor,
+    window: WindowLines,
+    caretLine: Int,
+    scrollOffset: Int,
+    caretChangedLine: Boolean,
+  ) {
     // Vim does a quick approximation before going through the full algorithm. It checks the line below the bottom
     // line in the window (bottomLine + 1). See move.c:update_topline
     val linesToScroll = caretLine - window.bottomLine + scrollOffset
     if (window.countsLinesReliably && linesToScroll > window.height) {
-      centre(editor, caretLine)
+      centre(editor, caretLine, caretChangedLine)
       return
     }
 
@@ -131,14 +149,14 @@ internal object ScrollViewHelper {
     // scrolloff, redraw with the caret in the middle of the screen
     val lineCount = if (used > window.height) used else scrolled
     if (window.countsLinesReliably && lineCount >= window.height && lineCount > scrollOffset) {
-      centre(editor, caretLine)
+      centre(editor, caretLine, caretChangedLine)
     } else {
       scrollVisualLineToBottomOfScreen(editor, caretLine + extra)
     }
   }
 
-  private fun centre(editor: Editor, caretLine: Int) =
-    scrollVisualLineToMiddleOfScreen(editor, caretLine, allowVirtualSpace = false)
+  private fun centre(editor: Editor, caretLine: Int, caretChangedLine: Boolean) =
+    scrollVisualLineToMiddleOfScreen(editor, caretLine, allowVirtualSpace = false, caretChangedLine)
 
   // Scrolljump is the minimal number of lines to scroll. It doesn't mean newLine = caretLine +/- MAX(sj, so), see
   // scrollUpToCaret and scrollDownToCaret
