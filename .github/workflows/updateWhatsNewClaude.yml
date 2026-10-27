@@ -3,8 +3,9 @@ name: Update What's New with Claude
 # Reacts to comments on the "What's New" PR opened by prepareWhatsNewClaude.yml.
 # That PR always lives on the `whatsnew-tbr` branch and is titled
 # "Prepare What's New for the upcoming release". When a maintainer leaves a
-# comment there, Claude reads it and updates the page / changelog accordingly,
-# then pushes back to the same branch.
+# comment there, Claude reads it and updates the page / changelog accordingly.
+# Claude itself can't commit or push: a separate step pushes its edits back to
+# the same branch, and only if they touch the What's New page or the changelog.
 on:
   issue_comment:
     types: [created]
@@ -12,13 +13,17 @@ on:
 jobs:
   update-whats-new:
     runs-on: ubuntu-latest
-    # Only on the What's New PR, and never on comments left by bots (the preview
-    # bot and Claude itself comment here — reacting to those would loop).
+    # Only on the What's New PR, only for comments from maintainers, and never on
+    # comments left by bots (the preview bot and Claude itself comment here —
+    # reacting to those would loop). The title alone is not trusted: anyone can
+    # open a fork PR with the same title, so the PR branch and the commenter's
+    # write access are verified in the first step.
     if: |
       github.repository == 'JetBrains/ideavim' &&
       github.event.issue.pull_request &&
       contains(github.event.issue.title, 'Prepare What''s New for the upcoming release') &&
-      github.event.comment.user.type != 'Bot'
+      github.event.comment.user.type != 'Bot' &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
 
     permissions:
       contents: write
@@ -28,11 +33,31 @@ jobs:
       actions: read
 
     steps:
+      - name: Verify the PR and the commenter
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          COMMENTER: ${{ github.event.comment.user.login }}
+        run: |
+          head=$(gh api "repos/$REPO/pulls/$PR_NUMBER" --jq '.head.repo.full_name + ":" + .head.ref')
+          if [ "$head" != "$REPO:whatsnew-tbr" ]; then
+            echo "::error::PR #$PR_NUMBER head is '$head', expected '$REPO:whatsnew-tbr'"
+            exit 1
+          fi
+          permission=$(gh api "repos/$REPO/collaborators/$COMMENTER/permission" --jq '.permission')
+          if [ "$permission" != "admin" ] && [ "$permission" != "write" ]; then
+            echo "::error::$COMMENTER has '$permission' permission, write access is required"
+            exit 1
+          fi
+
       - name: Checkout the What's New PR branch
         uses: actions/checkout@v4
         with:
           ref: whatsnew-tbr
-          fetch-depth: 0  # Full history so the branch can be pushed
+          fetch-depth: 0  # Full history for the changelog skill
+          # Keep the push token out of .git/config so Claude can't use it
+          persist-credentials: false
 
       - name: Run Claude Code to apply the requested changes
         id: claude
@@ -50,8 +75,9 @@ jobs:
 
           prompt: |
             A maintainer left a comment on the "What's New" pull request (branch
-            `whatsnew-tbr`). Read the comment below and apply exactly what it asks,
-            then push the result back to the `whatsnew-tbr` branch so the PR updates.
+            `whatsnew-tbr`). Read the comment below and apply exactly what it asks
+            by editing the files in the working tree. Do NOT commit or push — the
+            workflow does that after you finish.
 
             ## The maintainer's comment
             ${{ github.event.comment.body }}
@@ -60,6 +86,7 @@ jobs:
             - The What's New page: `src/main/resources/whatsnew-tbr.html`.
             - The changelog `## [To Be Released]` section of `CHANGES.md`, if the
               comment asks for changelog changes (use the `changelog` skill for its rules).
+            Changes to any other file are rejected and nothing gets pushed.
             Make the smallest change that satisfies the comment — do NOT rewrite or
             restyle anything that wasn't asked about.
 
@@ -72,10 +99,35 @@ jobs:
             - Keep the friendly, user-facing tone; no `VIM-####` ids or raw issue URLs.
 
             ## Finish
-            - Commit your changes and push them to the `whatsnew-tbr` branch (do NOT
-              open a new PR or new branch — push to the existing one).
+            - Leave your edits uncommitted in the working tree.
             - If the comment doesn't request any actionable change to the page or
-              changelog, make no changes, push nothing, and briefly explain why.
+              changelog, make no changes and briefly explain why.
 
-          # Page edits + changelog skill + git/gh to push to the existing branch.
-          claude_args: '--allowed-tools "Skill,Read,Write,Edit,Glob,Grep,Bash(git:*),Bash(gh:*),WebSearch,WebFetch(domain:plugins.jetbrains.com),WebFetch(domain:youtrack.jetbrains.com),WebFetch(domain:github.com)"'
+          # Edits limited to the two files + changelog skill + read-only git/gh.
+          claude_args: '--allowed-tools "Skill,Read,Glob,Grep,Edit(src/main/resources/whatsnew-tbr.html),Write(src/main/resources/whatsnew-tbr.html),Edit(CHANGES.md),Write(CHANGES.md),Bash(git log:*),Bash(git show:*),Bash(git diff:*),Bash(git tag --list:*),Bash(gh pr view:*),Bash(gh pr list:*),WebSearch,WebFetch(domain:plugins.jetbrains.com),WebFetch(domain:youtrack.jetbrains.com),WebFetch(domain:github.com)"'
+
+      - name: Push the allowed changes to whatsnew-tbr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          changed=$(git status --porcelain --untracked-files=all | cut -c4-)
+          if [ -z "$changed" ]; then
+            echo "No changes to push"
+            exit 0
+          fi
+          disallowed=$(echo "$changed" | grep -vxE 'src/main/resources/whatsnew-tbr\.html|CHANGES\.md' || true)
+          if [ -n "$disallowed" ]; then
+            echo "::error::Claude changed files outside the allowed set:"
+            echo "$disallowed"
+            exit 1
+          fi
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/whatsnew-tbr)" ]; then
+            echo "::error::HEAD moved away from origin/whatsnew-tbr, refusing to push"
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/main/resources/whatsnew-tbr.html CHANGES.md
+          git commit -m "Update What's New based on review comment"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" HEAD:whatsnew-tbr
