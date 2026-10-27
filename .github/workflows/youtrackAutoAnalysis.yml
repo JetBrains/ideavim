@@ -41,8 +41,9 @@ jobs:
 
       - name: Check if ticket was found
         id: check-ticket
+        env:
+          TICKET_ID: ${{ steps.select-ticket.outputs.ticket_id }}
         run: |
-          TICKET_ID="${{ steps.select-ticket.outputs.ticket_id }}"
           if [ -z "$TICKET_ID" ]; then
             echo "No tickets available for analysis"
             echo "has_ticket=false" >> $GITHUB_OUTPUT
@@ -830,68 +831,88 @@ jobs:
 
       - name: Workflow summary
         if: always()
+        env:
+          HAS_TICKET: ${{ steps.check-ticket.outputs.has_ticket }}
+          TICKET_ID: ${{ steps.select-ticket.outputs.ticket_id }}
+          TICKET_SUMMARY: ${{ steps.select-ticket.outputs.ticket_summary }}
+          CHECK_ANSWER_STATUS: ${{ steps.parse-check-answer.outputs.check_answer_status }}
+          TRIAGE_RESULT: ${{ steps.parse-triage.outputs.triage_result }}
+          PLANNING_STATUS: ${{ steps.parse-planning.outputs.planning_status }}
+          BUG_FIX_IMPLEMENTATION_STATUS: ${{ steps.parse-bug-fix.outputs.implementation_status }}
+          FEATURE_IMPLEMENTATION_STATUS: ${{ steps.parse-feature.outputs.implementation_status }}
+          REVIEW_STATUS: ${{ steps.parse-review.outputs.review_status }}
+          CHANGELOG_STATUS: ${{ steps.parse-changelog.outputs.changelog_status }}
+          PR_URL: ${{ steps.parse-pr.outputs.pr_url }}
+          CHECK_ANSWER_ATTENTION_REASON: ${{ steps.parse-check-answer.outputs.attention_reason }}
+          TRIAGE_ATTENTION_REASON: ${{ steps.parse-triage.outputs.attention_reason }}
+          PLANNING_ATTENTION_REASON: ${{ steps.parse-planning.outputs.attention_reason }}
+          BUG_FIX_ATTENTION_REASON: ${{ steps.parse-bug-fix.outputs.attention_reason }}
+          FEATURE_ATTENTION_REASON: ${{ steps.parse-feature.outputs.attention_reason }}
+          REVIEW_ATTENTION_REASON: ${{ steps.parse-review.outputs.attention_reason }}
+          CHANGELOG_ATTENTION_REASON: ${{ steps.parse-changelog.outputs.attention_reason }}
+          PR_ATTENTION_REASON: ${{ steps.parse-pr.outputs.attention_reason }}
         run: |
           echo "## YouTrack Auto-Analysis Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.check-ticket.outputs.has_ticket }}" == "true" ]; then
-            echo "- **Ticket:** ${{ steps.select-ticket.outputs.ticket_id }}" >> $GITHUB_STEP_SUMMARY
-            echo "- **Summary:** ${{ steps.select-ticket.outputs.ticket_summary }}" >> $GITHUB_STEP_SUMMARY
+          if [ "$HAS_TICKET" == "true" ]; then
+            echo "- **Ticket:** $TICKET_ID" >> $GITHUB_STEP_SUMMARY
+            echo "- **Summary:** $TICKET_SUMMARY" >> $GITHUB_STEP_SUMMARY
 
             # Show check-answer status if applicable (for pending clarification tickets)
-            if [ -n "${{ steps.parse-check-answer.outputs.check_answer_status }}" ]; then
-              echo "- **Check Answer:** ${{ steps.parse-check-answer.outputs.check_answer_status }}" >> $GITHUB_STEP_SUMMARY
+            if [ -n "$CHECK_ANSWER_STATUS" ]; then
+              echo "- **Check Answer:** $CHECK_ANSWER_STATUS" >> $GITHUB_STEP_SUMMARY
             fi
 
-            echo "- **Triage:** ${{ steps.parse-triage.outputs.triage_result }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Triage:** $TRIAGE_RESULT" >> $GITHUB_STEP_SUMMARY
 
             # Show planning status if applicable
-            if [ -n "${{ steps.parse-planning.outputs.planning_status }}" ]; then
-              echo "- **Planning:** ${{ steps.parse-planning.outputs.planning_status }}" >> $GITHUB_STEP_SUMMARY
+            if [ -n "$PLANNING_STATUS" ]; then
+              echo "- **Planning:** $PLANNING_STATUS" >> $GITHUB_STEP_SUMMARY
             fi
 
             # Show implementation status if applicable
-            if [ -n "${{ steps.parse-bug-fix.outputs.implementation_status }}" ]; then
-              echo "- **Bug Fix:** ${{ steps.parse-bug-fix.outputs.implementation_status }}" >> $GITHUB_STEP_SUMMARY
+            if [ -n "$BUG_FIX_IMPLEMENTATION_STATUS" ]; then
+              echo "- **Bug Fix:** $BUG_FIX_IMPLEMENTATION_STATUS" >> $GITHUB_STEP_SUMMARY
             fi
-            if [ -n "${{ steps.parse-feature.outputs.implementation_status }}" ]; then
-              echo "- **Feature:** ${{ steps.parse-feature.outputs.implementation_status }}" >> $GITHUB_STEP_SUMMARY
+            if [ -n "$FEATURE_IMPLEMENTATION_STATUS" ]; then
+              echo "- **Feature:** $FEATURE_IMPLEMENTATION_STATUS" >> $GITHUB_STEP_SUMMARY
             fi
 
             # Show review, changelog and PR status if applicable
-            if [ -n "${{ steps.parse-review.outputs.review_status }}" ]; then
-              echo "- **Review:** ${{ steps.parse-review.outputs.review_status }}" >> $GITHUB_STEP_SUMMARY
+            if [ -n "$REVIEW_STATUS" ]; then
+              echo "- **Review:** $REVIEW_STATUS" >> $GITHUB_STEP_SUMMARY
             fi
-            if [ -n "${{ steps.parse-changelog.outputs.changelog_status }}" ]; then
-              echo "- **Changelog:** ${{ steps.parse-changelog.outputs.changelog_status }}" >> $GITHUB_STEP_SUMMARY
+            if [ -n "$CHANGELOG_STATUS" ]; then
+              echo "- **Changelog:** $CHANGELOG_STATUS" >> $GITHUB_STEP_SUMMARY
             fi
-            if [ -n "${{ steps.parse-pr.outputs.pr_url }}" ]; then
-              echo "- **PR:** ${{ steps.parse-pr.outputs.pr_url }}" >> $GITHUB_STEP_SUMMARY
+            if [ -n "$PR_URL" ]; then
+              echo "- **PR:** $PR_URL" >> $GITHUB_STEP_SUMMARY
             fi
 
             # Show attention reasons if any
-            if [ -n "${{ steps.parse-check-answer.outputs.attention_reason }}" ]; then
-              echo "- **Attention (Check Answer):** ${{ steps.parse-check-answer.outputs.attention_reason }}" >> $GITHUB_STEP_SUMMARY
+            if [ -n "$CHECK_ANSWER_ATTENTION_REASON" ]; then
+              echo "- **Attention (Check Answer):** $CHECK_ANSWER_ATTENTION_REASON" >> $GITHUB_STEP_SUMMARY
             fi
-            if [ -n "${{ steps.parse-triage.outputs.attention_reason }}" ]; then
-              echo "- **Attention (Triage):** ${{ steps.parse-triage.outputs.attention_reason }}" >> $GITHUB_STEP_SUMMARY
+            if [ -n "$TRIAGE_ATTENTION_REASON" ]; then
+              echo "- **Attention (Triage):** $TRIAGE_ATTENTION_REASON" >> $GITHUB_STEP_SUMMARY
             fi
-            if [ -n "${{ steps.parse-planning.outputs.attention_reason }}" ]; then
-              echo "- **Attention (Planning):** ${{ steps.parse-planning.outputs.attention_reason }}" >> $GITHUB_STEP_SUMMARY
+            if [ -n "$PLANNING_ATTENTION_REASON" ]; then
+              echo "- **Attention (Planning):** $PLANNING_ATTENTION_REASON" >> $GITHUB_STEP_SUMMARY
             fi
-            if [ -n "${{ steps.parse-bug-fix.outputs.attention_reason }}" ]; then
-              echo "- **Attention (Bug Fix):** ${{ steps.parse-bug-fix.outputs.attention_reason }}" >> $GITHUB_STEP_SUMMARY
+            if [ -n "$BUG_FIX_ATTENTION_REASON" ]; then
+              echo "- **Attention (Bug Fix):** $BUG_FIX_ATTENTION_REASON" >> $GITHUB_STEP_SUMMARY
             fi
-            if [ -n "${{ steps.parse-feature.outputs.attention_reason }}" ]; then
-              echo "- **Attention (Feature):** ${{ steps.parse-feature.outputs.attention_reason }}" >> $GITHUB_STEP_SUMMARY
+            if [ -n "$FEATURE_ATTENTION_REASON" ]; then
+              echo "- **Attention (Feature):** $FEATURE_ATTENTION_REASON" >> $GITHUB_STEP_SUMMARY
             fi
-            if [ -n "${{ steps.parse-review.outputs.attention_reason }}" ]; then
-              echo "- **Attention (Review):** ${{ steps.parse-review.outputs.attention_reason }}" >> $GITHUB_STEP_SUMMARY
+            if [ -n "$REVIEW_ATTENTION_REASON" ]; then
+              echo "- **Attention (Review):** $REVIEW_ATTENTION_REASON" >> $GITHUB_STEP_SUMMARY
             fi
-            if [ -n "${{ steps.parse-changelog.outputs.attention_reason }}" ]; then
-              echo "- **Attention (Changelog):** ${{ steps.parse-changelog.outputs.attention_reason }}" >> $GITHUB_STEP_SUMMARY
+            if [ -n "$CHANGELOG_ATTENTION_REASON" ]; then
+              echo "- **Attention (Changelog):** $CHANGELOG_ATTENTION_REASON" >> $GITHUB_STEP_SUMMARY
             fi
-            if [ -n "${{ steps.parse-pr.outputs.attention_reason }}" ]; then
-              echo "- **Attention (PR):** ${{ steps.parse-pr.outputs.attention_reason }}" >> $GITHUB_STEP_SUMMARY
+            if [ -n "$PR_ATTENTION_REASON" ]; then
+              echo "- **Attention (PR):** $PR_ATTENTION_REASON" >> $GITHUB_STEP_SUMMARY
             fi
           else
             echo "No unanalyzed tickets were found." >> $GITHUB_STEP_SUMMARY
@@ -907,8 +928,17 @@ jobs:
           steps.parse-review.outputs.attention_reason != '' ||
           steps.parse-changelog.outputs.attention_reason != '' ||
           steps.parse-pr.outputs.attention_reason != ''
+        env:
+          CHECK_ANSWER_ATTENTION_REASON: ${{ steps.parse-check-answer.outputs.attention_reason }}
+          TRIAGE_ATTENTION_REASON: ${{ steps.parse-triage.outputs.attention_reason }}
+          PLANNING_ATTENTION_REASON: ${{ steps.parse-planning.outputs.attention_reason }}
+          BUG_FIX_ATTENTION_REASON: ${{ steps.parse-bug-fix.outputs.attention_reason }}
+          FEATURE_ATTENTION_REASON: ${{ steps.parse-feature.outputs.attention_reason }}
+          REVIEW_ATTENTION_REASON: ${{ steps.parse-review.outputs.attention_reason }}
+          CHANGELOG_ATTENTION_REASON: ${{ steps.parse-changelog.outputs.attention_reason }}
+          PR_ATTENTION_REASON: ${{ steps.parse-pr.outputs.attention_reason }}
         run: |
-          REASON="${{ steps.parse-check-answer.outputs.attention_reason }}${{ steps.parse-triage.outputs.attention_reason }}${{ steps.parse-planning.outputs.attention_reason }}${{ steps.parse-bug-fix.outputs.attention_reason }}${{ steps.parse-feature.outputs.attention_reason }}${{ steps.parse-review.outputs.attention_reason }}${{ steps.parse-changelog.outputs.attention_reason }}${{ steps.parse-pr.outputs.attention_reason }}"
+          REASON="$CHECK_ANSWER_ATTENTION_REASON$TRIAGE_ATTENTION_REASON$PLANNING_ATTENTION_REASON$BUG_FIX_ATTENTION_REASON$FEATURE_ATTENTION_REASON$REVIEW_ATTENTION_REASON$CHANGELOG_ATTENTION_REASON$PR_ATTENTION_REASON"
           echo "::error::Maintainer attention required: $REASON"
           exit 1
 
