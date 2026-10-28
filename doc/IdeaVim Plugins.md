@@ -1227,27 +1227,114 @@ The following features of the original plugin are **not** currently supported:
 <summary><h2>VimEverywhere: Keyboard-driven IDE navigation outside the editor</h2></summary>
 
 ### Summary:
-Brings vim-style keyboard navigation to the rest of the IDE. Enabling `VimEverywhere` turns on three
-behaviors:
+Brings vim-style keyboard navigation to the rest of the IDE: tool windows, trees, tables, popups and
+dialogs.
 
-- **Hints overlay.** Press `Ctrl+Shift+\` (`Ctrl+Cmd+\` on macOS) to display hint labels over
-  interactive UI components — buttons, tool window tabs, tree nodes, text fields, scroll panes, and
-  so on. Type the letters next to a target to focus or click it without touching the mouse.
-- **NERDTree-style mappings everywhere.** NERDTree file-opening mappings (`o`, `t`, `T`, `s`, `i`,
-  `go`, `gs`, `gi`) work in any focused tree, not just the Project tool window.
-- **Tool window navigation.** Vim-style window-motion keys work inside tool windows, so you can move
-  between split panes without leaving the keyboard.
+- **Hints:** `Ctrl+Shift+\` (`Ctrl+Cmd+\` on macOS) labels UI elements so you can click them from the
+  keyboard.
+- **Tool windows:** `<C-W>h`/`j`/`k`/`l` move between the editor and tool windows.
+- **Trees:** `j`, `k`, `o`, `s`, `i`, `gs`, `gi` and other NERDTree keys work in any tree.
+- **Tables:** `h`, `j`, `k`, `l`, `gg`, `G`, `0`, `$` move the selection in any table.
+- **Popups and dialogs:** `<C-[>` works as `Esc`.
+
+Full key lists are in the sections below.
 
 ### Setup:
-- Install the [AceJump](https://plugins.jetbrains.com/plugin/7086-acejump/) plugin.
 - Add the following command to `~/.ideavimrc`: `set VimEverywhere`
 
-### Instructions
+Mappings from `~/.ideavimrc` work only in the editor. Outside the editor, use the keys listed below.
 
-Press `Ctrl+Shift+\` (`Ctrl+Cmd+\` on macOS) to toggle the hints overlay. Type the letters shown
-next to a target to activate it, or press `Esc` to dismiss the overlay without activating anything.
-NERDTree-style and window-nav mappings are active automatically whenever the corresponding
-component has focus.
+### Hints
+
+Press `Ctrl+Shift+\` (`Ctrl+Cmd+\` on macOS) to show hint labels over buttons, tabs, tree nodes, text
+fields and other UI elements. Type the letters next to a target to focus or click it. Press `Esc` to
+close the hints without selecting anything.
+
+To use a different shortcut, change *Toggle Hints* in *Settings | Keymap*, or map it in `~/.ideavimrc`:
+
+```
+nmap <leader>h <Action>(ToggleHintsAction)
+```
+
+### Moving between tool windows
+
+| Direction | Keys                                        |
+|-----------|---------------------------------------------|
+| Left      | `<C-W>h`, `<C-W><C-H>`, `<C-W><Left>`       |
+| Down      | `<C-W>j`, `<C-W><C-J>`, `<C-W><Down>`       |
+| Up        | `<C-W>k`, `<C-W><C-K>`, `<C-W><Up>`         |
+| Right     | `<C-W>l`, `<C-W><C-L>`, `<C-W><Right>`      |
+
+These keys move focus to the neighbouring editor split or tool window in that direction. They work both
+in the editor and inside tool windows, so you can go from the editor to the Project view, to the
+Terminal and back. Press `Esc` after `<C-W>` to cancel.
+
+Use `<C-W>` followed by a direction; `<C-h>`, `<C-j>`, `<C-k>`, `<C-l>` alone don't move between tool
+windows. These keys can't be remapped.
+
+Works with docked tool windows (Project, Terminal, Run, Debug, Git, Find, Problems, AI Chat, tool
+windows from other plugins, ...). Floating and windowed tool windows, and the Python Console, are not
+supported.
+
+### Trees
+
+In any tree (Project, Structure, Find results, Services, ...):
+
+| Keys              | Action                                              |
+|-------------------|-----------------------------------------------------|
+| `j` / `k`         | Next / previous node                                |
+| `gg` / `G`        | First / last node                                   |
+| `<C-D>` / `<C-U>` | Scroll half a page down / up                        |
+| `p` / `P`         | Parent / root node                                  |
+| `K` / `J`         | First / last child                                  |
+| `<C-J>` / `<C-K>` | Next / previous sibling                             |
+| `O` / `x` / `X`   | Expand recursively / close parent / close children  |
+| `/`               | Speed search                                        |
+| `o`               | Open file or expand / collapse node                 |
+| `go`              | Preview file, stay in the tree                      |
+| `t` / `T`         | Open file / open file and stay in the tree          |
+| `s` / `i`         | Open file in a vertical / horizontal split          |
+| `gs` / `gi`       | Same as `s` / `i`, stay in the tree                 |
+
+You can change these keys with the same variables as in [NERDTree](NERDTree-support.md), e.g.
+`let g:NERDTreeMapActivateNode = 'l'`. The NERDTree plugin doesn't have to be enabled. If it is, the
+Project view also gets the rest of its mappings.
+
+### Tables
+
+In any table (database results, Git log, settings tables, ...):
+
+| Keys       | Action                 |
+|------------|------------------------|
+| `h` / `l`  | Previous / next column |
+| `j` / `k`  | Next / previous row    |
+| `gg` / `G` | First / last row       |
+| `0` / `$`  | First / last column    |
+
+To edit a cell, press `Enter` or `F2`.
+
+### Closing popups and dialogs
+
+`<C-[>` works as `Esc` everywhere in the IDE, e.g. to close a popup or a dialog.
+
+### Known limitations
+
+- **Terminal.** By default the terminal sends `<C-W>` to the shell. To use `<C-W>h`/`j`/`k`/`l` there,
+  disable *Settings | Tools | Terminal | Override IDE shortcuts*.
+- **AI Chat** and **web-based views** (e.g. Markdown preview) may not react to `<C-W>` or the hints
+  shortcut. Press `Esc` to return to the editor, or open another tool window with its shortcut
+  (e.g. `Alt+1` / `Cmd+1` for Project).
+
+### Examples
+
+- **Editor → Project view:** open the Project view (`Alt+1` / `Cmd+1`), press `Esc` to go back to the
+  editor, then `<C-W>h` to move back into the Project view.
+- **Project view → Terminal:** press `<C-W>l` to go to the editor, then `<C-W>j` to go down to the
+  Terminal.
+- **Back to the editor:** press `<C-W>` with the direction of the editor, or `Esc`.
+
+If nothing happens, check that `VimEverywhere` is enabled (`:set VimEverywhere?`) and that the tool
+window is docked.
 
 </details>
 
