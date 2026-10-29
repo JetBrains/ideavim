@@ -32,6 +32,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.ide.isRider
 import com.maddyhome.idea.vim.newapi.IjNativeAction
 import com.maddyhome.idea.vim.newapi.IjVimDocument
 import com.maddyhome.idea.vim.newapi.ij
@@ -77,6 +78,13 @@ class IjActionExecutor : VimActionExecutor {
     try {
       isRunningActionFromVim = true
       val place = ijAction.choosePlace()
+      if (isRider() && ijAction.isBackendAction()) {
+        // The synchronous update can't get the action's state from the backend: Rider asks the backend only for a real
+        //   hotkey, so the action stays disabled (VIM-3968). The asynchronous update asks the backend without blocking
+        //   the EDT. The action is performed later, as are the backend's changes anyway.
+        ActionManager.getInstance().tryToExecute(ijAction, null, contextComponent, place, false)
+        return true
+      }
       val res = ActionManager.getInstance().tryToExecute(ijAction, null, contextComponent, place, true)
       res.waitFor(5_000)
       return res.isDone
