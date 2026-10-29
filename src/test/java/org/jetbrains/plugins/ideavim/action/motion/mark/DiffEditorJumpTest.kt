@@ -12,6 +12,7 @@ import com.intellij.diff.DiffContentFactory
 import com.intellij.diff.DiffTool
 import com.intellij.diff.FrameDiffTool
 import com.intellij.diff.chains.DiffRequestProducer
+import com.intellij.diff.contents.DiffContent
 import com.intellij.diff.chains.SimpleDiffRequestChain
 import com.intellij.diff.editor.ChainDiffVirtualFile
 import com.intellij.diff.editor.DiffEditorViewerFileEditor
@@ -418,13 +419,20 @@ class DiffEditorJumpTest : VimSplitWindowTestCase() {
   private fun openDiff(leftText: String): VirtualFile {
     val request = SimpleDiffRequest(
       "Review",
-      DiffContentFactory.getInstance().create(leftText),
+      olderRevision(leftText, changedFile),
       DiffContentFactory.getInstance().create(fixture.project, changedFile),
       "Before",
       "After",
     )
     return open(SimpleDiffVirtualFile(request))
   }
+
+  /**
+   * The left side of a diff from version control: the text of an older revision. Its document has a file of its own,
+   * which is not the file on disk, so the side highlights the code like the file does
+   */
+  private fun olderRevision(text: String, file: VirtualFile): DiffContent =
+    DiffContentFactory.getInstance().createFromBytes(fixture.project, text.toByteArray(), file)
 
   /** A diff of several files in one tab, as the Commit tool window opens it */
   private fun openChainDiff(vararg changes: Pair<VirtualFile, String>): VirtualFile {
@@ -515,7 +523,7 @@ class DiffEditorJumpTest : VimSplitWindowTestCase() {
     override fun process(context: UserDataHolder, indicator: ProgressIndicator): DiffRequest =
       SimpleDiffRequest(
         file.name,
-        DiffContentFactory.getInstance().create(leftText),
+        olderRevision(leftText, file),
         DiffContentFactory.getInstance().create(fixture.project, file),
         "Before",
         "After",

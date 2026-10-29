@@ -293,7 +293,9 @@ abstract class VimMotionGroupBase : VimMotionGroup {
 
     // TODO [vakhitov] It is super super super wrong.
     // TODO [vakhitov] We should remove all of the secondary carets and return an offset of the primary one
-    val markEditor = injector.file.selectEditor(editor.projectId, mark.filepath, mark.protocol) ?: return Motion.Error
+    val markPosition = BufferPosition(line, if (toLineStart) 0 else mark.col)
+    val markEditor = injector.file.selectEditor(editor.projectId, mark.filepath, mark.protocol, markPosition)
+      ?: return Motion.Error
     // todo should we move all the carets or only one?
     for (carett in markEditor.carets()) {
       val offset = if (toLineStart) {
@@ -322,15 +324,13 @@ abstract class VimMotionGroupBase : VimMotionGroup {
   }
 
   override fun moveCaretToJump(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
-    val startingPoint = startingPointToRemember(editor)
-    var jump = injector.jumpService.getJump(editor, count)
+    var jump = firstJump(editor, count)
     while (jump != null) {
       if (jump.source is JumpSource.Diff && injector.jumpService.showInDiff(editor, jump)) {
-        remember(editor, startingPoint)
         return Motion.NoMotion
       }
       if (jump.isInFile) {
-        return moveCaretToJumpInFile(editor, jump, startingPoint)
+        return moveCaretToJumpInFile(editor, jump)
       }
       jump = dropJumpToClosedDiff(editor, jump, isGoingBack = count < 0)
     }
@@ -338,20 +338,23 @@ abstract class VimMotionGroupBase : VimMotionGroup {
   }
 
   /**
-   * Where the caret is before the jump, so a jump forward can bring the user back here
+   * The jump [count] steps away from the current spot of the jump list
    *
-   * Only a jump from the newest end of the jump list needs it. From anywhere else, the user moves between places that
-   * are already in the list.
+   * Leaving the newest end of the list first adds the place of the caret, so a jump forward can bring the user back
+   * here. It replaces an older jump to the same place, e.g. one the IDE recorded, so the caret never jumps to where it
+   * already is.
    */
-  private fun startingPointToRemember(editor: VimEditor): Jump? {
-    val isAtNewestEnd = injector.jumpService.getJumpSpot(editor) == -1
-    return if (isAtNewestEnd) injector.jumpService.jumpAtCaret(editor) else null
-  }
+  private fun firstJump(editor: VimEditor, count: Int): Jump? {
+    val jumpService = injector.jumpService
+    val isAtNewestEnd = jumpService.getJumpSpot(editor) == -1
+    if (!isAtNewestEnd) return jumpService.getJump(editor, count)
 
-  private fun remember(editor: VimEditor, startingPoint: Jump?) {
-    if (startingPoint != null) {
-      injector.jumpService.addJump(editor, startingPoint, false)
-    }
+    val hasOlderJump = count < 0 && jumpService.getJumps(editor).size + count >= 0
+    if (!hasOlderJump) return null
+    val here = jumpService.jumpAtCaret(editor) ?: return jumpService.getJump(editor, count)
+    jumpService.addJump(editor, here, true)
+    // The newest jump is the place of the caret now, so the jump to take is one step further
+    return jumpService.getJump(editor, count - 1)
   }
 
   /**
@@ -365,15 +368,14 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     return injector.jumpService.getJump(editor, if (isGoingBack) 0 else 1)
   }
 
-  private fun moveCaretToJumpInFile(editor: VimEditor, jump: Jump, startingPoint: Jump?): Motion {
+  private fun moveCaretToJumpInFile(editor: VimEditor, jump: Jump): Motion {
     val position = BufferPosition(jump.line, jump.col, false)
     if (editor.getPath() == jump.filepath) {
-      remember(editor, startingPoint)
       return editor.bufferPositionToOffset(position).toMotionOrError()
     }
 
-    val editorOfFile = injector.file.selectEditor(editor.projectId, jump.filepath, jump.protocol) ?: return Motion.Error
-    remember(editor, startingPoint)
+    val editorOfFile = injector.file.selectEditor(editor.projectId, jump.filepath, jump.protocol, position)
+      ?: return Motion.Error
     val offset = editorOfFile.normalizeOffset(editorOfFile.bufferPositionToOffset(position), false)
     editorOfFile.currentCaret().moveToOffset(offset)
     // The caret moved in another editor, so there is nothing to move in this one
@@ -436,7 +438,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
   private fun moveCaretToTagPosition(editor: VimEditor, entry: TagStackEntry): Motion {
     val lp = BufferPosition(entry.line, entry.col, false)
     return if (editor.getPath() != entry.filepath) {
-      injector.file.selectEditor(editor.projectId, entry.filepath, entry.protocol)?.let { newEditor ->
+      injector.file.selectEditor(editor.projectId, entry.filepath, entry.protocol, lp)?.let { newEditor ->
         newEditor.currentCaret()
           .moveToOffset(newEditor.normalizeOffset(newEditor.bufferPositionToOffset(lp), false))
       }
@@ -454,13 +456,13 @@ abstract class VimMotionGroupBase : VimMotionGroup {
    * first - that is where the identifier is.
    */
   private fun resolveTagAgain(editor: VimEditor, context: ExecutionContext, entry: TagStackEntry): Motion {
+    val lp = BufferPosition(entry.line, entry.col, false)
     val target = if (editor.getPath() != entry.filepath) {
-      injector.file.selectEditor(editor.projectId, entry.filepath, entry.protocol)
+      injector.file.selectEditor(editor.projectId, entry.filepath, entry.protocol, lp)
     } else {
       editor
     } ?: return Motion.Error
 
-    val lp = BufferPosition(entry.line, entry.col, false)
     target.currentCaret().moveToOffset(target.normalizeOffset(target.bufferPositionToOffset(lp), false))
     injector.actionExecutor.executeAction(target, name = "GotoDeclaration", context = context)
     // The caret has already been moved

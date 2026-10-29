@@ -14,6 +14,7 @@ import com.intellij.diff.tools.util.base.DiffViewerListener
 import com.intellij.diff.tools.util.side.TwosideTextDiffViewer
 import com.intellij.diff.util.Side
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.LogicalPosition
 
 /** A position in the text of one side of a diff */
 internal data class DiffPosition(val side: Side, val line: Int, val column: Int)
@@ -28,8 +29,8 @@ internal data class DiffEditorPosition(val editor: Editor, val line: Int, val co
  * view translates them to and from its own editors.
  */
 internal sealed interface DiffView {
-  /** The position of the caret of [editor], or null if [editor] is not one of this view's editors */
-  fun positionOf(editor: Editor): DiffPosition?
+  /** The position of [caret] in [editor], or null if [editor] is not one of this view's editors */
+  fun positionOf(editor: Editor, caret: LogicalPosition): DiffPosition?
 
   /** Where [position] is shown. A view with a current side makes the side of [position] current */
   fun show(position: DiffPosition): DiffEditorPosition
@@ -38,9 +39,8 @@ internal sealed interface DiffView {
   fun whenReady(action: () -> Unit)
 
   class SideBySide(private val viewer: TwosideTextDiffViewer) : DiffView {
-    override fun positionOf(editor: Editor): DiffPosition? {
+    override fun positionOf(editor: Editor, caret: LogicalPosition): DiffPosition? {
       val side = Side.fromValue(viewer.editors, editor) ?: return null
-      val caret = editor.caretModel.logicalPosition
       return DiffPosition(side, caret.line, caret.column)
     }
 
@@ -57,9 +57,8 @@ internal sealed interface DiffView {
     private val isReady: Boolean
       get() = viewer.diffChanges != null && !viewer.hasPendingRediff()
 
-    override fun positionOf(editor: Editor): DiffPosition? {
+    override fun positionOf(editor: Editor, caret: LogicalPosition): DiffPosition? {
       if (editor != viewer.editor || !isReady) return null
-      val caret = editor.caretModel.logicalPosition
       // An unchanged line belongs to both sides. The viewer then picks its master side, which shows the file
       val lines = viewer.transferLineFromOneside(caret.line)
       val side = lines.second

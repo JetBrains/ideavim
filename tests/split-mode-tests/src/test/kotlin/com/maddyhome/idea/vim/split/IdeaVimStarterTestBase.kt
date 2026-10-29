@@ -15,7 +15,10 @@ import com.intellij.driver.model.RdTarget
 import com.intellij.driver.sdk.invokeAction
 import com.intellij.driver.sdk.openFile
 import com.intellij.driver.sdk.singleProject
+import com.intellij.driver.sdk.ui.Finder
 import com.intellij.driver.sdk.ui.components.UiComponent.Companion.waitFound
+import com.intellij.driver.sdk.ui.components.common.JEditorUiComponent
+import com.intellij.driver.sdk.ui.keyboard.RemoteKeyboard
 import com.intellij.driver.sdk.ui.components.common.codeEditor
 import com.intellij.driver.sdk.ui.components.common.codeEditorForFile
 import com.intellij.driver.sdk.ui.components.common.ideFrame
@@ -425,6 +428,70 @@ abstract class IdeaVimStarterTestBase {
       (message ?: "Caret in $fileName should be after line $line") + ". Actual line: $actual"
     }
   }
+
+  // ── Helpers for diff tabs ───────────────────────────────────
+  //
+  // A side-by-side diff shows two editors in the selected tab, a plain editor tab shows one. The order of the two
+  // editors in the component tree is not the order on screen, so a side is found by its text.
+
+  /** Opens the diff of the file in the active editor against its version in the repository */
+  protected fun compareWithRepository() {
+    driver.withContext {
+      ideFrame { codeEditor().apply { waitFound(); invokeAction("Compare.SameVersion", component = component) } }
+    }
+    check(waitUntil(timeoutMs = 30_000, pollMs = 500) { isDiffShown() }) { "The diff did not open within timeout" }
+  }
+
+  /** Whether the selected editor tab is a side-by-side diff */
+  protected fun isDiffShown(): Boolean = visibleEditorCount() == 2
+
+  /**
+   * Clicks the side of the diff that shows [sideText], then types [keys] in it
+   *
+   * Only a click puts the keys into an editor of a diff - `requestFocus()` on it doesn't. The click moves the caret, so
+   * start the keys with a motion, and type everything that must happen at one position in a single call.
+   */
+  protected fun typeInDiffSide(sideText: String, keys: RemoteKeyboard.() -> Unit) {
+    driver.withContext {
+      requestFocusFromIde(singleProject())
+      ideFrame {
+        diffSide(sideText).apply {
+          click()
+          keyboard(keys)
+        }
+      }
+    }
+    waitForNoModalProgress()
+  }
+
+  /** Reads the caret line (1-based) of the side of the diff that shows [sideText] */
+  protected fun caretLineInDiffSide(sideText: String): Int {
+    var result = 0
+    driver.withContext { ideFrame { result = diffSide(sideText).getCaretLine() } }
+    return result
+  }
+
+  /** Closes every editor tab but the selected one */
+  protected fun closeOtherEditors() {
+    driver.withContext { invokeAction("CloseAllEditorsButActive") }
+  }
+
+  protected fun closeAllEditors() {
+    driver.withContext { invokeAction("CloseAllEditors") }
+    waitUntil { visibleEditorCount() == 0 }
+  }
+
+  private fun visibleEditorCount(): Int {
+    var result = 0
+    driver.withContext { ideFrame { result = visibleEditors().size } }
+    return result
+  }
+
+  private fun Finder.diffSide(sideText: String): JEditorUiComponent =
+    visibleEditors().singleOrNull { it.text == sideText } ?: error("No side of the diff shows the expected text")
+
+  private fun Finder.visibleEditors(): List<JEditorUiComponent> =
+    xx("//div[@class='EditorTabs']//div[@class='EditorComponentImpl']", JEditorUiComponent::class.java).list()
 
   /** Waits for a short time to let async operations settle. */
   protected fun pause(ms: Long = 500) {

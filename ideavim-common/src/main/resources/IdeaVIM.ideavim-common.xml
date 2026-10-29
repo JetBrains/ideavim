@@ -14,6 +14,9 @@
   <extensionPoints>
     <extensionPoint interface="com.maddyhome.idea.vim.group.rpc.VimRemoteApiResolver" dynamic="true"
                     name="remoteApiResolver"/>
+    <!-- In both modes: in split mode, diff tabs live on the backend -->
+    <extensionPoint interface="com.maddyhome.idea.vim.group.diff.DiffTabFilesProvider" dynamic="true"
+                    name="internal.diffTabFiles"/>
   </extensionPoints>
 
   <extensions defaultExtensionNs="com.intellij">

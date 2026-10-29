@@ -63,4 +63,22 @@ class JumpNavigationSplitTest : IdeaVimStarterTestBase() {
     pause(300)
     assertCaretAfter(40, "'' should return to position before IDE Back (end of file)")
   }
+
+  @Test
+  fun `global mark in a closed file brings the caret to the mark`() {
+    openFile(longFile("Marked"))
+    createFile("src/MarkTarget.txt", "Target line 1\nTarget line 2\n")
+    typeVim("10G")
+    typeVim("mA")
+    // The file is closed with the caret here, so reopening it alone would bring the caret back here, not to the mark
+    typeVim("30G")
+    exCommand("e src/MarkTarget.txt")
+    openFileInCurrentWindow("src/MarkTarget.txt", "MarkTarget.txt")
+    closeOtherEditors()
+
+    typeVimInFile("MarkTarget.txt", "`A")
+
+    assertCaretInFileAfter("Marked.txt", 9, "`A should open the file at the mark")
+    assertCaretInFileBefore("Marked.txt", 11, "`A should open the file at the mark")
+  }
 }

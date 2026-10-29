@@ -92,8 +92,9 @@ class QuickFixServiceImpl : QuickFixService {
 
   private fun openItem(editor: VimEditor, item: QuickFixItem): VimEditor? {
     injector.jumpService.saveJumpLocation(editor)
-    val target = injector.file.selectEditor(editor.projectId, item.filepath, item.protocol) ?: return null
-    target.currentCaret().moveToOffset(target.bufferPositionToOffset(BufferPosition(item.line, item.col)))
+    val position = BufferPosition(item.line, item.col)
+    val target = injector.file.selectEditor(editor.projectId, item.filepath, item.protocol, position) ?: return null
+    target.currentCaret().moveToOffset(target.bufferPositionToOffset(position))
     return target
   }
 }

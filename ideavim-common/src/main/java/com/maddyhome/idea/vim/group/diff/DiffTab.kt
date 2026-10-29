@@ -10,16 +10,20 @@ package com.maddyhome.idea.vim.group.diff
 
 import com.intellij.diff.contents.DocumentContent
 import com.intellij.diff.editor.DiffEditorViewerFileEditor
+import com.intellij.diff.impl.DiffEditorViewer
 import com.intellij.diff.impl.DiffRequestProcessor
 import com.intellij.diff.impl.DiffRequestProcessorListener
 import com.intellij.diff.requests.ContentDiffRequest
 import com.intellij.diff.util.Side
 import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.testFramework.LightVirtualFile
+import java.lang.reflect.Method
 import java.util.UUID
 
 /**
@@ -29,12 +33,12 @@ import java.util.UUID
  * A tab can show the diffs of many files, one at a time, see [DiffTabFiles].
  */
 internal class DiffTab private constructor(
-  private val fileEditor: DiffEditorViewerFileEditor,
+  private val file: VirtualFile,
   private val processor: DiffRequestProcessor,
 ) {
   /** Tells the tab apart from the other diff tabs while it is open */
   val id: String
-    get() = fileEditor.file.putUserDataIfAbsent(ID_KEY, UUID.randomUUID().toString())
+    get() = file.putUserDataIfAbsent(ID_KEY, UUID.randomUUID().toString())
 
   val view: DiffView?
     get() = DiffView.of(processor.activeViewer)
@@ -58,7 +62,7 @@ internal class DiffTab private constructor(
    * Switching to another file loads its diff in the background, so [action] may run later.
    */
   fun show(path: String, action: (DiffView) -> Unit) {
-    FileEditorManager.getInstance(processor.project ?: return).openFile(fileEditor.file, true)
+    FileEditorManager.getInstance(processor.project ?: return).openFile(file, true)
     val actionOnceReady = { view: DiffView -> view.whenReady { action(view) } }
     if (shows(path)) {
       view?.let(actionOnceReady)
@@ -91,7 +95,12 @@ internal class DiffTab private constructor(
   }
 
   private class DiffSideContent(content: DocumentContent) {
-    val fileOfDocument: VirtualFile? = FileDocumentManager.getInstance().getFile(content.document)
+    /**
+     * The file the side shows, if it shows a file at all. The text of an older revision has a file of its own too, for
+     * highlighting, but that one only lives in memory
+     */
+    val fileOfDocument: VirtualFile? =
+      FileDocumentManager.getInstance().getFile(content.document)?.takeIf { it !is LightVirtualFile }
 
     /** The file of the side. A side showing an older revision still knows the file, for highlighting it */
     val file: VirtualFile? = fileOfDocument ?: content.highlightFile
@@ -101,12 +110,34 @@ internal class DiffTab private constructor(
     private val ID_KEY = Key.create<String>("IdeaVim.DiffTabId")
 
     fun allOpen(project: Project): List<DiffTab> {
-      return FileEditorManager.getInstance(project).allEditors
-        .filterIsInstance<DiffEditorViewerFileEditor>()
-        .mapNotNull { fileEditor ->
-          val processor = fileEditor.editorViewer as? DiffRequestProcessor
-          processor?.let { DiffTab(fileEditor, it) }
-        }
+      return FileEditorManager.getInstance(project).allEditors.mapNotNull { fileEditor ->
+        val processor = diffViewerOf(fileEditor) as? DiffRequestProcessor
+        processor?.let { DiffTab(fileEditor.file, it) }
+      }
+    }
+
+    private fun diffViewerOf(fileEditor: FileEditor): DiffEditorViewer? {
+      if (fileEditor is DiffEditorViewerFileEditor) return fileEditor.editorViewer
+      val getProcessor = splitModeProcessorGetters.get(fileEditor.javaClass) ?: return null
+      return try {
+        getProcessor.invoke(fileEditor) as? DiffEditorViewer
+      } catch (_: ReflectiveOperationException) {
+        null
+      }
+    }
+
+    /**
+     * The getter of the diff viewer in a diff tab of split mode, looked up once per class of file editor
+     *
+     * On the backend, split mode keeps a diff tab in its own file editor, `DiffRequestDirectTransferEditor`, which has
+     * the viewer only in its `processor` property. There is no public API for it.
+     */
+    private val splitModeProcessorGetters = object : ClassValue<Method?>() {
+      override fun computeValue(type: Class<*>): Method? {
+        val getter = type.methods.find { it.name == "getProcessor" && it.parameterCount == 0 } ?: return null
+        if (!DiffEditorViewer::class.java.isAssignableFrom(getter.returnType)) return null
+        return getter.apply { trySetAccessible() }
+      }
     }
   }
 }
