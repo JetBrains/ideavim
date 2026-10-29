@@ -13,6 +13,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.Disposer
 import com.intellij.testFramework.replaceService
 import com.intellij.vim.api.VimApi
+import com.intellij.vim.api.models.Jump as ApiJump
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimInjector
 import com.maddyhome.idea.vim.api.VimJumpService
@@ -20,6 +21,8 @@ import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.mark.Jump as EngineJump
+import com.maddyhome.idea.vim.mark.JumpSource
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.thinapi.VimApiImpl
 import kotlinx.coroutines.runBlocking
@@ -33,6 +36,7 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class TransactionTest : MockTestCase() {
@@ -239,5 +243,21 @@ class TransactionTest : MockTestCase() {
     }
 
     verify(injector.jumpService).clearJumps(eq(vimEditor.projectId))
+  }
+
+  @Test
+  fun `test addJump from the API records a plain file jump`() {
+    runBlocking {
+      myVimApi.editor {
+        val path = read { filePath }
+        change {
+          addJump(ApiJump(2, 3, path), reset = true)
+        }
+      }
+    }
+
+    val jumpCaptor = argumentCaptor<EngineJump>()
+    verify(injector.jumpService).addJump(eq(vimEditor.jumpListId), jumpCaptor.capture(), eq(true))
+    assertEquals(JumpSource.File, jumpCaptor.firstValue.source)
   }
 }

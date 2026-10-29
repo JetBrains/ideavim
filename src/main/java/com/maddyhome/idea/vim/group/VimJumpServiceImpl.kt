@@ -19,9 +19,12 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimJumpServiceBase
 import com.maddyhome.idea.vim.api.VimWindowIdService
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.group.diff.DiffJumps
 import com.maddyhome.idea.vim.group.jump.JumpRemoteApi
 import com.maddyhome.idea.vim.mark.Jump
+import com.maddyhome.idea.vim.mark.JumpSource
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.initInjector
 import kotlinx.coroutines.launch
 import org.jdom.Element
@@ -53,6 +56,16 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
     }
   }
 
+  override fun jumpAtCaret(editor: VimEditor): Jump? {
+    return DiffJumps.jumpAtCaret(editor.ij) ?: super.jumpAtCaret(editor)
+  }
+
+  override fun showInDiff(editor: VimEditor, jump: Jump): Boolean {
+    val source = jump.source as? JumpSource.Diff ?: return false
+    val project = editor.ij.project ?: return false
+    return DiffJumps.show(project, jump, source)
+  }
+
   // We do not delete old project records.
   // Rationale: It's more likely that users will want to review their old projects and access their jump history
   // (e.g., recent files), than for the 100 jumps (max number of records) to consume enough space to be noticeable.
@@ -60,7 +73,8 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
     val projectsElem = Element("projects")
     for ((project, jumps) in jumpsByProject()) {
       val projectElement = Element("project").setAttribute("id", project)
-      for (jump in jumps) {
+      // A jump to text that is not in a file, such as an older revision shown in a diff, has nowhere to go after a restart
+      for (jump in jumps.filter { it.isInFile }) {
         val jumpElem = Element("jump")
         jumpElem.setAttribute("line", jump.line.toString())
         jumpElem.setAttribute("column", jump.col.toString())

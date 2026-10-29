@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.mark.Jump
+import com.maddyhome.idea.vim.mark.JumpSource
 import org.jetbrains.annotations.TestOnly
 
 // todo should it be multicaret?
@@ -56,6 +57,18 @@ interface VimJumpService {
   fun includeCurrentCommandAsNavigation(editor: VimEditor)
 
   /**
+   * The jump to the caret of [editor], or null if the editor shows nothing a jump can bring the user back to
+   */
+  fun jumpAtCaret(editor: VimEditor): Jump?
+
+  /**
+   * Brings back the diff a [JumpSource.Diff] jump was recorded in, and moves its caret to the jump
+   *
+   * @return false if no open diff can show the jump
+   */
+  fun showInDiff(editor: VimEditor, jump: Jump): Boolean
+
+  /**
    * Loads legacy jump state from an XML element for version migration.
    * Default no-op; overridden by implementations that support PersistentStateComponent.
    */
@@ -66,11 +79,7 @@ interface VimJumpService {
 }
 
 fun VimJumpService.addJump(editor: VimEditor, reset: Boolean) {
-  val virtualFile = editor.getVirtualFile() ?: return
-  val path = virtualFile.path
-  val protocol = virtualFile.protocol
-  val position = editor.offsetToBufferPosition(editor.currentCaret().offset)
-  val jump = Jump(position.line, position.column, path, protocol)
+  val jump = jumpAtCaret(editor) ?: return
   addJump(editor, jump, reset)
 }
 

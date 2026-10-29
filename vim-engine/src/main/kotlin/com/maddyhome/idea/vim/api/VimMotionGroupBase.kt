@@ -24,6 +24,8 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.handler.toAdjustedMotionOrError
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.mark.Jump
+import com.maddyhome.idea.vim.mark.JumpSource
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.isEndAllowedIgnoringOnemore
 import com.maddyhome.idea.vim.tag.TagStackEntry
@@ -320,26 +322,62 @@ abstract class VimMotionGroupBase : VimMotionGroup {
   }
 
   override fun moveCaretToJump(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
-    val jumpService = injector.jumpService
-    val spot = jumpService.getJumpSpot(editor)
-    val (line, col, fileName, protocol) = jumpService.getJump(editor, count) ?: return Motion.Error
-    val lp = BufferPosition(line, col, false)
-    return if (editor.getPath() != fileName) {
-      injector.file.selectEditor(editor.projectId, fileName, protocol)?.let { newEditor ->
-        if (spot == -1) {
-          jumpService.addJump(editor, false)
-        }
-        newEditor.let {
-          it.currentCaret().moveToOffset(it.normalizeOffset(newEditor.bufferPositionToOffset(lp), false))
-        }
+    val startingPoint = startingPointToRemember(editor)
+    var jump = injector.jumpService.getJump(editor, count)
+    while (jump != null) {
+      if (jump.source is JumpSource.Diff && injector.jumpService.showInDiff(editor, jump)) {
+        remember(editor, startingPoint)
+        return Motion.NoMotion
       }
-      Motion.Error
-    } else {
-      if (spot == -1) {
-        jumpService.addJump(editor, false)
+      if (jump.isInFile) {
+        return moveCaretToJumpInFile(editor, jump, startingPoint)
       }
-      editor.bufferPositionToOffset(lp).toMotionOrError()
+      jump = dropJumpToClosedDiff(editor, jump, isGoingBack = count < 0)
     }
+    return Motion.Error
+  }
+
+  /**
+   * Where the caret is before the jump, so a jump forward can bring the user back here
+   *
+   * Only a jump from the newest end of the jump list needs it. From anywhere else, the user moves between places that
+   * are already in the list.
+   */
+  private fun startingPointToRemember(editor: VimEditor): Jump? {
+    val isAtNewestEnd = injector.jumpService.getJumpSpot(editor) == -1
+    return if (isAtNewestEnd) injector.jumpService.jumpAtCaret(editor) else null
+  }
+
+  private fun remember(editor: VimEditor, startingPoint: Jump?) {
+    if (startingPoint != null) {
+      injector.jumpService.addJump(editor, startingPoint, false)
+    }
+  }
+
+  /**
+   * Removes a jump that only its diff could show, now that the diff is closed, and returns the next jump the same way
+   *
+   * The list is one shorter afterwards: the next older jump is at the current spot, and the next newer one a step
+   * forward.
+   */
+  private fun dropJumpToClosedDiff(editor: VimEditor, jump: Jump, isGoingBack: Boolean): Jump? {
+    injector.jumpService.removeJump(editor, jump)
+    return injector.jumpService.getJump(editor, if (isGoingBack) 0 else 1)
+  }
+
+  private fun moveCaretToJumpInFile(editor: VimEditor, jump: Jump, startingPoint: Jump?): Motion {
+    val position = BufferPosition(jump.line, jump.col, false)
+    if (editor.getPath() == jump.filepath) {
+      remember(editor, startingPoint)
+      return editor.bufferPositionToOffset(position).toMotionOrError()
+    }
+
+    val editorOfFile = injector.file.selectEditor(editor.projectId, jump.filepath, jump.protocol) ?: return Motion.Error
+    remember(editor, startingPoint)
+    val offset = editorOfFile.normalizeOffset(editorOfFile.bufferPositionToOffset(position), false)
+    editorOfFile.currentCaret().moveToOffset(offset)
+    // The caret moved in another editor, so there is nothing to move in this one
+    return Motion.Error
   }
 
   /**
