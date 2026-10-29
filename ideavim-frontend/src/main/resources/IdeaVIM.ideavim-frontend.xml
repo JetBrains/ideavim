@@ -44,14 +44,13 @@
               topic="com.intellij.ide.ui.LafManagerListener"/>
     <listener class="com.maddyhome.idea.vim.listener.VimAppActivationListener"
               topic="com.intellij.openapi.application.ApplicationActivationListener"/>
+    <listener class="com.maddyhome.idea.vim.listener.IdeaSpecifics$VimActionListener"
+              topic="com.intellij.openapi.actionSystem.ex.AnActionListener"/>
   </applicationListeners>
 
   <projectListeners>
     <listener class="com.maddyhome.idea.vim.listener.VimListenerManager$VimFileEditorManagerListener"
               topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
-
-    <listener class="com.maddyhome.idea.vim.listener.IdeaSpecifics$VimActionListener"
-              topic="com.intellij.openapi.actionSystem.ex.AnActionListener"/>
 
     <listener class="com.maddyhome.idea.vim.listener.IdeaSpecifics$VimTemplateManagerListener"
               topic="com.intellij.codeInsight.template.TemplateManagerListener"/>
