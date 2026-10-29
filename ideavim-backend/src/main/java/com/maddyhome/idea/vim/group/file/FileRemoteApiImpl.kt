@@ -20,6 +20,7 @@ import com.intellij.openapi.editor.impl.EditorId
 import com.intellij.openapi.editor.impl.findEditorOrNull
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileEditor.impl.EditorsSplitters
@@ -175,12 +176,24 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     return vf.path
   }
 
-  override suspend fun selectEditor(projectId: ProjectId, documentPath: String, protocol: String): Boolean =
+  override suspend fun selectEditor(
+    projectId: ProjectId,
+    documentPath: String,
+    protocol: String,
+    line: Int?,
+    column: Int?,
+  ): Boolean =
     onEdt {
       val virtualFile = findVirtualFile(documentPath, protocol) ?: return@onEdt false
       val project = projectId.findProjectOrNull() ?: return@onEdt false
       val fMgr = FileEditorManager.getInstance(project)
-      val feditors = fMgr.openFile(virtualFile, true)
+      // Opening the file at the position places the caret here. In split mode the frontend gets the editor later, too
+      // late to place the caret itself
+      val feditors = if (line != null) {
+        fMgr.openFileEditor(OpenFileDescriptor(project, virtualFile, line, column ?: 0), true)
+      } else {
+        fMgr.openFile(virtualFile, true).toList()
+      }
       val first = feditors.firstOrNull()
       if (first is TextEditor) !first.editor.isDisposed else false
     }

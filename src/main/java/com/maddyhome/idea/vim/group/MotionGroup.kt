@@ -90,7 +90,7 @@ class MotionGroup : VimMotionGroupBase() {
     if (editor.getPath() == change.filepath) {
       return AbsoluteOffset(editor.bufferPositionToOffset(target))
     }
-    injector.file.selectEditor(editor.projectId, change.filepath, change.protocol)?.let { newEditor ->
+    injector.file.selectEditor(editor.projectId, change.filepath, change.protocol, target)?.let { newEditor ->
       val offset = newEditor.bufferPositionToOffset(target)
       newEditor.currentCaret().moveToOffset(newEditor.normalizeOffset(offset, false))
     }

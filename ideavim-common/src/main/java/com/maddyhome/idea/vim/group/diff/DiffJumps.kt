@@ -11,25 +11,30 @@ package com.maddyhome.idea.vim.group.diff
 import com.intellij.diff.util.Side
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorKind
+import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.IdeFocusManager
-import com.maddyhome.idea.vim.api.BufferPosition
-import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.mark.DiffSide
 import com.maddyhome.idea.vim.mark.Jump
 import com.maddyhome.idea.vim.mark.JumpSource
-import com.maddyhome.idea.vim.newapi.vim
+import org.jetbrains.annotations.ApiStatus
 
 /**
  * Jumps recorded in diff tabs: which diff, side and line the caret is on, and how to bring that diff back
+ *
+ * This runs where the diff tab lives. That is the IDE itself, except in split mode, where diff tabs live on the backend
+ * and the frontend asks for them over [com.maddyhome.idea.vim.group.jump.JumpRemoteApi]. So it uses only the platform,
+ * not IdeaVim's own editor API, which the backend doesn't have.
  */
-internal object DiffJumps {
-  /** The jump to the caret of [editor], or null if [editor] is not part of a diff tab */
-  fun jumpAtCaret(editor: Editor): Jump? {
+@ApiStatus.Internal
+object DiffJumps {
+  /** The jump to [caret] in [editor], or null if [editor] is not part of a diff tab */
+  fun jumpAt(editor: Editor, caret: LogicalPosition = editor.caretModel.logicalPosition): Jump? {
     if (editor.editorKind != EditorKind.DIFF) return null
     val project = editor.project ?: return null
     for (tab in DiffTab.allOpen(project)) {
-      val position = tab.view?.positionOf(editor) ?: continue
+      val position = tab.view?.positionOf(editor, caret) ?: continue
       val file = tab.shownFile ?: return null
       val source = JumpSource.Diff(tab.id, position.side.toDiffSide(), isInFile = tab.fileOn(position.side) != null)
       return Jump(position.line, position.column, file.path, file.fileSystem.protocol, source)
@@ -46,7 +51,8 @@ internal object DiffJumps {
    *
    * @return false if no open diff can show the jump
    */
-  fun show(project: Project, jump: Jump, source: JumpSource.Diff): Boolean {
+  fun show(project: Project, jump: Jump): Boolean {
+    val source = jump.source as? JumpSource.Diff ?: return false
     val path = jump.filepath
     val position = DiffPosition(source.side.toSide(), jump.line, jump.col)
     val tabs = DiffTab.allOpen(project)
@@ -80,9 +86,8 @@ internal object DiffJumps {
 
   private fun moveCaret(project: Project, view: DiffView, position: DiffPosition) {
     val target = view.show(position)
-    val editor = target.editor.vim
-    val offset = editor.bufferPositionToOffset(BufferPosition(target.line, target.column, false))
-    editor.currentCaret().moveToOffset(editor.normalizeOffset(offset, false))
+    target.editor.caretModel.moveToLogicalPosition(LogicalPosition(target.line, target.column))
+    target.editor.scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
     IdeFocusManager.getInstance(project).requestFocus(target.editor.contentComponent, true)
   }
 

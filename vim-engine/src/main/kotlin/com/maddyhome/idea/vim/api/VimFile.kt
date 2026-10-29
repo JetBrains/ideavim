@@ -71,7 +71,15 @@ interface VimFile {
   fun getProjectId(project: Any): String
 
   /**
-   * Focuses or opens a new VimEditor by [documentPath]
+   * Focuses or opens a new VimEditor by [documentPath], with its caret at [position] if it is given
+   *
+   * Returns null if the editor can't be found right away. In split mode the frontend gets the editor of a file it just
+   * opened later, so the caret is only at [position] because the file was opened there.
    */
-  fun selectEditor(projectId: String, documentPath: String, protocol: String): VimEditor?
+  fun selectEditor(
+    projectId: String,
+    documentPath: String,
+    protocol: String,
+    position: BufferPosition? = null,
+  ): VimEditor?
 }

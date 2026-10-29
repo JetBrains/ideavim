@@ -25,6 +25,7 @@ import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.platform.project.ProjectId
 import com.intellij.platform.project.findProjectOrNull
 import com.intellij.platform.project.projectId
+import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimFile
@@ -176,13 +177,21 @@ class IjFileGroup : VimFileBase() {
     return rpc { FileRemoteApi.getInstance().buildFileInfoMessage(editorId, fullPath) }
   }
 
-  override fun selectEditor(projectId: String, documentPath: String, protocol: String): VimEditor? {
+  override fun selectEditor(
+    projectId: String,
+    documentPath: String,
+    protocol: String,
+    position: BufferPosition?,
+  ): VimEditor? {
     val platformProjectId = try {
       ProjectId.deserializeFromString(projectId)
     } catch (_: Exception) {
       return null
     }
-    val success = rpc { FileRemoteApi.getInstance().selectEditor(platformProjectId, documentPath, protocol) }
+    val success = rpc {
+      FileRemoteApi.getInstance()
+        .selectEditor(platformProjectId, documentPath, protocol, position?.line, position?.column)
+    }
     if (!success) return null
 
     // The backend opened/focused the file. Find the editor it opened.
