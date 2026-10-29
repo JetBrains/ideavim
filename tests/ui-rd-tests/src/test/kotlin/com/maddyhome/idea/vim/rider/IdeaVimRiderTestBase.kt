@@ -13,6 +13,8 @@ import com.intellij.driver.client.Remote
 import com.intellij.driver.model.OnDispatcher
 import com.intellij.driver.sdk.Editor
 import com.intellij.driver.sdk.VirtualFile
+import com.intellij.driver.sdk.invokeActionByShortcut
+import com.intellij.driver.sdk.getRunContentManager
 import com.intellij.driver.sdk.openEditor
 import com.intellij.driver.sdk.singleProject
 import com.intellij.driver.sdk.ui.components.UiComponent.Companion.waitFound
@@ -20,6 +22,7 @@ import com.intellij.driver.sdk.ui.components.common.JEditorUiComponent
 import com.intellij.driver.sdk.ui.components.common.codeEditor
 import com.intellij.driver.sdk.ui.components.common.ideFrame
 import com.intellij.driver.sdk.ui.requestFocusFromIde
+import com.intellij.driver.sdk.ui.ui
 import com.intellij.driver.sdk.waitForIndicators
 import com.intellij.ide.starter.driver.engine.BackgroundRun
 import com.intellij.ide.starter.driver.engine.runIdeWithDriver
@@ -231,9 +234,11 @@ abstract class IdeaVimRiderTestBase {
       utility(CopyPasteManagerUtil::class).getInstance().setContents(new(StringSelectionRef::class, command))
     }
     driver.withContext {
+      requestFocusFromIde(singleProject())
       ideFrame {
         codeEditor().apply {
           waitFound()
+          component.requestFocus()
           keyboard {
             typeText(":")
             pressing(KeyEvent.VK_CONTROL) { key(KeyEvent.VK_R) }
@@ -245,6 +250,21 @@ abstract class IdeaVimRiderTestBase {
     }
   }
 
+  /** Presses the shortcut of the IDE action [actionId] from the active keymap */
+  protected fun actionShortcut(actionId: String) {
+    withEditor { invokeActionByShortcut(actionId) }
+  }
+
+  /** Types [keys] into whatever has the focus, e.g. a tool window */
+  protected fun typeInFocused(keys: String) {
+    driver.ui.keyboard { typeText(keys) }
+  }
+
+  /** Presses Ctrl and [keyCode] in the editor */
+  protected fun ctrl(keyCode: Int) {
+    withEditor { keyboard { pressing(KeyEvent.VK_CONTROL) { key(keyCode) } } }
+  }
+
   protected fun enter() {
     withEditor { keyboard { enter() } }
   }
@@ -254,6 +274,11 @@ abstract class IdeaVimRiderTestBase {
   }
 
   protected fun editorText(): String = withEditor { text }
+
+  protected fun caretLine(): Int {
+    val offset = caretOffset()
+    return editorText().take(offset).count { it == '\n' }
+  }
 
   protected fun caretOffset(): Int = onEdt { getCaretModel().getOffset() }
 
@@ -273,6 +298,21 @@ abstract class IdeaVimRiderTestBase {
     )
   }
 
+  /** Titles of the open popups, e.g. `Generate` */
+  protected fun popupTitles(): List<String> =
+    driver.ui.xx("//div[@class='EngravedLabel']").list().flatMap { label -> label.getAllTexts().map { it.text } }
+
+  /** Number of started processes in the Run tool window that are still running */
+  protected fun runningProcesses(): Int = driver.withContext {
+    getRunContentManager(singleProject()).getAllDescriptors().count { it.getProcessHandler()?.isProcessTerminated() == false }
+  }
+
+  /** Selected row of the focused tree, or null if the focus isn't in a tree */
+  protected fun focusedTreeRow(): Int? = driver.withContext(OnDispatcher.EDT) {
+    val owner = utility(KeyboardFocusManagerUtil::class).getCurrentKeyboardFocusManager().getFocusOwner()
+    owner?.let { runCatching { it.getLeadSelectionRow() }.getOrNull() }
+  }
+
   protected fun waitUntil(timeoutMs: Long = 5000, pollMs: Long = 200, check: () -> Boolean): Boolean {
     val deadline = System.currentTimeMillis() + timeoutMs
     while (System.currentTimeMillis() < deadline) {
@@ -289,6 +329,13 @@ abstract class IdeaVimRiderTestBase {
     var text = ""
     val found = waitUntil { text = editorText(); text == expected }
     assertTrue(found) { "Expected text:\n$expected\nActual:\n$text" }
+  }
+
+  /** Asserts that a popup with [title] is shown, polling until timeout */
+  protected fun assertPopup(title: String) {
+    var titles = emptyList<String>()
+    val found = waitUntil(timeoutMs = 10_000) { titles = popupTitles(); title in titles }
+    assertTrue(found) { "Expected a popup '$title'. Shown popups: $titles" }
   }
 
   /** Asserts the selected text, polling until timeout. Rider's backend applies some changes asynchronously */
@@ -376,3 +423,19 @@ interface CopyPasteManagerRef {
 
 @Remote("java.awt.datatransfer.StringSelection")
 interface StringSelectionRef
+
+@Remote("java.awt.KeyboardFocusManager")
+interface KeyboardFocusManagerUtil {
+  fun getCurrentKeyboardFocusManager(): KeyboardFocusManagerRef
+}
+
+@Remote("java.awt.KeyboardFocusManager")
+interface KeyboardFocusManagerRef {
+  fun getFocusOwner(): JTreeRef?
+}
+
+/** Only works when the referenced component is a JTree */
+@Remote("javax.swing.JTree")
+interface JTreeRef {
+  fun getLeadSelectionRow(): Int
+}

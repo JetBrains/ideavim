@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.rider
 
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
@@ -48,22 +47,6 @@ class RiderTest : IdeaVimRiderTestBase() {
       |Console.WriteLine("Hello, World!");
       """.trimMargin()
     )
-  }
-
-  // Freezes Rider: the EDT parks in ActionManagerImpl.tryToExecute (runBlockingForActionExpand) when the mapping runs
-  // ReformatCode, and every later test fails with it
-  @Disabled("Freezes Rider when <Action>(ReformatCode) runs from the mapping")
-  @Test
-  fun `mapping with space runs a Rider action`() {
-    setText(PROGRAM_TEXT, caretAt = "Console")
-    typeVim(">>")
-    assertText(PROGRAM_TEXT.replace("Console", "    Console"))
-
-    exCommand("map <Space>x <Action>(ReformatCode)")
-    typeVim(" x")
-
-    assertText(PROGRAM_TEXT)
-    exCommand("unmap <Space>x")
   }
 
   // Control for the test below: starting on any other letter, the selection grows past `foo`
