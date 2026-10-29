@@ -124,6 +124,9 @@ dependencies {
 
     testFramework(TestFrameworkType.Platform)
     testFramework(TestFrameworkType.JUnit5)
+    // Tests for diff previews that follow a tree of changes, which lives in this module (see :ideavim-vcs)
+    testBundledModule("intellij.platform.vcs.impl")
+    testBundledModule("intellij.platform.vcs.impl.shared")
 
     pluginComposedModule(runtimeOnly(project(":ideavim-common")))
     pluginModule(runtimeOnly(project(":ideavim-frontend")))
@@ -136,6 +139,7 @@ dependencies {
     pluginModule(runtimeOnly(project(":ideavim-rider")))
     pluginModule(runtimeOnly(project(":ideavim-clion-nova")))
     pluginModule(runtimeOnly(project(":ideavim-terminal")))
+    pluginModule(runtimeOnly(project(":ideavim-vcs")))
     pluginModule(runtimeOnly(project(":ideavim-rpc")))
 
     bundledModule("intellij.spellchecker")

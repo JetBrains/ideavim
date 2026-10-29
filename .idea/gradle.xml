@@ -23,6 +23,7 @@
             <option value="$PROJECT_DIR$/ideavim-rider" />
             <option value="$PROJECT_DIR$/ideavim-rpc" />
             <option value="$PROJECT_DIR$/ideavim-terminal" />
+            <option value="$PROJECT_DIR$/ideavim-vcs" />
             <option value="$PROJECT_DIR$/scripts" />
             <option value="$PROJECT_DIR$/tests" />
             <option value="$PROJECT_DIR$/tests/java-tests" />

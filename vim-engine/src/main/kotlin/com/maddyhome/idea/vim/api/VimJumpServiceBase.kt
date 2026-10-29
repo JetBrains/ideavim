@@ -40,7 +40,7 @@ abstract class VimJumpServiceBase : VimJumpService {
     inheritProjectListIfNeeded(scopeId)
     lastJumpTimeStamp = System.currentTimeMillis() + JUMP_NAVIGATION_SUPPRESS_MS
     val jumps = scopeToJumps[scopeId] ?: mutableListOf()
-    jumps.removeIf { it.filepath == jump.filepath && it.line == jump.line }
+    jumps.removeIf { it.isSamePlaceAs(jump) }
     jumps.add(jump)
     putAsMostRecentlyUsed(scopeId, jumps)
 
@@ -51,6 +51,14 @@ abstract class VimJumpServiceBase : VimJumpService {
     }
   }
 
+  override fun jumpAtCaret(editor: VimEditor): Jump? {
+    val virtualFile = editor.getVirtualFile() ?: return null
+    val position = editor.offsetToBufferPosition(editor.currentCaret().offset)
+    return Jump(position.line, position.column, virtualFile.path, virtualFile.protocol)
+  }
+
+  override fun showInDiff(editor: VimEditor, jump: Jump): Boolean = false
+
   override fun saveJumpLocation(editor: VimEditor) {
     addJump(editor, true)
     injector.markService.setMark(editor, '\'')
@@ -58,7 +66,7 @@ abstract class VimJumpServiceBase : VimJumpService {
   }
 
   override fun removeJump(scopeId: String, jump: Jump) {
-    scopeToJumps[scopeId]?.removeIf { it == jump }
+    scopeToJumps[scopeId]?.removeIf { it.isSamePlaceAs(jump) }
   }
 
   override fun dropLastJump(scopeId: String) {

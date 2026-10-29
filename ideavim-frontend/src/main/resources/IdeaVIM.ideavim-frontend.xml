@@ -21,6 +21,8 @@
     <extensionPoint interface="com.maddyhome.idea.vim.ide.RiderProvider" dynamic="true" name="riderProvider"/>
     <extensionPoint interface="com.maddyhome.idea.vim.key.IdeaVimDisablerExtensionPoint" dynamic="true"
                     name="internal.disabler"/>
+    <extensionPoint interface="com.maddyhome.idea.vim.group.diff.DiffTabFilesProvider" dynamic="true"
+                    name="internal.diffTabFiles"/>
   </extensionPoints>
 
   <!-- Frontend registrations: UI, editor, key handling, status bar, actions.
