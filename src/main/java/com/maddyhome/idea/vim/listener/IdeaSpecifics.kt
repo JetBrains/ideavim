@@ -60,6 +60,7 @@ import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
+import com.maddyhome.idea.vim.helper.isPossiblyDelegatingToBackend
 import com.maddyhome.idea.vim.helper.vimInitialised
 import com.maddyhome.idea.vim.ide.isClionNova
 import com.maddyhome.idea.vim.ide.isRider
@@ -241,15 +242,6 @@ internal object IdeaSpecifics {
      */
     private fun isAwaitingBackend(action: AnAction, editor: Editor): Boolean =
       action.isPossiblyDelegatingToBackend() && editorStateBeforeAction?.isUnchangedIn(editor) == true
-
-    // The interface belongs to the remote development client, which is not available at compile time
-    private fun AnAction.isPossiblyDelegatingToBackend(): Boolean =
-      javaClass.implementsInterface("com.jetbrains.rd.ui.actions.PossiblyDelegatingToBackendAction")
-
-    private fun Class<*>.implementsInterface(name: String): Boolean =
-      generateSequence(this) { it.superclass }.any { cls ->
-        cls.interfaces.any { it.name == name || it.implementsInterface(name) }
-      }
 
     private fun isGotoAction(actionId: String?): Boolean =
       actionId == IdeActions.ACTION_GOTO_BACK || actionId == IdeActions.ACTION_GOTO_FORWARD
