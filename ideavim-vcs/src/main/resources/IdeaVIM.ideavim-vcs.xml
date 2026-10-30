@@ -13,6 +13,6 @@
     <module name="intellij.platform.vcs.impl"/>
   </dependencies>
   <extensions defaultExtensionNs="IdeaVIM">
-    <internal.diffTabFiles implementation="com.maddyhome.idea.vim.group.diff.vcs.ChangesViewDiffTabFilesProvider"/>
+    <internal.diffTabFiles implementation="com.maddyhome.idea.vim.group.diff.vcs.VcsDiffTabFilesProvider"/>
   </extensions>
 </idea-plugin>

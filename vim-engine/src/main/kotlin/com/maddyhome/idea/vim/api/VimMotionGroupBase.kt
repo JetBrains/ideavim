@@ -379,7 +379,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     val offset = editorOfFile.normalizeOffset(editorOfFile.bufferPositionToOffset(position), false)
     editorOfFile.currentCaret().moveToOffset(offset)
     // The caret moved in another editor, so there is nothing to move in this one
-    return Motion.Error
+    return Motion.NoMotion
   }
 
   /**

@@ -8,16 +8,46 @@
 
 package com.maddyhome.idea.vim.group.diff.vcs
 
+import com.intellij.diff.impl.CacheDiffRequestChainProcessor
 import com.intellij.diff.impl.DiffRequestProcessor
 import com.intellij.openapi.vcs.FilePath
 import com.intellij.openapi.vcs.changes.ChangeViewDiffRequestProcessor
+import com.intellij.openapi.vcs.changes.ui.PresentableChange
 import com.maddyhome.idea.vim.group.diff.DiffTabFiles
 import com.maddyhome.idea.vim.group.diff.DiffTabFilesProvider
 import java.lang.reflect.Method
 
-internal class ChangesViewDiffTabFilesProvider : DiffTabFilesProvider {
-  override fun filesOf(processor: DiffRequestProcessor): DiffTabFiles? {
-    return (processor as? ChangeViewDiffRequestProcessor)?.let(::ChangesViewFiles)
+internal class VcsDiffTabFilesProvider : DiffTabFilesProvider {
+  override fun filesOf(processor: DiffRequestProcessor): DiffTabFiles? = when (processor) {
+    is ChangeViewDiffRequestProcessor -> ChangesViewFiles(processor)
+    is CacheDiffRequestChainProcessor -> ChangesChainFiles.of(processor)
+    else -> null
+  }
+}
+
+/**
+ * The files of a "Show Diff" tab of changes in version control, matched by the paths the changes know
+ */
+private class ChangesChainFiles(private val processor: CacheDiffRequestChainProcessor) : DiffTabFiles {
+  override fun canShow(path: String): Boolean = indexOf(path) != null
+
+  override fun show(path: String): Boolean {
+    val index = indexOf(path) ?: return false
+    processor.setCurrentRequest(index)
+    return true
+  }
+
+  private fun indexOf(path: String): Int? {
+    val changes = processor.requestChain.requests
+    return changes.indexOfFirst { (it as? PresentableChange)?.filePath?.path == path }.takeIf { it >= 0 }
+  }
+
+  companion object {
+    /** The files of a chain of changes, or null for a chain of other diffs */
+    fun of(processor: CacheDiffRequestChainProcessor): ChangesChainFiles? {
+      val isChainOfChanges = processor.requestChain.requests.any { it is PresentableChange }
+      return if (isChainOfChanges) ChangesChainFiles(processor) else null
+    }
   }
 }
 

@@ -9,13 +9,15 @@
 package org.jetbrains.plugins.ideavim.action.motion.mark
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.vfs.VirtualFile
 import com.maddyhome.idea.vim.api.addJump
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimSplitWindowTestCase
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 
-class MotionJumpActionTest : VimTestCase() {
+class MotionJumpActionTest : VimSplitWindowTestCase() {
   private val text = """
     |line 1
     |line 2
@@ -62,6 +64,23 @@ class MotionJumpActionTest : VimTestCase() {
         |   1     4    0 line 4
       """.trimMargin(),
     )
+  }
+
+  @Test
+  fun `test control-O to another file is not an error`() {
+    val main = configureByText(text)
+    enterCommand("set noideaunifyjumps")
+    typeText("4G")
+    recordJumpAtCaret()
+    val other = openNewBufferWindow("Other.txt", "other text")
+    selectWindow(other)
+
+    typeText("<C-O>")
+
+    var selected: VirtualFile? = null
+    ApplicationManager.getApplication().invokeAndWait { selected = fileEditorManager.selectedEditor?.file }
+    assertEquals(main.virtualFile, selected, "<C-O> should go to the other file")
+    assertPluginError(false)
   }
 
   private fun recordJumpAtCaret() {
