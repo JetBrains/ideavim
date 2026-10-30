@@ -75,6 +75,9 @@ usual beta standards.
 * [VIM-1309](https://youtrack.jetbrains.com/issue/VIM-1309) Middle-click paste on Linux (X11) in Insert mode now pastes the `*` register at the caret, as in Vim, instead of moving the caret to the mouse position first
 * [VIM-4269](https://youtrack.jetbrains.com/issue/VIM-4269) Fixed `/` in [NERDTree](https://github.com/JetBrains/ideavim/blob/master/doc/NERDTree-support.md) not opening speed search in trees outside tool windows, such as the File Structure popup
 * [VIM-4349](https://youtrack.jetbrains.com/issue/VIM-4349) Fixed mappings of `'` and `` ` `` with a modifier being triggered by unrelated keys — `nmap <A-'> w` no longer runs on `<A-Right>`, and ``nmap <A-`> w`` no longer runs on keypad `0` with Alt. Mapping a character that only a shifted key types, such as `<A-%>`, now reports an error suggesting to map the key itself, e.g. `<A-S-5>`
+* [VIM-4338](https://youtrack.jetbrains.com/issue/VIM-4338) Fixed [`.`](https://vimhelp.org/repeat.txt.html#.) repeating scrambled text after accepting a code completion when more than one project is open
+* [VIM-3968](https://youtrack.jetbrains.com/issue/VIM-3968) Fixed IDE actions that Rider runs on its backend, such as `MoveElementRight` or `ReformatCode` in C# files, doing nothing when run with `:action` or an `<Action>` mapping
+* [VIM-4336](https://youtrack.jetbrains.com/issue/VIM-4336) Fixed the caret returning to the commented line after commenting a line with the IDE shortcut in Rider
 
 ### Merged PRs:
 * [2082](https://github.com/JetBrains/ideavim/pull/2082) by [1grzyb1](https://github.com/1grzyb1): VIM-748 changing multiple commands with |
