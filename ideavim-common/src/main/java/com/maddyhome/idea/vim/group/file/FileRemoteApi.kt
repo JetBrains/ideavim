@@ -44,7 +44,14 @@ interface FileRemoteApi : RemoteApi<Unit> {
   suspend fun buildFileInfoMessage(editorId: EditorId, fullPath: Boolean): String?
   suspend fun getBufferName(virtualFileId: VirtualFileId, projectId: ProjectId?, fullPath: Boolean): String?
   suspend fun getFileName(editorId: EditorId, fullPath: Boolean): String?
-  suspend fun selectEditor(projectId: ProjectId, documentPath: String, protocol: String): Boolean
+  /** Opens the file, with its caret at [line] and [column] if they are given */
+  suspend fun selectEditor(
+    projectId: ProjectId,
+    documentPath: String,
+    protocol: String,
+    line: Int?,
+    column: Int?,
+  ): Boolean
   suspend fun listFilesForCompletion(pathPrefix: String, projectId: ProjectId?): List<String>
   suspend fun createFile(filename: String, projectId: ProjectId?, content: String?)
 

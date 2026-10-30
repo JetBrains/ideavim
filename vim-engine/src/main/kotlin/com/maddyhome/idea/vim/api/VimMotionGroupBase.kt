@@ -24,6 +24,8 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.handler.toAdjustedMotionOrError
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.mark.Jump
+import com.maddyhome.idea.vim.mark.JumpSource
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.isEndAllowedIgnoringOnemore
 import com.maddyhome.idea.vim.tag.TagStackEntry
@@ -291,7 +293,9 @@ abstract class VimMotionGroupBase : VimMotionGroup {
 
     // TODO [vakhitov] It is super super super wrong.
     // TODO [vakhitov] We should remove all of the secondary carets and return an offset of the primary one
-    val markEditor = injector.file.selectEditor(editor.projectId, mark.filepath, mark.protocol) ?: return Motion.Error
+    val markPosition = BufferPosition(line, if (toLineStart) 0 else mark.col)
+    val markEditor = injector.file.selectEditor(editor.projectId, mark.filepath, mark.protocol, markPosition)
+      ?: return Motion.Error
     // todo should we move all the carets or only one?
     for (carett in markEditor.carets()) {
       val offset = if (toLineStart) {
@@ -320,26 +324,62 @@ abstract class VimMotionGroupBase : VimMotionGroup {
   }
 
   override fun moveCaretToJump(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
-    val jumpService = injector.jumpService
-    val spot = jumpService.getJumpSpot(editor)
-    val (line, col, fileName, protocol) = jumpService.getJump(editor, count) ?: return Motion.Error
-    val lp = BufferPosition(line, col, false)
-    return if (editor.getPath() != fileName) {
-      injector.file.selectEditor(editor.projectId, fileName, protocol)?.let { newEditor ->
-        if (spot == -1) {
-          jumpService.addJump(editor, false)
-        }
-        newEditor.let {
-          it.currentCaret().moveToOffset(it.normalizeOffset(newEditor.bufferPositionToOffset(lp), false))
-        }
+    var jump = firstJump(editor, count)
+    while (jump != null) {
+      if (jump.source is JumpSource.Diff && injector.jumpService.showInDiff(editor, jump)) {
+        return Motion.NoMotion
       }
-      Motion.Error
-    } else {
-      if (spot == -1) {
-        jumpService.addJump(editor, false)
+      if (jump.isInFile) {
+        return moveCaretToJumpInFile(editor, jump)
       }
-      editor.bufferPositionToOffset(lp).toMotionOrError()
+      jump = dropJumpToClosedDiff(editor, jump, isGoingBack = count < 0)
     }
+    return Motion.Error
+  }
+
+  /**
+   * The jump [count] steps away from the current spot of the jump list
+   *
+   * Leaving the newest end of the list first adds the place of the caret, so a jump forward can bring the user back
+   * here. It replaces an older jump to the same place, e.g. one the IDE recorded, so the caret never jumps to where it
+   * already is.
+   */
+  private fun firstJump(editor: VimEditor, count: Int): Jump? {
+    val jumpService = injector.jumpService
+    val isAtNewestEnd = jumpService.getJumpSpot(editor) == -1
+    if (!isAtNewestEnd) return jumpService.getJump(editor, count)
+
+    val hasOlderJump = count < 0 && jumpService.getJumps(editor).size + count >= 0
+    if (!hasOlderJump) return null
+    val here = jumpService.jumpAtCaret(editor) ?: return jumpService.getJump(editor, count)
+    jumpService.addJump(editor, here, true)
+    // The newest jump is the place of the caret now, so the jump to take is one step further
+    return jumpService.getJump(editor, count - 1)
+  }
+
+  /**
+   * Removes a jump that only its diff could show, now that the diff is closed, and returns the next jump the same way
+   *
+   * The list is one shorter afterwards: the next older jump is at the current spot, and the next newer one a step
+   * forward.
+   */
+  private fun dropJumpToClosedDiff(editor: VimEditor, jump: Jump, isGoingBack: Boolean): Jump? {
+    injector.jumpService.removeJump(editor, jump)
+    return injector.jumpService.getJump(editor, if (isGoingBack) 0 else 1)
+  }
+
+  private fun moveCaretToJumpInFile(editor: VimEditor, jump: Jump): Motion {
+    val position = BufferPosition(jump.line, jump.col, false)
+    if (editor.getPath() == jump.filepath) {
+      return editor.bufferPositionToOffset(position).toMotionOrError()
+    }
+
+    val editorOfFile = injector.file.selectEditor(editor.projectId, jump.filepath, jump.protocol, position)
+      ?: return Motion.Error
+    val offset = editorOfFile.normalizeOffset(editorOfFile.bufferPositionToOffset(position), false)
+    editorOfFile.currentCaret().moveToOffset(offset)
+    // The caret moved in another editor, so there is nothing to move in this one
+    return Motion.NoMotion
   }
 
   /**
@@ -398,7 +438,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
   private fun moveCaretToTagPosition(editor: VimEditor, entry: TagStackEntry): Motion {
     val lp = BufferPosition(entry.line, entry.col, false)
     return if (editor.getPath() != entry.filepath) {
-      injector.file.selectEditor(editor.projectId, entry.filepath, entry.protocol)?.let { newEditor ->
+      injector.file.selectEditor(editor.projectId, entry.filepath, entry.protocol, lp)?.let { newEditor ->
         newEditor.currentCaret()
           .moveToOffset(newEditor.normalizeOffset(newEditor.bufferPositionToOffset(lp), false))
       }
@@ -416,13 +456,13 @@ abstract class VimMotionGroupBase : VimMotionGroup {
    * first - that is where the identifier is.
    */
   private fun resolveTagAgain(editor: VimEditor, context: ExecutionContext, entry: TagStackEntry): Motion {
+    val lp = BufferPosition(entry.line, entry.col, false)
     val target = if (editor.getPath() != entry.filepath) {
-      injector.file.selectEditor(editor.projectId, entry.filepath, entry.protocol)
+      injector.file.selectEditor(editor.projectId, entry.filepath, entry.protocol, lp)
     } else {
       editor
     } ?: return Motion.Error
 
-    val lp = BufferPosition(entry.line, entry.col, false)
     target.currentCaret().moveToOffset(target.normalizeOffset(target.bufferPositionToOffset(lp), false))
     injector.actionExecutor.executeAction(target, name = "GotoDeclaration", context = context)
     // The caret has already been moved

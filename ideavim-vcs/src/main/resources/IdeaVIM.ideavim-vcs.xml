@@ -1,0 +1,18 @@
+<!--
+  ~ Copyright 2003-2026 The IdeaVim authors
+  ~
+  ~ Use of this source code is governed by an MIT-style
+  ~ license that can be found in the LICENSE.txt file or at
+  ~ https://opensource.org/licenses/MIT.
+  -->
+
+<!-- Diff previews of version control (Commit tool window, VCS Log, Shelf, ...) for jumps.
+     Split out so the intellij.platform.vcs.impl dependency does not gate the rest of IdeaVim. -->
+<idea-plugin package="com.maddyhome.idea.vim.group.diff.vcs">
+  <dependencies>
+    <module name="intellij.platform.vcs.impl"/>
+  </dependencies>
+  <extensions defaultExtensionNs="IdeaVIM">
+    <internal.diffTabFiles implementation="com.maddyhome.idea.vim.group.diff.vcs.VcsDiffTabFilesProvider"/>
+  </extensions>
+</idea-plugin>

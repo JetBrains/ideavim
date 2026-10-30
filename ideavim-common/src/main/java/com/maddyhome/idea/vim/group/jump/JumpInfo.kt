@@ -22,4 +22,6 @@ data class JumpInfo(
   val protocol: String,
   val added: Boolean,
   val timestamp: Long,
+  /** Where in a diff tab the place is, or null for a plain editor */
+  val diffSource: DiffJumpSource? = null,
 )

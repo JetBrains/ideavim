@@ -8,20 +8,29 @@
 
 package com.maddyhome.idea.vim.group
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.RoamingType
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.components.service
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.EditorKind
+import com.intellij.openapi.editor.impl.editorIdOrNull
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
+import com.intellij.util.PlatformUtils
 import com.intellij.platform.project.projectId
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimJumpServiceBase
 import com.maddyhome.idea.vim.api.VimWindowIdService
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.group.diff.DiffJumps
+import com.maddyhome.idea.vim.group.jump.DiffJump
 import com.maddyhome.idea.vim.group.jump.JumpRemoteApi
 import com.maddyhome.idea.vim.mark.Jump
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.initInjector
 import kotlinx.coroutines.launch
 import org.jdom.Element
@@ -53,6 +62,34 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
     }
   }
 
+  override fun jumpAtCaret(editor: VimEditor): Jump? {
+    return DiffJumps.jumpAt(editor.ij) ?: diffJumpOnBackend(editor.ij) ?: super.jumpAtCaret(editor)
+  }
+
+  override fun showInDiff(editor: VimEditor, jump: Jump): Boolean {
+    val project = editor.ij.project ?: return false
+    return DiffJumps.show(project, jump) || showDiffJumpOnBackend(project, jump)
+  }
+
+  /**
+   * In split mode, diff tabs live on the backend. The frontend shows them with editors that mirror the backend's ones
+   *
+   * A write action can't wait for the backend, so a jump recorded in one falls back to what the frontend knows.
+   */
+  private fun diffJumpOnBackend(editor: Editor): Jump? {
+    if (!PlatformUtils.isJetBrainsClient() || editor.editorKind != EditorKind.DIFF) return null
+    if (ApplicationManager.getApplication().isWriteAccessAllowed) return null
+    val editorId = editor.editorIdOrNull() ?: return null
+    val caret = editor.caretModel.logicalPosition
+    return rpc(editor.project) { JumpRemoteApi.getInstance().diffJumpAt(editorId, caret.line, caret.column) }?.toJump()
+  }
+
+  private fun showDiffJumpOnBackend(project: Project, jump: Jump): Boolean {
+    if (!PlatformUtils.isJetBrainsClient()) return false
+    val diffJump = DiffJump.of(jump) ?: return false
+    return rpc(project) { JumpRemoteApi.getInstance().showDiffJump(project.projectId(), diffJump) }
+  }
+
   // We do not delete old project records.
   // Rationale: It's more likely that users will want to review their old projects and access their jump history
   // (e.g., recent files), than for the 100 jumps (max number of records) to consume enough space to be noticeable.
@@ -60,7 +97,8 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
     val projectsElem = Element("projects")
     for ((project, jumps) in jumpsByProject()) {
       val projectElement = Element("project").setAttribute("id", project)
-      for (jump in jumps) {
+      // A jump to text that is not in a file, such as an older revision shown in a diff, has nowhere to go after a restart
+      for (jump in jumps.filter { it.isInFile }) {
         val jumpElem = Element("jump")
         jumpElem.setAttribute("line", jump.line.toString())
         jumpElem.setAttribute("column", jump.col.toString())
