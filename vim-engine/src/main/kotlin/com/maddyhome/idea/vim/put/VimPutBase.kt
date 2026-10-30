@@ -479,7 +479,12 @@ abstract class VimPutBase : VimPut {
       }
 
       var startOffset: Int
-      val line = if (data.putToLine < 0) vimCaret.getBufferPosition().line else data.putToLine
+      var line = if (data.putToLine < 0) vimCaret.getBufferPosition().line else data.putToLine
+      val foldRegion = vimEditor.getCollapsedFoldRegionAtVisualStartLine(line)
+      if (foldRegion != null && typeInRegister.isLine) {
+        line = vimEditor.offsetToBufferPosition(foldRegion.endOffset - 1).line
+      }
+
       when (typeInRegister) {
         SelectionType.LINE_WISE -> {
           startOffset = if (data.putBeforeLine) {
