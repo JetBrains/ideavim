@@ -15,6 +15,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.PlatformCoreDataKeys
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -105,6 +106,41 @@ class VimShortcutKeyActionTest : VimTestCase() {
     assertTrue(isEnabledFor(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)))
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `Enter is passed to AIR in the AIR prompt input`() {
+    configureByText("Lorem ipsum")
+    markAsAirPrompt()
+    val enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)
+    assertFalse(isEnabledFor(enter), "Enter should send the prompt in Normal mode")
+    typeText("i")
+    assertFalse(isEnabledFor(enter), "Enter should send the prompt in Insert mode")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `mapped Enter stays with Vim in the AIR prompt input`() {
+    configureByText("Lorem ipsum")
+    markAsAirPrompt()
+    typeText(commandToKeys("nnoremap <CR> j"))
+    assertTrue(isEnabledFor(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)))
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `Shift-Enter in the AIR prompt input is not affected`() {
+    configureByText("Lorem ipsum")
+    markAsAirPrompt()
+    assertTrue(isEnabledFor(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK)))
+  }
+
+  private fun markAsAirPrompt() {
+    @Suppress("DEPRECATION")
+    val key = Key.findKeyByName(AIR_PROMPT_DOCUMENT_KEY_NAME) ?: Key.create<Boolean>(AIR_PROMPT_DOCUMENT_KEY_NAME)
+    @Suppress("UNCHECKED_CAST")
+    fixture.editor.document.putUserData(key as Key<Boolean>, true)
+  }
+
   private fun isEnabledFor(keyStroke: KeyStroke): Boolean {
     var enabled = false
     ApplicationManager.getApplication().invokeAndWait {
@@ -135,5 +171,9 @@ class VimShortcutKeyActionTest : VimTestCase() {
       enabled = event.presentation.isEnabled
     }
     return enabled
+  }
+
+  private companion object {
+    const val AIR_PROMPT_DOCUMENT_KEY_NAME = "AIR_PROMPT_INPUT_DOCUMENT"
   }
 }

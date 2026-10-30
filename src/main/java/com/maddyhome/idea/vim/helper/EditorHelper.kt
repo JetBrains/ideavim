@@ -756,10 +756,19 @@ object EditorHelper {
   @JvmStatic
   fun isChatInput(editor: Editor): Boolean {
     if (editor.isViewer) return false
-    if (hasUserDataFlag(editor.document, AIR_PROMPT_DOCUMENT_KEY_NAME)) return true
+    if (isAirPromptInput(editor)) return true
     if (hasUserDataFlag(editor, AI_ASSISTANT_INPUT_EDITOR_KEY_NAME)) return true
-    val name = getVirtualFile(editor)?.name ?: return false
-    return name.startsWith(AI_ASSISTANT_INPUT_FILE_NAME_PREFIX) || name.startsWith(AIR_PROMPT_FILE_NAME_PREFIX)
+    return getVirtualFile(editor)?.name?.startsWith(AI_ASSISTANT_INPUT_FILE_NAME_PREFIX) == true
+  }
+
+  /**
+   * Checks if the editor is the prompt input of AIR, recognised by the markers described in [isChatInput]
+   */
+  @JvmStatic
+  fun isAirPromptInput(editor: Editor): Boolean {
+    if (editor.isViewer) return false
+    if (hasUserDataFlag(editor.document, AIR_PROMPT_DOCUMENT_KEY_NAME)) return true
+    return getVirtualFile(editor)?.name?.startsWith(AIR_PROMPT_FILE_NAME_PREFIX) == true
   }
 
   private fun hasUserDataFlag(holder: UserDataHolder, keyName: String): Boolean {

@@ -207,6 +207,14 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
 
     val keyCode = keyStroke.keyCode
 
+    // AIR sends the prompt on Enter (`Air.Chat.Prompt.Send`) and swallows the platform line-break actions, so Vim's
+    // Enter would do nothing useful in Insert mode. Hand Enter to AIR in every mode, unless the user maps it.
+    if (keyCode == KeyEvent.VK_ENTER && keyStroke.modifiers == 0 && EditorHelper.isAirPromptInput(editor)
+      && !hasMapping(listOf(keyStroke), editor)
+    ) {
+      return ActionEnableStatus.no("Enter sends the AIR prompt", LogLevel.INFO)
+    }
+
     if (HandlerInjector.notebookCommandMode(editor)) {
       LOG.debug("Python Notebook command mode")
       if (keyCode == KeyEvent.VK_RIGHT || keyCode == KeyEvent.VK_KP_RIGHT || keyCode == KeyEvent.VK_ENTER) {
