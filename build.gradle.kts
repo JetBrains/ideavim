@@ -266,6 +266,19 @@ tasks {
     systemProperty("ideavim.use.debug.ideavimrc", "true")
   }
 
+  // AIR is only published for 2026.2 (since-build 262.8665), so it can't run in the default IDE version.
+  // The version is pinned because the latest compatible one on Marketplace is an x86_64-only build.
+  val runIdeWithAir by intellijPlatformTesting.runIde.registering {
+    version = "2026.2.3"
+    task {
+      systemProperty("ideavim.use.debug.ideavimrc", "true")
+    }
+
+    plugins {
+      plugin("com.intellij.air", "262.8665.467")
+    }
+  }
+
   val runPycharm by intellijPlatformTesting.runIde.registering {
     type = IntelliJPlatformType.PyCharmProfessional
     version = "2026.1"
