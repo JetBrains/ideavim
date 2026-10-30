@@ -221,7 +221,10 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
         # release branch to master, and fixes keep landing on master afterwards. So nothing here is
         # promoted from master's own To Be Released content - the released changelog section and the
         # What's New page are taken from the release branch, and master keeps the rest as unreleased.
-        git checkout master
+        # The local master is the revision the build started from, and fixes may have landed on master
+        # while the tests ran. Start from the current origin/master, or the push below is rejected.
+        git fetch origin +master:refs/remotes/origin/master
+        git checkout -B master origin/master
         git show release:CHANGES.md > /tmp/release-CHANGES.md
         cd scripts-ts
         npx tsx src/syncChangelogToMaster.ts "%build.number%" ../CHANGES.md /tmp/release-CHANGES.md
