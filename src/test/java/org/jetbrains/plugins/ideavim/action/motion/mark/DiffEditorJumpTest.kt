@@ -37,11 +37,13 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.UserDataHolder
 import com.intellij.openapi.vcs.FilePath
+import com.intellij.openapi.vcs.FileStatus
 import com.intellij.openapi.vcs.changes.Change
 import com.intellij.openapi.vcs.changes.ChangeViewDiffRequestProcessor
 import com.intellij.openapi.vcs.changes.ChangesUtil
 import com.intellij.openapi.vcs.changes.CurrentContentRevision
 import com.intellij.openapi.vcs.changes.SimpleContentRevision
+import com.intellij.openapi.vcs.changes.ui.ChangeDiffRequestChain
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.vcsUtil.VcsUtil
 import com.maddyhome.idea.vim.api.injector
@@ -233,6 +235,18 @@ class DiffEditorJumpTest : VimSplitWindowTestCase() {
   fun `test control-O switches a diff chain back to the file of the jump`() {
     val otherFile = createFile("Other.txt", "other\nlines\n")
     val chain = openChainDiff(changedFile to before, otherFile to "other\n")
+    recordJump(sideEditor(chain, Side.RIGHT), line = 2, column = 3)
+    showChainEntry(chain, 1)
+
+    jumpBackFrom(definition)
+
+    assertCaretInDiff(chain, Side.RIGHT, line = 2, column = 3)
+  }
+
+  @Test
+  fun `test control-O switches a chain of version control changes back by the path of the change`() {
+    val otherFile = createFile("Other.txt", "other\nlines\n")
+    val chain = openChangesChain(changedFile to before, otherFile to "other\n")
     recordJump(sideEditor(chain, Side.RIGHT), line = 2, column = 3)
     showChainEntry(chain, 1)
 
@@ -601,10 +615,31 @@ class DiffEditorJumpTest : VimSplitWindowTestCase() {
   }
 
   /**
+   * A diff of several changes in version control in one tab. Their diffs are named after the file alone, so only the
+   * changes know the path
+   */
+  private fun openChangesChain(vararg changes: Pair<VirtualFile, String>): VirtualFile {
+    val producers = changes.map { (file, leftText) -> VersionControlChangeProducer(file, leftText) }
+    return open(ChainDiffVirtualFile(ChangeDiffRequestChain(producers, 0), "Review"))
+  }
+
+  private inner class VersionControlChangeProducer(private val file: VirtualFile, private val leftText: String) :
+    ChangeDiffRequestChain.Producer {
+    override fun getName(): String = file.name
+
+    override fun getFilePath(): FilePath = VcsUtil.getFilePath(file)
+
+    override fun getFileStatus(): FileStatus = FileStatus.MODIFIED
+
+    override fun process(context: UserDataHolder, indicator: ProgressIndicator): DiffRequest =
+      ChangeProducer(file, leftText).process(context, indicator)
+  }
+
+  /**
    * Loads the diff of one file of a chain
    *
-   * Stands in for `ChangeDiffRequestProducer`, which lives in a module IdeaVim does not depend on. Like it, the name of
-   * the producer is the path of the file.
+   * A diff that only its name ties to the file: the name is the path of the file, as `ChangeDiffRequestProducer` names
+   * its diffs. Such a chain is matched by the names of its diffs.
    */
   private inner class ChangeProducer(private val file: VirtualFile, private val leftText: String) : DiffRequestProducer {
     override fun getName(): String = file.path

@@ -26,14 +26,15 @@ interface DiffTabFiles {
 
   companion object {
     fun of(processor: DiffRequestProcessor): DiffTabFiles? {
-      if (processor is CacheDiffRequestChainProcessor) return ChainFiles(processor)
-      return DiffTabFilesProvider.EP_NAME.extensionList.firstNotNullOfOrNull { it.filesOf(processor) }
+      val provided = DiffTabFilesProvider.EP_NAME.extensionList.firstNotNullOfOrNull { it.filesOf(processor) }
+      return provided ?: (processor as? CacheDiffRequestChainProcessor)?.let(::ChainFiles)
     }
   }
 }
 
 /**
- * Knows the files of the diff tabs that live outside the platform core, such as the previews of version control
+ * Knows the files of the diff tabs that live outside the platform core, such as the previews of version control, or
+ * knows the files of a diff tab of the core better than the core does
  *
  * This extension point is available only for the IdeaVim internally
  */
@@ -47,10 +48,9 @@ interface DiffTabFilesProvider {
 }
 
 /**
- * The files of a "Show Diff" tab
+ * The files of a "Show Diff" tab, when no [DiffTabFilesProvider] knows them better
  *
- * They are matched by the names of their diffs. A diff of a change in version control is named after the path of the
- * file, and other diffs give us nothing better.
+ * They are matched by the names of their diffs, which only some diffs name after the path of the file.
  */
 private class ChainFiles(private val processor: CacheDiffRequestChainProcessor) : DiffTabFiles {
   override fun canShow(path: String): Boolean = indexOf(path) != null
