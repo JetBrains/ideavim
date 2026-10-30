@@ -12,9 +12,11 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.actionSystem.PlatformCoreDataKeys
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.keymap.KeymapManager
 import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -108,30 +110,60 @@ class VimShortcutKeyActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
-  fun `Enter is passed to AIR in the AIR prompt input`() {
+  fun `keys bound to AIR prompt actions are passed to AIR in the AIR prompt input`() {
     configureByText("Lorem ipsum")
     markAsAirPrompt()
     val enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)
-    assertFalse(isEnabledFor(enter), "Enter should send the prompt in Normal mode")
-    typeText("i")
-    assertFalse(isEnabledFor(enter), "Enter should send the prompt in Insert mode")
+    val shiftEnter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK)
+    withAirPromptShortcuts {
+      assertFalse(isEnabledFor(enter), "Enter should send the prompt in Normal mode")
+      assertFalse(isEnabledFor(shiftEnter), "Shift+Enter should break the line in Normal mode")
+      typeText("i")
+      assertFalse(isEnabledFor(enter), "Enter should send the prompt in Insert mode")
+      assertFalse(isEnabledFor(shiftEnter), "Shift+Enter should break the line in Insert mode")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
-  fun `mapped Enter stays with Vim in the AIR prompt input`() {
+  fun `mapped key bound to an AIR prompt action stays with Vim in the AIR prompt input`() {
     configureByText("Lorem ipsum")
     markAsAirPrompt()
     typeText(commandToKeys("nnoremap <CR> j"))
+    withAirPromptShortcuts {
+      assertTrue(isEnabledFor(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)))
+    }
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `key not bound to an AIR prompt action stays with Vim in the AIR prompt input`() {
+    configureByText("Lorem ipsum")
+    markAsAirPrompt()
     assertTrue(isEnabledFor(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)))
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
-  fun `Shift-Enter in the AIR prompt input is not affected`() {
+  fun `keys bound to AIR prompt actions stay with Vim outside the AIR prompt input`() {
     configureByText("Lorem ipsum")
-    markAsAirPrompt()
-    assertTrue(isEnabledFor(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK)))
+    withAirPromptShortcuts {
+      assertTrue(isEnabledFor(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)))
+    }
+  }
+
+  private fun withAirPromptShortcuts(block: () -> Unit) {
+    val keymap = KeymapManager.getInstance().activeKeymap
+    val shortcuts = mapOf(
+      "Air.Chat.Prompt.Send" to KeyboardShortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), null),
+      "Air.Chat.Prompt.NewLine" to KeyboardShortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK), null),
+    )
+    shortcuts.forEach { (actionId, shortcut) -> keymap.addShortcut(actionId, shortcut) }
+    try {
+      block()
+    } finally {
+      shortcuts.forEach { (actionId, shortcut) -> keymap.removeShortcut(actionId, shortcut) }
+    }
   }
 
   private fun markAsAirPrompt() {
