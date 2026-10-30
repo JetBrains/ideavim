@@ -49,6 +49,7 @@ import com.maddyhome.idea.vim.api.VimOptionGroupBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
+import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.NumberOption
@@ -820,6 +821,7 @@ private class NumberOptionMapper(numberOption: ToggleOption, internalOptionValue
   }
 
   override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
+    if (!supportsLineNumbers(editor)) return
     if (value.booleanValue) {
       if (editor.ij.settings.isLineNumbersShown) {
         if (isShowingRelativeLineNumbers(editor.ij.settings.lineNumerationType)) {
@@ -874,6 +876,7 @@ private class RelativeNumberOptionMapper(
   }
 
   override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
+    if (!supportsLineNumbers(editor)) return
     if (value.booleanValue) {
       if (editor.ij.settings.isLineNumbersShown) {
         if (isShowingAbsoluteLineNumbers(editor.ij.settings.lineNumerationType)) {
@@ -903,6 +906,11 @@ private class RelativeNumberOptionMapper(
     }
   }
 }
+
+/**
+ * AI chat prompt inputs never show line numbers, even when the user sets `'number'` or `'relativenumber'`
+ */
+private fun supportsLineNumbers(editor: VimEditor) = !EditorHelper.isChatInput(editor.ij)
 
 private fun isShowingAbsoluteLineNumbers(lineNumerationType: LineNumerationType) = when (lineNumerationType) {
   LineNumerationType.ABSOLUTE -> true

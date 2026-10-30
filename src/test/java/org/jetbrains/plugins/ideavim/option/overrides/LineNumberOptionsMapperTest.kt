@@ -11,6 +11,7 @@ package org.jetbrains.plugins.ideavim.option.overrides
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.EditorSettings.LineNumerationType
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
+import com.intellij.openapi.util.Key
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.maddyhome.idea.vim.api.Options
@@ -49,6 +50,29 @@ class LineNumberOptionsMapperTest : VimTestCase() {
     // panel (which causes problems if our next command is `:set`). So type something (`0` is a good no-op) to give time
     // for the event to propagate
     typeText("0")
+  }
+
+  @Test
+  fun `test 'number' and 'relativenumber' do not show line numbers in AI chat prompt input`() {
+    markAsAirPrompt()
+    enterCommand("set number")
+    assertFalse(fixture.editor.settings.isLineNumbersShown)
+    enterCommand("set relativenumber")
+    assertFalse(fixture.editor.settings.isLineNumbersShown)
+  }
+
+  @Test
+  fun `test 'number' and 'relativenumber' do not show line numbers in AI chat prompt input when set locally`() {
+    markAsAirPrompt()
+    enterCommand("setlocal number relativenumber")
+    assertFalse(fixture.editor.settings.isLineNumbersShown)
+  }
+
+  private fun markAsAirPrompt() {
+    @Suppress("DEPRECATION")
+    val key = Key.findKeyByName(AIR_PROMPT_DOCUMENT_KEY_NAME) ?: Key.create<Boolean>(AIR_PROMPT_DOCUMENT_KEY_NAME)
+    @Suppress("UNCHECKED_CAST")
+    fixture.editor.document.putUserData(key as Key<Boolean>, true)
   }
 
   @Test
@@ -591,5 +615,9 @@ class LineNumberOptionsMapperTest : VimTestCase() {
       assertCommandOutput("set relativenumber?", "norelativenumber")
       assertCommandOutput("setglobal relativenumber?", "norelativenumber")
     }
+  }
+
+  private companion object {
+    const val AIR_PROMPT_DOCUMENT_KEY_NAME = "AIR_PROMPT_INPUT_DOCUMENT"
   }
 }
