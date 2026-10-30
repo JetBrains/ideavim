@@ -14,6 +14,7 @@ import com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl.PlaceInfo
 import com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl.RecentPlacesListener
 import com.intellij.openapi.project.Project
 import com.intellij.platform.rpc.topics.broadcast
+import com.maddyhome.idea.vim.group.diff.DiffJumps
 
 /**
  * Listens to IntelliJ's [RecentPlacesListener] to capture IDE navigation events
@@ -44,6 +45,15 @@ internal class JumpsListener(val project: Project) : RecentPlacesListener {
   }
 
   private fun buildJumpInfo(place: PlaceInfo, added: Boolean): JumpInfo? {
+    // The place of a diff tab has no caret, so only the tab knows it: where its caret is now. That is where the user
+    // navigated away from, but it says nothing about an older place the IDE drops, so a removal is not mirrored
+    val diffJump = DiffJumps.jumpInTab(project, place.file)
+    if (diffJump != null) {
+      if (!added) return null
+      val source = DiffJumpSource.of(diffJump)
+      return JumpInfo(diffJump.line, diffJump.col, diffJump.filepath, diffJump.protocol, added, place.timeStamp, source)
+    }
+
     val editor = FileEditorManager.getInstance(project).getAllEditors(place.file)
       .filterIsInstance<TextEditor>()
       .firstOrNull()

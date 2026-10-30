@@ -36,6 +36,9 @@ internal class DiffTab private constructor(
   private val file: VirtualFile,
   private val processor: DiffRequestProcessor,
 ) {
+  /** Whether this is the tab of [tabFile], the file the tab is opened for */
+  fun isTabOf(tabFile: VirtualFile): Boolean = file == tabFile
+
   /** Tells the tab apart from the other diff tabs while it is open */
   val id: String
     get() = file.putUserDataIfAbsent(ID_KEY, UUID.randomUUID().toString())

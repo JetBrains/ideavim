@@ -464,6 +464,13 @@ abstract class IdeaVimStarterTestBase {
     waitForNoModalProgress()
   }
 
+  /** Runs an IDE action in the side of the diff that shows [sideText], as its shortcut would */
+  protected fun invokeActionInDiffSide(sideText: String, actionId: String) {
+    driver.withContext {
+      ideFrame { diffSide(sideText).apply { invokeAction(actionId, component = component) } }
+    }
+  }
+
   /** Reads the caret line (1-based) of the side of the diff that shows [sideText] */
   protected fun caretLineInDiffSide(sideText: String): Int {
     var result = 0

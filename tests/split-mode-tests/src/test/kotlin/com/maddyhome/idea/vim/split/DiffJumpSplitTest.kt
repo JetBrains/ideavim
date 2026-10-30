@@ -26,6 +26,16 @@ class DiffJumpSplitTest : IdeaVimStarterTestBase() {
   private val before = (1..20).joinToString("\n") { "Line $it" } + "\n"
   private val after = before.replace("Line 3\n", "Line 3\nAdded line\n")
 
+  // The call on line 4 of the newer version goes to the declaration in another file
+  private val javaBefore = """
+    |class Calls {
+    |  void caller() {
+    |    Target.callee();
+    |  }
+    |}
+    |""".trimMargin()
+  private val javaAfter = javaBefore.replace("  void caller() {\n", "  void caller() {\n    // Added line\n")
+
   override fun beforeContextCreated() {
     projectDir.resolve(".idea").createDirectories()
     projectDir.resolve(".idea/vcs.xml").writeText(
@@ -38,12 +48,41 @@ class DiffJumpSplitTest : IdeaVimStarterTestBase() {
       </project>
       """.trimIndent(),
     )
+    // A module with `src` as a source root, so that Java resolves the call to its declaration
+    projectDir.resolve(".idea/modules.xml").writeText(
+      """
+      <?xml version="1.0" encoding="UTF-8"?>
+      <project version="4">
+        <component name="ProjectModuleManager">
+          <modules>
+            <module fileurl="file://${'$'}PROJECT_DIR${'$'}/split.iml" filepath="${'$'}PROJECT_DIR${'$'}/split.iml" />
+          </modules>
+        </component>
+      </project>
+      """.trimIndent(),
+    )
+    projectDir.resolve("split.iml").writeText(
+      """
+      <?xml version="1.0" encoding="UTF-8"?>
+      <module type="JAVA_MODULE" version="4">
+        <component name="NewModuleRootManager" inherit-compiler-output="true">
+          <content url="file://${'$'}MODULE_DIR${'$'}">
+            <sourceFolder url="file://${'$'}MODULE_DIR${'$'}/src" isTestSource="false" />
+          </content>
+          <orderEntry type="sourceFolder" forTests="false" />
+        </component>
+      </module>
+      """.trimIndent(),
+    )
     createFile("src/Changed.txt", before)
     createFile("src/Other.txt", "Other line 1\nOther line 2\n")
+    createFile("src/Calls.java", javaBefore)
+    createFile("src/Target.java", "class Target {\n  static void callee() {\n  }\n}\n")
     git("init", "-q")
     git("add", ".")
     git("commit", "-q", "-m", "Initial")
     createFile("src/Changed.txt", after)
+    createFile("src/Calls.java", javaAfter)
   }
 
   @AfterEach
@@ -86,6 +125,24 @@ class DiffJumpSplitTest : IdeaVimStarterTestBase() {
 
     assertCaretInFileAfter("Changed.txt", 9, "<C-O> should open the file at the line of the jump")
     assertCaretInFileBefore("Changed.txt", 11, "<C-O> should open the file at the line of the jump")
+  }
+
+  @Test
+  fun `control-O returns to the diff after Go to Declaration of the IDE`() {
+    openFile("src/Calls.java")
+    compareWithRepository()
+    // The caret on `callee`, the way Cmd+B and Ctrl+Click find what to go to
+    typeInDiffSide(javaAfter) { typeText("4G^fc") }
+    // `4G` is a jump, and for a moment after one the jump list ignores the IDE's navigation, which would otherwise
+    // mirror IdeaVim's own jumps a second time
+    pause(1000)
+
+    invokeActionInDiffSide(javaAfter, "GotoDeclaration")
+    check(waitUntil(timeoutMs = 15_000, pollMs = 500) { !isDiffShown() }) { "Go to Declaration did not leave the diff" }
+    ctrlOInFile("Target.java")
+
+    assertDiffShown()
+    assertEquals(4, waitForCaretLineInDiffSide(javaAfter, 4), "Caret on the right side of the diff")
   }
 
   @Test

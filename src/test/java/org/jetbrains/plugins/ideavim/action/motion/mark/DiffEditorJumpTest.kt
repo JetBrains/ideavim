@@ -12,8 +12,8 @@ import com.intellij.diff.DiffContentFactory
 import com.intellij.diff.DiffTool
 import com.intellij.diff.FrameDiffTool
 import com.intellij.diff.chains.DiffRequestProducer
-import com.intellij.diff.contents.DiffContent
 import com.intellij.diff.chains.SimpleDiffRequestChain
+import com.intellij.diff.contents.DiffContent
 import com.intellij.diff.editor.ChainDiffVirtualFile
 import com.intellij.diff.editor.DiffEditorViewerFileEditor
 import com.intellij.diff.editor.DiffViewerVirtualFile
@@ -29,8 +29,10 @@ import com.intellij.diff.tools.simple.SimpleDiffTool
 import com.intellij.diff.tools.util.side.TwosideTextDiffViewer
 import com.intellij.diff.util.Side
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.UserDataHolder
@@ -44,6 +46,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.vcsUtil.VcsUtil
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.VimJumpServiceImpl
+import com.maddyhome.idea.vim.mark.JumpSource
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -102,6 +105,44 @@ class DiffEditorJumpTest : VimSplitWindowTestCase() {
     jumpBackFrom(definition)
 
     assertCaretInDiff(diff, Side.LEFT, line = 1, column = 2)
+  }
+
+  @Test
+  fun `test control-O returns to the right side of the diff after the IDE navigated away`() {
+    enterCommand("set ideaunifyjumps")
+    val diff = openDiff(before)
+
+    navigateLikeTheIde(diff, Side.RIGHT, line = 2, column = 3, target = definition)
+    waitForJumpRecordedInDiff()
+    jumpBackFrom(definition)
+
+    assertCaretInDiff(diff, Side.RIGHT, line = 2, column = 3)
+  }
+
+  @Test
+  fun `test control-O returns to the left side of the diff after the IDE navigated away`() {
+    enterCommand("set ideaunifyjumps")
+    val diff = openDiff(before)
+
+    navigateLikeTheIde(diff, Side.LEFT, line = 1, column = 2, target = definition)
+    waitForJumpRecordedInDiff()
+    jumpBackFrom(definition)
+
+    assertCaretInDiff(diff, Side.LEFT, line = 1, column = 2)
+  }
+
+  @Test
+  fun `test the IDE navigating away from unified view records the side of the line`() {
+    enterCommand("set ideaunifyjumps")
+    useDiffTool(UnifiedDiffTool.INSTANCE)
+    val diff = openDiff(before)
+    val editor = unifiedEditor(diff)
+
+    navigateLikeTheIde(diff, editor, line = unifiedLine(diff, Side.RIGHT, 1), column = 4, target = definition)
+    waitForJumpRecordedInDiff()
+    jumpBackFrom(definition)
+
+    assertCaretInUnifiedDiff(diff, Side.RIGHT, line = 1, column = 4)
   }
 
   @Test
@@ -412,6 +453,54 @@ class DiffEditorJumpTest : VimSplitWindowTestCase() {
       // IdeaVim. Hand the keys to the key handler directly
       VimTestCase.typeText(keys, editor, fixture.project)
     }
+  }
+
+  /**
+   * Navigates to [target] the way the IDE's Go to Declaration does (Cmd+B, Ctrl+Click): IdeaVim doesn't see it, the IDE
+   * records it in its navigation history, and `ideaunifyjumps` brings it into the jump list
+   */
+  private fun navigateLikeTheIde(diffFile: VirtualFile, side: Side, line: Int, column: Int, target: Editor) {
+    val editor = sideEditor(diffFile, side)
+    ApplicationManager.getApplication().invokeAndWait {
+      // The side the user works in, which the viewer tracks by the focus
+      (processor(diffFile).activeViewer as TwosideTextDiffViewer).currentSide = side
+    }
+    navigateLikeTheIde(diffFile, editor, line, column, target)
+  }
+
+  private fun navigateLikeTheIde(diffFile: VirtualFile, editor: Editor, line: Int, column: Int, target: Editor) {
+    ApplicationManager.getApplication().invokeAndWait {
+      fileEditorManager.openFile(diffFile, true)
+      editor.caretModel.moveToLogicalPosition(LogicalPosition(line, column))
+    }
+    waitForIdeNavigationToBeMirrored()
+    ApplicationManager.getApplication().invokeAndWait {
+      CommandProcessor.getInstance().executeCommand(fixture.project, {
+        IdeDocumentHistory.getInstance(fixture.project).includeCurrentCommandAsNavigation()
+        fileEditorManager.openFile(target.virtualFile!!, true)
+      }, "Go to Declaration", null)
+    }
+  }
+
+  /**
+   * Waits until a jump just made no longer hides the IDE's navigation from the jump list
+   *
+   * Opening the diff is a navigation the IDE mirrors into the jump list too. For a short while after any jump, the jump
+   * list ignores the IDE's navigation, which would otherwise mirror IdeaVim's own jumps a second time.
+   */
+  private fun waitForIdeNavigationToBeMirrored() {
+    waitUntil { System.currentTimeMillis() > injector.jumpService.lastJumpTimeStamp }
+  }
+
+  private fun waitForJumpRecordedInDiff() {
+    val recorded = waitUntil {
+      var found = false
+      ApplicationManager.getApplication().invokeAndWait {
+        found = injector.jumpService.getJumps(definition.vim.jumpListId).any { it.source is JumpSource.Diff }
+      }
+      found
+    }
+    check(recorded) { "The IDE navigation was not recorded as a jump in the diff" }
   }
 
   // ======================== Opening diffs ========================
