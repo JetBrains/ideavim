@@ -29,6 +29,9 @@ internal data class DiffEditorPosition(val editor: Editor, val line: Int, val co
  * view translates them to and from its own editors.
  */
 internal sealed interface DiffView {
+  /** The editor the user works in: in side-by-side view, the one of the current side */
+  val currentEditor: Editor
+
   /** The position of [caret] in [editor], or null if [editor] is not one of this view's editors */
   fun positionOf(editor: Editor, caret: LogicalPosition): DiffPosition?
 
@@ -39,6 +42,9 @@ internal sealed interface DiffView {
   fun whenReady(action: () -> Unit)
 
   class SideBySide(private val viewer: TwosideTextDiffViewer) : DiffView {
+    override val currentEditor: Editor
+      get() = viewer.currentEditor
+
     override fun positionOf(editor: Editor, caret: LogicalPosition): DiffPosition? {
       val side = Side.fromValue(viewer.editors, editor) ?: return null
       return DiffPosition(side, caret.line, caret.column)
@@ -54,6 +60,9 @@ internal sealed interface DiffView {
 
   /** Both sides in one editor, with the lines of each side interleaved */
   class Unified(private val viewer: UnifiedDiffViewer) : DiffView {
+    override val currentEditor: Editor
+      get() = viewer.editor
+
     private val isReady: Boolean
       get() = viewer.diffChanges != null && !viewer.hasPendingRediff()
 

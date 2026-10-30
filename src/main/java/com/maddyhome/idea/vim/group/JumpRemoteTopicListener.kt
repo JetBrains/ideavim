@@ -19,6 +19,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.jump.JUMP_REMOTE_TOPIC
 import com.maddyhome.idea.vim.group.jump.JumpInfo
 import com.maddyhome.idea.vim.mark.Jump
+import com.maddyhome.idea.vim.mark.JumpSource
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.newapi.vim
@@ -43,7 +44,8 @@ internal class JumpRemoteTopicListener : ProjectRemoteTopicListener<JumpInfo> {
     if (event.timestamp < jumpService.lastJumpTimeStamp) return
 
     val scopeId = scopeIdFor(project, event)
-    val jump = Jump(event.line, event.col, event.filepath, event.protocol)
+    val source = event.diffSource?.toJumpSource() ?: JumpSource.File
+    val jump = Jump(event.line, event.col, event.filepath, event.protocol, source)
 
     if (event.added) {
       jumpService.addJump(scopeId, jump, true)

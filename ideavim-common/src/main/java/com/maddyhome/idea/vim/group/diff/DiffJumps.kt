@@ -14,6 +14,7 @@ import com.intellij.openapi.editor.EditorKind
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.IdeFocusManager
 import com.maddyhome.idea.vim.mark.DiffSide
 import com.maddyhome.idea.vim.mark.Jump
@@ -40,6 +41,17 @@ object DiffJumps {
       return Jump(position.line, position.column, file.path, file.fileSystem.protocol, source)
     }
     return null
+  }
+
+  /**
+   * The jump to the caret of the diff tab of [tabFile], on the side the user works in, or null if [tabFile] is not the
+   * file of an open diff tab
+   *
+   * The IDE's navigation history knows a diff tab only as a whole, without its caret, so the tab has to tell
+   */
+  fun jumpInTab(project: Project, tabFile: VirtualFile): Jump? {
+    val tab = DiffTab.allOpen(project).find { it.isTabOf(tabFile) } ?: return null
+    return jumpAt(tab.view?.currentEditor ?: return null)
   }
 
   /**

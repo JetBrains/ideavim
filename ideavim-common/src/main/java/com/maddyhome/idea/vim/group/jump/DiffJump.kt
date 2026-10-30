@@ -22,16 +22,27 @@ data class DiffJump(
   val col: Int,
   val filepath: String,
   val protocol: String,
-  val diffId: String,
-  val side: DiffSide,
-  val isInFile: Boolean,
+  val source: DiffJumpSource,
 ) {
-  fun toJump(): Jump = Jump(line, col, filepath, protocol, JumpSource.Diff(diffId, side, isInFile))
+  fun toJump(): Jump = Jump(line, col, filepath, protocol, source.toJumpSource())
 
   companion object {
     fun of(jump: Jump): DiffJump? {
+      val source = DiffJumpSource.of(jump) ?: return null
+      return DiffJump(jump.line, jump.col, jump.filepath, jump.protocol, source)
+    }
+  }
+}
+
+/** [JumpSource.Diff], to send over RPC */
+@Serializable
+data class DiffJumpSource(val diffId: String, val side: DiffSide, val isInFile: Boolean) {
+  fun toJumpSource(): JumpSource.Diff = JumpSource.Diff(diffId, side, isInFile)
+
+  companion object {
+    fun of(jump: Jump): DiffJumpSource? {
       val source = jump.source as? JumpSource.Diff ?: return null
-      return DiffJump(jump.line, jump.col, jump.filepath, jump.protocol, source.diffId, source.side, source.isInFile)
+      return DiffJumpSource(source.diffId, source.side, source.isInFile)
     }
   }
 }
