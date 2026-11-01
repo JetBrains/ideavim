@@ -34,6 +34,10 @@ usual beta standards.
 
 * [VIM-4346](https://youtrack.jetbrains.com/issue/VIM-4346) Fixed [`'incsearch'`](https://vimhelp.org/options.txt.html#%27incsearch%27) searching for the text typed into prompts that are not searches. Typing a tag name after `vt<St` in the `surround` extension no longer moves the caret or changes the Visual selection, and `<Esc>` in that prompt keeps the selection. The `<C-R>=` expression prompt in Insert mode no longer moves the caret either, and `<C-F>` there no longer opens the command-line window
 * Fixed [`'langmap'`](https://vimhelp.org/options.txt.html#%27langmap%27) being applied twice to keys typed after the start of a mapping that did not match. With `set langmap=ig,gE` and a mapping starting with `g`, typing `ii` now runs `gg` instead of `gE`
+* [VIM-4365](https://youtrack.jetbrains.com/issue/VIM-4365) Fixed the chat prompt of JetBrains AIR with `:set ideaeditor+=chat`. `<Enter>` now sends the message and `<S-Enter>` breaks the line in every mode, as do any other keys bound to AIR's prompt actions, unless you map them. `:set number` and `:set relativenumber` no longer show line numbers in AI chat inputs
+* [VIM-4338](https://youtrack.jetbrains.com/issue/VIM-4338) Fixed [`.`](https://vimhelp.org/repeat.txt.html#.) repeating scrambled text after accepting a completion when more than one project is open
+* [VIM-3968](https://youtrack.jetbrains.com/issue/VIM-3968) Fixed `:action` and `<Action>` mappings doing nothing in Rider for actions that run on the backend, such as `:action MoveElementRight` or `ReformatCode` in C# files
+* [VIM-4336](https://youtrack.jetbrains.com/issue/VIM-4336) Fixed the caret jumping back to the commented line after commenting a line with the IDE shortcut in Rider. The caret now moves to the next line, so repeating the shortcut comments the following lines
 
 ### Merged PRs:
 * [2142](https://github.com/JetBrains/ideavim/pull/2142) by [1grzyb1](https://github.com/1grzyb1): VIM-2374 I and A move to begginig/end of multi selection
