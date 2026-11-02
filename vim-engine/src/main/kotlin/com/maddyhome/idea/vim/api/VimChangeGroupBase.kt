@@ -691,7 +691,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     val state = injector.vimState
     if (!state.isDotRepeatInProgress) {
       // While repeating the enter action has been already executed because `initInsert` repeats the input
-      val action = getEnterAction(editor)
+      val action = getLineBreakAction(editor) ?: injector.nativeActionManager.enterAction
       if (action != null) {
         // We use enter action for `o`, `O` commands. If we want to undo the added \n and indent, we should record start of insert
         if (editor.mode is Mode.INSERT) {
@@ -712,10 +712,10 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   }
 
   /**
-   * The native action that breaks the line at the caret for `o` and `O`. An editor can replace the platform's Enter
-   * action with its own.
+   * The editor's own action that breaks the line at the caret, for an editor where the platform's line-break actions
+   * don't work. Used for `o`, `O` and `<CR>` in Insert mode. Null to use the platform's actions.
    */
-  protected open fun getEnterAction(editor: VimEditor): NativeAction? = injector.nativeActionManager.enterAction
+  protected open fun getLineBreakAction(editor: VimEditor): NativeAction? = null
 
   override fun runEnterAboveAction(editor: VimEditor, context: ExecutionContext) {
     val state = injector.vimState
@@ -942,7 +942,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   }
 
   /**
-   * Processes the Enter key by running the first successful action registered for "ENTER" keystroke.
+   * Processes the Enter key by running the editor's own line-break action (see [getLineBreakAction]), or else the first
+   * successful action registered for "ENTER" keystroke.
    *
    * If this is REPLACE mode we need to turn off OVERWRITE before and then turn OVERWRITE back on after sending the
    * "ENTER" key.
@@ -954,11 +955,16 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     if (editor.mode is Mode.REPLACE) {
       editor.insertMode = true
     }
-    val enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)
-    val actions = injector.keyGroup.getActions(editor, enterKeyStroke)
-    for (action in actions) {
-      if (injector.actionExecutor.executeAction(editor, action, context)) {
-        break
+    val lineBreakAction = getLineBreakAction(editor)
+    if (lineBreakAction != null) {
+      injector.actionExecutor.executeAction(editor, lineBreakAction, context)
+    } else {
+      val enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)
+      val actions = injector.keyGroup.getActions(editor, enterKeyStroke)
+      for (action in actions) {
+        if (injector.actionExecutor.executeAction(editor, action, context)) {
+          break
+        }
       }
     }
     if (editor.mode is Mode.REPLACE) {

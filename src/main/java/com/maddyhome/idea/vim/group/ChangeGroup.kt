@@ -8,7 +8,6 @@
 package com.maddyhome.idea.vim.group
 
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
@@ -33,8 +32,8 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.format.FormatRemoteApi
 import com.maddyhome.idea.vim.helper.CodeWrapper
 import com.maddyhome.idea.vim.helper.CommentLeaderParser
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inInsertMode
+import com.maddyhome.idea.vim.ide.ChatInputProvider
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper
 import com.maddyhome.idea.vim.listener.VimInsertListener
 import com.maddyhome.idea.vim.newapi.IjVimEditor
@@ -62,12 +61,9 @@ class ChangeGroup : VimChangeGroupBase() {
     EventFacade.getInstance().addEditorMouseListener(editor.ij, listener, disposable)
   }
 
-  // AIR turns the platform's line-break actions into no-ops in its prompt and breaks a line only with its own action
-  override fun getEnterAction(editor: VimEditor): NativeAction? {
-    if (EditorHelper.isAirPrompt(editor.ij)) {
-      ActionManager.getInstance().getAction(AIR_PROMPT_NEW_LINE_ACTION)?.let { return it.vim }
-    }
-    return super.getEnterAction(editor)
+  override fun getLineBreakAction(editor: VimEditor): NativeAction? {
+    val ijEditor = editor.ij
+    return ChatInputProvider.forEditor(ijEditor)?.getLineBreakAction(ijEditor)?.vim
   }
 
   override fun type(vimEditor: VimEditor, context: ExecutionContext, key: Char) {
@@ -277,6 +273,5 @@ class ChangeGroup : VimChangeGroupBase() {
 
   private companion object {
     private val logger = logger<ChangeGroup>()
-    private const val AIR_PROMPT_NEW_LINE_ACTION = "Air.Chat.Prompt.NewLine"
   }
 }

@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
 import com.maddyhome.idea.vim.api.normalizeVisualLine
 import com.maddyhome.idea.vim.common.IndentConfig
+import com.maddyhome.idea.vim.ide.ChatInputProvider
 import com.maddyhome.idea.vim.newapi.IjVimDocument
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import java.awt.Font
@@ -53,8 +54,6 @@ object EditorHelper {
   const val PYTHON_CONSOLE_FILE_NAME: String = "Python Console.py"
   const val PYTHON_CONSOLE_TOOL_WINDOW_ID: String = "Python Console"
   private const val PYDEV_CONSOLE_KEY_NAME = "PYDEV_CONSOLE_KEY"
-  private const val AIR_PROMPT_DOCUMENT_KEY_NAME = "AIR_PROMPT_INPUT_DOCUMENT"
-  private const val AIR_PROMPT_FILE_NAME_PREFIX = "AirPrompt-"
   private const val AI_ASSISTANT_INPUT_EDITOR_KEY_NAME = "AI_ASSISTANT_INPUT_EDITOR"
   private const val AI_ASSISTANT_INPUT_FILE_NAME_PREFIX = "AIAssistantInput-"
 
@@ -743,42 +742,22 @@ object EditorHelper {
   private fun isMarkedAsPythonConsole(file: VirtualFile): Boolean = hasUserDataFlag(file, PYDEV_CONSOLE_KEY_NAME)
 
   /**
-   * Checks if the editor is the prompt input of an AI chat: JetBrains AI Assistant (which also hosts Junie) or AIR.
+   * Checks if the editor is the prompt input of an AI chat: one described by a [ChatInputProvider] (e.g. AIR), or
+   * JetBrains AI Assistant (which also hosts Junie).
    *
-   * Neither plugin exposes a public marker, so we look for their internal ones. AIR marks the prompt document with
-   * `AIR_PROMPT_INPUT_DOCUMENT` and names its light file `AirPrompt-<uuid>`. AI Assistant puts
-   * `AI_ASSISTANT_INPUT_EDITOR` on the editor and names the input's light file `AIAssistantInput-<uuid>`.
-   * The AI Assistant key is only set after the editor is created, and not by every input variant (e.g. the in-code
-   * generation popup), so the file name is what recognises it when the editor is created.
+   * AI Assistant has no public marker, so we look for its internal ones. It puts `AI_ASSISTANT_INPUT_EDITOR` on the
+   * editor and names the input's light file `AIAssistantInput-<uuid>`. The key is only set after the editor is
+   * created, and not by every input variant (e.g. the in-code generation popup), so the file name is what recognises
+   * it when the editor is created.
    *
    * Viewers are excluded, so code snippets rendered in chat answers keep their native behaviour.
    */
   @JvmStatic
   fun isChatInput(editor: Editor): Boolean {
     if (editor.isViewer) return false
-    if (isAirPromptInput(editor)) return true
+    if (ChatInputProvider.forEditor(editor) != null) return true
     if (hasUserDataFlag(editor, AI_ASSISTANT_INPUT_EDITOR_KEY_NAME)) return true
     return getVirtualFile(editor)?.name?.startsWith(AI_ASSISTANT_INPUT_FILE_NAME_PREFIX) == true
-  }
-
-  /**
-   * Checks if the editor is the prompt input of AIR, recognised by the markers described in [isChatInput]
-   */
-  @JvmStatic
-  fun isAirPromptInput(editor: Editor): Boolean {
-    if (editor.isViewer) return false
-    if (hasUserDataFlag(editor.document, AIR_PROMPT_DOCUMENT_KEY_NAME)) return true
-    return getVirtualFile(editor)?.name?.startsWith(AIR_PROMPT_FILE_NAME_PREFIX) == true
-  }
-
-  /**
-   * Checks if the editor is the prompt input of AIR (see [isChatInput]).
-   */
-  @JvmStatic
-  fun isAirPrompt(editor: Editor): Boolean {
-    if (editor.isViewer) return false
-    if (hasUserDataFlag(editor.document, AIR_PROMPT_DOCUMENT_KEY_NAME)) return true
-    return getVirtualFile(editor)?.name?.startsWith(AIR_PROMPT_FILE_NAME_PREFIX) == true
   }
 
   private fun hasUserDataFlag(holder: UserDataHolder, keyName: String): Boolean {

@@ -26,7 +26,6 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.impl.EditorComponentImpl
-import com.intellij.openapi.keymap.KeymapManager
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.util.Key
@@ -47,6 +46,7 @@ import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.isPrimaryEditor
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
+import com.maddyhome.idea.vim.ide.ChatInputProvider
 import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
@@ -208,11 +208,10 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
 
     val keyCode = keyStroke.keyCode
 
-    // AIR binds its prompt actions to Enter (send) and Shift+Enter (new line), and swallows the platform line-break
-    // actions, so Vim's handling of these keys would do nothing useful in Insert mode. Hand any key bound to an AIR
-    // prompt action to AIR in every mode, unless the user maps it.
-    if (isAirPromptKey(keyStroke, editor) && !hasMapping(listOf(keyStroke), editor)) {
-      return ActionEnableStatus.no("Key is bound to an AIR prompt action", LogLevel.INFO)
+    // A chat can own keys in its prompt input, e.g. AIR sends the message with Enter. Hand them to the chat in every
+    // mode, unless the user maps them.
+    if (isChatKey(keyStroke, editor) && !hasMapping(listOf(keyStroke), editor)) {
+      return ActionEnableStatus.no("Key is owned by the chat", LogLevel.INFO)
     }
 
     if (HandlerInjector.notebookCommandMode(editor)) {
@@ -299,11 +298,8 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
     return injector.keyGroup.getFirstMappingInfoMatch(keys, mode) != null
   }
 
-  private fun isAirPromptKey(keyStroke: KeyStroke, editor: Editor): Boolean {
-    if (!EditorHelper.isAirPromptInput(editor)) return false
-    val keymap = KeymapManager.getInstance()?.activeKeymap ?: return false
-    return keymap.getActionIds(keyStroke).any { it.startsWith(AIR_PROMPT_ACTION_ID_PREFIX) }
-  }
+  private fun isChatKey(keyStroke: KeyStroke, editor: Editor): Boolean =
+    ChatInputProvider.forEditor(editor)?.isChatKey(editor, keyStroke) == true
 
   private fun isEnabledForEscape(editor: Editor): Boolean {
     if (editor.isPrimaryEditor()) return true
@@ -362,9 +358,6 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
     // Keymap id of the console execute action (com.intellij.execution.console.ConsoleExecuteAction). The id constant
     // itself is not public in the platform, so we mirror it here.
     private const val CONSOLE_EXECUTE_ACTION_ID = "Console.Execute"
-
-    // Prefix of AIR's prompt actions, e.g. `Air.Chat.Prompt.Send` (Enter) and `Air.Chat.Prompt.NewLine` (Shift+Enter)
-    private const val AIR_PROMPT_ACTION_ID_PREFIX = "Air.Chat.Prompt."
 
     @JvmField
     val VIM_ONLY_EDITOR_KEYS: Set<KeyStroke> =

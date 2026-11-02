@@ -140,6 +140,7 @@ dependencies {
     pluginModule(runtimeOnly(project(":ideavim-clion-nova")))
     pluginModule(runtimeOnly(project(":ideavim-terminal")))
     pluginModule(runtimeOnly(project(":ideavim-vcs")))
+    pluginModule(runtimeOnly(project(":ideavim-air")))
     pluginModule(runtimeOnly(project(":ideavim-rpc")))
 
     bundledModule("intellij.spellchecker")
@@ -151,6 +152,9 @@ dependencies {
   // --------- Test dependencies ----------
 
   testApi("com.squareup.okhttp3:okhttp:5.5.0")
+
+  // The AIR plugin isn't in the test IDE, so tests register the module's chat input provider themselves
+  testImplementation(project(":ideavim-air"))
 
   // https://mvnrepository.com/artifact/com.ensarsarajcic.neovim.java/neovim-api
   // Its Jackson 2.9.10 shadows the platform's own on the flat test classpath.

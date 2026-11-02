@@ -17,11 +17,11 @@ import com.intellij.openapi.actionSystem.PlatformCoreDataKeys
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.keymap.KeymapManager
-import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.air.AirPrompt
 import org.junit.jupiter.api.Test
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
@@ -167,10 +167,7 @@ class VimShortcutKeyActionTest : VimTestCase() {
   }
 
   private fun markAsAirPrompt() {
-    @Suppress("DEPRECATION")
-    val key = Key.findKeyByName(AIR_PROMPT_DOCUMENT_KEY_NAME) ?: Key.create<Boolean>(AIR_PROMPT_DOCUMENT_KEY_NAME)
-    @Suppress("UNCHECKED_CAST")
-    fixture.editor.document.putUserData(key as Key<Boolean>, true)
+    AirPrompt.mark(fixture.editor, fixture.testRootDisposable)
   }
 
   private fun isEnabledFor(keyStroke: KeyStroke): Boolean {
@@ -203,9 +200,5 @@ class VimShortcutKeyActionTest : VimTestCase() {
       enabled = event.presentation.isEnabled
     }
     return enabled
-  }
-
-  private companion object {
-    const val AIR_PROMPT_DOCUMENT_KEY_NAME = "AIR_PROMPT_INPUT_DOCUMENT"
   }
 }
