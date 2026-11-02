@@ -61,17 +61,23 @@ class ChangeGroup : VimChangeGroupBase() {
   override fun type(vimEditor: VimEditor, context: ExecutionContext, key: Char) {
     doType(vimEditor, context) {
       tryExpandAbbreviation(vimEditor, key)
-      it.execute(vimEditor.ij, key, context.ij)
+      it.execute(vimEditor.ij, key.toDocumentChar(), context.ij)
     }
   }
 
   override fun type(vimEditor: VimEditor, context: ExecutionContext, string: String) {
     doType(vimEditor, context) { handler ->
       string.forEach { char ->
-        handler.execute(vimEditor.ij, char, context.ij)
+        handler.execute(vimEditor.ij, char.toDocumentChar(), context.ij)
       }
     }
   }
+
+  /**
+   * IntelliJ documents only allow `\n` as a line separator, so a carriage return (e.g. inserted literally with
+   * `<C-V><CR>`) is typed as a line break.
+   */
+  private fun Char.toDocumentChar(): Char = if (this == '\r') '\n' else this
 
   private fun doType(vimEditor: VimEditor, context: ExecutionContext, action: (TypedActionHandler) -> Unit) {
     val editor = (vimEditor as IjVimEditor).editor

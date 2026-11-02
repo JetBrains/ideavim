@@ -117,7 +117,21 @@ class InsertCompletedLiteralActionTest : VimTestCase() {
   @Test
   fun `special keys`() {
     checkInsert("<Esc>", "${27.toChar()}")
-//     checkInsert("<CR>", "${13.toChar()}") exception is thrown because of the \r symbol
+  }
+
+  @TestWithoutNeovim(
+    reason = SkipNeovimReason.SEE_DESCRIPTION,
+    description = "IntelliJ documents can't contain a carriage return, so a line break is inserted instead of ^M",
+  )
+  @Test
+  fun `carriage return inserts line break`() {
+    checkInsert("<CR>", "\n")
+    checkInsert("<C-m>", "\n")
+    checkInsert("013", "\n")
+    checkInsert("o015", "\n")
+    checkInsert("x0d", "\n")
+    checkInsert("u000d", "\n")
+    checkInsert("U0000000d", "\n")
   }
 
   @Test
@@ -198,7 +212,6 @@ class InsertCompletedLiteralActionTest : VimTestCase() {
 //    checkInsert("<C-j>", 0.toChar().toString()) can't be inserted to IDE for some reason
     checkInsert("<C-k>", 11.toChar().toString())
     checkInsert("<C-l>", 12.toChar().toString())
-//    checkInsert("<C-m>", 13.toChar().toString()) can't be inserted to IDE for some reason
     checkInsert("<C-n>", 14.toChar().toString())
     checkInsert("<C-o>", 15.toChar().toString())
     checkInsert("<C-p>", 16.toChar().toString())
