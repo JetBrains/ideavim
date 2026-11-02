@@ -691,7 +691,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     val state = injector.vimState
     if (!state.isDotRepeatInProgress) {
       // While repeating the enter action has been already executed because `initInsert` repeats the input
-      val action = injector.nativeActionManager.enterAction
+      val action = getEnterAction(editor)
       if (action != null) {
         // We use enter action for `o`, `O` commands. If we want to undo the added \n and indent, we should record start of insert
         if (editor.mode is Mode.INSERT) {
@@ -710,6 +710,12 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       }
     }
   }
+
+  /**
+   * The native action that breaks the line at the caret for `o` and `O`. An editor can replace the platform's Enter
+   * action with its own.
+   */
+  protected open fun getEnterAction(editor: VimEditor): NativeAction? = injector.nativeActionManager.enterAction
 
   override fun runEnterAboveAction(editor: VimEditor, context: ExecutionContext) {
     val state = injector.vimState
