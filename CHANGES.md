@@ -34,6 +34,9 @@ usual beta standards.
 
 * [VIM-4346](https://youtrack.jetbrains.com/issue/VIM-4346) Fixed [`'incsearch'`](https://vimhelp.org/options.txt.html#%27incsearch%27) searching for the text typed into prompts that are not searches. Typing a tag name after `vt<St` in the `surround` extension no longer moves the caret or changes the Visual selection, and `<Esc>` in that prompt keeps the selection. The `<C-R>=` expression prompt in Insert mode no longer moves the caret either, and `<C-F>` there no longer opens the command-line window
 * Fixed [`'langmap'`](https://vimhelp.org/options.txt.html#%27langmap%27) being applied twice to keys typed after the start of a mapping that did not match. With `set langmap=ig,gE` and a mapping starting with `g`, typing `ii` now runs `gg` instead of `gE`
+* [VIM-4338](https://youtrack.jetbrains.com/issue/VIM-4338) Fixed [`.`](https://vimhelp.org/repeat.txt.html#.) repeating scrambled text after a code completion was accepted while more than one project was open
+* [VIM-3968](https://youtrack.jetbrains.com/issue/VIM-3968) Fixed IDE actions handled by Rider's backend, such as `MoveElementRight` or `ReformatCode` in C# files, doing nothing when run with `:action` or an `<Action>` mapping in Rider
+* [VIM-4336](https://youtrack.jetbrains.com/issue/VIM-4336) Fixed the caret jumping back to the commented line after Comment with Line Comment (`CommentByLineComment`) in Rider, instead of moving to the next line
 
 ### Merged PRs:
 * [2142](https://github.com/JetBrains/ideavim/pull/2142) by [1grzyb1](https://github.com/1grzyb1): VIM-2374 I and A move to begginig/end of multi selection
@@ -46,6 +49,12 @@ usual beta standards.
 * [2157](https://github.com/JetBrains/ideavim/pull/2157) by [1grzyb1](https://github.com/1grzyb1): VIM-4346 Fix surround tag
 * [2158](https://github.com/JetBrains/ideavim/pull/2158) by [1grzyb1](https://github.com/1grzyb1): VIM-4329 Fix k movement scrolling with so=9999
 * [2141](https://github.com/JetBrains/ideavim/pull/2141) by [citizenmatt](https://github.com/citizenmatt): Fix incorrect langmap when replaying failed map
+
+## 2.48.1, 2026-10-30
+
+### Fixes:
+
+* [VIM-4365](https://youtrack.jetbrains.com/issue/VIM-4365) Fixed `<Enter>` and `<S-Enter>` in AI chat prompt inputs with Vim enabled by `:set ideaeditor+=chat`. In every mode, `<Enter>` now sends the message and `<S-Enter>` starts a new line, as do other keys bound to the chat's prompt actions, unless you map them. The chat input also no longer shows line numbers when [`'number'`](https://vimhelp.org/options.txt.html#%27number%27) or `'relativenumber'` is set
 
 ## 2.48.0, 2026-10-29
 
