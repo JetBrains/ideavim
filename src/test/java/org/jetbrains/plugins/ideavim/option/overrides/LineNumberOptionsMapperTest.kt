@@ -11,7 +11,6 @@ package org.jetbrains.plugins.ideavim.option.overrides
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.EditorSettings.LineNumerationType
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
-import com.intellij.openapi.util.Key
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.maddyhome.idea.vim.api.Options
@@ -19,6 +18,7 @@ import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.air.AirPrompt
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -69,10 +69,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
   }
 
   private fun markAsAirPrompt() {
-    @Suppress("DEPRECATION")
-    val key = Key.findKeyByName(AIR_PROMPT_DOCUMENT_KEY_NAME) ?: Key.create<Boolean>(AIR_PROMPT_DOCUMENT_KEY_NAME)
-    @Suppress("UNCHECKED_CAST")
-    fixture.editor.document.putUserData(key as Key<Boolean>, true)
+    AirPrompt.mark(fixture.editor, fixture.testRootDisposable)
   }
 
   @Test
@@ -615,9 +612,5 @@ class LineNumberOptionsMapperTest : VimTestCase() {
       assertCommandOutput("set relativenumber?", "norelativenumber")
       assertCommandOutput("setglobal relativenumber?", "norelativenumber")
     }
-  }
-
-  private companion object {
-    const val AIR_PROMPT_DOCUMENT_KEY_NAME = "AIR_PROMPT_INPUT_DOCUMENT"
   }
 }

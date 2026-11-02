@@ -21,11 +21,12 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorModificationUtilEx
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
-import com.intellij.openapi.util.Key
+import com.maddyhome.idea.vim.ide.ChatInputProvider
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.air.AirPrompt
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -34,7 +35,7 @@ import org.junit.jupiter.api.TestInfo
 /**
  * An AIR prompt ignores the platform's Enter action and breaks a line only with its own `Air.Chat.Prompt.NewLine`.
  */
-@TestFor(issues = ["VIM-3786"])
+@TestFor(issues = ["VIM-4365"])
 class AirPromptNewLineTest : VimTestCase() {
   private lateinit var originalEnterHandler: EditorActionHandler
 
@@ -124,6 +125,20 @@ class AirPromptNewLineTest : VimTestCase() {
 
   @Test
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test C-J breaks the line in Insert mode in AIR prompt`() {
+    configurePrompt("first${c} line")
+    typeText("i<C-J>")
+    assertState(
+      """
+        |first
+        |${c} line
+      """.trimMargin()
+    )
+    assertMode(Mode.INSERT)
+  }
+
+  @Test
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test o in other editor still uses Enter action`() {
     configureByText("first ${c}line")
     typeText("o")
@@ -137,7 +152,7 @@ class AirPromptNewLineTest : VimTestCase() {
 
   private fun configurePrompt(text: String) {
     configureByText(text)
-    fixture.editor.document.putUserData(AIR_PROMPT_DOCUMENT, true)
+    AirPrompt.mark(fixture.editor, fixture.testRootDisposable)
   }
 
   /** Like AIR's `AirPromptLineBreakHandler` */
@@ -150,7 +165,7 @@ class AirPromptNewLineTest : VimTestCase() {
       original.execute(editor, caret, dataContext)
     }
 
-    private fun isPrompt(editor: Editor) = editor.document.getUserData(AIR_PROMPT_DOCUMENT) == true
+    private fun isPrompt(editor: Editor) = ChatInputProvider.forEditor(editor) != null
   }
 
   /** Like AIR's `AirPromptNewLineAction` */
@@ -165,6 +180,5 @@ class AirPromptNewLineTest : VimTestCase() {
 
   private companion object {
     const val AIR_NEW_LINE_ACTION = "Air.Chat.Prompt.NewLine"
-    val AIR_PROMPT_DOCUMENT: Key<Boolean> = Key.create("AIR_PROMPT_INPUT_DOCUMENT")
   }
 }

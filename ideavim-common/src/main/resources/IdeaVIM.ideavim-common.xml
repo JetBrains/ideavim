@@ -17,6 +17,8 @@
     <!-- In both modes: in split mode, diff tabs live on the backend -->
     <extensionPoint interface="com.maddyhome.idea.vim.group.diff.DiffTabFilesProvider" dynamic="true"
                     name="internal.diffTabFiles"/>
+    <extensionPoint interface="com.maddyhome.idea.vim.ide.ChatInputProvider" dynamic="true"
+                    name="chatInputProvider"/>
   </extensionPoints>
 
   <extensions defaultExtensionNs="com.intellij">
