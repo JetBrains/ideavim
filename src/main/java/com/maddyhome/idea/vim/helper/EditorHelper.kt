@@ -771,6 +771,16 @@ object EditorHelper {
     return getVirtualFile(editor)?.name?.startsWith(AIR_PROMPT_FILE_NAME_PREFIX) == true
   }
 
+  /**
+   * Checks if the editor is the prompt input of AIR (see [isChatInput]).
+   */
+  @JvmStatic
+  fun isAirPrompt(editor: Editor): Boolean {
+    if (editor.isViewer) return false
+    if (hasUserDataFlag(editor.document, AIR_PROMPT_DOCUMENT_KEY_NAME)) return true
+    return getVirtualFile(editor)?.name?.startsWith(AIR_PROMPT_FILE_NAME_PREFIX) == true
+  }
+
   private fun hasUserDataFlag(holder: UserDataHolder, keyName: String): Boolean {
     @Suppress("DEPRECATION") val key = Key.findKeyByName(keyName) ?: return false
     return holder.getUserData(key) == true
