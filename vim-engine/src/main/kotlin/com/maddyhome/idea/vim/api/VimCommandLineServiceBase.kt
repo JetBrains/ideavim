@@ -26,6 +26,21 @@ abstract class VimCommandLineServiceBase : VimCommandLineService {
     initText: String,
   ): VimCommandLine
 
+  /**
+   * Creates the command line panel without entering the command line mode
+   *
+   * The type of the command line is guessed from [label], see [CommandLineType.fromLabel]. Prefer the overload that
+   * takes the type.
+   */
+  fun createPanel(
+    editor: VimEditor,
+    context: ExecutionContext,
+    label: String,
+    initText: String,
+  ): VimCommandLine {
+    return createPanel(editor, context, CommandLineType.fromLabel(label), label, initText)
+  }
+
   private fun createCommandLinePrompt(
     editor: VimEditor,
     context: ExecutionContext,
