@@ -768,6 +768,23 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest(listOf("VG", exCommand("normal yss\"")), before, after, Mode.NORMAL())
   }
 
+  // VIM-4368
+  @Test
+  fun `test surround line with tag and normal command over range`() {
+    val before = """
+      ${c}foo
+      bar
+      baz
+    """.trimIndent()
+    val after = """
+      <b>foo</b>
+      <b>bar</b>
+      ${c}<b>baz</b>
+    """.trimIndent()
+
+    doTest(exCommand("1,3normal yss<lt>b>"), before, after, Mode.NORMAL())
+  }
+
   @Test
   fun `test csw`() {
     val before = "var1, va${c}r2, var3"
