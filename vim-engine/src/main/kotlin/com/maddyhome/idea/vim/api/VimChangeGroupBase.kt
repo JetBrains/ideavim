@@ -1691,7 +1691,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    *
    * Vim reindents this line with 'cindent' or 'indentexpr' whatever 'autoindent' is set to (`fix_indent()`, called from
    * `op_change()` in ops.c), so the caret ends up at the indent of the surrounding code rather than at the indent the
-   * line used to have. Like the indent of `o`, this is only available where the language has a formatter.
+   * line used to have. This is only available where the IDE can work out the indent of the language.
    *
    * @return true if the line was reindented
    */
@@ -1707,8 +1707,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   }
 
   /**
-   * The indent the language would give to the line at [offset], or null if the language has no formatter to work it
-   * out, in which case the line keeps the indent it was given.
+   * The indent the language would give to the line at [offset], or null if the IDE can't work it out, in which case the
+   * line keeps the indent it was given.
    */
   protected open fun getLanguageIndent(editor: VimEditor, offset: Int): String? = null
 

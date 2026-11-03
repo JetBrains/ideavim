@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.group.format
 
 import com.intellij.application.options.CodeStyle
+import com.intellij.lang.Language
 import com.intellij.lang.LanguageFormatting
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.IdeActions
@@ -18,11 +19,14 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.impl.EditorId
 import com.intellij.openapi.editor.impl.findEditorOrNull
+import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
+import com.intellij.openapi.util.text.Strings
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import com.intellij.psi.codeStyle.ExternalFormatProcessor
+import com.intellij.psi.codeStyle.lineIndent.LineIndentProvider
 import com.intellij.psi.util.PsiUtilCore
 import com.maddyhome.idea.vim.group.onEdt
 
@@ -53,9 +57,8 @@ internal class FormatRemoteApiImpl : FormatRemoteApi {
   }
 
   /**
-   * Goes through [CodeStyle.getLineIndent], as the Enter handler does: a
-   * [LineIndentProvider][com.intellij.psi.codeStyle.lineIndent.LineIndentProvider] of the language answers straight
-   * from the text, and the formatter, which needs the PSI to be up to date, is only asked if there is none.
+   * Works like [CodeStyle.getLineIndent], as the Enter handler does: a [LineIndentProvider] of the language answers
+   * straight from the text, and the formatter, which needs the PSI to be up to date, is only asked if none does.
    *
    * The document is committed up front because the fallback to the formatter would otherwise commit it from inside the
    * read action.
@@ -68,11 +71,39 @@ internal class FormatRemoteApiImpl : FormatRemoteApi {
 
     ApplicationManager.getApplication().runReadAction<String?> {
       val psiFile = documentManager.getPsiFile(editor.document) ?: return@runReadAction null
-      if (LanguageFormatting.INSTANCE.forContext(psiFile) == null) return@runReadAction null
       val language = PsiUtilCore.getLanguageAtOffset(psiFile, offset)
-      CodeStyle.getLineIndent(editor, language, offset, true)
+      val answers = askLineIndentProviders(project, editor, language, offset)
+      val indent = answers.firstOrNull { !it.isDoNotAdjust() }
+      val providersSayDoNotAdjust = answers.isNotEmpty() && answers.all { it.isDoNotAdjust() }
+      when {
+        indent != null -> indent
+        providersSayDoNotAdjust -> null
+        hasFormatter(psiFile) -> askFormatter(editor, language, offset)
+        else -> null
+      }
     }
   }
+
+  /**
+   * The answers of all the [LineIndentProvider]s of [language], not only of the first one like
+   * [CodeStyle.getLineIndent]: in Rider, a dummy provider of C# answers [LineIndentProvider.DO_NOT_ADJUST] because the
+   * Enter handler runs on the ReSharper backend, while another one works the indent out on the frontend. Rider has no
+   * formatter for C# on the frontend, so without that provider there would be no indent at all.
+   *
+   * Providers that don't know the indent (null) are left out.
+   */
+  private fun askLineIndentProviders(project: Project, editor: Editor, language: Language, offset: Int): List<String> =
+    LINE_INDENT_PROVIDER_EP.extensionList
+      .filter { it.isSuitableFor(language) }
+      .mapNotNull { it.getLineIndent(project, editor, language, offset) }
+
+  /** [LineIndentProvider.DO_NOT_ADJUST] is told apart from an indent by its identity, not by its content */
+  private fun String.isDoNotAdjust(): Boolean = Strings.areSameInstance(this, LineIndentProvider.DO_NOT_ADJUST)
+
+  private fun hasFormatter(psiFile: PsiFile): Boolean = LanguageFormatting.INSTANCE.forContext(psiFile) != null
+
+  private fun askFormatter(editor: Editor, language: Language, offset: Int): String? =
+    CodeStyle.getLineIndent(editor, language, offset, true)
 
   /**
    * A file owned by an [ExternalFormatProcessor] (C/C++ in CLion Nova, where formatting lives in the
@@ -129,5 +160,8 @@ internal class FormatRemoteApiImpl : FormatRemoteApi {
 
   private companion object {
     private const val COMMAND_NAME = "AutoIndent"
+
+    /** [com.intellij.psi.codeStyle.lineIndent.LineIndentProviderEP] only gives the first provider of a language */
+    private val LINE_INDENT_PROVIDER_EP = ExtensionPointName<LineIndentProvider>("com.intellij.lineIndentProvider")
   }
 }
