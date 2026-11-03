@@ -7,6 +7,7 @@
  */
 package com.maddyhome.idea.vim.extension.surround
 
+import com.intellij.openapi.application.WriteIntentReadAction
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
@@ -458,10 +459,12 @@ private fun readInput(
   }
   injector.commandLine.readInputAndProcess(editor, context, CommandLineType.Input, prompt, finishOn) { input ->
     Extension.addString(input)
-    // The key that closes the command line is still being handled, and when it's typed into the command line's text
-    // field, without the IDE's read lock. The surround reads and changes the document, and runs Normal commands such as
-    // `[, so it runs after that key, in its own command
-    injector.application.invokeLater(editor) {
+    // A key typed into the command line's text field is handled without any lock, and the surround changes the
+    // document. It runs right away, before the next key, which matters when the keys come from :normal or a mapping
+    WriteIntentReadAction.run {
+      // The command line is closed, and the Normal commands of the surround, such as `[, need the commands of the mode
+      // the editor is back in
+      KeyHandler.getInstance().reset(editor)
       injector.actionExecutor.executeCommand(editor, { processing(input) }, "Vim surround", null)
     }
   }
