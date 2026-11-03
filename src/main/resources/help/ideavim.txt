@@ -1709,7 +1709,8 @@ zf                      Create a closed fold over the Visual selection.
 :actionl[ist]           List IDE action IDs and their shortcuts, keeping only
                         lines that contain the optional search text. The list
                         opens in a read-only window, an already open one is
-                        reused.
+                        reused. <CR> in that window executes the action on the
+                        cursor line in the window the list was opened from.
 
                                                            *:argu* *:argument*
 :argu[ment]             Go to the [count]th editor tab in the current window.

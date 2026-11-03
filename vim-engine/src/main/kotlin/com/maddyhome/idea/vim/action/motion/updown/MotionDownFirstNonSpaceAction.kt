@@ -47,7 +47,7 @@ class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
 @CommandOrMotion(
   keys = ["<CR>"],
   modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING],
-  description = "Move [count] lines downward, to the first non-blank character. In a live template, jump to the next template variable."
+  description = "Move [count] lines downward, to the first non-blank character. In a live template, jump to the next template variable. In the :actionlist window, execute the action on the line."
 )
 class EnterNormalAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
@@ -61,6 +61,10 @@ class EnterNormalAction : MotionActionHandler.ForEachCaret() {
   ): Motion {
     if (editor.getVirtualBufferKind() == VirtualBufferKind.QuickFix) {
       if (caret.id == editor.primaryCaret().id) jumpToQuickFixItemOnLine(editor, caret)
+      return Motion.NoMotion
+    }
+    if (editor.getVirtualBufferKind() == VirtualBufferKind.ActionList) {
+      if (caret.id == editor.primaryCaret().id) executeActionOnLine(editor, caret)
       return Motion.NoMotion
     }
     if (editor.isInHistoryWindow()) {
@@ -93,4 +97,30 @@ private fun jumpToQuickFixItemOnLine(editor: VimEditor, caret: ImmutableVimCaret
   val from = injector.virtualBufferGroup.selectOriginalWindow(editor) ?: editor.getCmdwinOriginalEditor() ?: editor
   val jump = injector.quickFixService.jumpToItem(from, number)
   if (jump is QuickFixJump.Moved) showPosition(jump)
+}
+
+/**
+ * `<CR>` in the `:actionlist` window executes the action on the caret line in the window the list was opened from.
+ */
+private fun executeActionOnLine(editor: VimEditor, caret: ImmutableVimCaret) {
+  // Read the line before moving to the other window
+  val actionId = editor.getLineText(caret.getBufferPosition().line).trim().substringBefore(' ')
+  // The header line isn't an action
+  val action = injector.actionExecutor.getAction(actionId) ?: return
+  // Without another window, the original editor is a tab next to the list, and the action works on the selected tab
+  val from = injector.virtualBufferGroup.selectOriginalWindow(editor)
+    ?: editor.getCmdwinOriginalEditor()?.also { selectEditor(it) }
+    ?: editor
+  val context = injector.executionContextManager.getEditorExecutionContext(from)
+  if (injector.application.isUnitTest()) {
+    injector.actionExecutor.executeAction(from, action, context)
+  } else {
+    injector.application.runAfterGotFocus { injector.actionExecutor.executeAction(from, action, context) }
+  }
+}
+
+private fun selectEditor(editor: VimEditor) {
+  val path = editor.getPath() ?: return
+  val protocol = editor.extractProtocol() ?: return
+  injector.file.selectEditor(editor.projectId, path, protocol)
 }

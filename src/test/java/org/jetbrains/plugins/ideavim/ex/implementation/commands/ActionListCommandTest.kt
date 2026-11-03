@@ -8,6 +8,7 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
@@ -81,6 +82,38 @@ class ActionListCommandTest : VimTestCase() {
     val displayedLines = parseActionListOutput()
     assertTrue(displayedLines.size > 1)
     displayedLines.drop(1).forEach { assertTrue(it.lowercase(Locale.getDefault()).contains("reformatcode")) }
+  }
+
+  @Test
+  fun `enter executes the action on the line in the original editor`() {
+    configureByText("${c}first\nsecond\n")
+    val originalEditor = fixture.editor
+    typeText(commandToKeys("actionlist EditorDown"))
+    val line = parseActionListOutput().indexOfFirst { it.substringBefore(' ') == "EditorDown" }
+    assertTrue(line > 0)
+
+    typeInActionList("${line + 1}G<CR>")
+
+    assertEquals(1, runReadAction { originalEditor.caretModel.logicalPosition.line })
+  }
+
+  @Test
+  fun `enter on the header does nothing`() {
+    configureByText("${c}first\nsecond\n")
+    val originalEditor = fixture.editor
+    typeText(commandToKeys("actionlist EditorDown"))
+
+    typeInActionList("gg<CR>")
+
+    assertEquals(0, runReadAction { originalEditor.caretModel.logicalPosition.line })
+    assertEquals(0, runReadAction { assertNotNull(actionListEditor()).caretModel.offset })
+  }
+
+  private fun typeInActionList(keys: String) {
+    val editor = assertNotNull(actionListEditor())
+    ApplicationManager.getApplication().invokeAndWait {
+      VimTestCase.typeText(injector.parser.parseKeys(keys), editor, fixture.project)
+    }
   }
 
   private fun actionListEditor(): Editor? {
