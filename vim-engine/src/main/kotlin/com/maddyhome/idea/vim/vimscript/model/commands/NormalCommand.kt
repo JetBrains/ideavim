@@ -57,13 +57,21 @@ data class NormalCommand(val range: Range, val modifier: CommandModifier, val ar
       }
 
       // Perform operations
+      // The keys go through the key stack, so that a handler waiting for a character, such as the one of surround's
+      // `yss`, takes the next key of the command instead of waiting for the user to type it
       val keys = injector.parser.stringToKeys(argument)
       val keyHandler = KeyHandler.getInstance()
       keyHandler.reset(editor)
-      for (key in keys) {
-        val keySource =
-          if (modifier == CommandModifier.BANG) KeySource.NORMAL_COMMAND_NOT_MAPPED else KeySource.NORMAL_COMMAND
-        keyHandler.handleKey(editor, key, keySource, context, keyHandler.keyHandlerState)
+      val keySource =
+        if (modifier == CommandModifier.BANG) KeySource.NORMAL_COMMAND_NOT_MAPPED else KeySource.NORMAL_COMMAND
+      keyHandler.keyStack.addKeys(keys)
+      try {
+        while (keyHandler.keyStack.hasStroke()) {
+          val key = keyHandler.keyStack.feedStroke()
+          keyHandler.handleKey(editor, key, keySource, context, keyHandler.keyHandlerState)
+        }
+      } finally {
+        keyHandler.keyStack.removeFirst()
       }
 
       // Exit if state leaves as insert or cmd_line
