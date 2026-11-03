@@ -39,57 +39,79 @@ data class NormalCommand(val range: Range, val modifier: CommandModifier, val ar
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
-    val rangeSpecified = range.size() != 0
-    val range = getLineRange(editor, editor.primaryCaret())
     val modeBefore = editor.mode
-    if (modeBefore is Mode.INSERT || modeBefore is Mode.REPLACE) {
-      editor.mode = Mode.NORMAL()
+    if (modeBefore.isInsertOrReplace()) {
+      executeFromInsertMode(editor, context, modeBefore)
+    } else {
+      executeOnEachLine(editor, context)
     }
-
-    for (line in range.startLine..range.endLine) {
-      if (editor.lineCount() < line) {
-        break
-      }
-
-      // If a range is specified, the caret is moved to the start of each line before the command is executed
-      if (rangeSpecified) {
-        editor.currentCaret().moveToOffset(injector.motion.moveCaretToLineStart(editor, line))
-      }
-
-      // Perform operations
-      // The keys go through the key stack, so that a handler waiting for a character, such as the one of surround's
-      // `yss`, takes the next key of the command instead of waiting for the user to type it
-      val keys = injector.parser.stringToKeys(argument)
-      val keyHandler = KeyHandler.getInstance()
-      keyHandler.reset(editor)
-      val keySource =
-        if (modifier == CommandModifier.BANG) KeySource.NORMAL_COMMAND_NOT_MAPPED else KeySource.NORMAL_COMMAND
-      keyHandler.keyStack.addKeys(keys)
-      try {
-        while (keyHandler.keyStack.hasStroke()) {
-          val key = keyHandler.keyStack.feedStroke()
-          keyHandler.handleKey(editor, key, keySource, context, keyHandler.keyHandlerState)
-        }
-      } finally {
-        keyHandler.keyStack.removeFirst()
-      }
-
-      // Exit if state leaves as insert or cmd_line
-      val mode = editor.mode
-      if (mode is Mode.CMD_LINE) {
-        injector.commandLine.getActiveCommandLine()?.close(refocusOwningEditor = true, resetCaret = false)
-      }
-
-      if (modeBefore is Mode.INSERT || modeBefore is Mode.REPLACE) {
-        editor.mode = modeBefore
-        return ExecutionResult.Success
-      }
-
-      if (mode is Mode.INSERT || mode is Mode.REPLACE) {
-        editor.exitInsertMode(context)
-      }
-    }
-
     return ExecutionResult.Success
   }
+
+  /** From Insert mode, the keys run once, in Normal mode, and Insert mode is back when they are done */
+  private fun executeFromInsertMode(editor: VimEditor, context: ExecutionContext, insertMode: Mode) {
+    editor.mode = Mode.NORMAL()
+    val line = getLineRange(editor, editor.primaryCaret()).startLine
+    if (line <= editor.lineCount()) {
+      executeOnLine(editor, context, line)
+      closeCommandLine(editor)
+    }
+    editor.mode = insertMode
+  }
+
+  private fun executeOnEachLine(editor: VimEditor, context: ExecutionContext) {
+    val lines = getLineRange(editor, editor.primaryCaret())
+    for (line in lines.startLine..lines.endLine) {
+      // The keys can delete lines, so the end of the buffer is checked again for every line
+      if (line > editor.lineCount()) break
+      executeOnLine(editor, context, line)
+      abandonUnfinishedCommand(editor, context)
+    }
+  }
+
+  private fun executeOnLine(editor: VimEditor, context: ExecutionContext, line: Int) {
+    if (isRangeGiven) {
+      editor.currentCaret().moveToOffset(injector.motion.moveCaretToLineStart(editor, line))
+    }
+    typeKeys(editor, context)
+  }
+
+  /**
+   * The keys go through the key stack, so that a handler waiting for a character, such as the one of surround's `yss`,
+   * takes the next key of the command instead of waiting for the user to type it
+   */
+  private fun typeKeys(editor: VimEditor, context: ExecutionContext) {
+    val keyHandler = KeyHandler.getInstance()
+    keyHandler.reset(editor)
+    keyHandler.keyStack.addKeys(injector.parser.stringToKeys(argument))
+    try {
+      while (keyHandler.keyStack.hasStroke()) {
+        keyHandler.handleKey(editor, keyHandler.keyStack.feedStroke(), keySource, context, keyHandler.keyHandlerState)
+      }
+    } finally {
+      keyHandler.keyStack.removeFirst()
+    }
+  }
+
+  /** Keys that end in Insert or Command-line mode leave a command unfinished, and it is abandoned */
+  private fun abandonUnfinishedCommand(editor: VimEditor, context: ExecutionContext) {
+    when {
+      editor.mode is Mode.CMD_LINE -> closeCommandLine(editor)
+      editor.mode.isInsertOrReplace() -> editor.exitInsertMode(context)
+    }
+  }
+
+  private fun closeCommandLine(editor: VimEditor) {
+    if (editor.mode is Mode.CMD_LINE) {
+      injector.commandLine.getActiveCommandLine()?.close(refocusOwningEditor = true, resetCaret = false)
+    }
+  }
+
+  private val isRangeGiven: Boolean
+    get() = range.size() != 0
+
+  private val keySource: KeySource
+    get() = if (modifier == CommandModifier.BANG) KeySource.NORMAL_COMMAND_NOT_MAPPED else KeySource.NORMAL_COMMAND
+
+  private fun Mode.isInsertOrReplace() = this is Mode.INSERT || this is Mode.REPLACE
 }
