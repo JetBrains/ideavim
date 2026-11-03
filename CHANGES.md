@@ -34,6 +34,12 @@ usual beta standards.
 
 * [VIM-4346](https://youtrack.jetbrains.com/issue/VIM-4346) Fixed [`'incsearch'`](https://vimhelp.org/options.txt.html#%27incsearch%27) searching for the text typed into prompts that are not searches. Typing a tag name after `vt<St` in the `surround` extension no longer moves the caret or changes the Visual selection, and `<Esc>` in that prompt keeps the selection. The `<C-R>=` expression prompt in Insert mode no longer moves the caret either, and `<C-F>` there no longer opens the command-line window
 * Fixed [`'langmap'`](https://vimhelp.org/options.txt.html#%27langmap%27) being applied twice to keys typed after the start of a mapping that did not match. With `set langmap=ig,gE` and a mapping starting with `g`, typing `ii` now runs `gg` instead of `gE`
+* [VIM-4351](https://youtrack.jetbrains.com/issue/VIM-4351) Fixed [`<C-O>`](https://vimhelp.org/motion.txt.html#CTRL-O) and `<C-I>` opening the plain file instead of the [diff view](https://www.jetbrains.com/help/idea/comparing-file-versions.html) a jump was made in. Jumping back now returns to the same side of the diff tab, in both side-by-side and unified views, also after Go to Declaration (`Cmd+B`/`Ctrl+B`) from a diff. `<C-O>` to another file no longer reports an error after a successful jump
+* [VIM-4364](https://youtrack.jetbrains.com/issue/VIM-4364) Fixed an error when inserting a carriage return literally in Insert mode with `<C-V><CR>`, `<C-V><C-M>` or `<C-V>013`. A line break is inserted instead
+* [VIM-4338](https://youtrack.jetbrains.com/issue/VIM-4338) Fixed [`.`](https://vimhelp.org/repeat.txt.html#.) repeating scrambled text after accepting a code completion when more than one project is open
+* [VIM-3968](https://youtrack.jetbrains.com/issue/VIM-3968) Fixed `:action` and `<Action>` mappings doing nothing in Rider for actions that run on the backend, such as `ReformatCode` or `MoveElementRight` in C# files
+* [VIM-4336](https://youtrack.jetbrains.com/issue/VIM-4336) Fixed the caret jumping back to the commented line after commenting a line with a shortcut in Rider
+* [VIM-4365](https://youtrack.jetbrains.com/issue/VIM-4365) Fixed `o` and `O` in the JetBrains AIR chat prompt only moving the caret to the end of the line. They now open a new line, and `<C-J>`, `<C-M>` and mappings ending in `<CR>` break the line there too
 
 ### Merged PRs:
 * [2142](https://github.com/JetBrains/ideavim/pull/2142) by [1grzyb1](https://github.com/1grzyb1): VIM-2374 I and A move to begginig/end of multi selection
@@ -45,6 +51,11 @@ usual beta standards.
 * [2154](https://github.com/JetBrains/ideavim/pull/2154) by [1grzyb1](https://github.com/1grzyb1): VIM-4349 parse ' and ` keycodes in mappings
 * [2157](https://github.com/JetBrains/ideavim/pull/2157) by [1grzyb1](https://github.com/1grzyb1): VIM-4346 Fix surround tag
 * [2158](https://github.com/JetBrains/ideavim/pull/2158) by [1grzyb1](https://github.com/1grzyb1): VIM-4329 Fix k movement scrolling with so=9999
+* [2164](https://github.com/JetBrains/ideavim/pull/2164) by [1grzyb1](https://github.com/1grzyb1): VIM-3968, VIM-4336 Fix IDE actions that run on the Rider backend
+* [2167](https://github.com/JetBrains/ideavim/pull/2167) by [1grzyb1](https://github.com/1grzyb1): VIM-4338 fis dot scramble after autocomplete
+* [2166](https://github.com/JetBrains/ideavim/pull/2166) by [1grzyb1](https://github.com/1grzyb1): VIM-4351 support C-O jump list in diff view
+* [2171](https://github.com/JetBrains/ideavim/pull/2171) by [1grzyb1](https://github.com/1grzyb1): VIM-4364 Type carriage return as line break in Insert mode
+* [2173](https://github.com/JetBrains/ideavim/pull/2173) by [1grzyb1](https://github.com/1grzyb1): VIM-4365 Open a new line with o and O in the AIR prompt
 * [2141](https://github.com/JetBrains/ideavim/pull/2141) by [citizenmatt](https://github.com/citizenmatt): Fix incorrect langmap when replaying failed map
 
 ## 2.48.0, 2026-10-29
