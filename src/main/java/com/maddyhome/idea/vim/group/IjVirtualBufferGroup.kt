@@ -83,19 +83,17 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
     refreshQuickFix(context, content, line)
   }
 
+  override fun openActionList(context: ExecutionContext, editor: VimEditor, content: String) {
+    projectOf(context)?.let { project ->
+      findOpenFile(project, VirtualBufferKind.ActionList)?.let { replaceReadOnlyContent(it, content) }
+    }
+    openReadOnly(context, editor, VirtualBufferKind.ActionList, content, 0)
+  }
+
   override fun refreshQuickFix(context: ExecutionContext, content: String, line: Int) {
     val project = projectOf(context) ?: return
     val file = findOpenFile(project, VirtualBufferKind.QuickFix) ?: return
-    val document = FileDocumentManager.getInstance().getDocument(file) ?: return
-    if (!document.immutableCharSequence.contentEquals(content)) {
-      CommandProcessor.getInstance().runUndoTransparentAction {
-        ApplicationManager.getApplication().runWriteAction {
-          document.setReadOnly(false)
-          document.setText(content)
-          document.setReadOnly(true)
-        }
-      }
-    }
+    replaceReadOnlyContent(file, content)
     FileEditorManager.getInstance(project).getEditors(file).filterIsInstance<TextEditor>().forEach {
       val quickFixEditor = it.editor.vim
       quickFixEditor.primaryCaret().moveToOffset(quickFixEditor.getLineStartOffset(line))
@@ -112,6 +110,18 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
       ?: return null
     window.setAsCurrentWindow(true)
     return (window.selectedComposite?.selectedEditor as? TextEditor)?.editor?.vim
+  }
+
+  private fun replaceReadOnlyContent(file: VirtualFile, content: String) {
+    val document = FileDocumentManager.getInstance().getDocument(file) ?: return
+    if (document.immutableCharSequence.contentEquals(content)) return
+    CommandProcessor.getInstance().runUndoTransparentAction {
+      ApplicationManager.getApplication().runWriteAction {
+        document.setReadOnly(false)
+        document.setText(content)
+        document.setReadOnly(true)
+      }
+    }
   }
 
   /**
@@ -153,6 +163,7 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
     VirtualBufferKind.SubstitutePreview -> "A substitute preview is already open"
     VirtualBufferKind.Help -> "A help window is already open"
     VirtualBufferKind.QuickFix -> "A quickfix window is already open"
+    VirtualBufferKind.ActionList -> "An action list window is already open"
   }
 
   /** The kind of the currently open (nesting-restricted) virtual buffer, or null if none is open. */
@@ -160,7 +171,8 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
     val project = projectOf(context) ?: return null
     return FileEditorManager.getInstance(project).openFiles
       .mapNotNull { it.getUserData(CmdwinKeys.KIND) }
-      // The inccommand=split preview is transient, the help and the quickfix list are regular read-only windows.
+      // The inccommand=split preview is transient, the help, the quickfix and the action lists are regular read-only
+      // windows.
       // None of them blocks cmdwin
       .firstOrNull { it !in NON_BLOCKING_KINDS }
   }
@@ -227,6 +239,11 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
     PlatformDataKeys.PROJECT.getData((context as IjEditorExecutionContext).context)
 
   private companion object {
-    val NON_BLOCKING_KINDS = setOf(VirtualBufferKind.SubstitutePreview, VirtualBufferKind.Help, VirtualBufferKind.QuickFix)
+    val NON_BLOCKING_KINDS = setOf(
+      VirtualBufferKind.SubstitutePreview,
+      VirtualBufferKind.Help,
+      VirtualBufferKind.QuickFix,
+      VirtualBufferKind.ActionList,
+    )
   }
 }

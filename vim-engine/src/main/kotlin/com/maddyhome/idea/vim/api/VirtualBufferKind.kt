@@ -41,4 +41,9 @@ sealed class VirtualBufferKind {
   data object QuickFix : VirtualBufferKind() {
     override val fileName: String = "[Quickfix List]"
   }
+
+  /** The read-only window `:actionlist` opens to show the IDE actions */
+  data object ActionList : VirtualBufferKind() {
+    override val fileName: String = "[Action List]"
+  }
 }

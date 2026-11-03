@@ -56,7 +56,7 @@ internal data class ActionListCommand(val range: Range, val modifier: CommandMod
       }
     }
 
-    injector.outputPanel.output(editor, context, text)
+    injector.virtualBufferGroup.openActionList(context, editor, text)
     return ExecutionResult.Success
   }
 }
