@@ -85,7 +85,7 @@ class IjSearchWindowGroup : SearchWindowGroup {
       }
 
       VirtualBufferKind.ControlCharsEditor, VirtualBufferKind.SubstitutePreview, VirtualBufferKind.Help,
-      VirtualBufferKind.QuickFix -> {}
+      VirtualBufferKind.QuickFix, VirtualBufferKind.ActionList -> {}
     }
   }
 

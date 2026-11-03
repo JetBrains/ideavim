@@ -8,12 +8,21 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.intellij.openapi.actionSystem.ActionManager
-import com.intellij.util.ArrayUtil
+import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.TextEditor
+import com.maddyhome.idea.vim.api.VirtualBufferKind
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.CmdwinKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import java.util.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 @Suppress("SpellCheckingInspection")
 class ActionListCommandTest : VimTestCase() {
@@ -21,17 +30,11 @@ class ActionListCommandTest : VimTestCase() {
   fun testListAllActions() {
     configureByText("\n")
     typeText(commandToKeys("actionlist"))
-    val output = injector.outputPanel.getCurrentOutputPanel()?.text
-    assertNotNull<Any>(output)
+    val displayedLines = parseActionListOutput()
 
-    // Header line
-    val displayedLines = output!!.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-    kotlin.test.assertEquals("--- Actions ---", displayedLines[0])
-
-    // Action lines
-    val displayedActionNum = displayedLines.size - 1
+    assertEquals("--- Actions ---", displayedLines[0])
     val actionIds = ActionManager.getInstance().getActionIdList("")
-    kotlin.test.assertEquals(displayedActionNum, actionIds.size)
+    assertEquals(actionIds.size, displayedLines.size - 1)
   }
 
   @Test
@@ -39,14 +42,10 @@ class ActionListCommandTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("actionlist quickimpl"))
     val displayedLines = parseActionListOutput()
-    for (i in displayedLines.indices) {
-      val line = displayedLines[i]
-      if (i == 0) {
-        kotlin.test.assertEquals("--- Actions ---", line)
-      } else {
-        kotlin.test.assertTrue(line.lowercase(Locale.getDefault()).contains("quickimpl"))
-      }
-    }
+
+    assertEquals("--- Actions ---", displayedLines[0])
+    assertTrue(displayedLines.size > 1)
+    displayedLines.drop(1).forEach { assertTrue(it.lowercase(Locale.getDefault()).contains("quickimpl")) }
   }
 
   @Test
@@ -54,19 +53,46 @@ class ActionListCommandTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("actionlist <M-S-"))
     val displayedLines = parseActionListOutput()
-    for (i in displayedLines.indices) {
-      val line = displayedLines[i]
-      if (i == 0) {
-        kotlin.test.assertEquals("--- Actions ---", line)
-      } else {
-        kotlin.test.assertTrue(line.lowercase(Locale.getDefault()).contains("<m-s-"))
-      }
-    }
+
+    assertEquals("--- Actions ---", displayedLines[0])
+    displayedLines.drop(1).forEach { assertTrue(it.lowercase(Locale.getDefault()).contains("<m-s-")) }
   }
 
-  private fun parseActionListOutput(): Array<String> {
-    val output = injector.outputPanel.getCurrentOutputPanel()?.text
-    return output?.split("\n".toRegex())?.dropLastWhile { it.isEmpty() }?.toTypedArray()
-      ?: ArrayUtil.EMPTY_STRING_ARRAY
+  @Test
+  fun `action list opens in a read-only buffer instead of the output panel`() {
+    configureByText("\n")
+    typeText(commandToKeys("actionlist quickimpl"))
+
+    val actionListEditor = assertNotNull(actionListEditor())
+    assertFalse(actionListEditor.document.isWritable)
+    assertEquals(0, runReadAction { actionListEditor.caretModel.offset })
+    assertNull(injector.outputPanel.getCurrentOutputPanel())
+  }
+
+  @Test
+  fun `an open action list is reused with the new search result`() {
+    configureByText("\n")
+    typeText(commandToKeys("actionlist quickimpl"))
+    typeText(commandToKeys("actionlist reformatcode"))
+
+    val actionListFiles = FileEditorManager.getInstance(fixture.project).openFiles
+      .filter { it.getUserData(CmdwinKeys.KIND) == VirtualBufferKind.ActionList }
+    assertEquals(1, actionListFiles.size)
+    val displayedLines = parseActionListOutput()
+    assertTrue(displayedLines.size > 1)
+    displayedLines.drop(1).forEach { assertTrue(it.lowercase(Locale.getDefault()).contains("reformatcode")) }
+  }
+
+  private fun actionListEditor(): Editor? {
+    val fileEditorManager = FileEditorManager.getInstance(fixture.project)
+    val file = fileEditorManager.openFiles
+      .firstOrNull { it.getUserData(CmdwinKeys.KIND) == VirtualBufferKind.ActionList }
+      ?: return null
+    return fileEditorManager.getEditors(file).filterIsInstance<TextEditor>().firstOrNull()?.editor
+  }
+
+  private fun parseActionListOutput(): List<String> {
+    val editor = assertNotNull(actionListEditor())
+    return runReadAction { editor.document.text }.lines().dropLastWhile { it.isEmpty() }
   }
 }

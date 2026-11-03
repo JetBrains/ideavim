@@ -61,6 +61,14 @@ interface VirtualBufferGroup {
   fun openQuickFix(context: ExecutionContext, editor: VimEditor, content: String, line: Int)
 
   /**
+   * Shows [content] in the read-only action list window with the cursor at its start, the way `:actionlist` does.
+   *
+   * An already open action list window is reused and gets the new [content]. It doesn't take part in the nesting
+   * restriction of the other virtual buffers.
+   */
+  fun openActionList(context: ExecutionContext, editor: VimEditor, content: String)
+
+  /**
    * Replaces the content of the open quickfix window and puts its cursor at the start of [line].
    * Does nothing when the window isn't open.
    */
