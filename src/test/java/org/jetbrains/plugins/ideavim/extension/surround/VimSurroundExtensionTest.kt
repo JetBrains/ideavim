@@ -313,6 +313,40 @@ class VimSurroundExtensionTest : VimTestCase() {
     assertMode(Mode.NORMAL())
   }
 
+  // VIM-4368
+  @Test
+  fun testVisualBlockSurroundEachLine() {
+    val before = """
+      ${c}foo
+      bar
+      baz
+    """.trimIndent()
+    val after = """
+      ${c}"foo"
+      "bar"
+      "baz"
+    """.trimIndent()
+
+    doTest("<C-V>jjllS\"", before, after, Mode.NORMAL())
+  }
+
+  // VIM-4368
+  @Test
+  fun testVisualBlockSurroundPartOfLines() {
+    val before = """
+      a${c}foo b
+      abar b
+      abaz b
+    """.trimIndent()
+    val after = """
+      a${c}(foo) b
+      a(bar) b
+      a(baz) b
+    """.trimIndent()
+
+    doTest("<C-V>jjllS)", before, after, Mode.NORMAL())
+  }
+
   // VIM-4346
   @Test
   fun testVisualSurroundTagPromptDoesNotTriggerIncsearch() {
@@ -698,6 +732,40 @@ class VimSurroundExtensionTest : VimTestCase() {
                     """
 
     doTest(listOf("yss\""), before, after, Mode.NORMAL())
+  }
+
+  // VIM-4368
+  @Test
+  fun `test surround line with normal command over range`() {
+    val before = """
+      ${c}foo
+      bar
+      baz
+    """.trimIndent()
+    val after = """
+      "foo"
+      "bar"
+      ${c}"baz"
+    """.trimIndent()
+
+    doTest(exCommand("1,3normal yss\""), before, after, Mode.NORMAL())
+  }
+
+  // VIM-4368
+  @Test
+  fun `test surround line with normal command over Visual selection`() {
+    val before = """
+      ${c}foo
+      bar
+      baz
+    """.trimIndent()
+    val after = """
+      "foo"
+      "bar"
+      ${c}"baz"
+    """.trimIndent()
+
+    doTest(listOf("VG", exCommand("normal yss\"")), before, after, Mode.NORMAL())
   }
 
   @Test

@@ -187,18 +187,24 @@ internal class VimSurroundExtension : VimExtension {
 
   private class VSurroundHandler : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      // XXX: Will it work with block-wise selections?
       val caret = editor.currentCaret()
-      val range = TextRange(caret.selectionStart, caret.selectionEnd)
-      val isLineWise = editor.mode.selectionType == SelectionType.LINE_WISE
+      val selectionType = editor.mode.selectionType
+      val isLineWise = selectionType == SelectionType.LINE_WISE
+      // A block selection is made of a native caret on each line, and each line is surrounded on its own. The lines are
+      // surrounded from the bottom up, so that the text inserted on a line doesn't move the ranges of the lines above
+      val ranges = if (selectionType == SelectionType.BLOCK_WISE) {
+        editor.nativeCarets().map { TextRange(it.selectionStart, it.selectionEnd) }.sortedByDescending { it.startOffset }
+      } else {
+        listOf(TextRange(caret.selectionStart, caret.selectionEnd))
+      }
 
       // Visual mode, and so the selection, stays while the surround character and the tag are read. <Esc> in the tag
       // prompt returns to it, like <Esc> on the command line
       val c = injector.keyGroup.getChar(editor) ?: return leaveVisualMode(editor)
       withSurroundPair(c, editor, context, onInvalid = { leaveVisualMode(editor) }) { pair ->
-        performSurround(pair, range, caret, isLineWise)
+        ranges.forEach { performSurround(pair, it, caret, isLineWise) }
         leaveVisualMode(editor)
-        caret.moveToOffset(range.startOffset)
+        caret.moveToOffset(ranges.last().startOffset)
       }
     }
 
