@@ -26,7 +26,7 @@ interface FormatRemoteApi : RemoteApi<Unit> {
 
   /**
    * The indent the language gives to the line at [offset], as the IDE works it out for a new line. Null if the
-   * language has no formatter, or if the indent of the line is not to be adjusted.
+   * language has neither a line indent provider that works it out nor a formatter.
    */
   suspend fun lineIndent(editorId: EditorId, offset: Int): String?
 
