@@ -80,7 +80,7 @@ class DiffJumpSplitTest : IdeaVimStarterTestBase() {
     createFile("src/Target.java", "class Target {\n  static void callee() {\n  }\n}\n")
     git("init", "-q")
     git("add", ".")
-    git("commit", "-q", "-m", "Initial")
+    git("-c", "user.name=IdeaVim", "-c", "user.email=ideavim@example.com", "commit", "-q", "-m", "Initial")
     createFile("src/Changed.txt", after)
     createFile("src/Calls.java", javaAfter)
   }
