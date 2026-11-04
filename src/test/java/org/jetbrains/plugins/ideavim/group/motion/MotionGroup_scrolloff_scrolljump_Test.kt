@@ -405,9 +405,10 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     addBlockInlay(fixture.editor.vim.getOffset(30, 0), true, 20)
     setPositionAndScroll(20, 31)
 
+    // Line 32 is on row 32 of 35, so only two rows are left below it
     typeText("j")
     assertPosition(32, 0)
-    assertTopLogicalLine(20)
+    assertTopLogicalLine(21)
 
     typeText("j")
     assertPosition(33, 0)
@@ -476,6 +477,61 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertCaretOnScreen()
   }
 
+  // A notebook with one-line cells, each followed by its output: a line and its 15 row inlay take 16 rows. With line 20
+  // at the top of the 35 row screen, line 21 is at row 16 and line 22 at row 32. Scrolling scrolloff=5 lines would
+  // scroll 80 rows and lose the caret, so scrolloff is kept in rows
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
+  @Test
+  fun `test append at top of screen keeps scrolloff rows when each line has a tall block inlay`() {
+    configureByLines(2000, "    I found it in a legendary land")
+    addNotebookOutputInlays(0..40, 15)
+    enterCommand("set scrolloff=5")
+    setPositionAndScroll(20, 21)
+    moveCaretWithoutScrolling(20)
+
+    typeText("A")
+    assertTopLogicalLine(20)
+    assertCaretScreenRow(5)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
+  @Test
+  fun `test append at bottom of screen keeps scrolloff rows when each line has a tall block inlay`() {
+    configureByLines(2000, "    I found it in a legendary land")
+    addNotebookOutputInlays(0..40, 15)
+    enterCommand("set scrolloff=5")
+    setPositionAndScroll(20, 21)
+    moveCaretWithoutScrolling(22)
+
+    typeText("A")
+    assertTopLogicalLine(21)
+    assertCaretScreenRow(29)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
+  @Test
+  fun `test setting scrolloff at top of screen keeps scrolloff rows when each line has a tall block inlay`() {
+    configureByLines(2000, "    I found it in a legendary land")
+    addNotebookOutputInlays(0..40, 15)
+    setPositionAndScroll(20, 20)
+
+    enterCommand("set scrolloff=5")
+    assertTopLogicalLine(20)
+    assertCaretScreenRow(5)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
+  @Test
+  fun `test setting scrolloff at bottom of screen keeps scrolloff rows when each line has a tall block inlay`() {
+    configureByLines(2000, "    I found it in a legendary land")
+    addNotebookOutputInlays(0..40, 15)
+    setPositionAndScroll(20, 22)
+
+    enterCommand("set scrolloff=5")
+    assertTopLogicalLine(21)
+    assertCaretScreenRow(29)
+  }
+
   // VIM-4329
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @Test
@@ -533,6 +589,28 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     typeText("Vc")
     assertPosition(60, 0)
     assertVisibleArea(43, 77)
+  }
+
+  private fun addNotebookOutputInlays(lines: IntRange, heightInRows: Int) {
+    for (line in lines) {
+      addBlockInlay(fixture.editor.vim.getOffset(line, 0), false, heightInRows)
+    }
+  }
+
+  // Like a mouse click, which doesn't scroll
+  private fun moveCaretWithoutScrolling(line: Int) {
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.caretModel.moveToOffset(fixture.editor.document.getLineStartOffset(line))
+    }
+  }
+
+  private fun assertCaretScreenRow(expected: Int) {
+    ApplicationManager.getApplication().invokeAndWait {
+      val editor = fixture.editor
+      val caretY = editor.visualLineToY(editor.caretModel.visualPosition.line)
+      val row = (caretY - EditorHelper.getVisibleArea(editor).y) / editor.lineHeight
+      assertEquals(expected, row, "Caret screen row doesn't match")
+    }
   }
 
   private fun assertCaretOnScreen() {
