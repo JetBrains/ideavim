@@ -542,6 +542,27 @@ abstract class IdeaVimStarterTestBase {
     return result
   }
 
+  // ── Clipboard helpers ───────────────────────────────────────
+
+  /** Puts [text] into the system clipboard of the frontend, as another application copying it would */
+  protected fun setSystemClipboard(text: String) {
+    driver.withContext(OnDispatcher.EDT) {
+      val selection = new(StringSelection::class, text, rdTarget = RdTarget.FRONTEND)
+      utility(Toolkit::class, RdTarget.FRONTEND).getDefaultToolkit().getSystemClipboard().setContents(selection, null)
+    }
+  }
+
+  /** Reads the text in the system clipboard of the frontend */
+  protected fun systemClipboardText(): String? {
+    var result: String? = null
+    driver.withContext(OnDispatcher.EDT) {
+      val flavor = new(DataFlavor::class, STRING_FLAVOR_MIME_TYPE, rdTarget = RdTarget.FRONTEND)
+      val clipboard = utility(Toolkit::class, RdTarget.FRONTEND).getDefaultToolkit().getSystemClipboard()
+      result = clipboard.getData(flavor) as? String
+    }
+    return result
+  }
+
   // ── Assertions ──────────────────────────────────────────────
 
   /** Asserts the editor contains the given text, polling until timeout. */
@@ -615,6 +636,7 @@ abstract class IdeaVimStarterTestBase {
   }
 
   companion object {
+    private const val STRING_FLAVOR_MIME_TYPE = "application/x-java-serialized-object; class=java.lang.String"
     private val SEARCH_COUNT = Regex("""\[[^/\]]+/[^/\]]+]""")
 
     // Inlined IdeInfo for IntelliJ IDEA Ultimate. Avoids the IdeProductProvider/IdeInfo.IdeaUltimate
@@ -642,3 +664,21 @@ abstract class IdeaVimStarterTestBase {
 interface LaterInvocator {
   fun isInModalContext(): Boolean
 }
+
+@Remote("java.awt.Toolkit")
+interface Toolkit {
+  fun getDefaultToolkit(): Toolkit
+  fun getSystemClipboard(): Clipboard
+}
+
+@Remote("java.awt.datatransfer.Clipboard")
+interface Clipboard {
+  fun setContents(contents: StringSelection, owner: Any?)
+  fun getData(flavor: DataFlavor): Any?
+}
+
+@Remote("java.awt.datatransfer.StringSelection")
+interface StringSelection
+
+@Remote("java.awt.datatransfer.DataFlavor")
+interface DataFlavor

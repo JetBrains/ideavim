@@ -58,6 +58,7 @@ import com.maddyhome.idea.vim.state.mode.isLine
 import com.maddyhome.idea.vim.undo.VimKeyBasedUndoService
 import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 import java.awt.datatransfer.DataFlavor
+import java.awt.datatransfer.Transferable
 
 internal class PutGroup : VimPutBase() {
 
@@ -181,45 +182,51 @@ internal class PutGroup : VimPutBase() {
   /**
    * ideaput - option that enables "smartness" of the insert operation. For example, it automatically
    *   inserts import statements, or converts Java code to kotlin.
-   * Unfortunately, at the moment, this functionality of "additional text processing" is bound to
-   *   paste operation. So here we do the trick, in order to insert text from the register with all the
-   *   brains from IJ, we put this text into the clipboard and perform a regular IJ paste.
-   * In order to do this properly, after the paste, we should remove the clipboard text from
-   *   the kill ring (stack of clipboard items)
-   * So, generally this function should look like this:
-   * ```
-   * setClipboardText(text)
-   * try {
-   *   performPaste()
-   * } finally {
-   *   removeTextFromClipboard()
-   * }
-   * ```
-   * And it was like this till some moment. However, if our text to paste matches the text that is already placed
-   *   in the clipboard, instead of putting new text on top of stack, it merges the text into the last stack item.
-   * So, all the other code in this function is created to detect such case and do not remove last clipboard item.
+   * This "additional text processing" is bound to the IDE paste, and the IDE paste reads the clipboard. So the
+   *   register text is put into the clipboard, the IDE paste is performed, and the clipboard is put back as it was:
+   * - Usually the register text becomes a new item on top of the clipboard history. Removing it brings the previous
+   *   content back to the top.
+   * - Sometimes the register text replaces the previous item instead, e.g. on a put from the + or * register. The
+   *   register text is removed then as well.
+   * - If the clipboard already holds the same text, the register text is merged into that item. The clipboard didn't
+   *   change, so nothing is removed: removing would lose the item of the user.
+   * - A clipboard without history, like the one of the frontend in split mode, can't remove anything. It still holds
+   *   the register text after the removal, so the previous content is set back.
    */
   private fun pasteKeepingClipboard(text: ProcessedTextData, doPaste: () -> Unit) {
-    val allContentsBefore = CopyPasteManager.getInstance().allContents
-    val sizeBeforeInsert = allContentsBefore.size
-    val firstItemBefore = allContentsBefore.firstOrNull()
-    logger.debug { "Copied text: ${text.copiedText}" }
-    val (textContent, transferableData) = text.copiedText as IjVimCopiedText
-    val origContent: TextBlockTransferable =
-      injector.clipboardManager.setClipboardText(textContent, textContent, transferableData) as TextBlockTransferable
-    val allContentsAfter = CopyPasteManager.getInstance().allContents
-    val sizeAfterInsert = allContentsAfter.size
+    val clipboard = CopyPasteManager.getInstance()
+    val previousContent = clipboard.allContents.firstOrNull()
+    val historySizeBefore = clipboard.allContents.size
+
+    val registerText = text.copiedText.text
+    val registerContent = putIntoClipboard(text.copiedText as IjVimCopiedText)
+
+    val registerAddedToHistory = clipboard.allContents.size != historySizeBefore
+    val registerReplacedOtherText = previousContent?.getText().let { it != null && it != registerText }
     try {
       doPaste()
     } finally {
-      val textInClipboard = (firstItemBefore as? TextBlockTransferable)
-        ?.getTransferData(DataFlavor.stringFlavor) as? String
-      val textOnTop = textInClipboard != null && textInClipboard != text.copiedText.text
-      if (sizeBeforeInsert != sizeAfterInsert || textOnTop) {
-        // Sometimes an inserted text replaces an existing one. E.g. on insert with + or * register
-        (CopyPasteManager.getInstance() as? CopyPasteManagerEx)?.run { removeContent(origContent) }
+      if (registerAddedToHistory || registerReplacedOtherText) {
+        (clipboard as? CopyPasteManagerEx)?.removeContent(registerContent)
+      }
+      if (previousContent != null && registerReplacedOtherText && clipboard.holdsText(registerText)) {
+        clipboard.setContents(previousContent)
       }
     }
+  }
+
+  private fun putIntoClipboard(copiedText: IjVimCopiedText): TextBlockTransferable {
+    logger.debug { "Copied text: $copiedText" }
+    val (text, transferableData) = copiedText
+    return injector.clipboardManager.setClipboardText(text, text, transferableData) as TextBlockTransferable
+  }
+
+  private fun CopyPasteManager.holdsText(text: String): Boolean = contents?.getText() == text
+
+  private fun Transferable.getText(): String? {
+    if (!isDataFlavorSupported(DataFlavor.stringFlavor)) return null
+    // The content of another application may be gone by now
+    return runCatching { getTransferData(DataFlavor.stringFlavor) as? String }.getOrNull()
   }
 
   override fun doIndent(
