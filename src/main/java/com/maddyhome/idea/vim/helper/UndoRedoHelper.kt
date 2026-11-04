@@ -8,12 +8,14 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.intellij.ide.impl.UndoRemoteBehaviorService
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.undo.UndoManager
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.impl.editorId
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.TextEditorWithPreview
 import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider
@@ -25,6 +27,8 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ChangesListener
 import com.maddyhome.idea.vim.common.InsertSequence
+import com.maddyhome.idea.vim.group.change.ChangeRemoteApi
+import com.maddyhome.idea.vim.group.rpc
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ij
@@ -42,6 +46,10 @@ class UndoRedoHelper : VimTimestampBasedUndoService {
 
   override fun undo(editor: VimEditor, context: ExecutionContext): Boolean {
     if (PlatformUtils.isJetBrainsClient()) {
+      if (!UndoRemoteBehaviorService.isSpeculativeUndoEnabled()) {
+        // The undo stack is on the backend (e.g. Rider). `$Undo` would spend a step on restoring the caret (VIM-4370)
+        return rpc(editor.ij.project) { ChangeRemoteApi.getInstance().undo(editor.ij.editorId()) }
+      }
       // Note: Remote Dev has special hacks for undo/redo, so we don't use the manager.
       // The action is sent directly to the backend using the internal API.
       return injector.actionExecutor.executeAction(editor, injector.actionExecutor.ACTION_UNDO, context)
@@ -122,6 +130,9 @@ class UndoRedoHelper : VimTimestampBasedUndoService {
 
   override fun redo(editor: VimEditor, context: ExecutionContext): Boolean {
     if (PlatformUtils.isJetBrainsClient()) {
+      if (!UndoRemoteBehaviorService.isSpeculativeUndoEnabled()) {
+        return rpc(editor.ij.project) { ChangeRemoteApi.getInstance().redo(editor.ij.editorId()) }
+      }
       return injector.actionExecutor.executeAction(editor, injector.actionExecutor.ACTION_REDO, context)
     }
 
