@@ -485,7 +485,8 @@ $                       As an operator motion, move to the end of the line,
                                                                         *<CR>*
 <CR>                    Move [count] lines downward, to the first non-blank
                         character. In a live template, jump to the next
-                        template variable.
+                        template variable. In the :actionlist window, execute
+                        the action on the line.
 
                                                                        *<Del>*
 <Del>                   Delete the character under the cursor into register

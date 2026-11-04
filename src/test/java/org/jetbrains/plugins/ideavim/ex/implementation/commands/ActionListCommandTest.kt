@@ -13,7 +13,7 @@ import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
-import com.maddyhome.idea.vim.api.VirtualBufferKind
+import com.maddyhome.idea.vim.vimscript.model.commands.ActionListBuffer
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.CmdwinKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -77,7 +77,7 @@ class ActionListCommandTest : VimTestCase() {
     typeText(commandToKeys("actionlist reformatcode"))
 
     val actionListFiles = FileEditorManager.getInstance(fixture.project).openFiles
-      .filter { it.getUserData(CmdwinKeys.KIND) == VirtualBufferKind.ActionList }
+      .filter { it.getUserData(CmdwinKeys.KIND) == ActionListBuffer }
     assertEquals(1, actionListFiles.size)
     val displayedLines = parseActionListOutput()
     assertTrue(displayedLines.size > 1)
@@ -119,7 +119,7 @@ class ActionListCommandTest : VimTestCase() {
   private fun actionListEditor(): Editor? {
     val fileEditorManager = FileEditorManager.getInstance(fixture.project)
     val file = fileEditorManager.openFiles
-      .firstOrNull { it.getUserData(CmdwinKeys.KIND) == VirtualBufferKind.ActionList }
+      .firstOrNull { it.getUserData(CmdwinKeys.KIND) == ActionListBuffer }
       ?: return null
     return fileEditorManager.getEditors(file).filterIsInstance<TextEditor>().firstOrNull()?.editor
   }

@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VirtualBufferKind
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.exExceptionMessage
@@ -38,9 +39,23 @@ internal data class HelpCommand(val range: Range, val modifier: CommandModifier,
   ): ExecutionResult {
     val subject = argument.trim()
     val line = if (subject.isEmpty()) 0 else HelpFile.findTag(subject) ?: throw exExceptionMessage("E149", subject)
-    injector.virtualBufferGroup.openHelp(context, editor, HelpFile.text, line)
+    val helpEditor = injector.virtualBufferGroup.open(context, editor, HelpBuffer, HelpFile.text, line)
+      ?: return ExecutionResult.Success
+    // `:help` shows the tag at the top of the window
+    injector.scroll.scrollCurrentLineToDisplayTop(helpEditor, line + 1, false)
     return ExecutionResult.Success
   }
+}
+
+/**
+ * The read-only window `:help` opens, see `:help help-buffer-options`.
+ *
+ * An already open help window is reused rather than opening another one.
+ */
+internal data object HelpBuffer : VirtualBufferKind() {
+  override val fileName: String = "ideavim.txt"
+  override val readOnly: Boolean = true
+  override val reuseOpen: Boolean = true
 }
 
 /**

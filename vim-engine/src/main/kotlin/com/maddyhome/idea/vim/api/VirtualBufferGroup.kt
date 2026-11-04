@@ -8,19 +8,19 @@
 package com.maddyhome.idea.vim.api
 
 /**
- * Manages IdeaVim's virtual buffers (the command-line / search history windows, the control-chars
- * editor, and the `inccommand=split` substitute preview) — light in-memory editors that are not
- * backed by a real file.
+ * Manages IdeaVim's virtual buffers — light in-memory editors that are not backed by a real file, such as the
+ * command-line window, the `:help` window or the quickfix window. How a buffer is shown is described by its
+ * [VirtualBufferKind].
  */
 interface VirtualBufferGroup {
 
   /**
    * Opens a virtual buffer of [kind] populated with [content].
    *
-   * Command-line / search history buffers and the control-chars editor refuse to open while another
-   * such buffer is already open, since these buffers cannot be nested (`:help cmdwin`). The
-   * substitute preview is transient and does not participate in that restriction.
+   * An [exclusive][VirtualBufferKind.exclusive] buffer refuses to open while another exclusive one is open. When
+   * [kind] [reuses][VirtualBufferKind.reuseOpen] an open buffer, the open one gets [content] and is moved to instead.
    *
+   * @param line when not null, the caret is put at the start of this line
    * @param focus when false, the buffer is shown without stealing focus (used by `inccommand=split`).
    * @return the editor hosting the opened buffer, or null if it wasn't opened or was opened without focus.
    */
@@ -29,6 +29,7 @@ interface VirtualBufferGroup {
     editor: VimEditor,
     kind: VirtualBufferKind,
     content: String,
+    line: Int? = null,
     focus: Boolean = true,
   ): VimEditor?
 
@@ -41,38 +42,12 @@ interface VirtualBufferGroup {
   /** Returns whether a virtual buffer of [kind] is currently open in the project associated with [context]. */
   fun isOpen(context: ExecutionContext, kind: VirtualBufferKind): Boolean
 
-  /** Replaces the content of an already-open virtual buffer of [kind] in place. */
-  fun refresh(context: ExecutionContext, kind: VirtualBufferKind, content: String)
-
   /**
-   * Shows [content] in the read-only help window, with the cursor at the start of [line], the way `:help` does.
+   * Replaces the content of an already-open virtual buffer of [kind] in place. Does nothing when it isn't open.
    *
-   * Like in Vim, an already open help window is reused rather than opening another one. It also doesn't take part in
-   * the nesting restriction of the other virtual buffers.
+   * @param line when not null, the caret is put at the start of this line in every editor of the buffer
    */
-  fun openHelp(context: ExecutionContext, editor: VimEditor, content: String, line: Int)
-
-  /**
-   * Shows [content] in the read-only quickfix window with the cursor at the start of [line], the way `:copen` does.
-   *
-   * An already open quickfix window is reused. It doesn't take part in the nesting restriction of the other virtual
-   * buffers.
-   */
-  fun openQuickFix(context: ExecutionContext, editor: VimEditor, content: String, line: Int)
-
-  /**
-   * Shows [content] in the read-only action list window with the cursor at its start, the way `:actionlist` does.
-   *
-   * An already open action list window is reused and gets the new [content]. It doesn't take part in the nesting
-   * restriction of the other virtual buffers.
-   */
-  fun openActionList(context: ExecutionContext, editor: VimEditor, content: String)
-
-  /**
-   * Replaces the content of the open quickfix window and puts its cursor at the start of [line].
-   * Does nothing when the window isn't open.
-   */
-  fun refreshQuickFix(context: ExecutionContext, content: String, line: Int)
+  fun refresh(context: ExecutionContext, kind: VirtualBufferKind, content: String, line: Int? = null)
 
   /**
    * Makes the window [buffer] was opened from the current one, so files open there rather than next to the buffer.
