@@ -34,6 +34,13 @@ usual beta standards.
 
 * [VIM-4346](https://youtrack.jetbrains.com/issue/VIM-4346) Fixed [`'incsearch'`](https://vimhelp.org/options.txt.html#%27incsearch%27) searching for the text typed into prompts that are not searches. Typing a tag name after `vt<St` in the `surround` extension no longer moves the caret or changes the Visual selection, and `<Esc>` in that prompt keeps the selection. The `<C-R>=` expression prompt in Insert mode no longer moves the caret either, and `<C-F>` there no longer opens the command-line window
 * Fixed [`'langmap'`](https://vimhelp.org/options.txt.html#%27langmap%27) being applied twice to keys typed after the start of a mapping that did not match. With `set langmap=ig,gE` and a mapping starting with `g`, typing `ii` now runs `gg` instead of `gE`
+* [VIM-4351](https://youtrack.jetbrains.com/issue/VIM-4351) Fixed [`<C-O>`](https://vimhelp.org/motion.txt.html#CTRL-O) opening the plain file instead of the diff editor the jump was made in. Jumps made in a diff tab, such as "Show Diff" or the diff preview of the Commit tool window, now return to that diff, including jumps made with the IDE's Go to Declaration. `<C-O>` to another file no longer reports an error
+* [VIM-4368](https://youtrack.jetbrains.com/issue/VIM-4368) Fixed the `surround` extension with [`:normal`](https://vimhelp.org/various.txt.html#%3Anormal) and in Visual block mode. `:1,3normal yss"` and `:1,3normal yss<b>` now surround each of the lines, and `S"` in Visual block mode surrounds the selection on every line of the block instead of only the last one
+* [VIM-4364](https://youtrack.jetbrains.com/issue/VIM-4364) Fixed an error when inserting a literal carriage return in Insert mode with `<C-V><CR>`, `<C-V><C-M>` or `<C-V>013`. It is now inserted as a line break
+* [VIM-4338](https://youtrack.jetbrains.com/issue/VIM-4338) Fixed [`.`](https://vimhelp.org/repeat.txt.html#.) repeating scrambled text after accepting a completion when several projects are open
+* [VIM-3968](https://youtrack.jetbrains.com/issue/VIM-3968) Fixed Rider actions that run on the backend, such as `ReformatCode` or `MoveElementRight` for C#, doing nothing when run with `:action` or an `<Action>` mapping
+* [VIM-2524](https://youtrack.jetbrains.com/issue/VIM-2524) [`cc`](https://vimhelp.org/change.txt.html#cc) and [`S`](https://vimhelp.org/change.txt.html#S) on an empty or blank line now indent it in C# files in Rider too
+* `o`, `O`, `<C-J>`, `<C-M>` and mappings ending in `<CR>` now break the line in the JetBrains AIR chat prompt instead of only moving the caret
 
 ### Merged PRs:
 * [2142](https://github.com/JetBrains/ideavim/pull/2142) by [1grzyb1](https://github.com/1grzyb1): VIM-2374 I and A move to begginig/end of multi selection
@@ -46,6 +53,11 @@ usual beta standards.
 * [2157](https://github.com/JetBrains/ideavim/pull/2157) by [1grzyb1](https://github.com/1grzyb1): VIM-4346 Fix surround tag
 * [2158](https://github.com/JetBrains/ideavim/pull/2158) by [1grzyb1](https://github.com/1grzyb1): VIM-4329 Fix k movement scrolling with so=9999
 * [2141](https://github.com/JetBrains/ideavim/pull/2141) by [citizenmatt](https://github.com/citizenmatt): Fix incorrect langmap when replaying failed map
+
+## 2.48.1, 2026-10-30
+
+### Fixes:
+* `<Enter>`, `<S-Enter>` and other keys bound to the chat prompt's actions are now passed to the JetBrains AIR chat, so messages can be sent and lines broken in Insert mode. Line numbers are no longer shown in the chat prompt
 
 ## 2.48.0, 2026-10-29
 
