@@ -125,6 +125,15 @@ class UiTests {
       testActionGenerate(javaEditor)
       testActionNewElementSamePlace(javaEditor)
       testActionCopy(javaEditor)
+
+      createFile(SCROLL_TEST_FILE, this@uiTest)
+      val scrollEditor = editor(SCROLL_TEST_FILE) {
+        step("Write a text") {
+          injectText(scrollTestText)
+        }
+      }
+      waitFor(Duration.ofMinutes(1)) { scrollEditor.text == scrollTestText }
+      testScrolling(scrollEditor)
     }
   }
 

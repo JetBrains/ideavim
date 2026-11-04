@@ -9,15 +9,19 @@
 package org.jetbrains.plugins.ideavim.option
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.util.ui.UIUtil
+import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
+import java.awt.event.InputEvent
 import java.awt.event.MouseWheelEvent
+import kotlin.math.roundToInt
 import kotlin.test.assertEquals
 
 /**
@@ -178,6 +182,64 @@ class IdeaScrollCursorOptionTest : VimTestCase() {
   }
 
   @Test
+  fun `test dragging horizontal scrollbar moves caret`() {
+    configureByColumns(200)
+    enterCommand("set ideascrollcursor")
+    enterCommand("set sidescrolloff=0")
+    dragHorizontalScrollBarTo(100)
+    assertPosition(0, 100)
+  }
+
+  @Test
+  fun `test mouse wheel with Ctrl does not move caret`() {
+    configureByPages(5)
+    enterCommand("set ideascrollcursor")
+    enterCommand("set scrolloff=0")
+    setPositionAndScroll(0, 0)
+    scrollWithMouseWheel(12, InputEvent.CTRL_DOWN_MASK)
+    assertPosition(0, 0)
+  }
+
+  @Test
+  fun `test mouse wheel with Cmd does not move caret`() {
+    configureByPages(5)
+    enterCommand("set ideascrollcursor")
+    enterCommand("set scrolloff=0")
+    setPositionAndScroll(0, 0)
+    scrollWithMouseWheel(12, InputEvent.META_DOWN_MASK)
+    assertPosition(0, 0)
+  }
+
+  @Test
+  fun `test mouse wheel does not move multiple carets`() {
+    configureByPages(5)
+    enterCommand("set ideascrollcursor")
+    enterCommand("set scrolloff=0")
+    setPositionAndScroll(0, 0)
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.caretModel.addCaret(VisualPosition(1, 0))
+    }
+    scrollWithMouseWheel(12)
+    assertTopLogicalLine(36)
+    ApplicationManager.getApplication().runReadAction {
+      val offsets = fixture.editor.caretModel.allCarets.map { it.offset }
+      assertEquals(listOf(0, fixture.editor.document.getLineStartOffset(1)), offsets)
+    }
+  }
+
+  @Test
+  fun `test mouse wheel does not move caret in Command-line mode`() {
+    configureByPages(5)
+    enterCommand("set ideascrollcursor")
+    enterCommand("set scrolloff=0")
+    setPositionAndScroll(0, 0)
+    typeText(":")
+    scrollWithMouseWheel(12)
+    typeText("<Esc>")
+    assertPosition(0, 0)
+  }
+
+  @Test
   fun `test programmatic scroll does not move caret`() {
     configureByPages(5)
     enterCommand("set ideascrollcursor")
@@ -204,7 +266,7 @@ class IdeaScrollCursorOptionTest : VimTestCase() {
   /**
    * Dispatches real mouse wheel events to the editor's scroll pane. Positive [notches] scroll down, negative up
    */
-  private fun scrollWithMouseWheel(notches: Int) {
+  private fun scrollWithMouseWheel(notches: Int, modifiers: Int = 0) {
     ApplicationManager.getApplication().invokeAndWait {
       val scrollPane = (fixture.editor as EditorEx).scrollPane
       val rotation = if (notches > 0) 1 else -1
@@ -213,7 +275,7 @@ class IdeaScrollCursorOptionTest : VimTestCase() {
           scrollPane,
           MouseWheelEvent.MOUSE_WHEEL,
           System.currentTimeMillis(),
-          0,
+          modifiers,
           10,
           10,
           0,
@@ -236,6 +298,16 @@ class IdeaScrollCursorOptionTest : VimTestCase() {
       val scrollBar = (fixture.editor as EditorEx).scrollPane.verticalScrollBar
       scrollBar.valueIsAdjusting = true
       scrollBar.value = topLogicalLine * fixture.editor.lineHeight
+      scrollBar.valueIsAdjusting = false
+      UIUtil.dispatchAllInvocationEvents()
+    }
+  }
+
+  private fun dragHorizontalScrollBarTo(leftColumn: Int) {
+    ApplicationManager.getApplication().invokeAndWait {
+      val scrollBar = (fixture.editor as EditorEx).scrollPane.horizontalScrollBar
+      scrollBar.valueIsAdjusting = true
+      scrollBar.value = (leftColumn * EditorHelper.getPlainSpaceWidthFloat(fixture.editor)).roundToInt()
       scrollBar.valueIsAdjusting = false
       UIUtil.dispatchAllInvocationEvents()
     }
