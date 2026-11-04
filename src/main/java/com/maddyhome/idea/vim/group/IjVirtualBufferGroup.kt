@@ -37,13 +37,23 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
     editor: VimEditor,
     kind: VirtualBufferKind,
     content: String,
+    line: Int?,
     focus: Boolean,
   ): VimEditor? {
-    if (kind != VirtualBufferKind.SubstitutePreview && refuseIfAlreadyOpen(context, editor)) return null
     val project = projectOf(context) ?: (editor as IjVimEditor).editor.project ?: return null
-    val file = createBufferFile(editor, kind, content)
-    showFile(project, file, kind, focus)
-    return if (focus) focusedEditorOf(project, file) else null
+    val openFile = if (kind.reuseOpen) findOpenFile(project, kind) else null
+    val file = if (openFile != null) {
+      replaceContent(openFile, kind, content)
+      openFile
+    } else {
+      if (kind.exclusive && refuseIfAlreadyOpen(context, editor)) return null
+      createBufferFile(editor, kind, content).also { showFile(project, it, kind, focus) }
+    }
+    if (!focus) return null
+
+    val bufferEditor = focusedEditorOf(project, file) ?: return null
+    line?.let { bufferEditor.primaryCaret().moveToOffset(bufferEditor.getLineStartOffset(it)) }
+    return bufferEditor
   }
 
   override fun close(editor: VimEditor) {
@@ -61,42 +71,14 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
   override fun isOpen(context: ExecutionContext, kind: VirtualBufferKind): Boolean =
     findOpenFile(projectOf(context), kind) != null
 
-  override fun refresh(context: ExecutionContext, kind: VirtualBufferKind, content: String) {
-    CommandProcessor.getInstance().runUndoTransparentAction {
-      ApplicationManager.getApplication().runWriteAction {
-        val project = projectOf(context) ?: return@runWriteAction
-        val file = findOpenFile(project, kind) ?: return@runWriteAction
-        val document = FileDocumentManager.getInstance().getDocument(file) ?: return@runWriteAction
-        if (!document.immutableCharSequence.contentEquals(content)) document.setText(content)
-      }
-    }
-  }
-
-  override fun openHelp(context: ExecutionContext, editor: VimEditor, content: String, line: Int) {
-    val helpEditor = openReadOnly(context, editor, VirtualBufferKind.Help, content, line) ?: return
-    // `:help` shows the tag at the top of the window
-    injector.scroll.scrollCurrentLineToDisplayTop(helpEditor, line + 1, false)
-  }
-
-  override fun openQuickFix(context: ExecutionContext, editor: VimEditor, content: String, line: Int) {
-    openReadOnly(context, editor, VirtualBufferKind.QuickFix, content, line)
-    refreshQuickFix(context, content, line)
-  }
-
-  override fun openActionList(context: ExecutionContext, editor: VimEditor, content: String) {
-    projectOf(context)?.let { project ->
-      findOpenFile(project, VirtualBufferKind.ActionList)?.let { replaceReadOnlyContent(it, content) }
-    }
-    openReadOnly(context, editor, VirtualBufferKind.ActionList, content, 0)
-  }
-
-  override fun refreshQuickFix(context: ExecutionContext, content: String, line: Int) {
+  override fun refresh(context: ExecutionContext, kind: VirtualBufferKind, content: String, line: Int?) {
     val project = projectOf(context) ?: return
-    val file = findOpenFile(project, VirtualBufferKind.QuickFix) ?: return
-    replaceReadOnlyContent(file, content)
+    val file = findOpenFile(project, kind) ?: return
+    replaceContent(file, kind, content)
+    line ?: return
     FileEditorManager.getInstance(project).getEditors(file).filterIsInstance<TextEditor>().forEach {
-      val quickFixEditor = it.editor.vim
-      quickFixEditor.primaryCaret().moveToOffset(quickFixEditor.getLineStartOffset(line))
+      val bufferEditor = it.editor.vim
+      bufferEditor.primaryCaret().moveToOffset(bufferEditor.getLineStartOffset(line))
     }
   }
 
@@ -112,69 +94,34 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
     return (window.selectedComposite?.selectedEditor as? TextEditor)?.editor?.vim
   }
 
-  private fun replaceReadOnlyContent(file: VirtualFile, content: String) {
+  private fun replaceContent(file: VirtualFile, kind: VirtualBufferKind, content: String) {
     val document = FileDocumentManager.getInstance().getDocument(file) ?: return
     if (document.immutableCharSequence.contentEquals(content)) return
     CommandProcessor.getInstance().runUndoTransparentAction {
       ApplicationManager.getApplication().runWriteAction {
-        document.setReadOnly(false)
+        if (kind.readOnly) document.setReadOnly(false)
         document.setText(content)
-        document.setReadOnly(true)
+        if (kind.readOnly) document.setReadOnly(true)
       }
     }
   }
 
   /**
-   * Moves to the window that already shows the buffer of [kind], or opens a read-only one with [content].
-   *
-   * @return the editor showing the buffer, with the caret at the start of [line]
-   */
-  private fun openReadOnly(
-    context: ExecutionContext,
-    editor: VimEditor,
-    kind: VirtualBufferKind,
-    content: String,
-    line: Int,
-  ): VimEditor? {
-    val project = projectOf(context) ?: (editor as IjVimEditor).editor.project ?: return null
-    val fem = FileEditorManagerEx.getInstanceEx(project)
-    val file = findOpenFile(project, kind)
-      ?: createBufferFile(editor, kind, content).apply { isWritable = false }
-        .also { openSplitFile(fem, it, focus = true) }
-
-    val bufferEditor = focusedEditorOf(project, file) ?: return null
-    bufferEditor.primaryCaret().moveToOffset(bufferEditor.getLineStartOffset(line))
-    return bufferEditor
-  }
-
-  /**
-   * Refuses to open a new virtual buffer while one is already open — they can't be nested
+   * Refuses to open a new exclusive virtual buffer while one is already open — they can't be nested
    * (`:help cmdwin`). Shows an error and returns true if the caller should abort.
    */
   private fun refuseIfAlreadyOpen(context: ExecutionContext, editor: VimEditor): Boolean {
-    val openKind = openVirtualBufferKind(context) ?: return false
-    injector.messages.showErrorMessage(editor, alreadyOpenMessage(openKind))
+    val openKind = openExclusiveKind(context) ?: return false
+    injector.messages.showErrorMessage(editor, openKind.alreadyOpenMessage)
     return true
   }
 
-  private fun alreadyOpenMessage(openKind: VirtualBufferKind): String = when (openKind) {
-    VirtualBufferKind.Command, is VirtualBufferKind.Search -> "E1292: Command-line window is already open"
-    VirtualBufferKind.ControlCharsEditor -> "A control characters editor is already open"
-    VirtualBufferKind.SubstitutePreview -> "A substitute preview is already open"
-    VirtualBufferKind.Help -> "A help window is already open"
-    VirtualBufferKind.QuickFix -> "A quickfix window is already open"
-    VirtualBufferKind.ActionList -> "An action list window is already open"
-  }
-
-  /** The kind of the currently open (nesting-restricted) virtual buffer, or null if none is open. */
-  private fun openVirtualBufferKind(context: ExecutionContext): VirtualBufferKind? {
+  /** The kind of the currently open exclusive virtual buffer, or null if none is open. */
+  private fun openExclusiveKind(context: ExecutionContext): VirtualBufferKind? {
     val project = projectOf(context) ?: return null
     return FileEditorManager.getInstance(project).openFiles
       .mapNotNull { it.getUserData(CmdwinKeys.KIND) }
-      // The inccommand=split preview is transient, the help, the quickfix and the action lists are regular read-only
-      // windows.
-      // None of them blocks cmdwin
-      .firstOrNull { it !in NON_BLOCKING_KINDS }
+      .firstOrNull { it.exclusive }
   }
 
   private fun findOpenFile(project: Project?, kind: VirtualBufferKind): VirtualFile? {
@@ -186,6 +133,7 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
   private fun createBufferFile(editor: VimEditor, kind: VirtualBufferKind, content: String): LightVirtualFile {
     val file = LightVirtualFile(kind.fileName, PlainTextFileType.INSTANCE, content)
     file.putUserData(CmdwinKeys.KIND, kind)
+    if (kind.readOnly) file.isWritable = false
     (editor as IjVimEditor).editor.virtualFile?.let { file.putUserData(CmdwinKeys.ORIGINAL_FILE, it) }
     return file
   }
@@ -193,7 +141,7 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
   private fun showFile(project: Project, file: LightVirtualFile, kind: VirtualBufferKind, focus: Boolean) {
     val fem = FileEditorManagerEx.getInstanceEx(project)
     openSplitFile(fem, file, focus)
-    if (kind == VirtualBufferKind.SubstitutePreview) {
+    if (kind.viewer) {
       fem.getEditors(file).filterIsInstance<TextEditor>()
         .forEach { (it.editor as? EditorEx)?.isViewer = true }
     }
@@ -237,13 +185,4 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
 
   private fun projectOf(context: ExecutionContext): Project? =
     PlatformDataKeys.PROJECT.getData((context as IjEditorExecutionContext).context)
-
-  private companion object {
-    val NON_BLOCKING_KINDS = setOf(
-      VirtualBufferKind.SubstitutePreview,
-      VirtualBufferKind.Help,
-      VirtualBufferKind.QuickFix,
-      VirtualBufferKind.ActionList,
-    )
-  }
 }
