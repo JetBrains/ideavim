@@ -308,13 +308,14 @@ class MotionLastScreenLineActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move caret to last line of screen with inlays and scrolloff`() {
-    // 35 high, with an inlay that is 10 rows high. Bottom line will be 25 (1 based), scrolloff of 10 puts caret at 15
+    // 35 high, with an inlay that is 10 rows high above line 21 (1 based). Bottom line will be 25 (1 based). The rows of
+    // the inlay count towards scrolloff, so 10 rows of scrolloff puts the caret at 20
     configureByLines(50, "    I found it in a legendary land")
     enterCommand("set scrolloff=10")
     addBlockInlay(IjVimEditor(fixture.editor).getOffset(20, 5), true, 10)
     setPositionAndScroll(0, 10, 10)
     typeText("L")
-    assertPosition(14, 4)
+    assertPosition(19, 4)
     assertBottomLogicalLine(24)
   }
 

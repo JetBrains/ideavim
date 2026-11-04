@@ -32,7 +32,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.CmdwinKeys
 import com.maddyhome.idea.vim.api.lineLength
 import com.maddyhome.idea.vim.api.normalizeOffset
-import com.maddyhome.idea.vim.api.normalizeVisualLine
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
@@ -46,7 +45,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.exitVisualMode
-import com.maddyhome.idea.vim.helper.getNormalizedScrollOffset
+import com.maddyhome.idea.vim.helper.keepVisualLineInScrollOffset
 import com.maddyhome.idea.vim.helper.getNormalizedSideScrollOffset
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.vimLastColumn
@@ -196,19 +195,12 @@ class MotionGroup : VimMotionGroupBase() {
     normalizeToScreen: Boolean,
   ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
     val vimEditor = editor.vim
-    val scrollOffset = if (normalizeToScreen) getNormalizedScrollOffset(editor) else 0
-    val maxVisualLine = vimEditor.getVisualLineCount()
-    val topVisualLine = EditorHelper.getVisualLineAtTopOfScreen(editor)
-    val topScrollOff = if (topVisualLine > 0) scrollOffset else 0
-    val bottomVisualLine = EditorHelper.getVisualLineAtBottomOfScreen(editor)
-    val bottomScrollOff = if (bottomVisualLine < maxVisualLine - 1) scrollOffset else 0
-    val topMaxVisualLine = if (normalizeToScreen) bottomVisualLine - bottomScrollOff else maxVisualLine
-    val bottomMinVisualLine = if (normalizeToScreen) topVisualLine + topScrollOff else 0
-    val targetVisualLine = when (screenLocation) {
-      ScreenLocation.TOP -> min(topVisualLine + max(topScrollOff, visualLineOffset), topMaxVisualLine)
+    val visualLine = when (screenLocation) {
+      ScreenLocation.TOP -> EditorHelper.getVisualLineAtTopOfScreen(editor) + visualLineOffset
       ScreenLocation.MIDDLE -> EditorHelper.getVisualLineAtMiddleOfScreen(editor)
-      ScreenLocation.BOTTOM -> max(bottomVisualLine - max(bottomScrollOff, visualLineOffset), bottomMinVisualLine)
-    }
+      ScreenLocation.BOTTOM -> EditorHelper.getVisualLineAtBottomOfScreen(editor) - visualLineOffset
+    }.coerceIn(0, vimEditor.getVisualLineCount() - 1)
+    val targetVisualLine = if (normalizeToScreen) keepVisualLineInScrollOffset(editor, visualLine) else visualLine
     val targetLogicalLine = vimEditor.visualLineToBufferLine(targetVisualLine)
     return moveCaretToLineWithStartOfLineOption(vimEditor, targetLogicalLine, caret.vim)
   }
@@ -322,18 +314,8 @@ class MotionGroup : VimMotionGroupBase() {
 
     fun moveCaretToView(editor: Editor) {
       val vimEditor: VimEditor = editor.vim
-      val scrollOffset = getNormalizedScrollOffset(editor)
-      val topVisualLine = EditorHelper.getVisualLineAtTopOfScreen(editor)
-      val bottomVisualLine = EditorHelper.getVisualLineAtBottomOfScreen(editor)
       val caretVisualLine = editor.caretModel.visualPosition.line
-      val lastVisualLine = vimEditor.getVisualLineCount() - 1
-      val newVisualLine = if (caretVisualLine < topVisualLine + scrollOffset) {
-        vimEditor.normalizeVisualLine(topVisualLine + scrollOffset)
-      } else if (bottomVisualLine < lastVisualLine && caretVisualLine > bottomVisualLine - scrollOffset) {
-        vimEditor.normalizeVisualLine(bottomVisualLine - scrollOffset)
-      } else {
-        caretVisualLine
-      }
+      val newVisualLine = keepVisualLineInScrollOffset(editor, caretVisualLine)
       val sideScrollOffset = getNormalizedSideScrollOffset(editor)
       val oldColumn = editor.caretModel.visualPosition.column
       var col = oldColumn
