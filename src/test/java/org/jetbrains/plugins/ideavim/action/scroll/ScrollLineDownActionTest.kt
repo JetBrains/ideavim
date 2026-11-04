@@ -76,7 +76,7 @@ class ScrollLineDownActionTest : VimTestCase() {
 
     // TODO: Enforce virtual space
     // Vim will put the caret on line 174, and put that line at the top of the screen
-    // See com.maddyhome.idea.vim.helper.EditorHelper.scrollVisualLineToTopOfScreen
+    // Without virtual space, IntelliJ can't scroll that far, see com.maddyhome.idea.vim.helper.EditorWindowLayout.offsetOf
     assertPosition(146, 0)
     assertVisibleArea(146, 175)
   }

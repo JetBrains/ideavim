@@ -12,10 +12,19 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.scroll.VerticalScroll
 
-fun getNormalizedScrollOffset(editor: Editor): Int {
-  val scrollOffset = injector.options(editor.vim).scrolloff
-  return EditorHelper.normalizeScrollOffset(editor, scrollOffset)
+/**
+ * Moves [visualLine] into the part of the screen that is at least 'scrolloff' rows from the top and the bottom, see
+ * [VerticalScroll.cursorCorrect]
+ */
+fun keepVisualLineInScrollOffset(
+  editor: Editor,
+  visualLine: Int,
+  scrollOffset: Int = injector.options(editor.vim).scrolloff,
+): Int {
+  val layout = EditorWindowLayout(editor)
+  return VerticalScroll.cursorCorrect(layout, layout.view, visualLine, scrollOffset)
 }
 
 fun getNormalizedSideScrollOffset(editor: Editor): Int {

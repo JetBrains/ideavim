@@ -82,10 +82,6 @@ object VerticalScroll {
   fun viewWithLineAtBottom(layout: WindowLayout, line: Int): WindowView =
     Window(layout, WindowView(0), 0).apply { setBottomLine(line) }.view
 
-  /** The view that shows [line] and the filler above it at the top of the window */
-  fun viewWithLineAtTop(layout: WindowLayout, line: Int): WindowView =
-    Window(layout, WindowView(line, layout.fillerRows(line)), 0).view
-
   /**
    * `CTRL-E` and `CTRL-Y`: scrolls [count] rows of filler or lines, up for a positive count and down for a negative one
    */

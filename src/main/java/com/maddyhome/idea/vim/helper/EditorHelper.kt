@@ -17,18 +17,12 @@ import com.intellij.openapi.editor.EditorKind
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.ex.util.EditorUtil
-import com.intellij.openapi.editor.impl.DocumentMarkupModel
-import com.intellij.openapi.editor.impl.EditorImpl
-import com.intellij.openapi.editor.impl.stickyLines.StickyLinesModel
-import com.intellij.openapi.editor.impl.stickyLines.VisualStickyLines
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileEditor.impl.EditorWindow
 import com.intellij.openapi.util.Key
-import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.UserDataHolder
-import com.intellij.openapi.util.registry.Registry
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.originalFileOrSelf
 import com.intellij.testFramework.LightVirtualFile
@@ -41,6 +35,9 @@ import com.maddyhome.idea.vim.common.IndentConfig
 import com.maddyhome.idea.vim.ide.ChatInputProvider
 import com.maddyhome.idea.vim.newapi.IjVimDocument
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.scroll.ScrollTarget
+import com.maddyhome.idea.vim.scroll.VerticalScroll
+import com.maddyhome.idea.vim.scroll.WindowView
 import java.awt.Font
 import java.awt.Point
 import java.awt.Rectangle
@@ -60,17 +57,7 @@ object EditorHelper {
   private const val AI_ASSISTANT_INPUT_EDITOR_KEY_NAME = "AI_ASSISTANT_INPUT_EDITOR"
   private const val AI_ASSISTANT_INPUT_FILE_NAME_PREFIX = "AIAssistantInput-"
 
-  // Set a max height on block inlays to be made visible at the top/bottom of a line when scrolling up/down. This
-  // mitigates the visible area bouncing around too much and even pushing the cursor line off screen with large
-  // multiline rendered doc comments, while still providing some visibility of the block inlay (e.g. Rider's single line
-  // Code Vision)
-  private const val BLOCK_INLAY_MAX_LINE_HEIGHT = 3
-
   private const val MAX_STICKY_LINES_ADJUSTMENTS = 3
-
-  // The platform hides the sticky lines panel this close to the top of the document, so a sticky line on the first
-  // line of the file doesn't stay stuck there for good (StickyLinesManager.visibleAreaChanged)
-  private const val MIN_SCROLL_OFFSET_WITH_STICKY_LINES = 3
 
   /**
    * The part of the editor that shows text: the viewport, minus the sticky lines panel at the top
@@ -78,7 +65,7 @@ object EditorHelper {
   @JvmStatic
   fun getVisibleArea(editor: Editor): Rectangle {
     val viewport = editor.viewport
-    val stickyLinesHeight = editor.stickyLinesHeight
+    val stickyLinesHeight = editor.stickyLinesHeightAt(viewport)
     if (stickyLinesHeight <= 0) return viewport
     val height = max(0, viewport.height - stickyLinesHeight)
     return Rectangle(viewport.x, viewport.y + stickyLinesHeight, viewport.width, height)
@@ -104,9 +91,8 @@ object EditorHelper {
   fun getNonNormalizedVisualLineAtBottomOfScreen(editor: Editor): Int {
     // The editor will return line numbers of virtual space if the text doesn't reach the end of the visible area
     // (either because it's too short, or it's been scrolled up)
-    val visibleArea = getVisibleArea(editor)
-    val height = visibleArea.height - getExEntryHeight() - getHorizontalScrollbarHeight(editor)
-    return getFullVisualLine(editor, visibleArea.y + height, visibleArea.y, visibleArea.y + height)
+    val layout = EditorWindowLayout(editor)
+    return getFullVisualLine(editor, layout.textAreaBottom, layout.textAreaTop, layout.textAreaBottom)
   }
 
   @JvmStatic
@@ -122,25 +108,6 @@ object EditorHelper {
     max(0, min(col, getVisualLineLength(editor, visualLine) - if (allowEnd) 0 else 1))
 
   /**
-   * Best efforts to ensure that scroll offset doesn't overlap itself.
-   *
-   * This is a sanity check that works fine if there are no visible block inlays. Otherwise, the screen height depends
-   * on what block inlays are currently visible in the target scroll area. Given a large enough scroll offset (or small
-   * enough screen), we can return a scroll offset that takes us over the half way point and causes scrolling issues -
-   * skipped lines, or unexpected movement.
-   *
-   * TODO: Investigate better ways of handling scroll offset
-   * Perhaps apply scroll offset after the move itself? Calculate a safe offset based on a target area?
-   *
-   * @param editor       The editor to use to normalize the scroll offset
-   * @param scrollOffset The value of the 'scrolloff' option
-   * @return The scroll offset value to use
-   */
-  @JvmStatic
-  fun normalizeScrollOffset(editor: Editor, scrollOffset: Int): Int =
-    min(scrollOffset, getApproximateScreenHeight(editor) / 2)
-
-  /**
    * Best efforts to ensure the side scroll offset doesn't overlap itself and remains a sensible value. Inline inlays
    * can cause this to work incorrectly.
    *
@@ -151,14 +118,6 @@ object EditorHelper {
   @JvmStatic
   fun normalizeSideScrollOffset(editor: Editor, sideScrollOffset: Int): Int =
     min(sideScrollOffset, getApproximateScreenWidth(editor) / 2)
-
-  /**
-   * Gets the number of lines than can be displayed on the screen at one time.
-   *
-   * Note that this value is only approximate and should be avoided whenever possible!
-   */
-  @JvmStatic
-  fun getApproximateScreenHeight(editor: Editor): Int = getVisibleArea(editor).height / editor.lineHeight
 
   /**
    * Gets the number of characters that are visible on a screen line, based on screen width and assuming a fixed width
@@ -225,20 +184,43 @@ object EditorHelper {
   }
 
   /**
+   * Scrolls the editor to show [view], below the sticky lines panel.
+   *
+   * The sticky lines panel shows the lines whose scopes start above the top of the screen, so its height changes when we
+   * scroll, and the top of the view can end up under the panel. We measure the panel for the position we scroll to, so
+   * we adjust straight away, rather than on the next keystroke. When [keepBottom] is true, the bottom of the window is what
+   * matters, and it doesn't move when the panel changes height, so we don't adjust.
+   *
+   * @return Returns true if the window was moved
+   */
+  fun scrollToView(editor: Editor, view: WindowView, keepBottom: Boolean = false): Boolean {
+    var scrolled = scrollVertically(editor, EditorWindowLayout(editor).offsetOf(view))
+    if (keepBottom) return scrolled
+    repeat(MAX_STICKY_LINES_ADJUSTMENTS) {
+      val layout = EditorWindowLayout(editor)
+      if (layout.isShown(view) || !scrollVertically(editor, layout.offsetOf(view))) return scrolled
+      scrolled = true
+    }
+    return scrolled
+  }
+
+  /** Scrolls the editor to show [target], see [VerticalScroll] */
+  fun scrollTo(editor: Editor, target: ScrollTarget, caretChangedLine: Boolean = false) {
+    when (target) {
+      is ScrollTarget.None -> {}
+      is ScrollTarget.Show -> scrollToView(editor, target.view, target.keepBottom)
+      is ScrollTarget.Centre -> scrollVisualLineToMiddleOfScreen(editor, target.line, target.atEnd, caretChangedLine)
+    }
+  }
+
+  /**
    * Scrolls the editor to put the given visual line at the top of the current window, below the sticky lines panel.
-   * Ensures that any block inlay elements above the given line are also visible.
    *
    * @return Returns true if the window was moved
    */
   @JvmStatic
-  fun scrollVisualLineToTopOfScreen(editor: Editor, visualLine: Int): Boolean {
-    val scrolled = scrollVertically(editor, editor.offsetToScrollVisualLineToTop(visualLine))
-    val adjusted = editor.scrollUntilStickyLinesSettle(
-      isInPlace = { !editor.isHiddenUnderStickyLines(visualLine) },
-      targetOffset = { editor.offsetToScrollVisualLineToTop(visualLine) },
-    )
-    return scrolled || adjusted
-  }
+  fun scrollVisualLineToTopOfScreen(editor: Editor, visualLine: Int): Boolean =
+    scrollToView(editor, WindowView(visualLine))
 
   /**
    * Scrolls the editor to place the given visual line in the middle of the current window, below the sticky lines
@@ -257,23 +239,20 @@ object EditorHelper {
     allowVirtualSpace: Boolean,
     caretChangedLine: Boolean = false,
   ) {
-    val lineY = editor.visualLineToY(IjVimEditor(editor).normalizeVisualLine(visualLine))
-    editor.scrollToClosestToCentre(lineY, allowVirtualSpace, caretChangedLine)
+    editor.scrollToClosestToCentre(IjVimEditor(editor).normalizeVisualLine(visualLine), allowVirtualSpace, caretChangedLine)
   }
 
   /**
    * Scrolls the editor to place the given visual line at the bottom of the screen.
-   *
-   * When we're moving the caret down a few lines and want to scroll to keep this visible, we need to be able to place
-   * a line at the bottom of the screen. Due to block inlays, we can't do this by specifying a top line to scroll to.
    *
    * @param nonNormalisedVisualLine The non-normalised visual line to place at the bottom of the current window. Might
    * be greater than visual line count to scroll to virtual space at the end of the file
    * @return True if the editor was scrolled
    */
   @JvmStatic
-  fun scrollVisualLineToBottomOfScreen(editor: Editor, nonNormalisedVisualLine: Int): Boolean =
-    scrollVertically(editor, editor.offsetToScrollVisualLineToBottom(nonNormalisedVisualLine))
+  fun scrollVisualLineToBottomOfScreen(editor: Editor, nonNormalisedVisualLine: Int): Boolean {
+    return scrollVertically(editor, EditorWindowLayout(editor).offsetToShowAtBottom(nonNormalisedVisualLine))
+  }
 
   /**
    * Scrolls the editor to put the given visual line at the current caret location, relative to the screen, as long as
@@ -305,7 +284,7 @@ object EditorHelper {
 
     // Scroll the given visual line to the caret location, but do not scroll down passed the end of file, or the current
     // virtual space at the bottom of the screen
-    val lastLineAtBottom = max(editor.offsetToScrollVisualLineToBottom(editor.lastVisualLine), visibleArea.y)
+    val lastLineAtBottom = max(EditorWindowLayout(editor).offsetToShowEndOfFile(), visibleArea.y)
     scrollVertically(editor, min(editor.visualLineToY(visualLine) - caretScreenOffset - inlayOffset, lastLineAtBottom))
   }
 
@@ -464,22 +443,6 @@ object EditorHelper {
   }
 
   /**
-   * Scrolls until the target position is reached, measuring the sticky lines panel again after each scroll.
-   *
-   * The panel shows the lines whose scopes start above the top of the screen, so scrolling changes its height, and
-   * anything positioned relative to the panel is then out of place. We measure the panel for the position we scroll to,
-   * so we adjust straight away, rather than on the next keystroke.
-   */
-  private fun Editor.scrollUntilStickyLinesSettle(isInPlace: () -> Boolean, targetOffset: () -> Int): Boolean {
-    var scrolled = false
-    repeat(MAX_STICKY_LINES_ADJUSTMENTS) {
-      if (isInPlace() || !scrollVertically(this, targetOffset())) return scrolled
-      scrolled = true
-    }
-    return scrolled
-  }
-
-  /**
    * Scrolls to the position that puts the line closest to the middle of the area below the sticky lines panel.
    *
    * The panel shows the scopes that start above the top of the screen, so the middle below it depends on where we
@@ -490,17 +453,17 @@ object EditorHelper {
    * Between two equally close positions, we keep the current one, so typing doesn't scroll back and forth, unless the
    * caret has moved to another line, which should scroll.
    */
-  private fun Editor.scrollToClosestToCentre(lineY: Int, allowVirtualSpace: Boolean, caretChangedLine: Boolean) {
+  private fun Editor.scrollToClosestToCentre(visualLine: Int, allowVirtualSpace: Boolean, caretChangedLine: Boolean) {
     var closestOffset = viewport.y
-    var closestDistance = distanceFromCentre(lineY, allowVirtualSpace)
+    var closestDistance = distanceFromCentre(visualLine, allowVirtualSpace)
     val triedOffsets = mutableSetOf(closestOffset)
 
     while (closestDistance > 0 && triedOffsets.size <= MAX_STICKY_LINES_ADJUSTMENTS) {
-      val targetOffset = offsetToCentre(lineY, allowVirtualSpace)
+      val targetOffset = offsetToCentre(visualLine, allowVirtualSpace)
       if (targetOffset in triedOffsets || !scrollVertically(this, targetOffset)) break
       triedOffsets += viewport.y
 
-      val distance = distanceFromCentre(lineY, allowVirtualSpace)
+      val distance = distanceFromCentre(visualLine, allowVirtualSpace)
       if (distance < closestDistance || distance == closestDistance && caretChangedLine) {
         closestOffset = viewport.y
         closestDistance = distance
@@ -510,99 +473,21 @@ object EditorHelper {
   }
 
   // How far we are from where we'd scroll to centre the line, with the sticky lines panel at the target position
-  private fun Editor.distanceFromCentre(lineY: Int, allowVirtualSpace: Boolean): Int =
-    abs(viewport.y - offsetToCentre(lineY, allowVirtualSpace))
+  private fun Editor.distanceFromCentre(visualLine: Int, allowVirtualSpace: Boolean): Int =
+    abs(viewport.y - offsetToCentre(visualLine, allowVirtualSpace))
 
-  private fun Editor.isHiddenUnderStickyLines(visualLine: Int): Boolean =
-    visualLineToY(visualLine) < getVisibleArea(this).y
-
-  private fun Editor.offsetToCentre(lineY: Int, allowVirtualSpace: Boolean): Int =
-    limitToLastLine(offsetToCentreIn(getVisibleArea(this).height, lineY) - stickyLinesHeight, allowVirtualSpace)
-
-  // Snaps the line to the nearest standard line height grid, which gives a good position for both an odd and even
-  // number of lines and mimics what Vim does
-  private fun Editor.offsetToCentreIn(areaHeight: Int, lineY: Int): Int =
-    lineY - (areaHeight - lineHeight) / lineHeight / 2 * lineHeight
-
-  private fun Editor.limitToLastLine(offset: Int, allowVirtualSpace: Boolean): Int =
-    if (allowVirtualSpace) offset else min(offset, offsetToScrollVisualLineToBottom(lastVisualLine))
-
-  private fun Editor.offsetToScrollVisualLineToTop(visualLine: Int): Int {
-    val inlayHeight = min(EditorUtil.getInlaysHeight(this, visualLine, true), BLOCK_INLAY_MAX_LINE_HEIGHT * lineHeight)
-    val y = visualLineToY(visualLine) - inlayHeight - stickyLinesHeight
-    if (settings.isAdditionalPageAtBottom) return y
-
-    // Don't try to scroll the editor to a location it can't reach. The editor will handle this, but when we ask for the
-    // target location to move the caret to match, we'll get the incorrect value.
-    // E.g. from line 100 of a 175 line, with line 100 at the top of screen, hit 100<C-E>. This should scroll line 175
-    // to the top of the screen. With virtual space enabled, this is fine. If it's not enabled, we end up scrolling line
-    // 146 to the top of the screen, but the caret thinks we're going to 175, and the caret is put in the wrong location
-    // (To complicate things, this issue doesn't show up when running headless for tests)
-    val virtualSpaceHeight = settings.additionalLinesCount * lineHeight
-    val yAfterLastLine = visualLineToY(IjVimEditor(this).lineCount())
-    return min(y, yAfterLastLine + virtualSpaceHeight - getVisibleArea(this).height)
-  }
-
-  // Note that we explicitly do not normalise the visual line, as we might be trying to scroll a virtual line, at the
-  // end of the file
-  private fun Editor.offsetToScrollVisualLineToBottom(nonNormalisedVisualLine: Int): Int {
-    // Sticky lines reduce the content area at the top, but the bottom of the window is still the bottom of the viewport
-    val screenHeight = viewport.height - getExEntryHeight() - getHorizontalScrollbarHeight(this)
-    val inlayHeight =
-      min(EditorUtil.getInlaysHeight(this, nonNormalisedVisualLine, false), BLOCK_INLAY_MAX_LINE_HEIGHT * lineHeight)
-    val y = visualLineToY(nonNormalisedVisualLine) + lineHeight + inlayHeight
-    return max(0, y - screenHeight)
+  private fun Editor.offsetToCentre(visualLine: Int, allowVirtualSpace: Boolean): Int {
+    val layout = EditorWindowLayout(this)
+    val offset = layout.offsetToCentre(visualLine)
+    // Without virtual space, only scroll far enough to put the end of the file at the bottom of the screen
+    return max(0, if (allowVirtualSpace) offset else min(offset, layout.offsetToShowEndOfFile()))
   }
 
   private val Editor.viewport: Rectangle
     get() = scrollingModel.visibleAreaOnScrollingFinished
 
-  /**
-   * The height of the sticky lines panel once the editor has finished scrolling to [viewport].
-   *
-   * We can't ask the panel. It follows the editor as it scrolls, and with animated scrolling that's after we've
-   * returned, so it would still give us the height for where we scrolled from. So we lay out the panel for the
-   * target position ourselves, with the same platform code the panel uses.
-   *
-   * That code is internal API. We use it without a fallback on purpose: if the platform changes it, the build breaks,
-   * rather than the scrolling quietly getting it wrong again.
-   */
-  private val Editor.stickyLinesHeight: Int
-    get() = if (isStickyLinesPanelShownAt(viewport)) layOutStickyLinesPanelAt(viewport) else 0
-
-  private fun Editor.isStickyLinesPanelShownAt(area: Rectangle): Boolean =
-    hasStickyLinesPanel && settings.areStickyLinesShown() && area.y >= MIN_SCROLL_OFFSET_WITH_STICKY_LINES
-
-  // Only these editors get a panel (EditorImpl.createStickyLinesPanel)
-  private val Editor.hasStickyLinesPanel: Boolean
-    get() = this is EditorImpl && project != null && editorKind == EditorKind.MAIN_EDITOR && !isMirrored
-
-  /** Lays out the sticky lines panel for the given visible area and returns its height */
-  private fun Editor.layOutStickyLinesPanelAt(area: Rectangle): Int {
-    val stickyLinesModel = StickyLinesModel.getModel(DocumentMarkupModel.forDocument(document, project, true))
-    val panel = VisualStickyLines(this, stickyLinesModel)
-    panel.recalculate(area) // Finds the scopes that start above the area
-    panel.lines(area) // Stacks them at the top of the area, which sets the height
-    return panel.height()
-  }
-
   private val Editor.lastVisualLine: Int
     get() = IjVimEditor(this).getVisualLineCount() - 1
-
-  private fun getExEntryHeight(): Int =
-    injector.commandLine.getActiveCommandLineHeight() ?: injector.outputPanel.getActiveOutputPanelHeight() ?: 0
-
-  private fun getHorizontalScrollbarHeight(editor: Editor): Int {
-    // Horizontal scrollbars on macOS are either transparent AND auto-hide, so we don't need to worry about obscured
-    // text, or always visible, opaque and outside the content area, so we don't need to adjust for them
-    // Transparent scrollbars on Windows and Linux are overlays on the editor content area, and always visible. That
-    // means they can obscure text, so we want to adjust by the scrollbar height. If they are not transparent, then they
-    // are not overlays and are outside the content area. We don't need to adjust
-    if (!SystemInfo.isMac && editor is EditorImpl && Registry.`is`("editor.transparent.scrollbar")) {
-      return editor.scrollPane.horizontalScrollBar.height
-    }
-    return 0
-  }
 
   private fun getFullVisualLine(editor: Editor, y: Int, topBound: Int, bottomBound: Int): Int {
     // Note that we ignore inlays here. We're interested in the bounds of the text line. Scrolling will handle inlays as
@@ -611,7 +496,7 @@ object EditorHelper {
     val yActual = editor.visualLineToY(line)
     return when {
       yActual < topBound -> line + 1
-      yActual + editor.lineHeight > bottomBound -> line - 1
+      editor.visualLineToYRange(line)[1] > bottomBound -> line - 1
       else -> line
     }
   }

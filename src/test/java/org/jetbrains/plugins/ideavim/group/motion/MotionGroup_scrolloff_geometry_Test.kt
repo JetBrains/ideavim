@@ -21,7 +21,6 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.awt.Graphics2D
 import java.awt.geom.Rectangle2D
@@ -111,7 +110,7 @@ abstract class ScrollGeometryTestCase : VimTestCase() {
     return offset
   }
 
-  private fun caretScreenRow(): Int {
+  protected fun caretScreenRow(): Int {
     var row = 0
     ApplicationManager.getApplication().invokeAndWait {
       val editor = fixture.editor
@@ -161,7 +160,6 @@ class MotionGroup_scrolloff_softWrap_Test : ScrollGeometryTestCase() {
     assertCaretScreenRow(5)
   }
 
-  @Disabled("Scrolling to the top limits the offset by the logical line count, as if it were the visual line count")
   @Test
   fun `test move up scrolls one row at a time with scrolloff in the second half of the file`() {
     configureByWrappedLines()
@@ -210,7 +208,6 @@ class MotionGroup_scrolloff_softWrap_Test : ScrollGeometryTestCase() {
     assertCaretScreenRow(0)
   }
 
-  @Disabled("Scrolling to the top limits the offset by the logical line count, as if it were the visual line count")
   @Test
   fun `test zt puts the line at the top`() {
     configureByWrappedLines()
@@ -237,7 +234,6 @@ class MotionGroup_scrolloff_softWrap_Test : ScrollGeometryTestCase() {
     assertCaretVisualLine(1)
   }
 
-  @Disabled("Scrolling to the top limits the offset by the logical line count, as if it were the visual line count")
   @Test
   fun `test CTRL-E scrolls down in the second half of the file`() {
     configureByWrappedLines()
@@ -248,7 +244,6 @@ class MotionGroup_scrolloff_softWrap_Test : ScrollGeometryTestCase() {
     assertTopVisualLine(131)
   }
 
-  @Disabled("Scrolling to the top limits the offset by the logical line count, as if it were the visual line count")
   @Test
   fun `test CTRL-F keeps scrolling down`() {
     configureByWrappedLines()
@@ -374,24 +369,20 @@ class MotionGroup_scrolloff_customFoldRegion_Test : ScrollGeometryTestCase() {
     addCustomFoldRegion(30, 34, 10)
   }
 
-  @VimBehaviorDiffers(description = "Vim counts the rows of the region, so it doesn't scroll while 5 rows are below")
   @Test
-  fun `test move down scrolls before reaching a tall custom fold region`() {
+  fun `test move down keeps scrolloff rows below a tall custom fold region`() {
     configureWithCustomFoldRegion()
     enterCommand("set scrolloff=5")
 
-    typeText("j".repeat(25))
+    // Line 29 is on row 29, and the top 5 rows of the region below it are on the screen
+    typeText("j".repeat(29))
     assertTopLogicalLine(0)
 
-    // The region is only 4 lines away, but there are still 8 rows below the caret
+    // The region is on rows 20 to 29, so there are 5 rows below it
     typeText("j")
-    assertPosition(26, 0)
-    assertTopLogicalLine(6)
-    assertCaretScreenRow(20)
-
-    typeText("j".repeat(4))
     assertPosition(30, 0)
     assertTopLogicalLine(10)
+    assertCaretScreenRow(20)
 
     typeText("j")
     assertPosition(35, 0)
@@ -419,7 +410,6 @@ class MotionGroup_scrolloff_customFoldRegion_Test : ScrollGeometryTestCase() {
     assertCaretScreenRow(0)
   }
 
-  @Disabled("Scrolling a line to the bottom assumes the line is one row high, so most of the region is below the screen")
   @Test
   fun `test zb puts the bottom of a custom fold region at the bottom`() {
     configureWithCustomFoldRegion()
@@ -427,13 +417,12 @@ class MotionGroup_scrolloff_customFoldRegion_Test : ScrollGeometryTestCase() {
     assertTopLogicalLine(5)
   }
 
-  @VimBehaviorDiffers(description = "Vim centres the rows of the region")
   @Test
-  fun `test zz puts the top of a custom fold region in the middle`() {
+  fun `test zz puts a custom fold region in the middle`() {
     configureWithCustomFoldRegion()
     typeText("31Gzz")
-    assertTopLogicalLine(13)
-    assertCaretScreenRow(17)
+    assertTopLogicalLine(18)
+    assertCaretScreenRow(12)
   }
 
   @Test
@@ -458,7 +447,6 @@ class MotionGroup_scrolloff_tallInlay_Test : ScrollGeometryTestCase() {
     addBlockInlay(fixture.editor.vim.getOffset(30, 0), false, 50)
   }
 
-  @Disabled("Moving down to two lines above the inlay scrolls the caret off the screen")
   @Test
   fun `test move down past an inlay taller than the screen keeps the caret on the screen`() {
     configureWithTallInlay()
@@ -471,7 +459,6 @@ class MotionGroup_scrolloff_tallInlay_Test : ScrollGeometryTestCase() {
     }
   }
 
-  @Disabled("Moving up to the line above the inlay puts that line at the top, and the inlay pushes the caret off the screen")
   @Test
   fun `test move up past an inlay taller than the screen keeps the caret on the screen`() {
     configureWithTallInlay()
@@ -484,6 +471,7 @@ class MotionGroup_scrolloff_tallInlay_Test : ScrollGeometryTestCase() {
     }
   }
 
+  // Moving up from below the inlay to the line above it leaves no room for the rows below that line, so it is centred
   @Test
   fun `test move up past an inlay taller than the screen after moving down past it`() {
     configureWithTallInlay()
@@ -497,7 +485,7 @@ class MotionGroup_scrolloff_tallInlay_Test : ScrollGeometryTestCase() {
       assertCaretOnScreen()
     }
     assertPosition(19, 0)
-    assertTopLogicalLine(16)
+    assertTopLogicalLine(12)
   }
 
   @Test
@@ -508,9 +496,10 @@ class MotionGroup_scrolloff_tallInlay_Test : ScrollGeometryTestCase() {
     assertTopLogicalLine(30)
     assertCaretScreenRow(0)
 
+    // The inlay below the line is shown at the bottom, as much of it as fits with the line on the screen
     typeText("zb")
-    assertTopLogicalLine(0)
-    assertCaretScreenRow(30)
+    assertTopLogicalLine(30)
+    assertCaretScreenRow(0)
 
     typeText("zz")
     assertTopLogicalLine(13)
@@ -518,7 +507,7 @@ class MotionGroup_scrolloff_tallInlay_Test : ScrollGeometryTestCase() {
   }
 
   @Test
-  fun `test CTRL-E scrolls over an inlay taller than the screen`() {
+  fun `test CTRL-E scrolls through an inlay taller than the screen one row at a time`() {
     configureWithTallInlay()
     typeText("30Gzt")
     assertTopLogicalLine(29)
@@ -526,10 +515,14 @@ class MotionGroup_scrolloff_tallInlay_Test : ScrollGeometryTestCase() {
     typeText("<C-E>")
     assertTopLogicalLine(30)
 
-    // The whole inlay is skipped, the next line is at the top
+    // The next line is at the bottom, below as much of the inlay as fits
     typeText("<C-E>")
     assertTopLogicalLine(31)
-    assertCaretScreenRow(0)
+    assertPosition(31, 0)
+    assertCaretScreenRow(34)
+
+    typeText("<C-E>")
+    assertCaretScreenRow(33)
   }
 
   // Line 30 is the last line on the screen, its inlay fills the rest
@@ -569,9 +562,8 @@ class MotionGroup_scrolloff_inlaysInMargin_Test : ScrollGeometryTestCase() {
     for (line in 10..12) addBlockInlay(fixture.editor.vim.getOffset(line, 0), true, 2)
   }
 
-  @VimBehaviorDiffers(description = "Vim counts inlay rows towards 'scrolloff', so it keeps exactly 3 rows below")
   @Test
-  fun `test move down keeps scrolloff lines below the caret including their inlays`() {
+  fun `test move down keeps scrolloff rows below the caret counting inlays`() {
     configureWithInlays()
     enterCommand("set scrolloff=3")
 
@@ -579,47 +571,31 @@ class MotionGroup_scrolloff_inlaysInMargin_Test : ScrollGeometryTestCase() {
     assertPosition(32, 0)
     assertCaretScreenRow(31)
 
-    // The 3 lines below the caret now have inlays below them, so they take more rows
-    typeText("j")
-    assertTopLogicalLine(10)
-    assertCaretScreenRow(29)
-
-    typeText("j")
-    assertCaretScreenRow(27)
-    typeText("j")
-    assertCaretScreenRow(25)
-    typeText("j")
-    assertCaretScreenRow(23)
-    typeText("j")
-    assertPosition(37, 0)
-    assertTopLogicalLine(16)
-    assertCaretScreenRow(23)
+    // From line 36, the rows below the caret include the inlays below the lines
+    repeat(10) {
+      typeText("j")
+      assertCaretScreenRow(31)
+    }
+    assertPosition(42, 0)
   }
 
-  @VimBehaviorDiffers(description = "Vim counts inlay rows towards 'scrolloff', so it keeps exactly 3 rows above")
   @Test
-  fun `test move up keeps scrolloff lines above the caret including their inlays`() {
+  fun `test move up keeps scrolloff rows above the caret counting inlays`() {
     configureWithInlays()
     enterCommand("set scrolloff=3")
     typeText("j".repeat(45))
     typeText("k".repeat(29))
     assertPosition(16, 0)
-    assertTopLogicalLine(13)
     assertCaretScreenRow(3)
 
-    typeText("k")
-    assertTopLogicalLine(12)
-    assertCaretScreenRow(5)
-    typeText("k")
-    assertTopLogicalLine(11)
-    assertCaretScreenRow(7)
-    typeText("k")
-    assertTopLogicalLine(10)
-    assertCaretScreenRow(9)
-    typeText("k")
-    assertPosition(12, 0)
-    assertTopLogicalLine(9)
-    assertCaretScreenRow(9)
+    // From line 12, the rows above the caret include the inlays above the lines. The whole inlay above the top line is
+    // shown, so there can be more rows than needed
+    repeat(13) {
+      typeText("k")
+      assertTrue(caretScreenRow() >= 3, "Fewer than 3 rows above the caret")
+    }
+    assertPosition(3, 0)
+    assertTopLogicalLine(0)
   }
 
   @Test
