@@ -17,7 +17,10 @@ import com.intellij.openapi.editor.EditorKind
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.ex.util.EditorUtil
+import com.intellij.openapi.editor.impl.DocumentMarkupModel
 import com.intellij.openapi.editor.impl.EditorImpl
+import com.intellij.openapi.editor.impl.stickyLines.StickyLinesModel
+import com.intellij.openapi.editor.impl.stickyLines.VisualStickyLines
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
@@ -64,6 +67,10 @@ object EditorHelper {
   private const val BLOCK_INLAY_MAX_LINE_HEIGHT = 3
 
   private const val MAX_STICKY_LINES_ADJUSTMENTS = 3
+
+  // The platform hides the sticky lines panel this close to the top of the document, so a sticky line on the first
+  // line of the file doesn't stay stuck there for good (StickyLinesManager.visibleAreaChanged)
+  private const val MIN_SCROLL_OFFSET_WITH_STICKY_LINES = 3
 
   /**
    * The part of the editor that shows text: the viewport, minus the sticky lines panel at the top
@@ -460,8 +467,8 @@ object EditorHelper {
    * Scrolls until the target position is reached, measuring the sticky lines panel again after each scroll.
    *
    * The panel shows the lines whose scopes start above the top of the screen, so scrolling changes its height, and
-   * anything positioned relative to the panel is then out of place. The panel is updated as soon as we scroll, so we
-   * adjust straight away, rather than on the next keystroke.
+   * anything positioned relative to the panel is then out of place. We measure the panel for the position we scroll to,
+   * so we adjust straight away, rather than on the next keystroke.
    */
   private fun Editor.scrollUntilStickyLinesSettle(isInPlace: () -> Boolean, targetOffset: () -> Int): Boolean {
     var scrolled = false
@@ -502,7 +509,7 @@ object EditorHelper {
     scrollVertically(this, closestOffset)
   }
 
-  // How far we are from where we'd scroll to centre the line, with the sticky lines panel at the current position
+  // How far we are from where we'd scroll to centre the line, with the sticky lines panel at the target position
   private fun Editor.distanceFromCentre(lineY: Int, allowVirtualSpace: Boolean): Int =
     abs(viewport.y - offsetToCentre(lineY, allowVirtualSpace))
 
@@ -550,8 +557,34 @@ object EditorHelper {
   private val Editor.viewport: Rectangle
     get() = scrollingModel.visibleAreaOnScrollingFinished
 
+  /**
+   * The height of the sticky lines panel once the editor has finished scrolling to [viewport].
+   *
+   * We can't ask the panel. It follows the editor as it scrolls, and with animated scrolling that's after we've
+   * returned, so it would still give us the height for where we scrolled from. So we lay out the panel for the
+   * target position ourselves, with the same platform code the panel uses.
+   *
+   * That code is internal API. We use it without a fallback on purpose: if the platform changes it, the build breaks,
+   * rather than the scrolling quietly getting it wrong again.
+   */
   private val Editor.stickyLinesHeight: Int
-    get() = (this as? EditorImpl)?.stickyLinesPanelHeight ?: 0
+    get() = if (isStickyLinesPanelShownAt(viewport)) layOutStickyLinesPanelAt(viewport) else 0
+
+  private fun Editor.isStickyLinesPanelShownAt(area: Rectangle): Boolean =
+    hasStickyLinesPanel && settings.areStickyLinesShown() && area.y >= MIN_SCROLL_OFFSET_WITH_STICKY_LINES
+
+  // Only these editors get a panel (EditorImpl.createStickyLinesPanel)
+  private val Editor.hasStickyLinesPanel: Boolean
+    get() = this is EditorImpl && project != null && editorKind == EditorKind.MAIN_EDITOR && !isMirrored
+
+  /** Lays out the sticky lines panel for the given visible area and returns its height */
+  private fun Editor.layOutStickyLinesPanelAt(area: Rectangle): Int {
+    val stickyLinesModel = StickyLinesModel.getModel(DocumentMarkupModel.forDocument(document, project, true))
+    val panel = VisualStickyLines(this, stickyLinesModel)
+    panel.recalculate(area) // Finds the scopes that start above the area
+    panel.lines(area) // Stacks them at the top of the area, which sets the height
+    return panel.height()
+  }
 
   private val Editor.lastVisualLine: Int
     get() = IjVimEditor(this).getVisualLineCount() - 1
