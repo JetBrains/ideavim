@@ -282,6 +282,12 @@ abstract class IdeaVimRiderTestBase {
 
   protected fun caretOffset(): Int = onEdt { getCaretModel().getOffset() }
 
+  /** The vertical scroll offset and the height of the sticky lines panel, in pixels */
+  protected fun verticalScroll(): Pair<Int, Int> = onEdt {
+    val editor = driver.cast(this, ScrollEditorRef::class)
+    editor.getScrollingModel().getVerticalScrollOffset() to editor.getStickyLinesPanelHeight()
+  }
+
   protected fun selectedText(): String? = onEdt {
     driver.cast(getSelectionModel(), SelectionModelRef::class).getSelectedText(false)
   }
@@ -409,6 +415,17 @@ interface SelectionModelRef {
   fun getSelectionStart(): Int
   fun getSelectionEnd(): Int
   fun getSelectedText(allCarets: Boolean): String?
+}
+
+@Remote("com.intellij.openapi.editor.Editor")
+interface ScrollEditorRef {
+  fun getScrollingModel(): ScrollingModelRef
+  fun getStickyLinesPanelHeight(): Int
+}
+
+@Remote("com.intellij.openapi.editor.ScrollingModel")
+interface ScrollingModelRef {
+  fun getVerticalScrollOffset(): Int
 }
 
 @Remote("com.intellij.openapi.ide.CopyPasteManager")
