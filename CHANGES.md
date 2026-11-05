@@ -29,11 +29,20 @@ usual beta standards.
 * [VIM-3113](https://youtrack.jetbrains.com/issue/VIM-3113) Added the `autoselect` flag of the [`'clipboard'`](https://vimhelp.org/options.txt.html#%27clipboard%27) option. It is on by default; `:set clipboard-=autoselect` stops Visual and mouse selections from being copied to the X11 PRIMARY selection (the `*` register)
 * [VIM-2200](https://youtrack.jetbrains.com/issue/VIM-2200) [`<C-F>`](https://vimhelp.org/cmdline.txt.html#c_CTRL-F) in the command line or in a `/` or `?` search now opens the [command-line window](https://vimhelp.org/cmdline.txt.html#cmdline-window) with the text typed so far as its last line, so a long command or pattern can be edited with Normal mode motions. Press `<CR>` on a line to run it
 * [VIM-2342](https://youtrack.jetbrains.com/issue/VIM-2342) New `fugitive` extension emulates the `:Ggrep` command of [vim-fugitive](https://github.com/tpope/vim-fugitive). Enable it with `Plug 'tpope/vim-fugitive'`. `:Ggrep foo` runs `git grep foo`, so only files tracked by Git are searched, and jumps to the first match. `:Ggrep!` collects the matches without jumping. The matches go to the [quickfix list](https://vimhelp.org/quickfix.txt.html), which can be walked with [`:cnext`](https://vimhelp.org/quickfix.txt.html#%3Acnext), `:cprevious`, `:cnfile`, `:cpfile`, `:cfirst` and `:clast`, and shown in a window with [`:copen`](https://vimhelp.org/quickfix.txt.html#%3Acopen), where `<CR>` jumps to a match, and closed with `:cclose`. See the [documentation](https://github.com/JetBrains/ideavim/blob/master/doc/IdeaVim%20Plugins.md)
+* [VIM-2527](https://youtrack.jetbrains.com/issue/VIM-2527) `:actionlist` now opens the list of actions in a read-only buffer, like `:help`, so it can be searched with `/` and navigated with the usual Normal mode motions. Pressing `<CR>` on a line runs that action in the window the list was opened from, and running `:actionlist` again reuses the open window
+* [VIM-4351](https://youtrack.jetbrains.com/issue/VIM-4351) [`<C-O>`](https://vimhelp.org/motion.txt.html#CTRL-O) now brings back the diff editor a jump was made in, instead of opening the plain file. This works for "Show Diff" tabs and for diff previews in the Commit tool window, VCS Log and Shelf, and also for places left with the IDE's Go to Declaration (`Cmd+B`/`Ctrl+B`). Jumping back to another file with `<C-O>` no longer reports an error
 
 ### Fixes:
 
 * [VIM-4346](https://youtrack.jetbrains.com/issue/VIM-4346) Fixed [`'incsearch'`](https://vimhelp.org/options.txt.html#%27incsearch%27) searching for the text typed into prompts that are not searches. Typing a tag name after `vt<St` in the `surround` extension no longer moves the caret or changes the Visual selection, and `<Esc>` in that prompt keeps the selection. The `<C-R>=` expression prompt in Insert mode no longer moves the caret either, and `<C-F>` there no longer opens the command-line window
 * Fixed [`'langmap'`](https://vimhelp.org/options.txt.html#%27langmap%27) being applied twice to keys typed after the start of a mapping that did not match. With `set langmap=ig,gE` and a mapping starting with `g`, typing `ii` now runs `gg` instead of `gE`
+* [VIM-4368](https://youtrack.jetbrains.com/issue/VIM-4368) Fixed the `surround` extension with [`:normal`](https://vimhelp.org/various.txt.html#%3Anormal): `:1,3normal yss"` now surrounds each of the three lines instead of waiting for a key to be typed, and `:1,3normal yss<b>` puts a tag around each line instead of three tags around the last one. `S` in Visual block mode now surrounds the selection on every line of the block, not only the last one
+* [VIM-2524](https://youtrack.jetbrains.com/issue/VIM-2524) [`cc`](https://vimhelp.org/change.txt.html#cc) and `S` on an empty or blank line now indent it to match the surrounding code in C# files in Rider too
+* [VIM-3968](https://youtrack.jetbrains.com/issue/VIM-3968) Fixed Rider actions that run on the backend, such as `ReformatCode` or `MoveElementRight` in C# files, doing nothing when run with `:action` or an `<Action>` mapping
+* [VIM-4336](https://youtrack.jetbrains.com/issue/VIM-4336) Fixed the caret going back to the commented line after commenting a line with the IDE shortcut in Rider
+* [VIM-4338](https://youtrack.jetbrains.com/issue/VIM-4338) Fixed [`.`](https://vimhelp.org/repeat.txt.html#.) repeating scrambled text after accepting a completion when more than one project is open
+* [VIM-4364](https://youtrack.jetbrains.com/issue/VIM-4364) Fixed inserting a literal carriage return with `<C-V><CR>`, `<C-V><C-M>` or `<C-V>013` in Insert mode throwing an exception. A line break is inserted instead
+* [VIM-4365](https://youtrack.jetbrains.com/issue/VIM-4365) In the JetBrains AIR chat prompt, `o` and `O` now open a new line, and `<C-J>`, `<C-M>` and mappings ending in `<CR>` break the line in Insert mode
 
 ### Merged PRs:
 * [2142](https://github.com/JetBrains/ideavim/pull/2142) by [1grzyb1](https://github.com/1grzyb1): VIM-2374 I and A move to begginig/end of multi selection
@@ -46,6 +55,13 @@ usual beta standards.
 * [2157](https://github.com/JetBrains/ideavim/pull/2157) by [1grzyb1](https://github.com/1grzyb1): VIM-4346 Fix surround tag
 * [2158](https://github.com/JetBrains/ideavim/pull/2158) by [1grzyb1](https://github.com/1grzyb1): VIM-4329 Fix k movement scrolling with so=9999
 * [2141](https://github.com/JetBrains/ideavim/pull/2141) by [citizenmatt](https://github.com/citizenmatt): Fix incorrect langmap when replaying failed map
+* [2171](https://github.com/JetBrains/ideavim/pull/2171) by [1grzyb1](https://github.com/1grzyb1): VIM-4364 Type carriage return as line break in Insert mode
+* [2174](https://github.com/JetBrains/ideavim/pull/2174) by [1grzyb1](https://github.com/1grzyb1): VIM-4365 Move AIR support into an optional ideavim-air module
+
+## 2.48.1, 2026-10-30
+
+### Fixes:
+* [VIM-4365](https://youtrack.jetbrains.com/issue/VIM-4365) Fixed `<Enter>` and `<S-Enter>` in the JetBrains AIR chat prompt. Keys bound to AIR's chat prompt actions, such as sending a message or breaking a line, are now handled by AIR, and the prompt no longer shows line numbers when `'number'` or `'relativenumber'` is set
 
 ## 2.48.0, 2026-10-29
 
