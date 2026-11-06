@@ -28,12 +28,22 @@ usual beta standards.
 ### Features:
 * [VIM-3113](https://youtrack.jetbrains.com/issue/VIM-3113) Added the `autoselect` flag of the [`'clipboard'`](https://vimhelp.org/options.txt.html#%27clipboard%27) option. It is on by default; `:set clipboard-=autoselect` stops Visual and mouse selections from being copied to the X11 PRIMARY selection (the `*` register)
 * [VIM-2200](https://youtrack.jetbrains.com/issue/VIM-2200) [`<C-F>`](https://vimhelp.org/cmdline.txt.html#c_CTRL-F) in the command line or in a `/` or `?` search now opens the [command-line window](https://vimhelp.org/cmdline.txt.html#cmdline-window) with the text typed so far as its last line, so a long command or pattern can be edited with Normal mode motions. Press `<CR>` on a line to run it
+* [VIM-2527](https://youtrack.jetbrains.com/issue/VIM-2527) `:actionlist` now opens the list of actions in a read-only buffer instead of the output panel, so it can be searched with `/` and navigated with the usual Normal mode motions. Press `<CR>` on a line to run that action in the editor the list was opened from
 * [VIM-2342](https://youtrack.jetbrains.com/issue/VIM-2342) New `fugitive` extension emulates the `:Ggrep` command of [vim-fugitive](https://github.com/tpope/vim-fugitive). Enable it with `Plug 'tpope/vim-fugitive'`. `:Ggrep foo` runs `git grep foo`, so only files tracked by Git are searched, and jumps to the first match. `:Ggrep!` collects the matches without jumping. The matches go to the [quickfix list](https://vimhelp.org/quickfix.txt.html), which can be walked with [`:cnext`](https://vimhelp.org/quickfix.txt.html#%3Acnext), `:cprevious`, `:cnfile`, `:cpfile`, `:cfirst` and `:clast`, and shown in a window with [`:copen`](https://vimhelp.org/quickfix.txt.html#%3Acopen), where `<CR>` jumps to a match, and closed with `:cclose`. See the [documentation](https://github.com/JetBrains/ideavim/blob/master/doc/IdeaVim%20Plugins.md)
 
 ### Fixes:
 
 * [VIM-4346](https://youtrack.jetbrains.com/issue/VIM-4346) Fixed [`'incsearch'`](https://vimhelp.org/options.txt.html#%27incsearch%27) searching for the text typed into prompts that are not searches. Typing a tag name after `vt<St` in the `surround` extension no longer moves the caret or changes the Visual selection, and `<Esc>` in that prompt keeps the selection. The `<C-R>=` expression prompt in Insert mode no longer moves the caret either, and `<C-F>` there no longer opens the command-line window
 * Fixed [`'langmap'`](https://vimhelp.org/options.txt.html#%27langmap%27) being applied twice to keys typed after the start of a mapping that did not match. With `set langmap=ig,gE` and a mapping starting with `g`, typing `ii` now runs `gg` instead of `gE`
+* [VIM-4351](https://youtrack.jetbrains.com/issue/VIM-4351) Fixed `<C-O>` opening the plain file instead of the diff tab the jump was made in. Jumping back now returns to the same side of the diff, also after Go to Declaration (`Cmd+B`/`Ctrl+B`) from a diff, and `<C-O>` to another file no longer reports an error
+* [VIM-4368](https://youtrack.jetbrains.com/issue/VIM-4368) Fixed the `surround` extension in [`:normal`](https://vimhelp.org/various.txt.html#%3Anormal): `:normal yss"` now surrounds the line instead of waiting for a key, and `:1,3normal yss<b>` puts a tag around each of the three lines. `S` in Visual block mode now surrounds every line of the block, not only the last one
+* [VIM-2524](https://youtrack.jetbrains.com/issue/VIM-2524) Fixed `cc` and `S` on an empty or blank line not indenting it in C# files in Rider
+* [VIM-4364](https://youtrack.jetbrains.com/issue/VIM-4364) Fixed an error when inserting a literal carriage return in Insert mode with `<C-V><CR>`, `<C-V><C-M>` or `<C-V>013`. It is now typed as a line break
+* [VIM-4338](https://youtrack.jetbrains.com/issue/VIM-4338) Fixed [`.`](https://vimhelp.org/repeat.txt.html#.) repeating scrambled text after a completion when several projects are open
+* [VIM-3968](https://youtrack.jetbrains.com/issue/VIM-3968) Fixed Rider backend actions, such as `MoveElementRight` or `ReformatCode` in C# files, being reported as disabled and not running from `:action` or `<Action>` mappings
+* [VIM-4329](https://youtrack.jetbrains.com/issue/VIM-4329) Fixed the editor jumping far away and losing the caret when editing a cell near the edge of the window in notebooks with tall cell outputs, with [`'scrolloff'`](https://vimhelp.org/options.txt.html#%27scrolloff%27) set
+* [VIM-4372](https://youtrack.jetbrains.com/issue/VIM-4372) Fixed the editor scrolling back and forth by a line on `h` and `l` with [`'scrolloff'`](https://vimhelp.org/options.txt.html#%27scrolloff%27), [sticky lines](https://www.jetbrains.com/help/idea/sticky-lines.html) and smooth scrolling enabled
+* [VIM-4365](https://youtrack.jetbrains.com/issue/VIM-4365) `o` and `O` now open a new line in the AI chat prompt (`:set ideaeditor+=chat`), and `<C-J>`, `<C-M>` and mappings ending in `<CR>` break the line there instead of doing nothing
 
 ### Merged PRs:
 * [2142](https://github.com/JetBrains/ideavim/pull/2142) by [1grzyb1](https://github.com/1grzyb1): VIM-2374 I and A move to begginig/end of multi selection
@@ -46,6 +56,23 @@ usual beta standards.
 * [2157](https://github.com/JetBrains/ideavim/pull/2157) by [1grzyb1](https://github.com/1grzyb1): VIM-4346 Fix surround tag
 * [2158](https://github.com/JetBrains/ideavim/pull/2158) by [1grzyb1](https://github.com/1grzyb1): VIM-4329 Fix k movement scrolling with so=9999
 * [2141](https://github.com/JetBrains/ideavim/pull/2141) by [citizenmatt](https://github.com/citizenmatt): Fix incorrect langmap when replaying failed map
+* [2167](https://github.com/JetBrains/ideavim/pull/2167) by [1grzyb1](https://github.com/1grzyb1): VIM-4338 fis dot scramble after autocomplete
+* [2171](https://github.com/JetBrains/ideavim/pull/2171) by [1grzyb1](https://github.com/1grzyb1): VIM-4364 Type carriage return as line break in Insert mode
+* [2172](https://github.com/JetBrains/ideavim/pull/2172) by [1grzyb1](https://github.com/1grzyb1): VIM-4365 Open a new line with o and O in the AIR prompt
+* [2174](https://github.com/JetBrains/ideavim/pull/2174) by [1grzyb1](https://github.com/1grzyb1): VIM-4365 Move AIR support into an optional ideavim-air module
+* [2175](https://github.com/JetBrains/ideavim/pull/2175) by [1grzyb1](https://github.com/1grzyb1): VIM-2524 Indent the line emptied by cc in Rider
+* [2176](https://github.com/JetBrains/ideavim/pull/2176) by [1grzyb1](https://github.com/1grzyb1): VIM-4368 Surround in :normal and on each line of a Visual block
+* [2180](https://github.com/JetBrains/ideavim/pull/2180) by [1grzyb1](https://github.com/1grzyb1): VIM-2527 Open :actionlist in a read-only buffer
+* [2181](https://github.com/JetBrains/ideavim/pull/2181) by [1grzyb1](https://github.com/1grzyb1): VIM-4329 Keep scrolloff in rows when block inlays take up most of the window
+* [2182](https://github.com/JetBrains/ideavim/pull/2182) by [1grzyb1](https://github.com/1grzyb1): VIM-4372 Measure the sticky lines panel at the position we scroll to
+
+## 2.48.1, 2026-10-30
+
+### Fixes:
+* [VIM-4365](https://youtrack.jetbrains.com/issue/VIM-4365) Fixed `<Enter>`, `<S-Enter>` and other keys bound to the AI chat's prompt actions not working in the AI chat prompt (`:set ideaeditor+=chat`). They are now passed to the chat, so `<Enter>` sends the message and `<S-Enter>` breaks the line. Line numbers are no longer shown in the chat prompt
+
+### Merged PRs:
+* [2168](https://github.com/JetBrains/ideavim/pull/2168) by [1grzyb1](https://github.com/1grzyb1): VIM-4365 Make IdeaVim with AIR more robust
 
 ## 2.48.0, 2026-10-29
 
