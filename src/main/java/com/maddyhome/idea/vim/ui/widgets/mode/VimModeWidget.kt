@@ -111,7 +111,6 @@ class VimModeWidget(val project: Project) : CustomStatusBarWidget, VimStatusBarW
   }
 
   private val label = JBLabelWiderThan(setOf(REPLACE), ::showPopup).apply {
-    isOpaque = true
     accessibleContext.accessibleName = "Vim Mode"
   }
 
@@ -164,6 +163,7 @@ class VimModeWidget(val project: Project) : CustomStatusBarWidget, VimStatusBarW
   private fun updateLabel(mode: Mode?) {
     val modeText = getModeText(mode)
     label.text = modeText
+    label.isOpaque = modeText != null
     label.foreground = getModeForeground(mode)
     label.background = getModeBackground(mode)
 
