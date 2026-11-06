@@ -137,11 +137,19 @@ class UiTests {
     }
   }
 
-  private fun closeUnrelated(sharedSteps: JavaExampleSteps) {
+  private fun RemoteRobot.closeUnrelated(sharedSteps: JavaExampleSteps) {
+    closeNewUiOnboarding()
     with(sharedSteps) {
       closeTipOfTheDay()
       closeAllTabs()
     }
+  }
+
+  // A fresh IDE offers a tour of the new UI, which covers the project view
+  private fun RemoteRobot.closeNewUiOnboarding() = step("Close the new UI onboarding if it appears") {
+    val skip = byXpath("//div[@text='Skip' and @class='ActionLink']")
+    runCatching { waitFor(Duration.ofSeconds(15)) { findAll<ComponentFixture>(skip).isNotEmpty() } }
+    findAll<ComponentFixture>(skip).firstOrNull()?.click()
   }
 
   private fun RemoteRobot.startNewProject() {

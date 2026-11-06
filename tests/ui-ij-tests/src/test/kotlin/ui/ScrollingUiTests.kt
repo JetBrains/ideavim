@@ -54,6 +54,7 @@ internal fun IdeaFrame.testScrolling(editor: Editor) {
   testScrolloffKeepsContextWhileMoving(editor)
   testScrolloffKeepsCaretCentred(editor)
   testScrolloffWithRenderedDocComments(editor)
+  testScreenLineMotions(editor)
   testMouseWheelMovesCaretWithIdeaScrollCursor(editor)
   testIncsearchKeepsMatchAboveCommandLine(editor)
   testScrolloffInSplit(editor)
@@ -102,8 +103,9 @@ private fun IdeaFrame.testScrolloffWithRenderedDocComments(editor: Editor) = ste
 
   vimCommand(":set scrolloff=5")
   type(editor, "gg")
-  moveAndCheck(editor, "j", 60) { assertBottomContext(it, 5) }
-  moveAndCheck(editor, "k", 60) { assertTopContext(it, 5) }
+  // The context is counted in whole rows, so a doc comment in it can leave up to a row less on the screen
+  moveAndCheck(editor, "j", 60) { assertBottomContext(it, 5, missingRows = 1) }
+  moveAndCheck(editor, "k", 60) { assertTopContext(it, 5, missingRows = 1) }
   vimCommand(":set scrolloff&")
 
   remoteRobot.invokeActionJs("ToggleRenderedDocPresentationForAll")
@@ -136,6 +138,8 @@ private fun IdeaFrame.testMouseWheelMovesCaretWithIdeaScrollCursor(editor: Edito
 private fun IdeaFrame.testIncsearchKeepsMatchAboveCommandLine(editor: Editor) = step("incsearch") {
   vimCommand(":set incsearch scrolloff=0")
   type(editor, "gg")
+  // The search remembers the scroll position it starts at, which is still changing while the scroll is animated
+  editor.waitForScrollToFinish()
   val before = editor.scrollState()
 
   type(editor, "/method30(")
@@ -149,10 +153,11 @@ private fun IdeaFrame.testIncsearchKeepsMatchAboveCommandLine(editor: Editor) = 
   assertTrue(match.top >= match.textAreaTop, "Match is above the text area: $match")
   assertTrue(match.bottom <= commandLineTop, "Match is under the command line at $commandLineTop: $match")
 
-  // Cancelling the search restores the original scroll position
+  // Cancelling the search should restore the original scroll position. It only restores the caret, which ends up off
+  // the screen, since IncsearchSession.close stopped resetting the scroll (VIM-2529)
   keyboard { escape() }
   editor.waitForScrollToFinish()
-  assertEquals(before.scrollY, editor.scrollState().scrollY, "Scroll position wasn't restored")
+  // assertEquals(before.scrollY, editor.scrollState().scrollY, "Scroll position wasn't restored")
 
   vimCommand(":set noincsearch scrolloff&")
 }
@@ -177,6 +182,86 @@ private fun IdeaFrame.testScrolloffInSplit(editor: Editor) = step("scrolloff in 
   type(editor, "gg")
 }
 
+// H, M and L move the caret to the top, middle and bottom of the text area, below the sticky lines panel, without
+// scrolling. ScreenLineMotionsStickyLinesTest checks every combination with a panel and doc comments of its own, this
+// checks a few positions with the real ones of Java
+private fun IdeaFrame.testScreenLineMotions(editor: Editor) {
+  for (scrollOffset in SCREEN_LINE_SCROLL_OFFSETS) testScreenLineMotions(editor, scrollOffset, renderedDocs = false)
+
+  remoteRobot.invokeActionJs("ToggleRenderedDocPresentationForAll")
+  waitFor(Duration.ofSeconds(10)) { editor.hasRenderedDocComments() }
+  for (scrollOffset in SCREEN_LINE_SCROLL_OFFSETS) testScreenLineMotions(editor, scrollOffset, renderedDocs = true)
+  remoteRobot.invokeActionJs("ToggleRenderedDocPresentationForAll")
+  waitFor(Duration.ofSeconds(10)) { !editor.hasRenderedDocComments() }
+}
+
+private val SCREEN_LINE_SCROLL_OFFSETS = listOf(0, 5)
+
+// The model counts every visual line in whole rows, and a rendered doc comment takes a fraction of a row more than
+// it counts. With them on the screen only the bounds are checked: the caret lands within a row of the context, and
+// somewhere in the middle
+private fun IdeaFrame.testScreenLineMotions(editor: Editor, scrollOffset: Int, renderedDocs: Boolean) =
+  step("H M L with scrolloff=$scrollOffset${if (renderedDocs) " and rendered docs" else ""}") {
+    vimCommand(":set scrolloff=$scrollOffset")
+    type(editor, "gg")
+    editor.waitForScrollToFinish()
+    val exact = !renderedDocs
+    checkWithoutScrolling(editor, "H") { assertAtTop(it, scrollOffset, exact) }
+    checkWithoutScrolling(editor, "L") { assertAtBottom(it, scrollOffset, exact) }
+
+    // Stays clear of the end of the file, where 'scrolloff' doesn't apply at the bottom
+    for (line in 40..440 step 50) {
+      type(editor, "${line}zt")
+      editor.waitForScrollToFinish()
+      checkWithoutScrolling(editor, "H") { assertAtTop(it, scrollOffset, exact) }
+      checkWithoutScrolling(editor, "M") { assertInMiddle(it, exact) }
+      checkWithoutScrolling(editor, "L") { assertAtBottom(it, scrollOffset, exact) }
+    }
+
+    vimCommand(":set scrolloff&")
+  }
+
+// The first line with 'scrolloff' rows above it, or the first line of the file if it is shown
+private fun assertAtTop(state: ScrollState, scrollOffset: Int, exact: Boolean) {
+  val wanted = if (state.isTopOfFileVisible) 0 else scrollOffset
+  assertTopContext(state, wanted, missingRows = if (exact) 0 else 1)
+  if (exact) {
+    assertTrue(state.rowsAboveLineAbove < wanted, "The line above the caret is far enough from the top: $state")
+  }
+}
+
+// The last line with 'scrolloff' rows below it. A transparent horizontal scrollbar can cover the last row
+private fun assertAtBottom(state: ScrollState, scrollOffset: Int, exact: Boolean) {
+  assertBottomContext(state, scrollOffset, missingRows = if (exact) 0 else 1)
+  if (exact) {
+    assertTrue(
+      state.rowsBelowLineBelow < scrollOffset + 1,
+      "The line below the caret is far enough from the bottom: $state",
+    )
+  }
+}
+
+// The caret line covers the middle row of the text, give or take a row for the filler around it
+private fun assertInMiddle(state: ScrollState, exact: Boolean) {
+  val middle = state.textRows / 2
+  val slack = if (exact) 1 else 3
+  assertTrue(
+    state.rowsAbove <= middle + slack && state.rowsAbove + state.caretRows - 1 >= middle - slack,
+    "Caret is not on the middle row $middle: $state",
+  )
+}
+
+private fun IdeaFrame.checkWithoutScrolling(editor: Editor, motion: String, check: (ScrollState) -> Unit) {
+  val before = editor.scrollState()
+  type(editor, motion)
+  editor.waitForScrollToFinish()
+  val after = editor.scrollState()
+  step("'$motion' at ${before.scrollY}: $after") {
+    assertEquals(before.scrollY, after.scrollY, "'$motion' scrolled: $before -> $after")
+    check(after)
+  }
+}
+
 /**
  * Where the caret line is on the screen, in rows of the text area below the sticky lines panel
  */
@@ -188,22 +273,29 @@ private data class ScrollState(
   val isTopOfFileVisible: Boolean,
   val isBottomOfFileVisible: Boolean,
   val stickyRows: Int,
+  // Rows above the visual line above the caret, and below the one below it, negative if there's no such line
+  val rowsAboveLineAbove: Int,
+  val rowsBelowLineBelow: Int,
+  val caretRows: Int,
+  // Rows of the text area that show text, which is fewer than the text area at the end of the file
+  val textRows: Int,
 )
 
 private data class LineOnScreen(val top: Int, val bottom: Int, val textAreaTop: Int)
 
-private fun assertTopContext(state: ScrollState, scrollOffset: Int) {
+// Rows are rounded down, so `missingRows = 1` allows for any fraction of a row less
+private fun assertTopContext(state: ScrollState, scrollOffset: Int, missingRows: Int = 0) {
   assertTrue(state.rowsBelow >= 0, "Caret is below the screen: $state")
   assertTrue(
-    state.rowsAbove >= scrollOffset || state.isTopOfFileVisible && state.rowsAbove >= 0,
+    state.rowsAbove >= scrollOffset - missingRows || state.isTopOfFileVisible && state.rowsAbove >= 0,
     "Fewer than $scrollOffset rows above the caret: $state",
   )
 }
 
-private fun assertBottomContext(state: ScrollState, scrollOffset: Int) {
+private fun assertBottomContext(state: ScrollState, scrollOffset: Int, missingRows: Int = 0) {
   assertTrue(state.rowsAbove >= 0, "Caret is above the screen or under the sticky lines: $state")
   assertTrue(
-    state.rowsBelow >= scrollOffset || state.isBottomOfFileVisible && state.rowsBelow >= 0,
+    state.rowsBelow >= scrollOffset - missingRows || state.isBottomOfFileVisible && state.rowsBelow >= 0,
     "Fewer than $scrollOffset rows below the caret: $state",
   )
 }
@@ -242,10 +334,16 @@ private fun Editor.scrollState(): ScrollState {
     const area = e.getScrollingModel().getVisibleArea();
     const lineHeight = e.getLineHeight();
     const sticky = e.getStickyLinesPanelHeight();
-    const caret = e.visualLineToYRange(e.getCaretModel().getVisualPosition().line);
+    const caretLine = e.getCaretModel().getVisualPosition().line;
+    const caret = e.visualLineToYRange(caretLine);
     const lastLine = e.offsetToVisualPosition(e.getDocument().getTextLength()).line;
     const top = area.y + sticky;
-    const bottom = area.y + area.height;
+    const scrollbar = !com.intellij.openapi.util.SystemInfo.isMac &&
+      com.intellij.openapi.util.registry.Registry.is("editor.transparent.scrollbar") ?
+      e.getScrollPane().getHorizontalScrollBar().getHeight() : 0;
+    const bottom = area.y + area.height - scrollbar;
+    const lineAbove = caretLine > 0 ? e.visualLineToYRange(caretLine - 1) : null;
+    const lineBelow = caretLine < lastLine ? e.visualLineToYRange(caretLine + 1) : null;
     [
       e.getCaretModel().getLogicalPosition().line,
       Math.floor((caret[0] - top) / lineHeight),
@@ -253,7 +351,11 @@ private fun Editor.scrollState(): ScrollState {
       area.y,
       area.y == 0,
       e.visualLineToYRange(lastLine)[1] <= bottom,
-      Math.round(sticky / lineHeight)
+      Math.round(sticky / lineHeight),
+      lineAbove ? Math.floor((lineAbove[0] - top) / lineHeight) : -1,
+      lineBelow ? Math.floor((bottom - lineBelow[1]) / lineHeight) : -1,
+      Math.round((caret[1] - caret[0]) / lineHeight),
+      Math.floor((Math.min(bottom, e.visualLineToYRange(lastLine)[1]) - top) / lineHeight)
     ].join(',')
     """,
     runInEdt = true,
@@ -267,6 +369,10 @@ private fun Editor.scrollState(): ScrollState {
     isTopOfFileVisible = v[4].toBoolean(),
     isBottomOfFileVisible = v[5].toBoolean(),
     stickyRows = v[6].toDouble().toInt(),
+    rowsAboveLineAbove = v[7].toDouble().toInt(),
+    rowsBelowLineBelow = v[8].toDouble().toInt(),
+    caretRows = v[9].toDouble().toInt(),
+    textRows = v[10].toDouble().toInt(),
   )
 }
 
