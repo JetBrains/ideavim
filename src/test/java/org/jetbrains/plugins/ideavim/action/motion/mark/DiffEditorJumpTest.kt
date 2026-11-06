@@ -39,11 +39,16 @@ import com.intellij.openapi.util.UserDataHolder
 import com.intellij.openapi.vcs.FilePath
 import com.intellij.openapi.vcs.FileStatus
 import com.intellij.openapi.vcs.changes.Change
-import com.intellij.openapi.vcs.changes.ChangeViewDiffRequestProcessor
+import com.intellij.openapi.vcs.changes.ChangeViewDiffRequestProcessor.ChangeWrapper
+import com.intellij.openapi.vcs.changes.ChangeViewDiffRequestProcessor.Wrapper
 import com.intellij.openapi.vcs.changes.ChangesUtil
 import com.intellij.openapi.vcs.changes.CurrentContentRevision
 import com.intellij.openapi.vcs.changes.SimpleContentRevision
 import com.intellij.openapi.vcs.changes.ui.ChangeDiffRequestChain
+import com.intellij.openapi.vcs.changes.ui.ChangesTree
+import com.intellij.openapi.vcs.changes.ui.ChangesTreeDiffPreviewHandler
+import com.intellij.openapi.vcs.changes.ui.ChangesTreeImpl
+import com.intellij.openapi.vcs.changes.ui.TreeHandlerDiffRequestProcessor
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.vcsUtil.VcsUtil
 import com.maddyhome.idea.vim.api.injector
@@ -580,21 +585,30 @@ class DiffEditorJumpTest : VimSplitWindowTestCase() {
   }
 
   /** Stands in for the tree of changes: one change is selected, and the preview shows it */
-  private open inner class ChangesPreviewProcessor(private val changes: List<Change>) :
-    ChangeViewDiffRequestProcessor(fixture.project, "IdeaVim") {
+  private class FakeTreeHandler(private val changes: List<Change>) : ChangesTreeDiffPreviewHandler() {
     var selectedPath: String = ChangesUtil.getFilePath(changes.first()).path
+
+    override fun iterateSelectedChanges(tree: ChangesTree): Iterable<Wrapper> =
+      changes.filter { ChangesUtil.getFilePath(it).path == selectedPath }.map { ChangeWrapper(it) }
+
+    override fun iterateAllChanges(tree: ChangesTree): Iterable<Wrapper> = changes.map { ChangeWrapper(it) }
+
+    override fun selectChange(tree: ChangesTree, change: Wrapper) {
+      selectedPath = change.filePath.path
+    }
+  }
+
+  /** A preview that follows the selection in a tree of changes, such as the one of the Commit tool window */
+  private open inner class ChangesPreviewProcessor(changes: List<Change>) :
+    TreeHandlerDiffRequestProcessor("IdeaVim", ChangesTreeImpl.Changes(fixture.project, false, false), FakeTreeHandler(changes)) {
+    var selectedPath: String
+      get() = (handler as FakeTreeHandler).selectedPath
+      set(value) {
+        (handler as FakeTreeHandler).selectedPath = value
+      }
 
     init {
       refresh(false)
-    }
-
-    override fun iterateSelectedChanges(): Iterable<Wrapper> =
-      changes.filter { ChangesUtil.getFilePath(it).path == selectedPath }.map { ChangeWrapper(it) }
-
-    override fun iterateAllChanges(): Iterable<Wrapper> = changes.map { ChangeWrapper(it) }
-
-    override fun selectChange(change: Wrapper) {
-      selectedPath = change.filePath.path
     }
   }
 
