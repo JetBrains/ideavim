@@ -13,13 +13,14 @@ import com.intellij.diff.impl.DiffRequestProcessor
 import com.intellij.openapi.vcs.FilePath
 import com.intellij.openapi.vcs.changes.ChangeViewDiffRequestProcessor
 import com.intellij.openapi.vcs.changes.ui.PresentableChange
+import com.intellij.openapi.vcs.changes.ui.TreeHandlerDiffRequestProcessor
 import com.maddyhome.idea.vim.group.diff.DiffTabFiles
 import com.maddyhome.idea.vim.group.diff.DiffTabFilesProvider
 import java.lang.reflect.Method
 
 internal class VcsDiffTabFilesProvider : DiffTabFilesProvider {
   override fun filesOf(processor: DiffRequestProcessor): DiffTabFiles? = when (processor) {
-    is ChangeViewDiffRequestProcessor -> ChangesViewFiles(processor)
+    is TreeHandlerDiffRequestProcessor -> ChangesViewFiles(processor)
     is CacheDiffRequestChainProcessor -> ChangesChainFiles.of(processor)
     else -> null
   }
@@ -57,8 +58,11 @@ private class ChangesChainFiles(private val processor: CacheDiffRequestChainProc
  * Switching the file also selects it in the tree, so the preview keeps it when the tree refreshes. Only 2026.3 and later
  * can do that from outside the tree, with `showChange(FilePath)` (IJPL-248190). On older versions only the preview
  * switches, and it goes back to the file selected in the tree on the next refresh.
+ *
+ * Takes [TreeHandlerDiffRequestProcessor] rather than any [ChangeViewDiffRequestProcessor]: its `iterateAllChanges()`
+ * is public on every version, while the one of the base class is protected since 2026.3.
  */
-private class ChangesViewFiles(private val processor: ChangeViewDiffRequestProcessor) : DiffTabFiles {
+private class ChangesViewFiles(private val processor: TreeHandlerDiffRequestProcessor) : DiffTabFiles {
   override fun canShow(path: String): Boolean = changeOf(path) != null
 
   override fun show(path: String): Boolean {
