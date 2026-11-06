@@ -14,10 +14,52 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
+import java.awt.image.BufferedImage
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
 class VimShowModeTest : VimTestCase() {
+  @Test
+  fun `test widget paints no background without a text editor`() {
+    val widget = VimModeWidget(fixture.project)
+
+    val image = paintWidget(widget)
+
+    assertTrue(image.getRGB(0, 0, image.width, image.height, null, 0, image.width).all { it ushr 24 == 0 })
+  }
+
+  @Test
+  fun `test widget clears and restores its background when switching editors`() {
+    configureByText("Lorem ipsum")
+    val widget = VimModeWidget(fixture.project)
+    val component = widget.getComponent()
+
+    widget.updateWidget(fixture.editor.vim.mode)
+    assertEquals(component.background.rgb, paintWidget(widget).getRGB(0, 0))
+
+    widget.updateWidget(null)
+    val image = paintWidget(widget)
+    assertTrue(image.getRGB(0, 0, image.width, image.height, null, 0, image.width).all { it ushr 24 == 0 })
+
+    typeText("i")
+    widget.updateWidget(fixture.editor.vim.mode)
+    assertEquals(component.background.rgb, paintWidget(widget).getRGB(0, 0))
+  }
+
+  private fun paintWidget(widget: VimModeWidget): BufferedImage {
+    val component = widget.getComponent()
+    component.setSize(120, 24)
+    val image = BufferedImage(component.width, component.height, BufferedImage.TYPE_INT_ARGB)
+    val graphics = image.createGraphics()
+    try {
+      component.paint(graphics)
+    } finally {
+      graphics.dispose()
+    }
+    return image
+  }
+
   @Test
   fun `test status string in normal`() {
     configureByText("123")
