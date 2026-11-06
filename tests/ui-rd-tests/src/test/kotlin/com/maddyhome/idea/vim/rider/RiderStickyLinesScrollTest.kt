@@ -10,7 +10,8 @@ package com.maddyhome.idea.vim.rider
 
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 /**
  * Scrolling with 'scrolloff' and the sticky lines panel. In Rider, the sticky lines of C# come from the ReSharper
@@ -23,11 +24,12 @@ class RiderStickyLinesScrollTest : IdeaVimRiderTestBase() {
     esc()
   }
 
-  // VIM-4372. A smaller scrolloff, e.g. 20 in a window of about 40 lines, still scrolls once on the first motion after
-  // a 'j', as the panel it shows takes the window below twice the scrolloff, and that switches to centring (VIM-4329)
-  @Test
-  fun `moving left and right does not scroll with sticky lines`() {
-    exCommand("set scrolloff=999")
+  // VIM-4372. A scrolloff of 20 in a window of about 40 lines switches to centring when the panel takes the window
+  // below twice the scrolloff
+  @ParameterizedTest
+  @ValueSource(ints = [20, 999])
+  fun `moving left and right does not scroll with sticky lines`(scrollOffset: Int) {
+    exCommand("set scrolloff=$scrollOffset")
     setText(TEXT)
     typeVim("gg")
 
