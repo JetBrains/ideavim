@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.api.VimActionExecutor
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.group.closeBackendUndoStep
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.ide.isRider
 import com.maddyhome.idea.vim.newapi.IjNativeAction
@@ -178,6 +179,7 @@ class IjActionExecutor : VimActionExecutor {
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ) {
+    closeBackendUndoStep(editor)
     if (cmd.executesNestedCommands) {
       // Macro-like actions replay keystrokes that must each form their own undoable command, so they must not run
       // inside an outer command. See [EditorActionHandlerBase.executesNestedCommands].

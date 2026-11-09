@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.helper
 
-import com.intellij.ide.impl.UndoRemoteBehaviorService
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.command.CommandProcessor
@@ -19,7 +18,6 @@ import com.intellij.openapi.editor.impl.editorId
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.TextEditorWithPreview
 import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider
-import com.intellij.openapi.util.registry.Registry
 import com.intellij.util.PlatformUtils
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
@@ -28,6 +26,8 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ChangesListener
 import com.maddyhome.idea.vim.common.InsertSequence
 import com.maddyhome.idea.vim.group.change.ChangeRemoteApi
+import com.maddyhome.idea.vim.group.change.withTransparentCaretMovement
+import com.maddyhome.idea.vim.group.isUndoStackOnBackend
 import com.maddyhome.idea.vim.group.rpc
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.globalIjOptions
@@ -45,11 +45,12 @@ class UndoRedoHelper : VimTimestampBasedUndoService {
   }
 
   override fun undo(editor: VimEditor, context: ExecutionContext): Boolean {
+    if (isUndoStackOnBackend()) {
+      // `$Undo` would spend a step on restoring the caret (VIM-4370). Editors the backend doesn't know, e.g. in dialogs,
+      // still go through `$Undo`
+      rpc(editor.ij.project) { ChangeRemoteApi.getInstance().undo(editor.ij.editorId()) }?.let { return it }
+    }
     if (PlatformUtils.isJetBrainsClient()) {
-      if (!UndoRemoteBehaviorService.isSpeculativeUndoEnabled()) {
-        // The undo stack is on the backend (e.g. Rider). `$Undo` would spend a step on restoring the caret (VIM-4370)
-        return rpc(editor.ij.project) { ChangeRemoteApi.getInstance().undo(editor.ij.editorId()) }
-      }
       // Note: Remote Dev has special hacks for undo/redo, so we don't use the manager.
       // The action is sent directly to the backend using the internal API.
       return injector.actionExecutor.executeAction(editor, injector.actionExecutor.ACTION_UNDO, context)
@@ -104,7 +105,7 @@ class UndoRedoHelper : VimTimestampBasedUndoService {
         removeSelections(editor)
       }
     } else {
-      runWithBooleanRegistryOption("ide.undo.transparent.caret.movement", true) {
+      withTransparentCaretMovement {
         var nextUndoNanoTime = undoManager.getNextUndoNanoTime(fileEditor)
         val insertInfo = (editor.primaryCaret() as IjVimCaret).getInsertSequenceForTime(nextUndoNanoTime)
         if (insertInfo == null || undoManager.isNextUndoAskConfirmation(fileEditor)) {
@@ -129,10 +130,10 @@ class UndoRedoHelper : VimTimestampBasedUndoService {
   }
 
   override fun redo(editor: VimEditor, context: ExecutionContext): Boolean {
+    if (isUndoStackOnBackend()) {
+      rpc(editor.ij.project) { ChangeRemoteApi.getInstance().redo(editor.ij.editorId()) }?.let { return it }
+    }
     if (PlatformUtils.isJetBrainsClient()) {
-      if (!UndoRemoteBehaviorService.isSpeculativeUndoEnabled()) {
-        return rpc(editor.ij.project) { ChangeRemoteApi.getInstance().redo(editor.ij.editorId()) }
-      }
       return injector.actionExecutor.executeAction(editor, injector.actionExecutor.ACTION_REDO, context)
     }
 
@@ -188,7 +189,7 @@ class UndoRedoHelper : VimTimestampBasedUndoService {
         removeSelections(editor)
       }
     } else {
-      runWithBooleanRegistryOption("ide.undo.transparent.caret.movement", true) {
+      withTransparentCaretMovement {
         var nextRedoNanoTime = undoManager.getNextRedoNanoTime(fileEditor)
         val insertInfo = (editor.primaryCaret() as IjVimCaret).getInsertSequenceForTime(nextRedoNanoTime)
         if (insertInfo == null || undoManager.isNextRedoAskConfirmation(fileEditor)) {
@@ -236,17 +237,6 @@ class UndoRedoHelper : VimTimestampBasedUndoService {
       val selectionStart = ijCaret.selectionStart
       ijCaret.removeSelection()
       ijCaret.moveToOffset(selectionStart)
-    }
-  }
-
-  private fun runWithBooleanRegistryOption(option: String, value: Boolean, block: () -> Unit) {
-    val registry = Registry.get(option)
-    val oldValue = registry.asBoolean()
-    registry.setValue(value)
-    try {
-      block()
-    } finally {
-      registry.setValue(oldValue)
     }
   }
 

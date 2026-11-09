@@ -22,8 +22,8 @@ import org.jetbrains.annotations.ApiStatus
  * on the backend's UndoManager, bracketing multiple document changes into a
  * single undo step.
  *
- * [undo]/[redo] run undo/redo on the backend's UndoManager for frontends
- * without speculative undo (e.g. Rider), where the undo stack lives on the backend.
+ * [closeUndoStep], [undo] and [redo] are for frontends without speculative undo (e.g. Rider), where the undo stack
+ * lives on the backend.
  */
 @Rpc
 @ApiStatus.Internal
@@ -35,16 +35,24 @@ interface ChangeRemoteApi : RemoteApi<Unit> {
   suspend fun finishUndoMark(editorId: EditorId)
 
   /**
-   * Undo the last change in the editor, with the caret movement made after it as part of the same step.
-   * Returns false if there is nothing to undo.
+   * Ends the current undo step: the changes made so far are undone together, and the next ones separately.
+   *
+   * The backend merges all the changes made on the frontend into one undo step, so without this one `u` undoes all of
+   * them (VIM-4370, RIDER-145069).
    */
-  suspend fun undo(editorId: EditorId): Boolean
+  suspend fun closeUndoStep(editorId: EditorId)
+
+  /**
+   * Undo the last change in the editor, with the caret movement made after it as part of the same step.
+   * Returns false if there is nothing to undo, null if the backend has no such editor, e.g. a dialog editor.
+   */
+  suspend fun undo(editorId: EditorId): Boolean?
 
   /**
    * Redo the last undone change in the editor, with the caret movement as part of the same step.
-   * Returns false if there is nothing to redo.
+   * Returns false if there is nothing to redo, null if the backend has no such editor, e.g. a dialog editor.
    */
-  suspend fun redo(editorId: EditorId): Boolean
+  suspend fun redo(editorId: EditorId): Boolean?
 
   companion object {
     @JvmStatic
