@@ -12,6 +12,8 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.CustomFoldRegion
 import com.intellij.openapi.editor.CustomFoldRegionRenderer
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.EditorCustomElementRenderer
+import com.intellij.openapi.editor.Inlay
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.util.TextRange
@@ -28,23 +30,25 @@ import kotlin.test.assertTrue
 /**
  * H, M and L move the caret to the top, middle and bottom of the text area, below the sticky lines panel, without
  * scrolling. Each position is checked with the panel at different heights, as the scopes at the top of the screen
- * start and end.
- *
- * With doc comments rendered, each comment is a single visual line a fraction of a row taller than the rows it is
- * counted as, so only the bounds are checked: the caret lands within a row of the context, and roughly in the middle.
+ * start and end. Rendered doc comments are single visual lines a part of a row taller than whole rows, and the block
+ * inlays below each method, like the outputs of notebook cells, are a part of a row too.
  */
 @TestWithoutNeovim(SkipNeovimReason.SCROLL)
 class ScreenLineMotionsStickyLinesTest : StickyLinesTestCase() {
   @ParameterizedTest
-  @CsvSource("0, false", "5, false", "12, false", "0, true", "5, true", "12, true")
-  fun `test H M L with sticky lines`(scrollOffset: Int, renderedDocs: Boolean) {
+  @CsvSource(
+    "0, false, false", "5, false, false", "12, false, false",
+    "0, true, false", "5, true, false", "12, true, false",
+    "0, false, true", "5, false, true", "12, false, true",
+  )
+  fun `test H M L with sticky lines`(scrollOffset: Int, renderedDocs: Boolean, inlays: Boolean) {
     configureByText(classWithMethods())
     enterCommand("set scrolloff=$scrollOffset")
 
     withMainEditor(40) { editor ->
       addStickyLinesForBlocks(editor)
       if (renderedDocs) renderDocComments(editor)
-      val exact = !renderedDocs
+      if (inlays) addInlaysBelowMethods(editor)
       val failures = mutableListOf<String>()
       var maxStickyRows = 0
       fun check(motion: String, assert: (Screen) -> String?) {
@@ -57,14 +61,14 @@ class ScreenLineMotionsStickyLinesTest : StickyLinesTestCase() {
       }
 
       typeText(editor, "gg")
-      check("H") { atTop(it, scrollOffset, exact) }
-      check("L") { atBottom(it, scrollOffset, exact) }
+      check("H") { atTop(it, scrollOffset) }
+      check("L") { atBottom(it, scrollOffset) }
       // Stays clear of the end of the file, where 'scrolloff' doesn't apply at the bottom
       for (line in 40..560) {
         typeText(editor, "${line}zt")
-        check("H") { atTop(it, scrollOffset, exact) }
-        check("M") { inMiddle(it, exact) }
-        check("L") { atBottom(it, scrollOffset, exact) }
+        check("H") { atTop(it, scrollOffset) }
+        check("M") { inMiddle(it) }
+        check("L") { atBottom(it, scrollOffset) }
       }
 
       assertTrue(maxStickyRows >= 2, "The sticky lines panel wasn't shown")
@@ -73,36 +77,29 @@ class ScreenLineMotionsStickyLinesTest : StickyLinesTestCase() {
   }
 
   // The first line with 'scrolloff' rows above it, or the first line of the file if it is shown
-  private fun atTop(screen: Screen, scrollOffset: Int, exact: Boolean): String? {
+  private fun atTop(screen: Screen, scrollOffset: Int): String? {
     val wanted = if (screen.isTopOfFileVisible) 0 else scrollOffset
     return when {
-      screen.rowsAbove < wanted - if (exact) 0 else 1 -> "Fewer than $wanted rows above the caret"
-      exact && screen.rowsAboveLineAbove >= wanted -> "The line above the caret is far enough from the top"
+      screen.rowsAbove < wanted -> "Fewer than $wanted rows above the caret"
+      screen.rowsAboveLineAbove >= wanted -> "The line above the caret is far enough from the top"
       else -> null
     }
   }
 
   // The last line with 'scrolloff' rows below it
-  private fun atBottom(screen: Screen, scrollOffset: Int, exact: Boolean): String? = when {
-    screen.rowsBelow < scrollOffset - if (exact) 0 else 1 -> "Fewer than $scrollOffset rows below the caret"
-    exact && screen.rowsBelowLineBelow >= scrollOffset -> "The line below the caret is far enough from the bottom"
+  private fun atBottom(screen: Screen, scrollOffset: Int): String? = when {
+    screen.rowsBelow < scrollOffset -> "Fewer than $scrollOffset rows below the caret"
+    screen.rowsBelowLineBelow >= scrollOffset -> "The line below the caret is far enough from the bottom"
     else -> null
   }
 
-  // The caret line covers the middle row of the text, give or take a row for the filler around it
-  private fun inMiddle(screen: Screen, exact: Boolean): String? {
-    val middle = screen.textRows / 2
-    val slack = if (exact) 1 else 3
-    return if (screen.rowsAbove <= middle + slack && screen.rowsAbove + screen.caretRows - 1 >= middle - slack) {
-      null
-    } else {
-      "Caret is not on the middle row $middle"
-    }
-  }
+  // Give or take a row for the block inlays around the caret line
+  private fun inMiddle(screen: Screen): String? = if (screen.isAtMiddle) null else "Caret is not in the middle"
 
   /**
-   * Where the caret line is in the text area below the sticky lines panel, in whole rows, rounded down. The rows
-   * above and below the visual lines next to the caret are negative if there are no such lines.
+   * Where the caret line is in the text area below the sticky lines panel, in whole rows, rounded down. Only the lines
+   * that are fully shown, and the block inlays between them, are counted, not a line cut by the panel or the bottom of
+   * the editor. The rows above and below the visual lines next to the caret are negative if there are no such lines.
    */
   private data class Screen(
     val caretLine: Int,
@@ -113,9 +110,26 @@ class ScreenLineMotionsStickyLinesTest : StickyLinesTestCase() {
     val rowsBelow: Int,
     val rowsAboveLineAbove: Int,
     val rowsBelowLineBelow: Int,
-    val caretRows: Int,
-    val textRows: Int,
+    // The caret line covers the middle of the text area, or the end of the text if it's above that, give or take a row
+    val isAtMiddle: Boolean,
   )
+
+  private fun isAtMiddle(caret: IntArray, middle: Double, lineHeight: Double): Boolean =
+    caret[0] <= middle + lineHeight && caret[1] >= middle - lineHeight
+
+  // Below the line cut by the top of the text area, if any
+  private fun shownTextTop(editor: Editor, areaTop: Int): Int {
+    val line = editor.yToVisualLine(areaTop)
+    if (editor.visualLineToY(line) >= areaTop) return areaTop
+    return maxOf(areaTop, editor.visualLineToYRange(line)[1])
+  }
+
+  // Above the line cut by the bottom of the text area, if any
+  private fun shownTextBottom(editor: Editor, areaBottom: Int, lastLine: Int): Int {
+    val line = editor.yToVisualLine(areaBottom - 1)
+    if (line > lastLine || editor.visualLineToYRange(line)[1] <= areaBottom) return areaBottom
+    return minOf(areaBottom, editor.visualLineToY(line))
+  }
 
   private fun screen(editor: Editor): Screen {
     var screen: Screen? = null
@@ -123,10 +137,11 @@ class ScreenLineMotionsStickyLinesTest : StickyLinesTestCase() {
       val area = editor.scrollingModel.visibleArea
       val lineHeight = editor.lineHeight.toDouble()
       val sticky = (editor as EditorImpl).stickyLinesPanelHeight
-      val top = area.y + sticky
-      val bottom = area.y + area.height
       val caretLine = editor.caretModel.visualPosition.line
       val lastLine = editor.offsetToVisualPosition(editor.document.textLength).line
+      val top = shownTextTop(editor, area.y + sticky)
+      val bottom = shownTextBottom(editor, area.y + area.height, lastLine)
+      val middle = (area.y + sticky + minOf(area.y + area.height, editor.visualLineToYRange(lastLine)[1])) / 2.0
       val caret = editor.visualLineToYRange(caretLine)
       fun rows(pixels: Int) = floor(pixels / lineHeight).toInt()
       screen = Screen(
@@ -138,8 +153,7 @@ class ScreenLineMotionsStickyLinesTest : StickyLinesTestCase() {
         rowsBelow = rows(bottom - caret[1]),
         rowsAboveLineAbove = if (caretLine > 0) rows(editor.visualLineToYRange(caretLine - 1)[0] - top) else -1,
         rowsBelowLineBelow = if (caretLine < lastLine) rows(bottom - editor.visualLineToYRange(caretLine + 1)[1]) else -1,
-        caretRows = ((caret[1] - caret[0]) / lineHeight).roundToInt(),
-        textRows = rows(minOf(bottom, editor.visualLineToYRange(lastLine)[1]) - top),
+        isAtMiddle = isAtMiddle(caret, middle, lineHeight),
       )
     }
     return screen!!
@@ -177,6 +191,23 @@ class ScreenLineMotionsStickyLinesTest : StickyLinesTestCase() {
         }
       }
     }
+  }
+
+  // 1.4 rows below the closing brace of each method
+  private fun addInlaysBelowMethods(editor: Editor) {
+    ApplicationManager.getApplication().invokeAndWait {
+      val document = editor.document
+      for (line in 0 until document.lineCount) {
+        val text = document.getText(TextRange(document.getLineStartOffset(line), document.getLineEndOffset(line)))
+        if (text != "  }") continue
+        editor.inlayModel.addBlockElement(document.getLineEndOffset(line), true, false, 0, OutputRenderer(editor))
+      }
+    }
+  }
+
+  private class OutputRenderer(private val editor: Editor) : EditorCustomElementRenderer {
+    override fun calcWidthInPixels(inlay: Inlay<*>) = 100
+    override fun calcHeightInPixels(inlay: Inlay<*>) = (1.4 * editor.lineHeight).roundToInt()
   }
 
   private class DocCommentRenderer(private val editor: Editor) : CustomFoldRegionRenderer {

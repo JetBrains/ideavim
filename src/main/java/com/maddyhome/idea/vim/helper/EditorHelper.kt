@@ -84,7 +84,12 @@ object EditorHelper {
     val lastLineBaseline = editor.logicalPositionToXY(LogicalPosition(IjVimEditor(editor).lineCount(), 0)).y
     val visibleArea = getVisibleArea(editor)
     val height = min(lastLineBaseline - visibleArea.y, visibleArea.height)
-    return editor.yToVisualLine(visibleArea.y + height / 2)
+    val middle = visibleArea.y + height / 2
+    val line = editor.yToVisualLine(middle)
+    // The block inlays between two lines count half below the first line and half above the second
+    val belowLine = middle - editor.visualLineToYRange(line)[1]
+    val gap = editor.visualLineToY(line + 1) - editor.visualLineToYRange(line)[1]
+    return if (belowLine > 0 && belowLine * 2 >= gap && line < editor.lastVisualLine) line + 1 else line
   }
 
   @JvmStatic
