@@ -36,7 +36,7 @@ object ReleaseEap : IdeaVimBuildType({
     )
     password(
       "env.ORG_GRADLE_PROJECT_youtrackToken",
-      "credentialsJSON:eedfa0eb-c329-462a-b7b4-bc263bda8c01",
+      "credentialsJSON:66602338-e9c8-4e7b-85d0-4d1e3129570e",
       display = ParameterDisplay.HIDDEN
     )
   }
