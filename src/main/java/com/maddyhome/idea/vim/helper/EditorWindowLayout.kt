@@ -28,14 +28,14 @@ import kotlin.math.max
 import kotlin.math.min
 
 /**
- * The vertical layout of an editor in rows, as it is once the editor has finished scrolling.
+ * The vertical layout of an editor in pixels, as it is once the editor has finished scrolling.
  *
  * The text area is the viewport below the sticky lines panel, and above the command line or output panel and a
  * transparent horizontal scrollbar, which are drawn over the bottom of the editor. Block inlays are filler between
- * lines, and a line drawn taller than a row, e.g. a rendered doc comment, takes all the rows it covers.
+ * lines, and a line drawn taller than a row, e.g. a rendered doc comment, has its full height.
  */
 internal class EditorWindowLayout(private val editor: Editor) : WindowLayout {
-  val rowHeight: Int = editor.lineHeight
+  override val rowHeight: Int = editor.lineHeight
   private val viewport = editor.scrollingModel.visibleAreaOnScrollingFinished
   val stickyLinesHeight: Int = editor.stickyLinesHeightAt(viewport)
 
@@ -53,11 +53,10 @@ internal class EditorWindowLayout(private val editor: Editor) : WindowLayout {
 
   // Counted from where the view starts, which is the top of the text area unless the editor was scrolled to show part
   // of a row, e.g. with the mouse wheel
-  override val height: Int = max(1, (textAreaBottom - viewTop(view)) / rowHeight)
+  override val height: Int = max(1, textAreaBottom - viewTop(view))
 
-  override fun lineRows(line: Int): Int = max(1, ceilDiv(lineBottom(line) - lineTop(line), rowHeight))
-
-  override fun fillerRows(line: Int): Int = ceilDiv(fillerHeight(line), rowHeight)
+  // A custom fold region can be drawn shorter than a row, but every line takes at least one
+  override fun lineHeight(line: Int): Int = max(rowHeight, lineBottom(line) - lineTop(line))
 
   fun lineTop(line: Int): Int = editor.visualLineToY(line)
 
@@ -65,7 +64,7 @@ internal class EditorWindowLayout(private val editor: Editor) : WindowLayout {
   fun lineBottom(line: Int): Int = editor.visualLineToYRange(line)[1]
 
   /** The block inlays between [line] - 1 and [line] */
-  fun fillerHeight(line: Int): Int {
+  override fun fillerHeight(line: Int): Int {
     val above = if (line < lineCount) EditorUtil.getInlaysHeight(editor, line, true) else 0
     val below = if (line > 0) EditorUtil.getInlaysHeight(editor, line - 1, false) else 0
     return above + below
@@ -102,21 +101,17 @@ internal class EditorWindowLayout(private val editor: Editor) : WindowLayout {
     if (lineTop(line) < textAreaTop && line < lineCount - 1) line++
 
     val shown = lineTop(line) - textAreaTop
-    val fill = fillerRows(line)
+    val fill = fillerHeight(line)
     val topFill = when {
       shown <= 0 -> 0
       shown >= gapAbove(line) -> fill
-      else -> min(fill, shown / rowHeight)
+      else -> min(fill, shown)
     }
     return WindowView(line, topFill)
   }
 
   private fun viewTop(view: WindowView): Int {
-    val shownFiller = if (view.topFill >= fillerRows(view.topLine)) {
-      gapAbove(view.topLine)
-    } else {
-      view.topFill * rowHeight
-    }
+    val shownFiller = if (view.topFill >= fillerHeight(view.topLine)) gapAbove(view.topLine) else view.topFill
     return lineTop(view.topLine) - shownFiller
   }
 
@@ -146,8 +141,6 @@ internal class EditorWindowLayout(private val editor: Editor) : WindowLayout {
     }
     return 0
   }
-
-  private fun ceilDiv(value: Int, divisor: Int): Int = if (value <= 0) 0 else (value + divisor - 1) / divisor
 }
 
 // The platform hides the sticky lines panel this close to the top of the document, so a sticky line on the first line

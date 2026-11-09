@@ -45,20 +45,20 @@ internal object ScrollViewHelper {
   private fun scrollCaretIntoViewVertically(editor: Editor, caretLine: Int, caretChangedLine: Boolean) {
     val layout = EditorWindowLayout(editor)
     val scrollOffset = injector.options(editor.vim).scrolloff
-    val scrollJump = getScrollJump(editor.vim, layout.height)
+    val scrollJump = getScrollJump(editor.vim, layout.height / layout.rowHeight)
     val target = VerticalScroll.scrollCursorIntoView(layout, layout.view, caretLine, scrollOffset, scrollJump)
     EditorHelper.scrollTo(editor, target, caretChangedLine)
   }
 
-  // Scrolljump is the minimal number of rows to scroll
-  private fun getScrollJump(editor: VimEditor, height: Int): Int {
+  // Scrolljump is the minimal number of rows to scroll, a percentage of the [heightInRows] when negative
+  private fun getScrollJump(editor: VimEditor, heightInRows: Int): Int {
     if (injector.vimState.executingCommandFlags.contains(CommandFlags.FLAG_IGNORE_SCROLL_JUMP)) return 1
 
     // Default value is 1. Zero is a valid value, but we normalise to 1 - we always want to scroll at least one line
     // If the value is negative, it's a percentage of the height.
     val scrollJump = injector.options(editor).scrolljump
     return if (scrollJump < 0) {
-      (height * (min(100, -scrollJump) / 100.0)).toInt()
+      (heightInRows * (min(100, -scrollJump) / 100.0)).toInt()
     } else {
       max(1, scrollJump)
     }
