@@ -16,6 +16,7 @@ import com.intellij.driver.sdk.VirtualFile
 import com.intellij.driver.sdk.invokeActionByShortcut
 import com.intellij.driver.sdk.getRunContentManager
 import com.intellij.driver.sdk.openEditor
+import com.intellij.driver.sdk.openFile
 import com.intellij.driver.sdk.singleProject
 import com.intellij.driver.sdk.ui.components.UiComponent.Companion.waitFound
 import com.intellij.driver.sdk.ui.components.common.JEditorUiComponent
@@ -25,7 +26,10 @@ import com.intellij.driver.sdk.ui.requestFocusFromIde
 import com.intellij.driver.sdk.ui.ui
 import com.intellij.driver.sdk.waitForIndicators
 import com.intellij.ide.starter.driver.engine.BackgroundRun
+import com.intellij.ide.starter.config.ConfigurationStorage
+import com.intellij.ide.starter.config.splitMode
 import com.intellij.ide.starter.driver.engine.runIdeWithDriver
+import com.intellij.ide.starter.ide.IDERemDevTestContext
 import com.intellij.ide.starter.ide.IDETestContext
 import com.intellij.ide.starter.models.IdeInfo
 import com.intellij.ide.starter.models.TestCase
@@ -65,6 +69,7 @@ abstract class IdeaVimRiderTestBase {
     projectDir = kotlin.io.path.createTempDirectory("ideavim-rider-test")
     createConsoleProject()
 
+    ConfigurationStorage.splitMode(splitMode)
     val context = Starter.newContext(
       this::class.simpleName ?: "rider-test",
       // Open the .sln itself: given the directory, Rider asks which solution to open
@@ -73,6 +78,11 @@ abstract class IdeaVimRiderTestBase {
     context.trustAllSolutions()
     PluginConfigurator(context).installPluginFromPath(resolvePluginPath())
     context.useTestIdeaVimRc()
+    if (context is IDERemDevTestContext) {
+      PluginConfigurator(context.frontendIDEContext).installPluginFromPath(resolvePluginPath())
+      // Keys are handled on the frontend, so its ideavimrc is the one that matters
+      context.frontendIDEContext.useTestIdeaVimRc()
+    }
     // Without a license, Rider runs on a trial. GitHub Actions passes a missing secret as an empty string
     context.setLicense(System.getenv("RIDER_LICENSE_KEY")?.takeIf { it.isNotBlank() })
 
@@ -87,7 +97,14 @@ abstract class IdeaVimRiderTestBase {
   @AfterAll
   fun closeIde() {
     if (::bgRun.isInitialized) bgRun.closeIdeAndWait()
+    ConfigurationStorage.splitMode(false)
   }
+
+  /**
+   * Runs Rider in Remote Development split mode: the backend and a JetBrains Client, IdeaVim in both. Only on Linux:
+   * the Rider for macOS has no remote development backend
+   */
+  protected open val splitMode: Boolean = false
 
   /** Content of the ideavimrc the launched IDE will use */
   protected open fun ideaVimRcContent(): String = ""
@@ -154,8 +171,16 @@ abstract class IdeaVimRiderTestBase {
     project.resolve("Program.cs").writeText("\n")
   }
 
-  /** Opens [PROGRAM] by its absolute path: in Rider, the frontend's content roots don't contain the project files */
+  /**
+   * Opens [PROGRAM]. In the monolith by its absolute path: in Rider, the frontend's content roots don't contain the
+   * project files
+   */
   private fun openProgram() {
+    if (splitMode) {
+      // The frontend has no local files of the project: the backend opens it
+      driver.openFile(PROGRAM, waitForCodeAnalysis = false)
+      return
+    }
     val path = projectDir.resolve(PROGRAM).absolutePathString()
     driver.withContext {
       val file = checkNotNull(utility(LocalFileSystemUtil::class).getInstance().refreshAndFindFileByPath(path)) {

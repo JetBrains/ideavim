@@ -43,7 +43,9 @@ dependencies {
     }
 
     create(ideaType, ideaVersion) { this.useInstaller = useInstaller }
-    testFramework(TestFrameworkType.Starter)
+    // The 2026.1 Starter can't connect to a Rider 2026.2 backend in split mode: it looks for the join link in the main
+    // module of the remote development plugin, Rider 2026.2 has it in a content module
+    testFramework(TestFrameworkType.Starter, "262.10968.63")
   }
 }
 
@@ -60,7 +62,8 @@ tasks {
 
   register<Test>("testUi") {
     group = "verification"
-    useJUnitPlatform()
+    // The 2026.2 Starter brings JUnit 4's engine, which fails to discover these JUnit 5 tests
+    useJUnitPlatform { excludeEngines("junit-vintage") }
 
     testClassesDirs = sourceSets["test"].output.classesDirs
     // Include both the standard test classpath and the intellijPlatform test classpath
@@ -94,6 +97,14 @@ tasks {
       events("passed", "skipped", "failed")
       showStandardStreams = true
     }
+  }
+}
+
+// The 2026.2 Starter is built for Java 25. Set after evaluation: the IntelliJ Platform plugin points test tasks at the
+// runtime of the IDE dependency, which is Java 21
+afterEvaluate {
+  tasks.named<Test>("testUi") {
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(25)) })
   }
 }
 
