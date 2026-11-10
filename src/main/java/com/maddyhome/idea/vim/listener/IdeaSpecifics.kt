@@ -65,6 +65,7 @@ import com.maddyhome.idea.vim.helper.isPossiblyDelegatingToBackend
 import com.maddyhome.idea.vim.helper.vimInitialised
 import com.maddyhome.idea.vim.ide.isClionNova
 import com.maddyhome.idea.vim.ide.isRider
+import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.newapi.vim
@@ -557,10 +558,16 @@ internal object IdeaSpecifics {
    */
   private class RiderEscLookupListener(private val editor: Editor) : com.intellij.codeInsight.lookup.LookupListener {
     override fun lookupCanceled(event: com.intellij.codeInsight.lookup.LookupEvent) {
-      if (RiderEscAwtKeyTracker.lastKeyPressedWasEscape && editor.vim.mode is Mode.INSERT) {
+      if (RiderEscAwtKeyTracker.lastKeyPressedWasEscape && editor.vim.mode is Mode.INSERT && !isEscapeOwnedByIde()) {
         editor.vim.exitInsertMode(injector.executionContextManager.getEditorExecutionContext(editor.vim))
         KeyHandler.getInstance().reset(editor.vim)
       }
+    }
+
+    /** With `sethandler <Esc> i:ide`, Escape only closes the lookup and the editor stays in Insert mode */
+    private fun isEscapeOwnedByIde(): Boolean {
+      val escape = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)
+      return VimPlugin.getKey().savedShortcutConflicts[escape]?.forEditor(editor.vim) == ShortcutOwner.IDE
     }
   }
   //endregion
