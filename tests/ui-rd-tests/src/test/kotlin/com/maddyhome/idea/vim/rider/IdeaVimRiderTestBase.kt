@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.rider
 import com.intellij.driver.client.Driver
 import com.intellij.driver.client.Remote
 import com.intellij.driver.model.OnDispatcher
+import com.intellij.driver.model.RdTarget
 import com.intellij.driver.sdk.Editor
 import com.intellij.driver.sdk.VirtualFile
 import com.intellij.driver.sdk.invokeActionByShortcut
@@ -333,6 +334,36 @@ abstract class IdeaVimRiderTestBase {
   protected fun popupTitles(): List<String> =
     driver.ui.xx("//div[@class='EngravedLabel']").list().flatMap { label -> label.getAllTexts().map { it.text } }
 
+  /** Whether the completion popup is shown */
+  protected fun isLookupShown(): Boolean = driver.ui.x("//div[@class='LookupList']").present()
+
+  /** Whether the summary popup (e.g. the type of the selected item) is shown next to the completion popup */
+  protected fun isLookupSummaryShown(): Boolean = driver.ui.x("//div[@class='ParameterInfoListView']").present()
+
+  /**
+   * Shows the summary popup next to the open completion popup of the JetBrains Client, as the client does when the
+   * backend sends a summary. When the backend sends one depends on the state of the project, so tests can't rely on it
+   */
+  protected fun showLookupSummary(text: String) {
+    val editor = withEditor { editor }
+    driver.withContext(OnDispatcher.EDT) {
+      val lookup = checkNotNull(utility(LookupManagerUtil::class).getActiveLookup(editor)) { "No completion popup" }
+      val string = new(
+        RichAttributedStringModelRef::class,
+        null, text, null, null, null,
+        utility(EffectStyleUtil::class).valueOf("None"),
+        utility(FontStyleUtil::class).valueOf("Regular"),
+      )
+      val line = new(RichAttributedTextModelRef::class, listOf(string))
+      val block = new(RichAttributedTextBlockModelRef::class, listOf(line))
+      val item = new(SummaryInfoItemRef::class, block, null)
+      val summary = new(LookupSummaryInfoRef::class, listOf(item), false)
+      val withTexts = new(LookupSummaryInfoWithTextsRef::class, summary, "", "", "")
+      val lifetime = new(LifetimeDefinitionRef::class).getLifetime()
+      utility(FrontendLookupSummaryInfoUtil::class).showSummaryInfoPopup(lifetime, withTexts, lookup)
+    }
+  }
+
   /** Number of started processes in the Run tool window that are still running */
   protected fun runningProcesses(): Int = driver.withContext {
     getRunContentManager(singleProject()).getAllDescriptors().count { it.getProcessHandler()?.isProcessTerminated() == false }
@@ -481,3 +512,65 @@ interface KeyboardFocusManagerRef {
 interface JTreeRef {
   fun getLeadSelectionRow(): Int
 }
+
+@Remote("com.intellij.codeInsight.lookup.LookupManager", rdTarget = RdTarget.FRONTEND)
+interface LookupManagerUtil {
+  fun getActiveLookup(editor: Editor?): LookupImplRef?
+}
+
+@Remote("com.intellij.codeInsight.lookup.impl.LookupImpl", rdTarget = RdTarget.FRONTEND)
+interface LookupImplRef
+
+@Remote(
+  "com.jetbrains.rdclient.completion.summaryInfo.FrontendLookupSummaryInfoUtilKt",
+  plugin = RD_CLIENT,
+  rdTarget = RdTarget.FRONTEND,
+)
+interface FrontendLookupSummaryInfoUtil {
+  fun showSummaryInfoPopup(lifetime: LifetimeRef, summaryInfoWithTexts: LookupSummaryInfoWithTextsRef, lookup: LookupImplRef)
+}
+
+@Remote("com.jetbrains.rd.util.lifetime.LifetimeDefinition", plugin = RD_CLIENT, rdTarget = RdTarget.FRONTEND)
+interface LifetimeDefinitionRef {
+  fun getLifetime(): LifetimeRef
+}
+
+@Remote("com.jetbrains.rd.util.lifetime.Lifetime", plugin = RD_CLIENT, rdTarget = RdTarget.FRONTEND)
+interface LifetimeRef
+
+@Remote("com.jetbrains.rd.ide.model.LookupSummaryInfoWithTexts", plugin = RD_CLIENT, rdTarget = RdTarget.FRONTEND)
+interface LookupSummaryInfoWithTextsRef
+
+@Remote("com.jetbrains.rd.ide.model.LookupSummaryInfo", plugin = RD_CLIENT, rdTarget = RdTarget.FRONTEND)
+interface LookupSummaryInfoRef
+
+@Remote("com.jetbrains.rd.ide.model.SummaryInfoItem", plugin = RD_CLIENT, rdTarget = RdTarget.FRONTEND)
+interface SummaryInfoItemRef
+
+@Remote("com.jetbrains.rd.ide.model.RichAttributedTextBlockModel", plugin = RD_CLIENT, rdTarget = RdTarget.FRONTEND)
+interface RichAttributedTextBlockModelRef
+
+@Remote("com.jetbrains.rd.ide.model.RichAttributedTextModel", plugin = RD_CLIENT, rdTarget = RdTarget.FRONTEND)
+interface RichAttributedTextModelRef
+
+@Remote("com.jetbrains.rd.ide.model.RichAttributedStringModel", plugin = RD_CLIENT, rdTarget = RdTarget.FRONTEND)
+interface RichAttributedStringModelRef
+
+@Remote("com.jetbrains.rd.ide.model.EffectStyle", plugin = RD_CLIENT, rdTarget = RdTarget.FRONTEND)
+interface EffectStyleUtil {
+  fun valueOf(name: String): EffectStyleRef
+}
+
+@Remote("com.jetbrains.rd.ide.model.EffectStyle", plugin = RD_CLIENT, rdTarget = RdTarget.FRONTEND)
+interface EffectStyleRef
+
+@Remote("com.jetbrains.rd.ide.model.FontStyle", plugin = RD_CLIENT, rdTarget = RdTarget.FRONTEND)
+interface FontStyleUtil {
+  fun valueOf(name: String): FontStyleRef
+}
+
+@Remote("com.jetbrains.rd.ide.model.FontStyle", plugin = RD_CLIENT, rdTarget = RdTarget.FRONTEND)
+interface FontStyleRef
+
+/** The module of the Rider frontend with the completion summary popup, its classloader also sees the Rider protocol model */
+private const val RD_CLIENT = "com.intellij/intellij.rd.client"

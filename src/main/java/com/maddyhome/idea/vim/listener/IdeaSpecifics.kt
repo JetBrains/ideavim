@@ -44,6 +44,7 @@ import com.intellij.openapi.keymap.KeymapManager
 import com.intellij.openapi.project.DumbAwareToggleAction
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.TextRange
+import com.intellij.util.PlatformUtils
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
@@ -499,10 +500,8 @@ internal object IdeaSpecifics {
 
         // In Rider/CLion Nova, the popup manager (due to LookupSummaryInfo parameter info popup)
         // consumes Escape before the action system runs, so IdeaVim never sees it.
-        // Listen for explicit lookup cancellation (Escape) to exit insert mode.
-        // Note: this listener must NOT be attached in JetBrains Client (split mode), because
-        // isCanceledExplicitly can be true for non-Escape keys (e.g. space) there.
-        if (isRider() || isClionNova()) {
+        // Listen for the lookup cancellation by Escape to exit insert mode.
+        if (escapeMayBeConsumedByLookupPopup()) {
           newLookup.addLookupListener(RiderEscLookupListener(newLookup.editor))
         }
       }
@@ -516,6 +515,16 @@ internal object IdeaSpecifics {
       }
     }
   }
+
+  /**
+   * Whether the LookupSummaryInfo popup next to the lookup can consume Escape.
+   *
+   * VIM-4369: the JetBrains Client of Rider/CLion Nova (split mode) shows this popup too, and there it always consumes
+   * Escape: it lets Escape through only for an autopopup completion, but the completion runs on the backend, so the
+   * client never knows that it is one. [isRider] and [isClionNova] are false in the client.
+   */
+  internal fun escapeMayBeConsumedByLookupPopup(): Boolean =
+    isRider() || isClionNova() || PlatformUtils.isJetBrainsClient()
 
   /**
    * Tracks whether the last KEY_PRESSED was Escape. Needed because [LookupEvent.isCanceledExplicitly]
