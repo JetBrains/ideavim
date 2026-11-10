@@ -41,9 +41,9 @@ import kotlin.reflect.full.createType
 
 abstract class VimVariableServiceBase : VariableService {
   private var globalVariables: MutableMap<String, VimDataType> = mutableMapOf()
-  private val windowVariablesKey = Key<MutableMap<String, VimDataType>>("TabVariables")
+  private val windowVariablesKey = Key<MutableMap<String, VimDataType>>("WindowVariables")
   private val bufferVariablesKey = Key<MutableMap<String, VimDataType>>("BufferVariables")
-  private val tabVariablesKey = Key<MutableMap<String, VimDataType>>("WindowVariables")
+  private val tabVariablesKey = Key<MutableMap<String, VimDataType>>("TabVariables")
   protected var vimVariables: MutableMap<String, VimDataType> = mutableMapOf()
 
   private fun getWindowVariables(editor: VimEditor) =
