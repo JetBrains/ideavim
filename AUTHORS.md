@@ -558,6 +558,10 @@ Contributors:
   [![icon][github]](https://github.com/ameertaweel)
   &nbsp;
   ameertaweel
+* [![icon][mail]](mailto:21952175+pppobear@users.noreply.github.com)
+  [![icon][github]](https://github.com/pppobear)
+  &nbsp;
+  pppobear
 
 Contributors with JetBrains IP:
 
