@@ -55,6 +55,7 @@ import com.maddyhome.idea.vim.action.change.VimRedoBuffer
 import com.maddyhome.idea.vim.api.EffectiveOptions
 import com.maddyhome.idea.vim.api.GlobalOptions
 import com.maddyhome.idea.vim.api.Options
+import com.maddyhome.idea.vim.api.SystemInfoService
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimClipboardManager
 import com.maddyhome.idea.vim.api.VimDigraphGroupBase
@@ -101,6 +102,7 @@ import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import org.jetbrains.annotations.ApiStatus
+import org.jetbrains.plugins.ideavim.annotations.TestWithPrimaryClipboard
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInfo
@@ -152,7 +154,8 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     if (VimPlugin.isNotEnabled()) VimPlugin.setEnabled(true)
     injector.globalOptions().ideastrictmode = true
     Checks.reset()
-    replaceSystemSelections()
+    replaceSystemSelections(hasPrimarySelection = testInfo.testMethod.orElse(null)
+      ?.isAnnotationPresent(TestWithPrimaryClipboard::class.java) == true)
     clearClipboard()
     clearAlternateFile()
 
@@ -1170,15 +1173,23 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
    * Keeps the test away from the clipboards of the machine it runs on: PRIMARY is [primarySelection], and CLIPBOARD
    * isn't read from X11 when the IDE clipboard has no text, as the X11 clipboard is the one of the desktop. CLIPBOARD
    * itself is still the IDE clipboard, which [clearClipboard] empties.
+   *
+   * Whether there is a PRIMARY at all doesn't come from the machine either, but from [TestWithPrimaryClipboard].
    */
-  private fun replaceSystemSelections() {
+  private fun replaceSystemSelections(hasPrimarySelection: Boolean) {
+    val app = ApplicationManager.getApplication()
+    val systemInfo = injector.systemInfoService
+    val testSystemInfo = object : SystemInfoService by systemInfo {
+      override val hasPrimarySelection: Boolean = hasPrimarySelection
+    }
+    app.replaceService(SystemInfoService::class.java, testSystemInfo, fixture.testRootDisposable)
+
     primarySelection = FakePrimarySelection()
     val clipboardManager = IjClipboardManager(
       clipboard = IjClipboardSelection(x11ClipboardText = { null }),
       primary = IjPrimarySelection(primarySelection, primarySelection::contents),
     )
-    ApplicationManager.getApplication()
-      .replaceService(VimClipboardManager::class.java, clipboardManager, fixture.testRootDisposable)
+    app.replaceService(VimClipboardManager::class.java, clipboardManager, fixture.testRootDisposable)
   }
 
   private fun clearClipboard() {
