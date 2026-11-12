@@ -111,9 +111,8 @@ fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: VimCaret) 
     }
   }
 
-  // Selection-change notification for the IDE clipboard layer (vim-engine doesn't know how
-  // PRIMARY should behave on each platform). Clipboard I/O must never break visual mode setup.
-  runCatching { injector.clipboardManager.onVisualSelectionChange(caret.editor, caret) }
+  // With `autoselect` the visual selection goes to PRIMARY. Clipboard I/O must never break visual mode setup.
+  runCatching { injector.registerGroup.onVisualSelectionChange(caret.editor) }
 }
 
 /**

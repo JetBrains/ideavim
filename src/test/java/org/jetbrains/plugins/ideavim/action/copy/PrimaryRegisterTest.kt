@@ -58,4 +58,14 @@ class PrimaryRegisterTest : VimTestCase() {
     typeText("j", "\"*P")
     assertState("Lorem\nLor${c}eipsum")
   }
+
+  // PRIMARY still holds the first yank and is still ours, the second yank must not pass for it
+  @TestWithPrimaryClipboard
+  fun `test failed write to PRIMARY doesn't pass for what PRIMARY holds`() {
+    configureByText("${c}Lorem\nipsum")
+    typeText("\"*yy")
+    primarySelection.isWritable = false
+    typeText("j", "\"*yy", "\"*p")
+    assertState("Lorem\nipsum\n${c}Lorem\n")
+  }
 }

@@ -8,94 +8,86 @@
 
 package org.jetbrains.plugins.ideavim.option
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.registry.Registry
-import com.maddyhome.idea.vim.api.OwnedPrimaryContent
-import com.maddyhome.idea.vim.newapi.IjPrimarySelection
-import com.maddyhome.idea.vim.newapi.PrimaryAutoselect
-import com.maddyhome.idea.vim.newapi.PrimarySelectionWriter
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.annotations.TestWithPrimaryClipboard
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ClipboardAutoselectTest : VimTestCase() {
-  private class RecordingPrimaryWriter : PrimarySelectionWriter {
-    val writes = mutableListOf<String>()
-
-    override fun write(text: String, transferableData: List<Any>): Boolean {
-      writes.add(text)
-      return true
-    }
-
-    override fun ownsSelection(): Boolean = writes.isNotEmpty()
-  }
-
   private fun platformUpdatesPrimary() = Registry.`is`(PRIMARY_REGISTRY_KEY)
 
-  /** Publishes the visual selection as the visual group does, and returns what was remembered with it. */
-  private fun publishVisualSelection(writer: RecordingPrimaryWriter): OwnedPrimaryContent? {
-    val primary = IjPrimarySelection(writer)
-    val autoselect = PrimaryAutoselect(primary) { true }
-    try {
-      ApplicationManager.getApplication().invokeAndWait {
-        val editor = fixture.editor.vim
-        autoselect.onVisualSelectionChange(editor, editor.primaryCaret())
-      }
-      return primary.lastPublishedContent()
-    } finally {
-      primary.dispose()
-    }
+  private fun primaryRegisterType(): SelectionType? {
+    val editor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(editor)
+    return injector.registerGroup.getRegister(editor, context, '*')?.type
   }
 
-  @Test
+  @TestWithPrimaryClipboard
   fun `test visual selection is published to PRIMARY with autoselect`() {
     configureByText("${c}Lorem ipsum")
     enterCommand("set clipboard=autoselect")
     typeText("vll")
-
-    val writer = RecordingPrimaryWriter()
-    publishVisualSelection(writer)
-    assertEquals(listOf("Lor"), writer.writes)
+    assertEquals("Lor", primarySelection.currentText)
+    assertEquals(SelectionType.CHARACTER_WISE, primaryRegisterType())
   }
 
-  @Test
+  @TestWithPrimaryClipboard
   fun `test linewise visual selection is published to PRIMARY with its trailing newline`() {
     configureByText("${c}Lorem\nipsum\ndolor")
     enterCommand("set clipboard=autoselect")
     typeText("Vj")
-
-    val writer = RecordingPrimaryWriter()
-    val published = publishVisualSelection(writer)
-    assertEquals(listOf("Lorem\nipsum\n"), writer.writes)
-    assertEquals(SelectionType.LINE_WISE, published?.selectionType)
+    assertEquals("Lorem\nipsum\n", primarySelection.currentText)
+    assertEquals(SelectionType.LINE_WISE, primaryRegisterType())
   }
 
   // The text the platform puts into PRIMARY for the same selection: every caret, not the primary one only
-  @Test
+  @TestWithPrimaryClipboard
   fun `test blockwise visual selection is published to PRIMARY with every line`() {
     configureByText("a${c}bc\ndef\nghi")
     enterCommand("set clipboard=autoselect")
     typeText("<C-V>jjl")
-
-    val writer = RecordingPrimaryWriter()
-    val published = publishVisualSelection(writer)
-    assertEquals(listOf("bc\nef\nhi"), writer.writes)
-    assertEquals(SelectionType.BLOCK_WISE, published?.selectionType)
+    assertEquals("bc\nef\nhi", primarySelection.currentText)
+    assertEquals(SelectionType.BLOCK_WISE, primaryRegisterType())
   }
 
-  @Test
+  @TestWithPrimaryClipboard
   fun `test visual selection is not published to PRIMARY without autoselect`() {
     configureByText("${c}Lorem ipsum")
     enterCommand("set clipboard-=autoselect")
     typeText("vll")
+    assertEquals("", primarySelection.currentText)
+  }
 
-    val writer = RecordingPrimaryWriter()
-    publishVisualSelection(writer)
-    assertEquals(emptyList(), writer.writes)
+  @Test
+  fun `test visual selection is not published where there is no PRIMARY`() {
+    configureByText("${c}Lorem ipsum")
+    enterCommand("set clipboard=autoselect")
+    typeText("vll")
+    assertEquals("", primarySelection.currentText)
+  }
+
+  // The operator changes the selection on its way, which must not reach PRIMARY
+  @TestWithPrimaryClipboard
+  fun `test operator on visual selection keeps the published selection`() {
+    configureByText("${c}Lorem ipsum")
+    enterCommand("set clipboard=autoselect")
+    typeText("vll", "d")
+    assertEquals("Lor", primarySelection.currentText)
+  }
+
+  // Autoselect is not a yank: `vp` with unnamed puts the last yank, not the selection it replaces
+  @TestWithPrimaryClipboard
+  fun `test visual put with unnamed puts the last yank and not the published selection`() {
+    configureByText("${c}Lorem ipsum")
+    enterCommand("set clipboard=unnamed,autoselect")
+    typeText("yiw", "w", "viw", "p")
+    assertState("Lorem Lore${c}m")
   }
 
   @Test
