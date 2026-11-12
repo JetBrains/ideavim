@@ -23,7 +23,6 @@ import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.EngineStringHelper
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.register.RegisterConstants.ALTERNATE_BUFFER_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.BLACK_HOLE_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.CLIPBOARD_REGISTER
@@ -84,19 +83,8 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   }
 
   private val onClipboardChanged: () -> Unit = {
-    val clipboardOptionValue = injector.globalOptions().clipboard
-    defaultRegisterChar = when {
-      "unnamedplus" in clipboardOptionValue -> {
-        if (isPrimaryRegisterSupported()) {
-          CLIPBOARD_REGISTER
-        } else {
-          PRIMARY_REGISTER // for some reason non-X systems use PRIMARY_REGISTER as a clipboard storage
-        }
-      }
-
-      "unnamed" in clipboardOptionValue -> PRIMARY_REGISTER
-      else -> UNNAMED_REGISTER
-    }
+    defaultRegisterChar =
+      SystemRegisterPolicy.defaultRegister(injector.globalOptions().clipboard, isPrimaryRegisterSupported())
     lastRegisterChar = defaultRegisterChar
   }
 
@@ -220,22 +208,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
       logger.debug { "register '$register' contains: \"$copiedText\"" }
     } // Put the text in the specified register
 
-    if (register == CLIPBOARD_REGISTER) {
-      injector.clipboardManager.setClipboardContent(editor, context, copiedText)
-      if (!isRegisterSpecifiedExplicitly && !isDelete && isPrimaryRegisterSupported() && OptionConstants.clipboard_unnamedplus in injector.globalOptions().clipboard) {
-        injector.clipboardManager.setPrimaryContent(editor, context, copiedText, type)
-      }
-    }
-    if (register == PRIMARY_REGISTER) {
-      if (isPrimaryRegisterSupported()) {
-        injector.clipboardManager.setPrimaryContent(editor, context, copiedText, type)
-        if (!isRegisterSpecifiedExplicitly && !isDelete && OptionConstants.clipboard_unnamed in injector.globalOptions().clipboard) {
-          injector.clipboardManager.setClipboardContent(editor, context, copiedText)
-        }
-      } else {
-        injector.clipboardManager.setClipboardContent(editor, context, copiedText)
-      }
-    }
+    writeToSystemSelections(editor, context, copiedText, type, register, isRegisterSpecifiedExplicitly, isDelete)
 
     // Also add it to the unnamed register if the default wasn't specified
     if (register != UNNAMED_REGISTER && ".:/".indexOf(register) == -1) {
@@ -418,29 +391,39 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     return myRegisters[r.lowercaseChar()]
   }
 
-  private fun setSystemPrimaryRegisterText(
+  /**
+   * Writes [copiedText] to the selections [SystemRegisterPolicy] picks for [register]; nothing for a register that
+   * isn't backed by one. If PRIMARY can't be written, CLIPBOARD gets the text instead.
+   */
+  private fun writeToSystemSelections(
     editor: VimEditor,
     context: ExecutionContext,
     copiedText: VimCopiedText,
     selectionType: SelectionType,
+    register: Char,
+    isExplicit: Boolean,
+    isDelete: Boolean,
   ) {
-    logger.trace("Setting text: $copiedText to primary selection...")
-    if (isPrimaryRegisterSupported()) {
-      try {
-        injector.clipboardManager.setPrimaryContent(editor, context, copiedText, selectionType)
-      } catch (e: Exception) {
-        logger.warn("False positive X11 primary selection support")
-        logger.trace("Setting text to primary selection failed. Setting it to clipboard selection instead")
-        setSystemClipboardRegisterText(editor, context, copiedText)
+    val selections = SystemRegisterPolicy.selectionsToWrite(
+      register,
+      isExplicit,
+      isDelete,
+      injector.globalOptions().clipboard,
+      isPrimaryRegisterSupported(),
+    )
+    for (selection in selections) {
+      when (selection) {
+        SystemSelection.CLIPBOARD -> injector.clipboardManager.setClipboardContent(editor, context, copiedText)
+        SystemSelection.PRIMARY -> try {
+          injector.clipboardManager.setPrimaryContent(editor, context, copiedText, selectionType)
+        } catch (e: Exception) {
+          logger.warn("False positive X11 primary selection support")
+          if (SystemSelection.CLIPBOARD !in selections) {
+            injector.clipboardManager.setClipboardContent(editor, context, copiedText)
+          }
+        }
       }
-    } else {
-      logger.trace("X11 primary selection is not supporting. Setting clipboard selection instead")
-      setSystemClipboardRegisterText(editor, context, copiedText)
     }
-  }
-
-  private fun setSystemClipboardRegisterText(editor: VimEditor, context: ExecutionContext, copiedText: VimCopiedText) {
-    injector.clipboardManager.setClipboardContent(editor, context, copiedText)
   }
 
   /**
@@ -580,20 +563,11 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   override fun saveRegister(editor: VimEditor, context: ExecutionContext, r: Char, register: Register) {
     var myR = if (Character.isUpperCase(r)) Character.toLowerCase(r) else r
 
-    if (CLIPBOARD_REGISTERS.indexOf(myR) >= 0) {
-      when (myR) {
-        CLIPBOARD_REGISTER -> {
-          if (!isPrimaryRegisterSupported()) {
-            // it looks wrong, but for some reason non-X systems use the * register to store the clipboard content
-            myR = PRIMARY_REGISTER
-          }
-          setSystemClipboardRegisterText(editor, context, register.copiedText)
-        }
-
-        PRIMARY_REGISTER -> {
-          setSystemPrimaryRegisterText(editor, context, register.copiedText, register.type)
-        }
-      }
+    // Saving a register names it, as `:let @+ = …` does, so it is written as explicit
+    writeToSystemSelections(editor, context, register.copiedText, register.type, myR, isExplicit = true, isDelete = false)
+    if (myR == CLIPBOARD_REGISTER && !isPrimaryRegisterSupported()) {
+      // it looks wrong, but for some reason non-X systems use the * register to store the clipboard content
+      myR = PRIMARY_REGISTER
     }
     myRegisters[myR] = register
   }
