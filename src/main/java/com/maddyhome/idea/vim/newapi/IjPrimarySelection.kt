@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.newapi
 import com.maddyhome.idea.vim.api.OwnedPrimaryContent
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import java.awt.Toolkit
+import java.awt.datatransfer.Transferable
 import java.util.concurrent.atomic.AtomicReference
 
 /**
@@ -18,16 +19,16 @@ import java.util.concurrent.atomic.AtomicReference
  * [PrimarySelectionWriter], which also tells whether the selection still holds what was written.
  *
  * Disposable through [dispose], so the writer's background thread and helper process are released with the service.
+ * The parameters replace PRIMARY in tests.
  */
-internal class IjPrimarySelection(private val writer: PrimarySelectionWriter = primarySelectionWriter()) {
+internal class IjPrimarySelection(
+  private val writer: PrimarySelectionWriter = primarySelectionWriter(),
+  private val selectionContents: () -> Transferable? = ::readSystemSelection,
+) {
   private val published = AtomicReference<OwnedPrimaryContent?>()
 
   /** The text in PRIMARY, or null where there is no PRIMARY or it has no text. */
-  fun read(): IjVimCopiedText? {
-    val selection = Toolkit.getDefaultToolkit()?.systemSelection ?: return null
-    val contents = selection.getContents(null) ?: return null
-    return IjCopiedTextCollector.fromTransferable(contents)
-  }
+  fun read(): IjVimCopiedText? = selectionContents()?.let(IjCopiedTextCollector::fromTransferable)
 
   /**
    * Publishes [textData] to PRIMARY. [selectionType] is remembered alongside it, as PRIMARY stores text only.
@@ -51,3 +52,6 @@ internal class IjPrimarySelection(private val writer: PrimarySelectionWriter = p
     published.set(null)
   }
 }
+
+/** The content of PRIMARY through AWT, or null where there is no PRIMARY. */
+private fun readSystemSelection(): Transferable? = Toolkit.getDefaultToolkit()?.systemSelection?.getContents(null)
