@@ -40,6 +40,7 @@ import com.maddyhome.idea.vim.state.mode.selectionType
 import java.awt.HeadlessException
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
+import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.UnsupportedFlavorException
 import java.io.IOException
@@ -51,6 +52,8 @@ import java.util.concurrent.atomic.AtomicReference
 // all dynamic, so an un-disposed executor would pin the plugin classloader across a reload.
 internal class IjClipboardManager(
   private val primaryWriter: PrimarySelectionWriter = primarySelectionWriter(),
+  private val ideClipboardContents: () -> Transferable? = { CopyPasteManagerEx.getInstanceEx().contents },
+  private val x11ClipboardText: () -> String? = ::readX11ClipboardText,
   private val isPrimarySupported: () -> Boolean = { injector.registerGroup.isPrimaryRegisterSupported() },
 ) : VimClipboardManager, Disposable {
   private val publishedToPrimary = AtomicReference<OwnedPrimaryContent?>()
@@ -285,7 +288,19 @@ internal class IjClipboardManager(
     return allValues
   }
 
-  private fun getContents(): Transferable? = CopyPasteManagerEx.getInstanceEx().contents
+  /**
+   * The IDE clipboard comes first, as it keeps the IDE metadata of a copy (e.g. the references `ideaput` uses for
+   * imports). On X11 it can come back empty for text owned by another application, though: the platform first asks the
+   * owner for the clipboard formats with a 300 ms timeout and reports an empty clipboard when the answer is late. The
+   * system clipboard is read directly then, with the regular AWT timeout, as the `*` register already does.
+   */
+  private fun getContents(): Transferable? {
+    val ideContents = ideClipboardContents()
+    if (ideContents != null && ideContents.isDataFlavorSupported(DataFlavor.stringFlavor)) return ideContents
+    val text = x11ClipboardText() ?: return ideContents
+    logger.debug("The IDE clipboard has no text, the text was read from the X11 clipboard")
+    return StringSelection(text)
+  }
 
   companion object {
     val logger = vimLogger<IjClipboardManager>()
@@ -297,6 +312,27 @@ internal class IjClipboardManager(
       Command.Type.PASTE,
       Command.Type.INSERT,
     )
+  }
+}
+
+/**
+ * Reads the text of the X11 CLIPBOARD selection through AWT, bypassing `ClipboardSynchronizer`. Returns null on any
+ * other windowing system, where the IDE clipboard doesn't lose the content of other applications.
+ */
+private fun readX11ClipboardText(): String? {
+  return try {
+    val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+    // The same check the platform uses to apply its short X11 timeout
+    if (clipboard.javaClass.name != "sun.awt.X11.XClipboard") return null
+    clipboard.getData(DataFlavor.stringFlavor) as? String
+  } catch (_: HeadlessException) {
+    null
+  } catch (_: IllegalStateException) {
+    null
+  } catch (_: UnsupportedFlavorException) {
+    null
+  } catch (_: IOException) {
+    null
   }
 }
 
