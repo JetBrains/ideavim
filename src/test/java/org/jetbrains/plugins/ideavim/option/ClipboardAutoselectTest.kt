@@ -10,10 +10,12 @@ package org.jetbrains.plugins.ideavim.option
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.registry.Registry
+import com.maddyhome.idea.vim.api.OwnedPrimaryContent
 import com.maddyhome.idea.vim.newapi.IjPrimarySelection
 import com.maddyhome.idea.vim.newapi.PrimaryAutoselect
 import com.maddyhome.idea.vim.newapi.PrimarySelectionWriter
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -34,7 +36,8 @@ class ClipboardAutoselectTest : VimTestCase() {
 
   private fun platformUpdatesPrimary() = Registry.`is`(PRIMARY_REGISTRY_KEY)
 
-  private fun publishVisualSelection(writer: RecordingPrimaryWriter) {
+  /** Publishes the visual selection as the visual group does, and returns what was remembered with it. */
+  private fun publishVisualSelection(writer: RecordingPrimaryWriter): OwnedPrimaryContent? {
     val primary = IjPrimarySelection(writer)
     val autoselect = PrimaryAutoselect(primary) { true }
     try {
@@ -42,6 +45,7 @@ class ClipboardAutoselectTest : VimTestCase() {
         val editor = fixture.editor.vim
         autoselect.onVisualSelectionChange(editor, editor.primaryCaret())
       }
+      return primary.lastPublishedContent()
     } finally {
       primary.dispose()
     }
@@ -56,6 +60,31 @@ class ClipboardAutoselectTest : VimTestCase() {
     val writer = RecordingPrimaryWriter()
     publishVisualSelection(writer)
     assertEquals(listOf("Lor"), writer.writes)
+  }
+
+  @Test
+  fun `test linewise visual selection is published to PRIMARY with its trailing newline`() {
+    configureByText("${c}Lorem\nipsum\ndolor")
+    enterCommand("set clipboard=autoselect")
+    typeText("Vj")
+
+    val writer = RecordingPrimaryWriter()
+    val published = publishVisualSelection(writer)
+    assertEquals(listOf("Lorem\nipsum\n"), writer.writes)
+    assertEquals(SelectionType.LINE_WISE, published?.selectionType)
+  }
+
+  // The text the platform puts into PRIMARY for the same selection: every caret, not the primary one only
+  @Test
+  fun `test blockwise visual selection is published to PRIMARY with every line`() {
+    configureByText("a${c}bc\ndef\nghi")
+    enterCommand("set clipboard=autoselect")
+    typeText("<C-V>jjl")
+
+    val writer = RecordingPrimaryWriter()
+    val published = publishVisualSelection(writer)
+    assertEquals(listOf("bc\nef\nhi"), writer.writes)
+    assertEquals(SelectionType.BLOCK_WISE, published?.selectionType)
   }
 
   @Test
