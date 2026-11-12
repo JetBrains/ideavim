@@ -204,8 +204,9 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
         logger.debug { "register '$register' contains: \"$copiedText\"" }
       } // Set the text if the lowercase register didn't exist yet
     } else {
-      myRegisters[register] = Register(register, copiedText, type)
-      logger.debug { "register '$register' contains: \"$copiedText\"" }
+      val storage = storageRegister(register)
+      myRegisters[storage] = Register(storage, copiedText, type)
+      logger.debug { "register '$storage' contains: \"$copiedText\"" }
     } // Put the text in the specified register
 
     writeToSystemSelections(editor, context, copiedText, type, register, isRegisterSpecifiedExplicitly, isDelete)
@@ -367,17 +368,21 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     return if (text.endsWith("\n")) SelectionType.LINE_WISE else SelectionType.CHARACTER_WISE
   }
 
+  /** @see SystemRegisterPolicy.storageRegister */
+  private fun storageRegister(register: Char): Char =
+    SystemRegisterPolicy.storageRegister(register, isPrimaryRegisterSupported())
+
   /**
-   * The contents of [myRegisters] are not synchronized with the primary or clipboard selections.
-   * In the following method, we update `myRegisters.get(r)` with the content of the corresponding system selection.
+   * Reads the `+` or `*` register from the selection behind it. [myRegisters] isn't kept in sync with the selections,
+   * so it only tells the type of text that is still there.
    *
-   * @param r - the register character corresponding to either the primary selection (*) or clipboard selection (+)
    * @return the content of the selection, if available, otherwise null
    */
-  private fun refreshClipboardRegister(editor: VimEditor, context: ExecutionContext, r: Char): Register? {
-    return when (r) {
-      PRIMARY_REGISTER -> refreshPrimaryRegister(editor, context)
-      CLIPBOARD_REGISTER -> refreshClipboardRegister(editor, context)
+  private fun readSystemRegister(editor: VimEditor, context: ExecutionContext, r: Char): Register? {
+    val storage = storageRegister(r)
+    return when {
+      storage == PRIMARY_REGISTER && isPrimaryRegisterSupported() -> readPrimaryRegister(editor, context)
+      storage in CLIPBOARD_REGISTERS -> readClipboardRegister(editor, context, storage)
       else -> throw RuntimeException("Clipboard register expected, got $r")
     }
   }
@@ -388,7 +393,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
 
   override fun getLastExplicitlyWrittenRegister(r: Char): Register? {
     require(CLIPBOARD_REGISTERS.contains(r.lowercaseChar())) { "Only clipboard registers are supported: got '$r'" }
-    return myRegisters[r.lowercaseChar()]
+    return myRegisters[storageRegister(r.lowercaseChar())]
   }
 
   /**
@@ -432,16 +437,12 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
    * PRIMARY holds text and nothing else, so the selection type has to be found elsewhere. Each source
    * below is less trustworthy than the one before it, ending in a guess made from the text alone.
    */
-  private fun refreshPrimaryRegister(editor: VimEditor, context: ExecutionContext): Register? {
-    if (!isPrimaryRegisterSupported()) {
-      logger.trace("X11 primary selection is not supported. Syncing clipboard selection..")
-      return refreshClipboardRegister(editor, context)
-    }
+  private fun readPrimaryRegister(editor: VimEditor, context: ExecutionContext): Register? {
     return try {
       registerWeStillOwn() ?: registerFor(injector.clipboardManager.getPrimaryContent(editor, context))
     } catch (e: Exception) {
       logger.warn("False positive X11 primary selection support")
-      refreshClipboardRegister(editor, context)
+      readClipboardRegister(editor, context, CLIPBOARD_REGISTER)
     }
   }
 
@@ -508,22 +509,20 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     return text == ourText.trimEnd()
   }
 
-  private fun refreshClipboardRegister(editor: VimEditor, context: ExecutionContext): Register? {
-    // for some reason non-X systems use PRIMARY_REGISTER as a clipboard storage
-    val systemAwareClipboardRegister = if (isPrimaryRegisterSupported()) CLIPBOARD_REGISTER else PRIMARY_REGISTER
-
+  /** Reads CLIPBOARD into [storage], the register it is kept in. */
+  private fun readClipboardRegister(editor: VimEditor, context: ExecutionContext, storage: Char): Register? {
     val clipboardData = injector.clipboardManager.getClipboardContent(editor, context) ?: return null
-    val currentRegister = myRegisters[systemAwareClipboardRegister]
+    val currentRegister = myRegisters[storage]
     if (currentRegister != null) {
       // Same lossy-tail tolerance as PRIMARY: the clipboard is usually faithful, but it is re-read
       // from the X server once another application owns it, and `+` would otherwise lose its type
       // for exactly the same reason `*` did.
       if (clipboardData.text == currentRegister.text) return currentRegister
       if (clipboardData.isTailStrippedFormOf(currentRegister.text)) {
-        return Register(systemAwareClipboardRegister, clipboardData, currentRegister.type)
+        return Register(storage, clipboardData, currentRegister.type)
       }
     }
-    return Register(systemAwareClipboardRegister, clipboardData, guessSelectionType(clipboardData.text))
+    return Register(storage, clipboardData, guessSelectionType(clipboardData.text))
   }
 
   override fun getRegister(editor: VimEditor, context: ExecutionContext, r: Char): Register? {
@@ -541,18 +540,15 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
       return getAlternateBufferName(editor)
     }
 
-    return if (CLIPBOARD_REGISTERS.indexOf(myR) >= 0) refreshClipboardRegister(
-      editor,
-      context,
-      myR
-    ) else myRegisters[myR]
+    return if (myR in CLIPBOARD_REGISTERS) readSystemRegister(editor, context, myR) else myRegisters[myR]
   }
 
   override fun getRegisters(editor: VimEditor, context: ExecutionContext): List<Register> {
     val filteredRegisters = myRegisters.values.filterNot { CLIPBOARD_REGISTERS.contains(it.name) }.toMutableList()
     val clipboardRegisters = CLIPBOARD_REGISTERS
-      .filterNot { it == CLIPBOARD_REGISTER && !isPrimaryRegisterSupported() } // for some reason non-X systems use PRIMARY_REGISTER as a clipboard storage
-      .mapNotNull { refreshClipboardRegister(editor, context, it) }
+      .map { storageRegister(it) }
+      .distinct()
+      .mapNotNull { readSystemRegister(editor, context, it) }
     return (filteredRegisters + clipboardRegisters + listOfNotNull(
       getCurrentFileNameRegister(editor),
       getAlternateBufferName(editor)
@@ -561,14 +557,10 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   }
 
   override fun saveRegister(editor: VimEditor, context: ExecutionContext, r: Char, register: Register) {
-    var myR = if (Character.isUpperCase(r)) Character.toLowerCase(r) else r
+    val myR = storageRegister(r.lowercaseChar())
 
     // Saving a register names it, as `:let @+ = …` does, so it is written as explicit
     writeToSystemSelections(editor, context, register.copiedText, register.type, myR, isExplicit = true, isDelete = false)
-    if (myR == CLIPBOARD_REGISTER && !isPrimaryRegisterSupported()) {
-      // it looks wrong, but for some reason non-X systems use the * register to store the clipboard content
-      myR = PRIMARY_REGISTER
-    }
     myRegisters[myR] = register
   }
 

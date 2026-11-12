@@ -20,16 +20,22 @@ enum class SystemSelection { CLIPBOARD, PRIMARY }
  * The rules for the `+` and `*` registers that depend on `'clipboard'` and on the windowing system, kept in one place
  * so they read as a table. Pure: the caller passes the option value and whether there is a PRIMARY selection.
  *
- * PRIMARY exists on X11 (and XWayland) only. Without it, `*` is backed by CLIPBOARD, and `unnamedplus` selects `*`
- * rather than `+`, as `*` is where the clipboard register is kept there.
+ * PRIMARY exists on X11 (and XWayland) only. Without it there is one clipboard, and `+` and `*` are one register,
+ * see [storageRegister].
  */
 object SystemRegisterPolicy {
 
+  /**
+   * The register [register] is kept in. Without PRIMARY, `+` is kept in `*`, which is backed by CLIPBOARD, so both
+   * names read and write the same register and `:registers` lists it as `"*`. This is what Vim does with one clipboard
+   * (`PLUS_REGISTER` is `STAR_REGISTER` under `ONE_CLIPBOARD`).
+   */
+  fun storageRegister(register: Char, isPrimarySupported: Boolean): Char =
+    if (register == CLIPBOARD_REGISTER && !isPrimarySupported) PRIMARY_REGISTER else register
+
   /** The register that commands without a register name use. */
   fun defaultRegister(clipboardOption: Collection<String>, isPrimarySupported: Boolean): Char = when {
-    OptionConstants.clipboard_unnamedplus in clipboardOption ->
-      if (isPrimarySupported) CLIPBOARD_REGISTER else PRIMARY_REGISTER
-
+    OptionConstants.clipboard_unnamedplus in clipboardOption -> storageRegister(CLIPBOARD_REGISTER, isPrimarySupported)
     OptionConstants.clipboard_unnamed in clipboardOption -> PRIMARY_REGISTER
     else -> UNNAMED_REGISTER
   }
