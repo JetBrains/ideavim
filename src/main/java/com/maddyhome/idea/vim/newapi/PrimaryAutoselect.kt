@@ -25,19 +25,26 @@ import com.maddyhome.idea.vim.state.mode.selectionType
 
 /*
  * `autoselect` in 'clipboard': the visual selection goes to PRIMARY. Two things put a selection there:
- * - IdeaVim, through [PrimaryAutoselect], with the type of the visual selection
- * - the platform, which copies every editor selection as untyped text, and which [ClipboardAutoselectChangeListener]
- *   turns off without `autoselect`
+ * - the platform, which copies every selection as untyped text (of any editor, the terminal included), and which
+ *   [ClipboardAutoselectChangeListener] turns off without `autoselect`
+ * - IdeaVim, through [PrimaryAutoselect], which publishes the visual selection again with its type
  */
 
-/** Publishes the visual selection to PRIMARY with `autoselect`. */
+/**
+ * Publishes the visual selection to PRIMARY with `autoselect`, after the platform has.
+ *
+ * The text is the one the platform publishes, a linewise selection with its trailing newline added. So whichever
+ * comes last, PRIMARY holds the text of the selection, and the type is recognised from it when PRIMARY is read (the
+ * register group tolerates the missing newline). IdeaVim publishes it again because the write of the platform reaches
+ * readers late on Wayland (VIM-4184), and the writer here comes after it.
+ */
 internal class PrimaryAutoselect(
   private val primary: IjPrimarySelection,
   private val isPrimarySupported: () -> Boolean = { injector.registerGroup.isPrimaryRegisterSupported() },
 ) {
   fun onVisualSelectionChange(editor: VimEditor, caret: ImmutableVimCaret) {
     if (!shouldRepublishVisualSelection(editor)) return
-    val text = readVisualSelectionText(editor, caret) ?: return
+    val text = readVisualSelectionText(editor) ?: return
     val selectionType = editor.mode.selectionType ?: SelectionType.CHARACTER_WISE
     primary.write(IjVimCopiedText(text, emptyList()), selectionType)
   }
@@ -51,13 +58,11 @@ internal class PrimaryAutoselect(
     return isPrimarySupported()
   }
 
-  private fun readVisualSelectionText(editor: VimEditor, caret: ImmutableVimCaret): String? {
-    val start = caret.selectionStart
-    val end = caret.selectionEnd
-    if (start >= end) return null
-    val rawText = runCatching { editor.text().subSequence(start, end).toString() }.getOrNull() ?: return null
-    if (rawText.isEmpty()) return null
-    return ensureLinewiseTrailingNewline(rawText, editor.mode.selectionType)
+  /** The selection of every caret, as the platform publishes it, so a block comes with each of its lines. */
+  private fun readVisualSelectionText(editor: VimEditor): String? {
+    val text = runCatching { editor.ij.selectionModel.getSelectedText(true) }.getOrNull()
+    if (text.isNullOrEmpty()) return null
+    return ensureLinewiseTrailingNewline(text, editor.mode.selectionType)
   }
 
   // `lineToNativeSelection` ends the selection at the trailing `\n` rather than after it, so the

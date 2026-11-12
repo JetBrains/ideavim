@@ -15,6 +15,26 @@ import org.jetbrains.plugins.ideavim.annotations.TestWithoutPrimaryClipboard
 import org.junit.jupiter.api.Test
 
 class YankAndPutTest : VimTestCase() {
+  // With autoselect, PRIMARY gets every line of a block, and * keeps the block type
+  @TestWithPrimaryClipboard
+  fun `test blockwise visual selection is put from primary register as a block`() {
+    configureByText(
+      """
+        a${c}bc
+        def
+        ghi
+      """.trimIndent(),
+    )
+    typeText("<C-V>jjl<Esc>", "gg0\"*P")
+    assertState(
+      """
+        ${c}bcabc
+        efdef
+        highi
+      """.trimIndent(),
+    )
+  }
+
   // With unnamed, a yank to * is copied to CLIPBOARD, and + has to know its type
   @TestWithPrimaryClipboard
   fun `test blockwise yank with unnamed keeps its type in plus register`() {
