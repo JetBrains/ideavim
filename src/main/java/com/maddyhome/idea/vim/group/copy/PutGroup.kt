@@ -139,6 +139,12 @@ internal class PutGroup : VimPutBase() {
 
     val registerChar = text.registerChar
     if (registerChar != null && registerChar == RegisterConstants.CLIPBOARD_REGISTER) {
+      // On X11 the IDE clipboard can miss the text of another application even though the register was read (see
+      // IjClipboardManager.getContents), and the IDE paste would then insert nothing. The register holds the clipboard
+      // text, so it is put into the clipboard and kept there.
+      if (CopyPasteManager.getInstance().contents?.getText() == null) {
+        putIntoClipboard(text.copiedText as IjVimCopiedText)
+      }
       (pasteProvider as IjPasteProvider).pasteProvider.performPaste(context)
     } else {
       pasteKeepingClipboard(text) {
