@@ -11,4 +11,11 @@ package com.maddyhome.idea.vim.api
 interface SystemInfoService {
   val isWindows: Boolean
   val isXWindow: Boolean
+
+  /**
+   * Whether the windowing system has a PRIMARY selection, the one pasted with the middle mouse button: X11, and
+   * Wayland through XWayland. Without it there is one clipboard, and the `*` register is backed by it.
+   */
+  val hasPrimarySelection: Boolean
+    get() = isXWindow && System.getenv("DISPLAY") != null
 }

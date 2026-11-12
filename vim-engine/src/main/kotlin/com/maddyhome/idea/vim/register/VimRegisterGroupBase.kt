@@ -396,9 +396,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     }
   }
 
-  override fun isPrimaryRegisterSupported(): Boolean {
-    return System.getenv("DISPLAY") != null && injector.systemInfoService.isXWindow
-  }
+  override fun isPrimaryRegisterSupported(): Boolean = injector.systemInfoService.hasPrimarySelection
 
   override fun getLastExplicitlyWrittenRegister(r: Char): Register? {
     require(CLIPBOARD_REGISTERS.contains(r.lowercaseChar())) { "Only clipboard registers are supported: got '$r'" }
