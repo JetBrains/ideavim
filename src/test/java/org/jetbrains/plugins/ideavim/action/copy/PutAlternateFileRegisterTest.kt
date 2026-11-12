@@ -107,7 +107,8 @@ class PutAlternateFileRegisterTest : VimTestCase() {
     openFile("subdir/AnotherFile.txt")
     openFile("MyFile.txt")
 
-    enterCommand("registers")
+    // Only these two, as the listing has the selection registers too where there is a PRIMARY
+    enterCommand("registers %#")
 
     assertExOutput(
       """Type Name Content

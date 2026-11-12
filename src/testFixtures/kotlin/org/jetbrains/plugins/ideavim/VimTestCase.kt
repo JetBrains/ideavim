@@ -46,6 +46,7 @@ import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
+import com.intellij.testFramework.replaceService
 import com.intellij.util.ui.EmptyClipboardOwner
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
@@ -55,6 +56,7 @@ import com.maddyhome.idea.vim.api.EffectiveOptions
 import com.maddyhome.idea.vim.api.GlobalOptions
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimClipboardManager
 import com.maddyhome.idea.vim.api.VimDigraphGroupBase
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.VimOutputPanel
@@ -82,6 +84,9 @@ import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.mark.Mark
+import com.maddyhome.idea.vim.newapi.IjClipboardManager
+import com.maddyhome.idea.vim.newapi.IjClipboardSelection
+import com.maddyhome.idea.vim.newapi.IjPrimarySelection
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ijOptions
 import com.maddyhome.idea.vim.newapi.vim
@@ -125,6 +130,9 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
 
   lateinit var testInfo: TestInfo
 
+  /** PRIMARY as the test sees it, see [replaceSystemSelections]. */
+  lateinit var primarySelection: FakePrimarySelection
+
   @BeforeEach
   open fun setUp(testInfo: TestInfo) {
     val factory = IdeaTestFixtureFactory.getFixtureFactory()
@@ -144,6 +152,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     if (VimPlugin.isNotEnabled()) VimPlugin.setEnabled(true)
     injector.globalOptions().ideastrictmode = true
     Checks.reset()
+    replaceSystemSelections()
     clearClipboard()
     clearAlternateFile()
 
@@ -1155,6 +1164,21 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
   private fun KeyStroke.getChar(editor: Editor): CharType {
     if (keyChar != KeyEvent.CHAR_UNDEFINED) return CharType.CharDetected(keyChar)
     return CharType.UNDEFINED
+  }
+
+  /**
+   * Keeps the test away from the clipboards of the machine it runs on: PRIMARY is [primarySelection], and CLIPBOARD
+   * isn't read from X11 when the IDE clipboard has no text, as the X11 clipboard is the one of the desktop. CLIPBOARD
+   * itself is still the IDE clipboard, which [clearClipboard] empties.
+   */
+  private fun replaceSystemSelections() {
+    primarySelection = FakePrimarySelection()
+    val clipboardManager = IjClipboardManager(
+      clipboard = IjClipboardSelection(x11ClipboardText = { null }),
+      primary = IjPrimarySelection(primarySelection, primarySelection::contents),
+    )
+    ApplicationManager.getApplication()
+      .replaceService(VimClipboardManager::class.java, clipboardManager, fixture.testRootDisposable)
   }
 
   private fun clearClipboard() {
