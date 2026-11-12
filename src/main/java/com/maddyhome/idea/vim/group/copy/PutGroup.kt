@@ -38,6 +38,7 @@ import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.ide.isClionNova
 import com.maddyhome.idea.vim.ide.isRider
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
+import com.maddyhome.idea.vim.newapi.IjClipboardSelection
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimCopiedText
 import com.maddyhome.idea.vim.newapi.IjVimEditor
@@ -224,7 +225,7 @@ internal class PutGroup : VimPutBase() {
   private fun putIntoClipboard(copiedText: IjVimCopiedText): TextBlockTransferable {
     logger.debug { "Copied text: $copiedText" }
     val (text, transferableData) = copiedText
-    return injector.clipboardManager.setClipboardText(text, text, transferableData) as TextBlockTransferable
+    return checkNotNull(IjClipboardSelection.write(text, text, transferableData)) { "The clipboard can't be written" }
   }
 
   private fun CopyPasteManager.holdsText(text: String): Boolean = contents?.getText() == text

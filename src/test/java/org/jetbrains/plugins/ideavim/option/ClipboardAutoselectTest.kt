@@ -10,7 +10,8 @@ package org.jetbrains.plugins.ideavim.option
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.registry.Registry
-import com.maddyhome.idea.vim.newapi.IjClipboardManager
+import com.maddyhome.idea.vim.newapi.IjPrimarySelection
+import com.maddyhome.idea.vim.newapi.PrimaryAutoselect
 import com.maddyhome.idea.vim.newapi.PrimarySelectionWriter
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -34,14 +35,15 @@ class ClipboardAutoselectTest : VimTestCase() {
   private fun platformUpdatesPrimary() = Registry.`is`(PRIMARY_REGISTRY_KEY)
 
   private fun publishVisualSelection(writer: RecordingPrimaryWriter) {
-    val manager = IjClipboardManager(writer) { true }
+    val primary = IjPrimarySelection(writer)
+    val autoselect = PrimaryAutoselect(primary) { true }
     try {
       ApplicationManager.getApplication().invokeAndWait {
         val editor = fixture.editor.vim
-        manager.onVisualSelectionChange(editor, editor.primaryCaret())
+        autoselect.onVisualSelectionChange(editor, editor.primaryCaret())
       }
     } finally {
-      manager.dispose()
+      primary.dispose()
     }
   }
 

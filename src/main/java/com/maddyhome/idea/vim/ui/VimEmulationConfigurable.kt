@@ -49,6 +49,7 @@ import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo.AllModes
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo.PerMode
+import com.maddyhome.idea.vim.newapi.IjClipboardSelection
 import com.maddyhome.idea.vim.vimscript.services.VimRcService
 import org.jetbrains.annotations.Nls
 import java.awt.BorderLayout
@@ -535,7 +536,7 @@ internal class VimEmulationConfigurable : Configurable {
         stringBuilder.append("\n")
       }
       val data = stringBuilder.toString()
-      injector.clipboardManager.setClipboardText(data, data, emptyList())
+      IjClipboardSelection.write(data, data, emptyList())
     }
   }
 

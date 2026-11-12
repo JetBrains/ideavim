@@ -88,7 +88,6 @@ import com.maddyhome.idea.vim.autocmd.AutoCmdEvent
 import com.maddyhome.idea.vim.autocmd.IjFileTypeMapping
 import com.maddyhome.idea.vim.common.ModeChangeListener
 import com.maddyhome.idea.vim.common.ModeWillChangeListener
-import com.maddyhome.idea.vim.group.ClipboardAutoselectChangeListener
 import com.maddyhome.idea.vim.group.CommentsOptionInitializer
 import com.maddyhome.idea.vim.group.ConsoleOptionChangeListener
 import com.maddyhome.idea.vim.group.ControlCharsEditorHighlighter
@@ -126,6 +125,7 @@ import com.maddyhome.idea.vim.helper.vimSearchHighlights
 import com.maddyhome.idea.vim.key.noteCaretMoveInInsertSession
 import com.maddyhome.idea.vim.key.resetAbbreviationSession
 import com.maddyhome.idea.vim.listener.VimListenerManager.VimEditorFactoryListener.scheduleDeferredInitialisation
+import com.maddyhome.idea.vim.newapi.ClipboardAutoselectChangeListener
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.IjVimSearchGroup
 import com.maddyhome.idea.vim.newapi.InsertTimeRecorder

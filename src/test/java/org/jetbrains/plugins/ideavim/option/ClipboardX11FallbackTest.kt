@@ -11,10 +11,8 @@ package org.jetbrains.plugins.ideavim.option
 import com.intellij.codeInsight.editorActions.TextBlockTransferable
 import com.intellij.openapi.editor.CaretStateTransferableData
 import com.intellij.openapi.editor.RawText
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.VimCopiedText
-import com.maddyhome.idea.vim.newapi.IjClipboardManager
-import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.newapi.IjClipboardSelection
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import java.awt.datatransfer.DataFlavor
@@ -32,20 +30,14 @@ class ClipboardX11FallbackTest : VimTestCase() {
 
   private fun readClipboard(ideContents: Transferable?, x11Text: String?): VimCopiedText? {
     configureByText("${c}Lorem ipsum")
-    val manager = IjClipboardManager(
+    val clipboard = IjClipboardSelection(
       ideClipboardContents = { ideContents },
       x11ClipboardText = {
         x11Reads++
         x11Text
       },
     )
-    try {
-      val editor = fixture.editor.vim
-      val context = injector.executionContextManager.getEditorExecutionContext(editor)
-      return manager.getClipboardContent(editor, context)
-    } finally {
-      manager.dispose()
-    }
+    return clipboard.read()
   }
 
   @Test
