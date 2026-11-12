@@ -10,10 +10,31 @@ package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.annotations.TestWithPrimaryClipboard
 import org.jetbrains.plugins.ideavim.annotations.TestWithoutPrimaryClipboard
 import org.junit.jupiter.api.Test
 
 class YankAndPutTest : VimTestCase() {
+  // With unnamed, a yank to * is copied to CLIPBOARD, and + has to know its type
+  @TestWithPrimaryClipboard
+  fun `test blockwise yank with unnamed keeps its type in plus register`() {
+    configureByText(
+      """
+        a${c}bc
+        def
+      """.trimIndent(),
+    )
+    enterCommand("set clipboard=unnamed")
+    typeText("<C-V>jly", "0\"+P")
+    assertState(
+      """
+        ${c}bcabc
+        efdef
+      """.trimIndent(),
+    )
+    enterCommand("set clipboard&")
+  }
+
   // Without PRIMARY, + is kept in the * register, as in Vim. The type of a yank to + has to be found there.
   @TestWithoutPrimaryClipboard
   fun `test blockwise yank to plus register keeps its type without primary clipboard`() {

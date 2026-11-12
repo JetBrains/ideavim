@@ -38,6 +38,7 @@ import com.maddyhome.idea.vim.register.RegisterConstants.UNNAMED_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.VALID_REGISTERS
 import com.maddyhome.idea.vim.register.RegisterConstants.WRITABLE_REGISTERS
 import com.maddyhome.idea.vim.state.mode.SelectionType
+import java.util.EnumMap
 import javax.swing.KeyStroke
 
 abstract class VimRegisterGroupBase : VimRegisterGroup {
@@ -60,6 +61,13 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
 
   @JvmField
   protected val myRegisters: java.util.HashMap<Char, Register> = HashMap()
+
+  /**
+   * What IdeaVim last wrote to each selection, copies made by `unnamed` and `unnamedplus` included. A selection keeps
+   * text only, so this tells the type of text that is still there. The `+` and `*` registers in [myRegisters] are the
+   * registers as Vim sees them instead, which a copy to the other selection doesn't change.
+   */
+  private val lastWrittenToSelection = EnumMap<SystemSelection, Register>(SystemSelection::class.java)
 
   @JvmField
   protected var defaultRegisterChar: Char = UNNAMED_REGISTER
@@ -136,6 +144,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     defaultRegisterChar = UNNAMED_REGISTER
     lastRegisterChar = defaultRegister
     myRegisters.clear()
+    lastWrittenToSelection.clear()
   }
 
   private fun isSmallDeletionSpecialCase(): Boolean {
@@ -416,6 +425,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
       injector.globalOptions().clipboard,
       isPrimaryRegisterSupported(),
     )
+    val written = Register(register, copiedText, selectionType)
     for (selection in selections) {
       when (selection) {
         SystemSelection.CLIPBOARD -> injector.clipboardManager.setClipboardContent(editor, context, copiedText)
@@ -425,9 +435,11 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
           logger.warn("False positive X11 primary selection support")
           if (SystemSelection.CLIPBOARD !in selections) {
             injector.clipboardManager.setClipboardContent(editor, context, copiedText)
+            lastWrittenToSelection[SystemSelection.CLIPBOARD] = written
           }
         }
       }
+      lastWrittenToSelection[selection] = written
     }
   }
 
@@ -452,11 +464,12 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
 
   private fun registerFor(selection: VimCopiedText?): Register? {
     if (selection == null || selection.text.isEmpty()) return registerForUnreadableSelection(selection)
-    // What we published is asked first: it is the record of what actually went to the selection,
-    // whereas the `*` register is only updated by the paths that write it explicitly.
-    return publishedRegisterHolding(selection)
-      ?: cachedRegisterHolding(selection)
-      ?: Register(PRIMARY_REGISTER, selection, guessSelectionType(selection.text))
+    // The IDE republishes the editor selection to PRIMARY on every selection change, as untyped text, so ownership
+    // is routinely lost to our own process with no foreign application involved. What we published is asked first:
+    // it is the record of what went to the selection, the autoselect of a visual selection included.
+    val published = injector.clipboardManager.getLastPublishedPrimaryContent()
+      ?.let { Register(PRIMARY_REGISTER, it.copiedText, it.selectionType) }
+    return recognise(PRIMARY_REGISTER, selection, published, lastWrittenToSelection[SystemSelection.PRIMARY])
   }
 
   /**
@@ -465,31 +478,31 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
    * still a register: reporting it as absent would drop the `*` row from `:registers` altogether.
    */
   private fun registerForUnreadableSelection(selection: VimCopiedText?): Register? =
-    myRegisters[PRIMARY_REGISTER]
+    (lastWrittenToSelection[SystemSelection.PRIMARY] ?: myRegisters[PRIMARY_REGISTER])
+      ?.let { Register(PRIMARY_REGISTER, it.copiedText, it.type) }
       ?: selection?.let { Register(PRIMARY_REGISTER, it, SelectionType.CHARACTER_WISE) }
 
   /**
-   * The IDE republishes the editor selection to PRIMARY on every selection change, as untyped text, so
-   * ownership is routinely lost to our own process with no foreign application involved. Recognising
-   * our own text lets the type survive that.
+   * The [name] register read from a selection holding [selection], with the type of the first of [ours] that still
+   * holds this text. [myRegisters] comes last, as it is what remains of our writes after a restart. With none of them,
+   * the type is guessed from the text: someone else put it there.
    */
-  private fun publishedRegisterHolding(selection: VimCopiedText): Register? =
-    injector.clipboardManager.getLastPublishedPrimaryContent()
-      ?.let { recoverRegister(selection, it.copiedText, it.selectionType) }
-
-  private fun cachedRegisterHolding(selection: VimCopiedText): Register? =
-    myRegisters[PRIMARY_REGISTER]?.let { recoverRegister(selection, it.copiedText, it.type) }
+  private fun recognise(name: Char, selection: VimCopiedText, vararg ours: Register?): Register =
+    (ours.asSequence() + myRegisters[name])
+      .filterNotNull()
+      .firstNotNullOfOrNull { recoverRegister(name, selection, it) }
+      ?: Register(name, selection, guessSelectionType(selection.text))
 
   /**
-   * Rebuilds the register from [ours] when the selection still holds that text.
+   * Rebuilds the register from [ours] when the selection still holds its text.
    *
    * On an exact match our own copy is returned, keeping the transferable data collected at yank time.
    * On a stripped match only the *type* is taken from [ours]: the selection's text is what a paste
    * should insert, and substituting ours would hand back characters the selection never held.
    */
-  private fun recoverRegister(selection: VimCopiedText, ours: VimCopiedText, type: SelectionType): Register? = when {
-    selection.text == ours.text -> Register(PRIMARY_REGISTER, ours, type)
-    selection.isTailStrippedFormOf(ours.text) -> Register(PRIMARY_REGISTER, selection, type)
+  private fun recoverRegister(name: Char, selection: VimCopiedText, ours: Register): Register? = when {
+    selection.text == ours.text -> Register(name, ours.copiedText, ours.type)
+    selection.isTailStrippedFormOf(ours.text) -> Register(name, selection, ours.type)
     else -> null
   }
 
@@ -509,20 +522,13 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     return text == ourText.trimEnd()
   }
 
-  /** Reads CLIPBOARD into [storage], the register it is kept in. */
+  /**
+   * Reads CLIPBOARD into [storage], the register it is kept in. The clipboard is usually faithful, but it is re-read
+   * from the X server once another application owns it, so the same lossy-tail tolerance as for PRIMARY applies.
+   */
   private fun readClipboardRegister(editor: VimEditor, context: ExecutionContext, storage: Char): Register? {
     val clipboardData = injector.clipboardManager.getClipboardContent(editor, context) ?: return null
-    val currentRegister = myRegisters[storage]
-    if (currentRegister != null) {
-      // Same lossy-tail tolerance as PRIMARY: the clipboard is usually faithful, but it is re-read
-      // from the X server once another application owns it, and `+` would otherwise lose its type
-      // for exactly the same reason `*` did.
-      if (clipboardData.text == currentRegister.text) return currentRegister
-      if (clipboardData.isTailStrippedFormOf(currentRegister.text)) {
-        return Register(storage, clipboardData, currentRegister.type)
-      }
-    }
-    return Register(storage, clipboardData, guessSelectionType(clipboardData.text))
+    return recognise(storage, clipboardData, lastWrittenToSelection[SystemSelection.CLIPBOARD])
   }
 
   override fun getRegister(editor: VimEditor, context: ExecutionContext, r: Char): Register? {
