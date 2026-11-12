@@ -24,6 +24,23 @@ class SystemRegisterPolicyTest {
     NAMED_DELETE(true, true),
   }
 
+  // Without PRIMARY, + is kept in *, as in Vim with one clipboard
+  @ParameterizedTest
+  @CsvSource(
+    delimiter = '|',
+    useHeadersInDisplayName = true,
+    textBlock = """register | platform | storage register
+                   +        | X11      | +
+                   *        | X11      | *
+                   +        | OTHER    | *
+                   *        | OTHER    | *
+                   "        | OTHER    | "
+                   a        | OTHER    | a""",
+  )
+  fun `storage register`(register: Char, platform: Platform, expected: Char) {
+    assertEquals(expected, SystemRegisterPolicy.storageRegister(register, platform.isPrimarySupported))
+  }
+
   @ParameterizedTest
   @CsvSource(
     delimiter = '|',

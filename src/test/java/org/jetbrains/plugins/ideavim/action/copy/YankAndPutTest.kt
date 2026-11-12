@@ -14,6 +14,24 @@ import org.jetbrains.plugins.ideavim.annotations.TestWithoutPrimaryClipboard
 import org.junit.jupiter.api.Test
 
 class YankAndPutTest : VimTestCase() {
+  // Without PRIMARY, + is kept in the * register, as in Vim. The type of a yank to + has to be found there.
+  @TestWithoutPrimaryClipboard
+  fun `test blockwise yank to plus register keeps its type without primary clipboard`() {
+    configureByText(
+      """
+        a${c}bc
+        def
+      """.trimIndent(),
+    )
+    typeText("<C-V>jl\"+y", "0\"+P")
+    assertState(
+      """
+        ${c}bcabc
+        efdef
+      """.trimIndent(),
+    )
+  }
+
   @Test
   fun `test yank to number register with unnamedplus`() {
     val before = """
