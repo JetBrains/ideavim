@@ -91,5 +91,12 @@ interface VimRegisterGroup {
   fun isSystemClipboard(register: Char): Boolean
   fun isPrimaryRegisterSupported(): Boolean
 
+  /**
+   * The visual selection of [editor] changed: with `autoselect` in 'clipboard', it goes to PRIMARY.
+   *
+   * Default: no-op.
+   */
+  fun onVisualSelectionChange(editor: VimEditor) {}
+
   fun getLastExplicitlyWrittenRegister(r: Char): Register?
 }

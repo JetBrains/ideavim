@@ -10,8 +10,6 @@ package com.maddyhome.idea.vim.newapi
 
 import com.intellij.openapi.Disposable
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.ImmutableVimCaret
-import com.maddyhome.idea.vim.api.OwnedPrimaryContent
 import com.maddyhome.idea.vim.api.VimClipboardManager
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.TextRange
@@ -23,8 +21,10 @@ import java.awt.datatransfer.Transferable
  * The [VimClipboardManager] of IntelliJ. It only hands each call to the part that does the work:
  * - [IjClipboardSelection]: CLIPBOARD, through the IDE clipboard
  * - [IjPrimarySelection]: PRIMARY of X11, and whether it still holds what IdeaVim wrote
- * - [PrimaryAutoselect]: the visual selection to PRIMARY with `autoselect`
  * - [IjCopiedTextCollector]: the IDE metadata of copied text
+ *
+ * `autoselect` and the type of what was written to PRIMARY are in the register group of vim-engine. The methods about
+ * them that are left here keep their defaults.
  *
  * Disposable so the PRIMARY writer's background thread and helper process are released when the service goes away.
  * That covers plugin unload as well as shutdown: IdeaVim's extension points are all dynamic, so an un-disposed executor
@@ -33,7 +33,6 @@ import java.awt.datatransfer.Transferable
 internal class IjClipboardManager(
   private val clipboard: IjClipboardSelection = IjClipboardSelection(),
   private val primary: IjPrimarySelection = IjPrimarySelection(),
-  private val autoselect: PrimaryAutoselect = PrimaryAutoselect(primary),
 ) : VimClipboardManager, Disposable {
 
   override fun dispose() {
@@ -60,15 +59,10 @@ internal class IjClipboardManager(
     selectionType: SelectionType,
   ): Boolean {
     require(textData is IjVimCopiedText)
-    return primary.write(textData, selectionType)
+    return primary.write(textData)
   }
 
-  override fun getOwnedPrimaryContent(): OwnedPrimaryContent? = primary.ownedContent()
-
-  override fun getLastPublishedPrimaryContent(): OwnedPrimaryContent? = primary.lastPublishedContent()
-
-  override fun onVisualSelectionChange(editor: VimEditor, caret: ImmutableVimCaret) =
-    autoselect.onVisualSelectionChange(editor, caret)
+  override fun isPrimaryOwned(): Boolean = primary.isOwned()
 
   override fun collectCopiedText(
     editor: VimEditor,

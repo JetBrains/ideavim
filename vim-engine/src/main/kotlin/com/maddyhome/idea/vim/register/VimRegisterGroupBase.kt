@@ -63,9 +63,10 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   protected val myRegisters: java.util.HashMap<Char, Register> = HashMap()
 
   /**
-   * What IdeaVim last wrote to each selection, copies made by `unnamed` and `unnamedplus` included. A selection keeps
-   * text only, so this tells the type of text that is still there. The `+` and `*` registers in [myRegisters] are the
-   * registers as Vim sees them instead, which a copy to the other selection doesn't change.
+   * What IdeaVim last wrote to each selection: copies made by `unnamed` and `unnamedplus` and the visual selection of
+   * `autoselect` included, a write to PRIMARY that failed excluded. A selection keeps text only, so this tells the type
+   * of text that is still there. The `+` and `*` registers in [myRegisters] are the registers as Vim sees them instead,
+   * which neither a copy to the other selection nor `autoselect` changes.
    */
   private val lastWrittenToSelection = EnumMap<SystemSelection, Register>(SystemSelection::class.java)
 
@@ -426,19 +427,46 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     val written = Register(register, copiedText, selectionType)
     for (selection in selections) {
       when (selection) {
-        SystemSelection.CLIPBOARD -> injector.clipboardManager.setClipboardContent(editor, context, copiedText)
+        SystemSelection.CLIPBOARD -> writeToClipboard(editor, context, written)
         SystemSelection.PRIMARY -> try {
-          injector.clipboardManager.setPrimaryContent(editor, context, copiedText, selectionType)
+          writeToPrimary(editor, context, written)
         } catch (e: Exception) {
           logger.warn("False positive X11 primary selection support")
-          if (SystemSelection.CLIPBOARD !in selections) {
-            injector.clipboardManager.setClipboardContent(editor, context, copiedText)
-            lastWrittenToSelection[SystemSelection.CLIPBOARD] = written
-          }
+          lastWrittenToSelection.remove(SystemSelection.PRIMARY)
+          if (SystemSelection.CLIPBOARD !in selections) writeToClipboard(editor, context, written)
         }
       }
-      lastWrittenToSelection[selection] = written
     }
+  }
+
+  private fun writeToClipboard(editor: VimEditor, context: ExecutionContext, written: Register) {
+    injector.clipboardManager.setClipboardContent(editor, context, written.copiedText)
+    lastWrittenToSelection[SystemSelection.CLIPBOARD] = written
+  }
+
+  /**
+   * Only a write that took place is remembered: while IdeaVim owns PRIMARY, the `*` register is taken from this record
+   * without reading PRIMARY, and a failed write must not pass for the text a previous write left there.
+   */
+  private fun writeToPrimary(editor: VimEditor, context: ExecutionContext, written: Register) {
+    val isWritten = injector.clipboardManager.setPrimaryContent(editor, context, written.copiedText, written.type)
+    if (isWritten) {
+      lastWrittenToSelection[SystemSelection.PRIMARY] = written
+    } else {
+      lastWrittenToSelection.remove(SystemSelection.PRIMARY)
+    }
+  }
+
+  /**
+   * With `autoselect`, the visual selection goes to PRIMARY, see [PrimaryAutoselect]. It is not a yank: the `*` register
+   * in [myRegisters] keeps the last yank, which `vp` with `unnamed` puts.
+   */
+  override fun onVisualSelectionChange(editor: VimEditor) {
+    if (!isPrimaryRegisterSupported()) return
+    val (text, selectionType) = PrimaryAutoselect.selectionToPublish(editor) ?: return
+    val context = injector.executionContextManager.getEditorExecutionContext(editor)
+    val selection = Register(PRIMARY_REGISTER, injector.clipboardManager.dumbCopiedText(text), selectionType)
+    writeToPrimary(editor, context, selection)
   }
 
   /**
@@ -456,18 +484,16 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     }
   }
 
-  private fun registerWeStillOwn(): Register? =
-    injector.clipboardManager.getOwnedPrimaryContent()
-      ?.let { Register(PRIMARY_REGISTER, it.copiedText, it.selectionType) }
+  private fun registerWeStillOwn(): Register? {
+    if (!injector.clipboardManager.isPrimaryOwned()) return null
+    return lastWrittenToSelection[SystemSelection.PRIMARY]?.let { Register(PRIMARY_REGISTER, it.copiedText, it.type) }
+  }
 
   private fun registerFor(selection: VimCopiedText?): Register? {
     if (selection == null || selection.text.isEmpty()) return registerForUnreadableSelection(selection)
     // The IDE republishes the editor selection to PRIMARY on every selection change, as untyped text, so ownership
-    // is routinely lost to our own process with no foreign application involved. What we published is asked first:
-    // it is the record of what went to the selection, the autoselect of a visual selection included.
-    val published = injector.clipboardManager.getLastPublishedPrimaryContent()
-      ?.let { Register(PRIMARY_REGISTER, it.copiedText, it.selectionType) }
-    return recognise(PRIMARY_REGISTER, selection, published, lastWrittenToSelection[SystemSelection.PRIMARY])
+    // is routinely lost to our own process with no foreign application involved. The text is still ours then.
+    return recognise(PRIMARY_REGISTER, selection, lastWrittenToSelection[SystemSelection.PRIMARY])
   }
 
   /**
@@ -481,12 +507,12 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
       ?: selection?.let { Register(PRIMARY_REGISTER, it, SelectionType.CHARACTER_WISE) }
 
   /**
-   * The [name] register read from a selection holding [selection], with the type of the first of [ours] that still
-   * holds this text. [myRegisters] comes last, as it is what remains of our writes after a restart. With none of them,
-   * the type is guessed from the text: someone else put it there.
+   * The [name] register read from a selection holding [selection], with the type of [lastWritten], what IdeaVim last
+   * wrote to that selection, if the selection still holds its text. [myRegisters] comes next, as it is what remains of
+   * our writes after a restart. With neither, the type is guessed from the text: someone else put it there.
    */
-  private fun recognise(name: Char, selection: VimCopiedText, vararg ours: Register?): Register =
-    (ours.asSequence() + myRegisters[name])
+  private fun recognise(name: Char, selection: VimCopiedText, lastWritten: Register?): Register =
+    sequenceOf(lastWritten, myRegisters[name])
       .filterNotNull()
       .firstNotNullOfOrNull { recoverRegister(name, selection, it) }
       ?: Register(name, selection, guessSelectionType(selection.text))

@@ -26,7 +26,12 @@ class FakePrimarySelection : PrimarySelectionWriter {
   @Volatile
   private var ownedByIdeaVim = false
 
+  /** When false, a write fails and leaves PRIMARY as it was, as when the writer can't reach the windowing system. */
+  @Volatile
+  var isWritable: Boolean = true
+
   override fun write(text: String, transferableData: List<Any>): Boolean {
+    if (!isWritable) return false
     this.text = text
     ownedByIdeaVim = true
     return true

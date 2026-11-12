@@ -32,7 +32,7 @@ interface VimClipboardManager {
 
   /**
    * Publishes [textData] to PRIMARY. [selectionType] is remembered alongside it, because the windowing
-   * system stores text only and cannot carry it — see [getOwnedPrimaryContent].
+   * system stores text only and cannot carry it. The register group remembers it, see [isPrimaryOwned].
    */
   fun setPrimaryContent(
     editor: VimEditor,
@@ -42,26 +42,32 @@ interface VimClipboardManager {
   ): Boolean
 
   /**
-   * What we last published via [setPrimaryContent], while the selection is provably still ours, so the
-   * type survives instead of being guessed from the text. Neovim's clipboard provider does the same,
-   * reusing the `[lines, regtype]` it last handed out while its `xclip`/`wl-copy` job is alive.
+   * Whether PRIMARY still holds what was last written with [setPrimaryContent], as nothing else has claimed it since.
+   * The register group then takes the `*` register from what it wrote, type included, without reading PRIMARY. Neovim's
+   * clipboard provider does the same, reusing the `[lines, regtype]` it last handed out while its `xclip`/`wl-copy` job
+   * is alive.
    *
-   * Default: `null` — platforms without a PRIMARY selection never own one.
+   * Default: `false` — platforms without a PRIMARY selection never own one.
+   */
+  fun isPrimaryOwned(): Boolean = false
+
+  /**
+   * Not used by IdeaVim anymore: the register group remembers what it wrote to PRIMARY, and asks [isPrimaryOwned].
+   *
+   * Default: `null`.
    */
   fun getOwnedPrimaryContent(): OwnedPrimaryContent? = null
 
   /**
-   * The same value, but claiming nothing about who owns PRIMARY now — for recognising our own content
-   * after a lossy round trip. Callers must confirm the text before trusting it.
+   * Not used by IdeaVim anymore, see [getOwnedPrimaryContent].
    *
    * Default: `null`.
    */
   fun getLastPublishedPrimaryContent(): OwnedPrimaryContent? = null
 
   /**
-   * Fired when the user's visible visual selection changes. Whether to republish the new
-   * selection to the windowing system's PRIMARY is platform policy, so vim-engine just notifies
-   * and the IDE-specific implementation decides what (if anything) to do.
+   * Not called by IdeaVim anymore: the visual selection goes to PRIMARY with `autoselect` through
+   * [com.maddyhome.idea.vim.register.VimRegisterGroup.onVisualSelectionChange].
    *
    * Default: no-op.
    */
