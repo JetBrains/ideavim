@@ -41,9 +41,9 @@ import kotlin.reflect.full.createType
 
 abstract class VimVariableServiceBase : VariableService {
   private var globalVariables: MutableMap<String, VimDataType> = mutableMapOf()
-  private val windowVariablesKey = Key<MutableMap<String, VimDataType>>("TabVariables")
+  private val windowVariablesKey = Key<MutableMap<String, VimDataType>>("WindowVariables")
   private val bufferVariablesKey = Key<MutableMap<String, VimDataType>>("BufferVariables")
-  private val tabVariablesKey = Key<MutableMap<String, VimDataType>>("WindowVariables")
+  private val tabVariablesKey = Key<MutableMap<String, VimDataType>>("TabVariables")
   protected var vimVariables: MutableMap<String, VimDataType> = mutableMapOf()
 
   private fun getWindowVariables(editor: VimEditor) =
@@ -359,10 +359,10 @@ abstract class VimVariableServiceBase : VariableService {
           val mapArgumentTypes: List<KType> = type.arguments.mapNotNull { it.type }
           val values: HashMap<VimString, VimDataType> = vimDataType.dictionary
 
-          // the fist argument has to be string
+          // the first argument has to be string
           val keyArgumentType: KType = mapArgumentTypes[0]
           if (keyArgumentType != String::class.createType()) {
-            throw IllegalArgumentException("Expected Map with String as key, but got ${vimDataType::class.simpleName}")
+            throw IllegalArgumentException("Expected Map with String as key, but got $keyArgumentType")
           }
 
           val valueArgumentType: KType = mapArgumentTypes[1]
