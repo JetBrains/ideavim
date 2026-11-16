@@ -58,6 +58,7 @@ internal class IjVimPluginActivator : VimPluginActivator {
    * 4. ~/.ideavimrc execution
    * 5. Components initialization - AFTER ideavimrc execution
    *    (VimListenerManager accesses `number` option and guicaret)
+   * 6. Re-initialisation of the extensions suspended by [deactivate]
    */
   override fun activate() {
     // 1) Update state
@@ -96,6 +97,9 @@ internal class IjVimPluginActivator : VimPluginActivator {
 
     // TODO: Consider moving this before evaluating ideavimrc, so we can react to users changing settings
     VimListenerManager.turnOn()
+
+    // 6) The ideavimrc is executed only once, so the extensions disposed on turning off have to be initialised again
+    (injector.extensionRegistrator as VimExtensionRegistrar).resumeSuspendedExtensions()
   }
 
   override fun deactivate(unsubscribe: Boolean) {
@@ -103,6 +107,8 @@ internal class IjVimPluginActivator : VimPluginActivator {
 
     if (unsubscribe) {
       VimListenerManager.turnOff()
+      // Extensions like NERDTree install their own key handlers outside the editor, which have to stop working too
+      (injector.extensionRegistrator as VimExtensionRegistrar).suspendEnabledExtensions()
     }
 
     // Use getServiceIfCreated to avoid creating the service during the dispose (this is prohibited by the platform)

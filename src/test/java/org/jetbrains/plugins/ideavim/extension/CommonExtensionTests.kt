@@ -136,6 +136,43 @@ class OpMappingTest : VimTestCase() {
   }
 
   @Test
+  fun `test turning IdeaVim off disposes the enabled extension`() {
+    configureByText("${c}I found it in a legendary land")
+    extension.ext.initialized = false
+
+    try {
+      VimPlugin.setEnabled(false)
+      assertTrue(extension.ext.disposed)
+      assertFalse(extension.ext.initialized)
+    } finally {
+      VimPlugin.setEnabled(true)
+    }
+
+    assertTrue(extension.ext.initialized)
+    typeText("Q")
+    assertState("I$c found it in a legendary land")
+  }
+
+  @Test
+  fun `test turning IdeaVim off does not touch the disabled extension`() {
+    configureByText("${c}I found it in a legendary land")
+    enterCommand("set noTestExtension")
+    extension.ext.disposed = false
+    extension.ext.initialized = false
+
+    try {
+      VimPlugin.setEnabled(false)
+      assertFalse(extension.ext.disposed)
+    } finally {
+      VimPlugin.setEnabled(true)
+    }
+
+    assertFalse(extension.ext.initialized)
+    typeText("Q")
+    assertState("${c}I found it in a legendary land")
+  }
+
+  @Test
   fun `test disable extension as extension point`() {
     configureByText("${c}I found it in a legendary land")
     typeText("Q")

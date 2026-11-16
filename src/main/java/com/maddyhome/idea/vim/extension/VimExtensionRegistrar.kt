@@ -32,6 +32,14 @@ class VimExtensionRegistrar : VimExtensionRegistrator {
 
   private val delayedExtensionEnabling = mutableListOf<ExtensionBeanClass>()
 
+  private val extensionBeans = HashMap<String, ExtensionBeanClass>()
+
+  /**
+   * Extensions that were enabled when IdeaVim was turned off. Their options stay set, so they are initialised again
+   * when IdeaVim is turned back on.
+   */
+  private val suspendedExtensions = mutableListOf<ExtensionBeanClass>()
+
   fun registerExtensions() {
     if (extensionRegistered) return
     extensionRegistered = true
@@ -64,6 +72,7 @@ class VimExtensionRegistrar : VimExtensionRegistrator {
     if (name in registeredExtensions) return
 
     registeredExtensions.add(name)
+    extensionBeans[name] = extensionBean
     registerAliases(extensionBean)
     val option = ToggleOption(name, OptionDeclaredScope.GLOBAL, getAbbrev(name), false)
     injector.optionGroup.addOption(option)
@@ -117,13 +126,53 @@ class VimExtensionRegistrar : VimExtensionRegistrator {
     delayedExtensionEnabling.clear()
   }
 
+  /**
+   * Disposes all enabled extensions when IdeaVim is turned off. Some extensions handle keys outside the editor (e.g.,
+   * NERDTree in the project tree), and they must not do it while IdeaVim is off.
+   */
+  @Synchronized
+  fun suspendEnabledExtensions() {
+    for ((name, extensionBean) in extensionBeans) {
+      val option = injector.optionGroup.getOption(name) as? ToggleOption ?: continue
+      if (!injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(null)).booleanValue) continue
+      try {
+        extensionBean.instance.dispose()
+        suspendedExtensions += extensionBean
+        logger.info("IdeaVim extension '$name' suspended")
+      } catch (e: Throwable) {
+        logger.error("Failed to suspend IdeaVim extension '$name'", e)
+      }
+    }
+  }
+
+  /**
+   * Initialises again the extensions disposed by [suspendEnabledExtensions] when IdeaVim is turned back on.
+   */
+  @Synchronized
+  fun resumeSuspendedExtensions() {
+    suspendedExtensions.forEach {
+      val name = it.name ?: it.instance.name
+      try {
+        it.instance.init(createVimApi(name))
+        logger.info("IdeaVim extension '$name' resumed")
+      } catch (e: Throwable) {
+        logger.error("Failed to resume IdeaVim extension '$name'", e)
+      }
+    }
+    suspendedExtensions.clear()
+  }
+
   @Synchronized
   private fun unregisterExtension(extension: ExtensionBeanClass) {
     val name = extension.name ?: extension.instance.name
     if (name !in registeredExtensions) return
     registeredExtensions.remove(name)
+    extensionBeans.remove(name)
     removeAliases(extension)
-    extension.instance.dispose()
+    // A suspended extension is already disposed
+    if (!suspendedExtensions.remove(extension)) {
+      extension.instance.dispose()
+    }
     injector.optionGroup.removeOption(name)
     remove(name)
     logger.info("IdeaVim extension '$name' disposed")
