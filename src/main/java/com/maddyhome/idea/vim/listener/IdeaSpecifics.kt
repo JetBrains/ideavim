@@ -205,9 +205,30 @@ internal object IdeaSpecifics {
       // return so the lock can never leak - a leaked lock would silently disable selection handling everywhere.
       modeBeforeAction = null
 
-      if (VimPlugin.isNotEnabled()) return
+      // Take the state of this action and clear it first, so that a disposed editor is not kept until the next action
+      // with an editor, even if something below throws. The action might have disposed the editor, e.g. closed its tab.
+      val editor = this.editor?.takeUnless { it.isDisposed }
+      val completionData = this.completionData
+      val editorStateBeforeAction = this.editorStateBeforeAction
+      this.editor = null
+      this.completionData = null
+      this.editorStateBeforeAction = null
 
-      val editor = editor
+      try {
+        if (VimPlugin.isNotEnabled()) return
+        afterActionPerformed(action, event, editor, completionData, editorStateBeforeAction)
+      } finally {
+        completionData?.dispose()
+      }
+    }
+
+    private fun afterActionPerformed(
+      action: AnAction,
+      event: AnActionEvent,
+      editor: Editor?,
+      completionData: CompletionData?,
+      editorStateBeforeAction: EditorState?,
+    ) {
       if (editor != null && action is ChooseItemAction) {
         completionData?.recordCompletion(editor)
       }
@@ -234,17 +255,12 @@ internal object IdeaSpecifics {
       // perpetually mismatched, so every subsequent Ctrl+Z is spent restoring the caret and the text is never reverted
       // (VIM-4287). Vim's own `u` is unaffected because it calls UndoManager directly with that registry flag forced on.
       if (!isVimAction(action) && !isUndoRedoAction(ActionManager.getInstance().getId(action))) {
-        if (editor != null && isAwaitingBackend(action, editor)) {
+        if (editor != null && isAwaitingBackend(action, editor, editorStateBeforeAction)) {
           caretNormalizer.normalizeAfterNextCaretMove(editor)
         } else {
           caretNormalizer.normalize(editor)
         }
       }
-
-      this.editor = null
-
-      this.completionData?.dispose()
-      this.completionData = null
     }
 
     private fun isVimAction(action: AnAction): Boolean = (action as? AnActionWrapper)?.delegate is VimShortcutKeyAction
@@ -254,7 +270,7 @@ internal object IdeaSpecifics {
      * C#) with ones that just send a request to the backend, whose changes arrive later. Such an action might still run
      * on the frontend instead, in which case it has already changed the editor.
      */
-    private fun isAwaitingBackend(action: AnAction, editor: Editor): Boolean =
+    private fun isAwaitingBackend(action: AnAction, editor: Editor, editorStateBeforeAction: EditorState?): Boolean =
       action.isPossiblyDelegatingToBackend() && editorStateBeforeAction?.isUnchangedIn(editor) == true
 
     private fun isGotoAction(actionId: String?): Boolean =
@@ -289,7 +305,8 @@ internal object IdeaSpecifics {
       private var pendingNormalization: Disposable? = null
 
       fun normalize(editor: Editor?) {
-        if (editor == null || !editor.vimInitialised) return
+        // IdeaVim deinitializes an editor later than the platform disposes it, so vimInitialised is not enough
+        if (editor == null || editor.isDisposed || !editor.vimInitialised) return
         val vimEditor = editor.vim
         if (vimEditor.isEndAllowed) return
 
@@ -310,6 +327,7 @@ internal object IdeaSpecifics {
        */
       fun normalizeAfterNextCaretMove(editor: Editor) {
         cancelPendingNormalization()
+        if (editor.isDisposed) return
         val disposable = Disposer.newDisposable("IdeaVim caret normalization after backend action")
         EditorUtil.disposeWithEditor(editor, disposable)
         pendingNormalization = disposable
