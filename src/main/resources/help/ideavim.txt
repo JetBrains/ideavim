@@ -324,7 +324,7 @@ $                       As an operator motion, move to the end of the line,
 
                                                                       *CTRL-]*
 <C-]>                   Jump to the definition of the keyword under the cursor
-                        using the IDE's Go to Declaration action, pushing the
+                        using the IDE's Go to Declaration action. Pushes the
                         position onto the tag stack.
 
                                                    *CTRL-^* *<C-S-6>* *CTRL-6*
@@ -845,7 +845,7 @@ ga                      Print the decimal, hex and octal value of the
                                                                      *gD* *gd*
 gD gd                   Go to the declaration of the symbol under the cursor
                         using the IDE's Go to Declaration action. Saves the
-                        jump position.
+                        jump position and pushes it onto the tag stack.
 
                                                                           *gE*
 gE                      Move backward to the end of the [count]'th previous
