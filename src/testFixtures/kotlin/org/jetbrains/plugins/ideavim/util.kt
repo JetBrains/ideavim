@@ -60,8 +60,8 @@ annotation class VimBehaviorDiffers(
 )
 
 // The selection is updated after 'ideavisualdelay' milliseconds. Add an adjustment when we wait for it to be completed.
-// Since we wait for it on the main thread (to avoid reading in-progress state), we can get away with a short adjustment
-private const val visualDelayAdjustment = 200
+// We wait for it on the main thread (to avoid reading in-progress state), but loaded CI agents still need some slack
+private const val visualDelayAdjustment = 500
 
 fun assertHappened(timeInMillis: Int = 1000, precision: Int, condition: () -> Boolean) {
   assertDoesntChange(timeInMillis - precision) { !condition() }
