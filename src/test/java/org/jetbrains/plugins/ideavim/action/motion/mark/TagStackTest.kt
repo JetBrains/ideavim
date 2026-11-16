@@ -115,6 +115,26 @@ class TagStackTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
   @Test
+  fun `test two tag jumps from the same place are both on the stack`() {
+    configureByText(text)
+
+    // Same place, same tag - still two separate tag jumps, the stack does not merge them
+    typeText("<C-]>")
+    typeText("<C-]>")
+    typeText("G")
+
+    typeText("<C-T>")
+    assertPluginError(false)
+    assertPosition(0, 8)
+
+    typeText("G")
+    typeText("<C-T>")
+    assertPluginError(false)
+    assertPosition(0, 8)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
   fun `test ctrl-t at the bottom of the tag stack reports error`() {
     configureByText(text)
     typeText("<C-]>")
@@ -139,20 +159,6 @@ class TagStackTest : VimTestCase() {
 
     typeText("<C-O>")
     assertPosition(0, 8)
-  }
-
-  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
-  @Test
-  fun `test gd does not touch the tag stack`() {
-    configureByText(text)
-
-    // gd is "goto local declaration", not a tag command - in Vim it does not use the tag stack
-    typeText("gd")
-    typeText("G")
-
-    typeText("<C-T>")
-    assertPluginError(true)
-    assertPluginErrorMessage("E73: Tag stack empty")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)

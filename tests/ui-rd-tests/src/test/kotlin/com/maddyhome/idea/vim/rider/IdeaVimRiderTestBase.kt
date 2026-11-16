@@ -38,6 +38,7 @@ import com.intellij.ide.starter.plugins.PluginConfigurator
 import com.intellij.ide.starter.project.LocalProjectInfo
 import com.intellij.ide.starter.runner.Starter
 import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
@@ -286,6 +287,11 @@ abstract class IdeaVimRiderTestBase {
     driver.ui.keyboard { typeText(keys) }
   }
 
+  /** Clicks the middle of the first occurrence of [text] in the editor with Ctrl held, as for Go to Declaration */
+  protected fun ctrlClickOn(text: String) {
+    withEditor { keyboard { pressing(KeyEvent.VK_CONTROL) { clickOn(text) } } }
+  }
+
   /** Presses Ctrl and [keyCode] in the editor */
   protected fun ctrl(keyCode: Int) {
     withEditor { keyboard { pressing(KeyEvent.VK_CONTROL) { key(keyCode) } } }
@@ -391,6 +397,13 @@ abstract class IdeaVimRiderTestBase {
     var text = ""
     val found = waitUntil { text = editorText(); text == expected }
     assertTrue(found) { "Expected text:\n$expected\nActual:\n$text" }
+  }
+
+  /** Asserts the line of the caret, polling until timeout */
+  protected fun assertCaretLine(expected: Int) {
+    var line = -1
+    waitUntil { line = caretLine(); line == expected }
+    assertEquals(expected, line, "Caret line")
   }
 
   /** Asserts that a popup with [title] is shown, polling until timeout */

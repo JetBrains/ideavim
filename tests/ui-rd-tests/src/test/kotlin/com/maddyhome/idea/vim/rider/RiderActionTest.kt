@@ -12,7 +12,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.awt.event.KeyEvent
-import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 
@@ -162,12 +161,6 @@ class RiderActionTest : IdeaVimRiderTestBase() {
     var after: Int? = before
     waitUntil { after = focusedTreeRow(); after != before }
     assertNotEquals(before, after, "j didn't move the selection")
-  }
-
-  private fun assertCaretLine(expected: Int) {
-    var line = -1
-    waitUntil { line = caretLine(); line == expected }
-    assertEquals(expected, line, "Caret line")
   }
 
   companion object {

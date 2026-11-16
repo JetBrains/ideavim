@@ -34,6 +34,10 @@ usual beta standards.
 
 * [VIM-4346](https://youtrack.jetbrains.com/issue/VIM-4346) Fixed [`'incsearch'`](https://vimhelp.org/options.txt.html#%27incsearch%27) searching for the text typed into prompts that are not searches. Typing a tag name after `vt<St` in the `surround` extension no longer moves the caret or changes the Visual selection, and `<Esc>` in that prompt keeps the selection. The `<C-R>=` expression prompt in Insert mode no longer moves the caret either, and `<C-F>` there no longer opens the command-line window
 * Fixed [`'langmap'`](https://vimhelp.org/options.txt.html#%27langmap%27) being applied twice to keys typed after the start of a mapping that did not match. With `set langmap=ig,gE` and a mapping starting with `g`, typing `ii` now runs `gg` instead of `gE`
+* [VIM-4374](https://youtrack.jetbrains.com/issue/VIM-4374) Fixed Ctrl+Click on a symbol not adding an entry to the [tag stack](https://vimhelp.org/tagsrch.txt.html#tag-stack). [`CTRL-T`](https://vimhelp.org/tagsrch.txt.html#CTRL-T) now returns to where the caret was before the click, as it does after `CTRL-]`, instead of reporting `E73: Tag stack empty` or going back to an older tag jump. The same goes for Ctrl+Shift+Click (Go to Type Declaration), Ctrl+Alt+Click (Go to Implementation), their keyboard shortcuts, and mappings such as `nmap gi <Action>(GotoImplementation)` or `:action` running `GotoDeclaration`, `GotoDeclarationOnly`, `GotoTypeDeclaration` or `GotoImplementation`
+
+### Changes:
+* [VIM-4374](https://youtrack.jetbrains.com/issue/VIM-4374) `gd` and `gD` now add an entry to the [tag stack](https://vimhelp.org/tagsrch.txt.html#tag-stack), so [`CTRL-T`](https://vimhelp.org/tagsrch.txt.html#CTRL-T) returns from them. In IdeaVim they jump with the IDE's Go to Declaration, the same navigation as `CTRL-]`, rather than searching the text for the word as Vim does
 
 ### Merged PRs:
 * [2142](https://github.com/JetBrains/ideavim/pull/2142) by [1grzyb1](https://github.com/1grzyb1): VIM-2374 I and A move to begginig/end of multi selection

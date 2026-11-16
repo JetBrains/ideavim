@@ -51,9 +51,11 @@ import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.action.change.VimRedoBuffer
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimKeyGroupBase
+import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.api.options
+import com.maddyhome.idea.vim.api.pushCurrentPosition
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.helper.exitSelectMode
@@ -70,6 +72,7 @@ import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.tag.TagStackPlace
 import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.isIdeaRefactorModeKeep
@@ -96,6 +99,18 @@ internal object IdeaSpecifics {
     private val surrounderItems = listOf("if", "if / else", "for")
     private val surrounderAction =
       "com.intellij.codeInsight.generation.surroundWith.SurroundWithHandler\$InvokeSurrounderAction"
+    /**
+     * IDE navigation to a definition, which is a tag jump however it is invoked, see "h tag-stack"
+     *
+     * Covers Ctrl+Click and its siblings, the keyboard shortcuts, `<Action>(...)` mappings and `:action`, as well as
+     * `<C-]>`, `gd` and `gD`, which run Go to Declaration too.
+     */
+    private val tagActions = setOf(
+      IdeActions.ACTION_GOTO_DECLARATION,
+      "GotoDeclarationOnly",
+      IdeActions.ACTION_GOTO_TYPE_DECLARATION,
+      IdeActions.ACTION_GOTO_IMPLEMENTATION,
+    )
     private var editor: Editor? = null
     private var completionData: CompletionData? = null
     private var editorStateBeforeAction: EditorState? = null
@@ -120,6 +135,11 @@ internal object IdeaSpecifics {
       val actionId = ActionManager.getInstance().getId(action)
       if (isGotoAction(actionId)) {
         saveJumpBeforeGoto(event, editor)
+      }
+
+      // `:tag` runs Go to Declaration again to redo a jump that is already on the stack, see TagStackPlace
+      if (actionId in tagActions && event.place != TagStackPlace.TAG_STACK_PLACE) {
+        saveTagLocation()
       }
 
       val isVimAction = isVimAction(action)
@@ -186,6 +206,20 @@ internal object IdeaSpecifics {
           )
         }
       }
+    }
+
+    /**
+     * Pushes the caret position onto the tag stack before the IDE navigates away from it
+     *
+     * Without a keyword there is no tag to jump to, so there is nothing to walk back over either. The IDE is still free
+     * to be cleverer about what the caret is on than Vim's notion of a keyword.
+     */
+    private fun saveTagLocation() {
+      val vimEditor = editor?.vim ?: return
+      val wordRange =
+        injector.searchHelper.findWordAtOrFollowingCursor(vimEditor, vimEditor.currentCaret(), isBigWord = false)
+          ?: return
+      injector.tagService.pushCurrentPosition(vimEditor, vimEditor.getText(wordRange))
     }
 
     override fun afterActionPerformed(action: AnAction, event: AnActionEvent, result: AnActionResult) {
