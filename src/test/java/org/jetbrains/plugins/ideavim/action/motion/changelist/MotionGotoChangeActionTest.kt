@@ -8,9 +8,13 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.changelist
 
+import com.intellij.openapi.components.service
+import com.maddyhome.idea.vim.group.changelist.ChangeListService
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.waitUntil
 import org.junit.jupiter.api.Test
+import kotlin.test.assertTrue
 
 /**
  * Tests for VIM-519: cycling between recent edits with `g;` and `g,`.
@@ -54,7 +58,7 @@ class MotionGotoChangeActionTest : VimTestCase() {
       eee
     """.trimIndent()
 
-    doTest(keys, before, after, Mode.NORMAL())
+    doChangeListTest(keys, before, after)
   }
 
   @Test
@@ -77,7 +81,7 @@ class MotionGotoChangeActionTest : VimTestCase() {
       ddd
     """.trimIndent()
 
-    doTest(keys, before, after, Mode.NORMAL())
+    doChangeListTest(keys, before, after)
   }
 
   @Test
@@ -101,7 +105,7 @@ class MotionGotoChangeActionTest : VimTestCase() {
       ddd
     """.trimIndent()
 
-    doTest(keys, before, after, Mode.NORMAL())
+    doChangeListTest(keys, before, after)
   }
 
   @Test
@@ -124,7 +128,7 @@ class MotionGotoChangeActionTest : VimTestCase() {
       Ddd
     """.trimIndent()
 
-    doTest(keys, before, after, Mode.NORMAL())
+    doChangeListTest(keys, before, after)
   }
 
   @Test
@@ -145,7 +149,7 @@ class MotionGotoChangeActionTest : VimTestCase() {
       Ddd
     """.trimIndent()
 
-    doTest(keys, before, after, Mode.NORMAL())
+    doChangeListTest(keys, before, after)
   }
 
   @Test
@@ -167,7 +171,7 @@ class MotionGotoChangeActionTest : VimTestCase() {
       Ddd
     """.trimIndent()
 
-    doTest(keys, before, after, Mode.NORMAL())
+    doChangeListTest(keys, before, after)
   }
 
   @Test
@@ -178,7 +182,7 @@ class MotionGotoChangeActionTest : VimTestCase() {
     """.trimIndent()
 
     configureByText(before)
-    typeText("g;")
+    typeAndAwaitChangeList("g;")
     assertPluginError(true)
     assertStatusLineMessageContains("E664")
   }
@@ -193,10 +197,10 @@ class MotionGotoChangeActionTest : VimTestCase() {
 
     configureByText(before)
     // One change, then walk to it (oldest == newest), then try to go older.
-    typeText("rA")
-    typeText("G")
-    typeText("g;")          // lands on the only entry; idx = 0
-    typeText("g;")          // already at oldest → E662
+    typeAndAwaitChangeList("rA")
+    typeAndAwaitChangeList("G")
+    typeAndAwaitChangeList("g;")          // lands on the only entry; idx = 0
+    typeAndAwaitChangeList("g;")          // already at oldest → E662
     assertPluginError(true)
     assertStatusLineMessageContains("E662")
   }
@@ -211,9 +215,9 @@ class MotionGotoChangeActionTest : VimTestCase() {
     configureByText(before)
     // First `g,` after a single change silently clamps idx to the newest;
     // the second `g,` is the one that actually errors.
-    typeText("rA")
-    typeText("g,")
-    typeText("g,")
+    typeAndAwaitChangeList("rA")
+    typeAndAwaitChangeList("g,")
+    typeAndAwaitChangeList("g,")
     assertPluginError(true)
     assertStatusLineMessageContains("E663")
   }
@@ -227,12 +231,12 @@ class MotionGotoChangeActionTest : VimTestCase() {
     // the *latest* position (column 1), so a second `g;` errors instead of
     // taking us back to column 0.
     configureByText(before)
-    typeText("rA")
-    typeText("lrB")
-    typeText("G\$")
-    typeText("g;")          // lands on the merged entry (col 1, on the 'B')
+    typeAndAwaitChangeList("rA")
+    typeAndAwaitChangeList("lrB")
+    typeAndAwaitChangeList("G\$")
+    typeAndAwaitChangeList("g;")          // lands on the merged entry (col 1, on the 'B')
     assertState("A${c}Bcdef")
-    typeText("g;")          // only one entry → E662
+    typeAndAwaitChangeList("g;")          // only one entry → E662
     assertPluginError(true)
     assertStatusLineMessageContains("E662")
   }
@@ -253,7 +257,7 @@ class MotionGotoChangeActionTest : VimTestCase() {
       ccc
     """.trimIndent()
 
-    doTest(keys, before, after, Mode.NORMAL())
+    doChangeListTest(keys, before, after)
   }
 
   @Test
@@ -273,7 +277,7 @@ class MotionGotoChangeActionTest : VimTestCase() {
       ccc
     """.trimIndent()
 
-    doTest(keys, before, after, Mode.NORMAL())
+    doChangeListTest(keys, before, after)
   }
 
   @Test
@@ -293,7 +297,7 @@ class MotionGotoChangeActionTest : VimTestCase() {
       ${c}ccc
     """.trimIndent()
 
-    doTest(keys, before, after, Mode.NORMAL())
+    doChangeListTest(keys, before, after)
   }
 
   @Test
@@ -320,6 +324,29 @@ class MotionGotoChangeActionTest : VimTestCase() {
       ${c}Ccc
     """.trimIndent()
 
-    doTest(keys, before, after, Mode.NORMAL())
+    doChangeListTest(keys, before, after)
+  }
+
+  private fun doChangeListTest(keys: List<String>, before: String, after: String) {
+    configureByText(before)
+    keys.forEach { typeAndAwaitChangeList(it) }
+    assertState(after)
+    assertState(Mode.NORMAL())
+  }
+
+  /**
+   * Edits reach [ChangeListService] asynchronously over the remote topic, so `g;` typed right after an edit could
+   * read the list without it. Wait for every edit to be recorded before typing the next keys.
+   */
+  private fun typeAndAwaitChangeList(keys: String) {
+    val stampBefore = fixture.editor.document.modificationStamp
+    val changesBefore = service<ChangeListService>().addedChangesCount()
+    typeText(keys)
+    if (fixture.editor.document.modificationStamp != stampBefore) {
+      assertTrue(
+        waitUntil(5_000) { service<ChangeListService>().addedChangesCount() > changesBefore },
+        "Change made by '$keys' didn't reach the change list",
+      )
+    }
   }
 }

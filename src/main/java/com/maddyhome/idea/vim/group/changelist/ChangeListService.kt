@@ -24,6 +24,10 @@ internal class ChangeListService {
   private val projectToChanges = mutableMapOf<String, MutableList<Change>>()
   private val projectToIndex = mutableMapOf<String, Int>()
 
+  /** Changes arrive asynchronously over the remote topic, tests use this to wait for them. */
+  @Volatile
+  private var addedChanges = 0
+
   data class Change(
     val line: Int,
     val col: Int,
@@ -48,6 +52,7 @@ internal class ChangeListService {
       if (list.size > CHANGE_LIST_LIMIT) list.removeAt(0)
     }
     projectToIndex[projectId] = list.size
+    addedChanges++
   }
 
   @Synchronized
@@ -70,6 +75,9 @@ internal class ChangeListService {
     filepath == next.filepath &&
       line == next.line &&
       kotlin.math.abs(col - next.col) < TEXTWIDTH_FALLBACK
+
+  @TestOnly
+  fun addedChangesCount(): Int = addedChanges
 
   @TestOnly
   @Synchronized
