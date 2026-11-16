@@ -47,6 +47,22 @@ interface VimActionExecutor {
    */
   fun executeAction(editor: VimEditor, name: @NonNls String, context: ExecutionContext): Boolean
 
+  /**
+   * Execute an action by name, telling whoever listens to IDE actions where it was invoked from
+   *
+   * The place travels with the action itself, so a listener sees it even when the action runs later, asynchronously.
+   * Use it to mark an invocation that a listener must treat differently from other invocations of the same action, e.g.
+   * [com.maddyhome.idea.vim.tag.TagStackPlace.TAG_STACK_PLACE].
+   *
+   * Implementations that don't know about places run the action as [executeAction] without a place does.
+   *
+   * @param name    The name of the action to execute
+   * @param context The context to run it in
+   * @param place   Where the action reports being invoked from, or `null` for the usual place
+   */
+  fun executeAction(editor: VimEditor, name: @NonNls String, context: ExecutionContext, place: String?): Boolean =
+    executeAction(editor, name, context)
+
   fun executeCommand(
     editor: VimEditor?,
     runnable: Runnable,

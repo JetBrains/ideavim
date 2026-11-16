@@ -19,10 +19,16 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
+/**
+ * Goes to the declaration of the symbol under the caret using the IDE's Go to Declaration, see "h gd"
+ *
+ * The IDE's navigation is the same as `<C-]>`'s, so this is a tag jump as well: running Go to Declaration pushes onto the
+ * tag stack and `<C-T>` walks back over it. That is a deliberate difference from a plain text search for the keyword.
+ */
 @CommandOrMotion(
   keys = ["gD", "gd"],
   modes = [Mode.NORMAL, Mode.VISUAL],
-  description = "Go to the declaration of the symbol under the cursor using the IDE's Go to Declaration action. Saves the jump position."
+  description = "Go to the declaration of the symbol under the cursor using the IDE's Go to Declaration action. Saves the jump position and pushes it onto the tag stack."
 )
 class GotoDeclarationAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY

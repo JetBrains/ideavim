@@ -66,19 +66,26 @@ class IjActionExecutor : VimActionExecutor {
   var isRunningActionFromVim: Boolean = false
 
   override fun executeAction(editor: VimEditor?, action: NativeAction): Boolean {
+    return executeNativeAction(editor, action, place = null)
+  }
+
+  private fun executeNativeAction(editor: VimEditor?, action: NativeAction, place: String?): Boolean {
     val applicationEx = ApplicationManagerEx.getApplicationEx()
     if (ProgressIndicatorUtils.isWriteActionRunningOrPending(applicationEx)) {
       // This is needed for VIM-3376
       thisLogger().error("Actions cannot be updated when write-action is running or pending")
     }
 
-    return executeAction((action as IjNativeAction).action, editor?.ij?.contentComponent)
+    return executeAction((action as IjNativeAction).action, editor?.ij?.contentComponent, place)
   }
 
-  private fun executeAction(ijAction: AnAction, contextComponent: Component?): Boolean {
+  /**
+   * @param place Where the action reports being invoked from, see [com.intellij.openapi.actionSystem.AnActionEvent.getPlace]. `null` picks the usual one
+   */
+  private fun executeAction(ijAction: AnAction, contextComponent: Component?, place: String?): Boolean {
     try {
       isRunningActionFromVim = true
-      val place = ijAction.choosePlace()
+      val place = place ?: ijAction.choosePlace()
       if (isRider() && ijAction.isBackendAction()) {
         // The synchronous update can't get the action's state from the backend: Rider asks the backend only for a real
         //   hotkey, so the action stays disabled (VIM-3968). The asynchronous update asks the backend without blocking
@@ -95,11 +102,20 @@ class IjActionExecutor : VimActionExecutor {
   }
 
   override fun executeAction(editor: VimEditor?, action: NativeAction, context: ExecutionContext): Boolean {
+    return executeAction(editor, action, context, place = null)
+  }
+
+  private fun executeAction(
+    editor: VimEditor?,
+    action: NativeAction,
+    context: ExecutionContext,
+    place: String?,
+  ): Boolean {
     if (editor != null && editor === injector.fallbackWindow) {
       val contextComponent = context.ij.getData(PlatformDataKeys.CONTEXT_COMPONENT)
-      return executeAction((action as IjNativeAction).action, contextComponent)
+      return executeAction((action as IjNativeAction).action, contextComponent, place)
     }
-    return executeAction(editor, action)
+    return executeNativeAction(editor, action, place)
   }
 
   // Note: We should find a proper place for the IdeaVim actions
@@ -122,8 +138,17 @@ class IjActionExecutor : VimActionExecutor {
    * @param context The context to run it in
    */
   override fun executeAction(editor: VimEditor, name: @NonNls String, context: ExecutionContext): Boolean {
+    return executeAction(editor, name, context, place = null)
+  }
+
+  override fun executeAction(
+    editor: VimEditor,
+    name: @NonNls String,
+    context: ExecutionContext,
+    place: String?,
+  ): Boolean {
     val action = getAction(name, context)
-    return action != null && executeAction(editor, IjNativeAction(action), context)
+    return action != null && executeAction(editor, IjNativeAction(action), context, place)
   }
 
   private fun getAction(name: String, context: ExecutionContext): AnAction? {

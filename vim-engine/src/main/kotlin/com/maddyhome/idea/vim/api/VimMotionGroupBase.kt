@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.isEndAllowedIgnoringOnemore
 import com.maddyhome.idea.vim.tag.TagStackEntry
 import com.maddyhome.idea.vim.tag.TagStackMove
+import com.maddyhome.idea.vim.tag.TagStackPlace
 import org.jetbrains.annotations.Range
 import kotlin.math.abs
 import kotlin.math.absoluteValue
@@ -464,7 +465,13 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     } ?: return Motion.Error
 
     target.currentCaret().moveToOffset(target.normalizeOffset(target.bufferPositionToOffset(lp), false))
-    injector.actionExecutor.executeAction(target, name = "GotoDeclaration", context = context)
+    // The jump is already on the stack, so the IDE navigation must not push it again
+    injector.actionExecutor.executeAction(
+      target,
+      name = "GotoDeclaration",
+      context = context,
+      place = TagStackPlace.TAG_STACK_PLACE,
+    )
     // The caret has already been moved
     return Motion.Error
   }
