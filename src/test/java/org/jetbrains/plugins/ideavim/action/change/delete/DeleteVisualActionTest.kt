@@ -133,7 +133,7 @@ class DeleteVisualActionTest : VimTestCase() {
     ApplicationManager.getApplication().invokeAndWait {
       fixture.editor.selectionModel.setSelection(selectionStart, selectionEnd)
     }
-    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.LINE_WISE))
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.LINE_WISE), timeInMillis = 2000)
     typeText(injector.parser.parseKeys("d"))
     assertState(
       """
