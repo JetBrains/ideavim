@@ -31,7 +31,7 @@ internal fun AnAction.isPossiblyDelegatingToBackend(): Boolean =
  * For a hotkey, Rider replaces its backend actions with a single composite action that asks the backend which of them
  * to run, and doesn't wait for the result
  */
-private fun AnAction.isRiderBackendCompositeAction(): Boolean =
+internal fun AnAction.isRiderBackendCompositeAction(): Boolean =
   javaClass.name == "com.jetbrains.rider.actions.RiderActionUpdateInterceptor\$RiderBackendCompositeAction"
 
 internal fun Class<*>.implementsInterface(name: String): Boolean =
