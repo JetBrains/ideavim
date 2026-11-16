@@ -36,6 +36,8 @@ class NerdTreeEverywhere : VimExtension {
 
   override fun getName() = PLUGIN_NAME
 
+  private var registeredTree: Tree? = null
+
   val focusListener = PropertyChangeListener { evt ->
     val newFocusOwner = evt.newValue
     val oldFocusOwner = evt.oldValue
@@ -45,10 +47,12 @@ class NerdTreeEverywhere : VimExtension {
       dispatcher.reloadMappings()
       // It's okay to have `register` called multiple times, as its internal implementation prevents duplicate registrations
       dispatcher.register(newFocusOwner)
+      registeredTree = newFocusOwner
     }
     // Unregistration of the shortcut is required to make the plugin disposable
     if (oldFocusOwner is Tree) {
       dispatcher.unregisterCustomShortcutSet(oldFocusOwner)
+      if (registeredTree === oldFocusOwner) registeredTree = null
     }
   }
 
@@ -65,6 +69,9 @@ class NerdTreeEverywhere : VimExtension {
 
   override fun dispose() {
     KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener("focusOwner", focusListener)
+    // The focus listener is gone, so it can no longer unregister the shortcut from the focused tree
+    registeredTree?.let { service<Dispatcher>().unregisterCustomShortcutSet(it) }
+    registeredTree = null
     super.dispose()
   }
 }

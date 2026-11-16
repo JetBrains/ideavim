@@ -44,6 +44,8 @@ internal class TableEverywhere : VimExtension {
 
   override fun getName() = PLUGIN_NAME
 
+  private var registeredTable: JTable? = null
+
   val focusListener = PropertyChangeListener { evt ->
     val newFocusOwner = evt.newValue
     val oldFocusOwner = evt.oldValue
@@ -56,11 +58,13 @@ internal class TableEverywhere : VimExtension {
       // printable char and moves focus into the cell editor, so our KEY_TYPED shortcut never fires and
       // h/j/k/l are typed into the cell instead. Editing is still available via Enter/F2/double-click.
       disableTypeToEdit(newFocusOwner)
+      registeredTable = newFocusOwner
     }
     // Unregistration of the shortcut is required to make the plugin disposable.
     if (oldFocusOwner is JTable) {
       dispatcher.unregisterCustomShortcutSet(oldFocusOwner)
       restoreTypeToEdit(oldFocusOwner)
+      if (registeredTable === oldFocusOwner) registeredTable = null
     }
   }
 
@@ -70,6 +74,12 @@ internal class TableEverywhere : VimExtension {
 
   override fun dispose() {
     KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener("focusOwner", focusListener)
+    // The focus listener is gone, so it can no longer clean up the focused table
+    registeredTable?.let {
+      service<TableEverywhereDispatcher>().unregisterCustomShortcutSet(it)
+      restoreTypeToEdit(it)
+    }
+    registeredTable = null
     super.dispose()
   }
 
