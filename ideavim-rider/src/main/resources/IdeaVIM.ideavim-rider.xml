@@ -10,6 +10,10 @@
   <dependencies>
     <plugin id="com.intellij.modules.rider"/>
   </dependencies>
+  <applicationListeners>
+    <listener class="com.maddyhome.idea.vim.listener.RiderNavigationCommandListener"
+              topic="com.intellij.openapi.command.CommandListener"/>
+  </applicationListeners>
   <projectListeners>
     <listener class="com.maddyhome.idea.vim.listener.RiderActionListener"
               topic="com.intellij.openapi.actionSystem.ex.AnActionListener"/>

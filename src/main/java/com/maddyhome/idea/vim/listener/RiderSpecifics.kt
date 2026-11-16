@@ -18,6 +18,8 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.actionSystem.ex.AnActionListener
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.command.CommandEvent
+import com.intellij.openapi.command.CommandListener
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorAction
 import com.intellij.openapi.editor.actions.EnterAction
@@ -31,6 +33,8 @@ import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
+import com.maddyhome.idea.vim.helper.isPossiblyDelegatingToBackend
+import com.maddyhome.idea.vim.ide.isRider
 import com.maddyhome.idea.vim.newapi.vim
 
 internal class RiderActionListener : AnActionListener {
@@ -110,5 +114,54 @@ private class ExtendSelectionCaretFix {
   private fun cancelPendingFix() {
     pendingFix?.let { Disposer.dispose(it) }
     pendingFix = null
+  }
+}
+
+/**
+ * Tag jumps that ReSharper navigates by itself, so the tag stack entry waits for its navigation
+ *
+ * For a mouse click or a hotkey, Rider hides its backend actions behind one composite action, and the backend picks
+ * which of them to run. Only the shortcut tells that Go to Declaration is among them. And when Go to Declaration does
+ * show up, the backend may run it once more on the frontend for the same jump. Pushing before the action runs would
+ * miss the first case and push twice in the second.
+ *
+ * Instead, the action only marks a tag jump as expected. ReSharper navigates in a command of its own, and when it
+ * starts, the caret is still where the jump starts from. That's when the position goes onto the tag stack, once per
+ * navigation, and only for a navigation that happens.
+ */
+internal object RiderTagJumps {
+  /** The command Rider wraps ReSharper's navigation into */
+  private const val NAVIGATION_COMMAND = "NavigationHost.SendNavigation"
+
+  /** Long enough for the backend to answer, short enough not to mistake a later, unrelated navigation for the jump */
+  private const val EXPECTED_JUMP_TIMEOUT_MS = 5_000L
+
+  private var expectedJumpEditor: Editor? = null
+  private var expectedJumpTimestamp = 0L
+
+  /** True for an action whose navigation happens on the backend, see [RiderTagJumps] */
+  fun isNavigatedByBackend(action: AnAction): Boolean = isRider() && action.isPossiblyDelegatingToBackend()
+
+  /** Marks a tag jump from [editor] as expected, the push waits for the backend's navigation */
+  fun expectJump(editor: Editor) {
+    expectedJumpEditor = editor
+    expectedJumpTimestamp = System.currentTimeMillis()
+  }
+
+  fun commandStarted(commandName: String?) {
+    if (commandName != NAVIGATION_COMMAND) return
+    val editor = expectedJumpEditor ?: return
+    val isExpected = System.currentTimeMillis() - expectedJumpTimestamp < EXPECTED_JUMP_TIMEOUT_MS
+    expectedJumpEditor = null
+    if (isExpected) {
+      pushTagLocation(editor)
+    }
+  }
+}
+
+internal class RiderNavigationCommandListener : CommandListener {
+  override fun commandStarted(event: CommandEvent) {
+    if (VimPlugin.isNotEnabled()) return
+    RiderTagJumps.commandStarted(event.commandName)
   }
 }
