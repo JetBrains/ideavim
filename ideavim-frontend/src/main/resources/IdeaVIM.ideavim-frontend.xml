@@ -388,6 +388,14 @@
       </aliases>
     </vimExtension>
 
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.lion.VimLionExtension" name="lion">
+      <aliases>
+        <alias name="https://github.com/tommcdo/vim-lion"/>
+        <alias name="tommcdo/vim-lion"/>
+        <alias name="vim-lion"/>
+      </aliases>
+    </vimExtension>
+
     <vimExtension implementation="com.maddyhome.idea.vim.extension.multiplecursors.VimMultipleCursorsExtension"
                   name="multiple-cursors">
       <aliases>

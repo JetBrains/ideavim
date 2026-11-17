@@ -619,6 +619,66 @@ The log contains everything you type, including passwords typed into the editor.
 </details>
 
 <details>
+<summary><h2>lion: Operators for aligning text by a character</h2></summary>
+
+Original plugin: [vim-lion](https://github.com/tommcdo/vim-lion).
+
+### Summary:
+Adds `gl` and `gL` operators that align the text covered by a motion or a Visual selection to a character.
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'tommcdo/vim-lion'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plugin 'tommcdo/vim-lion'</code>
+      <br/>
+      <code>Plug 'https://github.com/tommcdo/vim-lion'</code>
+      <br/>
+      <code>Plug 'vim-lion'</code>
+      <br/>
+      <code>set lion</code>
+      </details>
+
+### Instructions
+
+- `[count]gl{motion}{char}` adds spaces to the left of `{char}`, so that the characters line up.
+- `[count]gL{motion}{char}` adds spaces to the right of `{char}`, so that the text after the characters lines up.
+- Both work in Visual mode too, e.g. `vipgl=`. A characterwise or blockwise selection limits the alignment to the
+  selected columns.
+
+For example, `glip=` turns
+
+```
+$i = 5;
+$username = 'tommcdo';
+```
+
+into
+
+```
+$i        = 5;
+$username = 'tommcdo';
+```
+
+Without a count, all occurrences of `{char}` are aligned. With a count, only the first `[count]` occurrences are
+aligned. `{char}` can be preceded by a number to start at that occurrence, e.g. `glip2,` leaves the first comma of each
+line alone. `{space}` aligns the first space after each word. `/` prompts for a pattern to align to, an empty pattern
+aligns to `/`.
+
+The following variables are supported. The mapping variables must be set before the plugin is enabled:
+
+- `let g:lion_create_maps = 0` doesn't create the default mappings. Map `<Plug>LionRight`, `<Plug>LionLeft` (Normal
+  mode) and `<Plug>VLionRight`, `<Plug>VLionLeft` (Visual mode) yourself.
+- `let g:lion_map_right = 'ga'` and `let g:lion_map_left = 'gA'` change the default mappings.
+- `let g:lion_squeeze_spaces = 1` or `let b:lion_squeeze_spaces = 1` collapses runs of spaces outside the indent
+  before aligning.
+- `let g:lion_prompt = 'Align to: '` changes the prompt for `/`.
+
+https://github.com/tommcdo/vim-lion/blob/master/doc/lion.txt
+
+</details>
+
+<details>
 <summary><h2>matchit.vim: Extends the % key functionality</h2></summary>
 
 By [Martin Yzeiri](https://github.com/myzeiri)
