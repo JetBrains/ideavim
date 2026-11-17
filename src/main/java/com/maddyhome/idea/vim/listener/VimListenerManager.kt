@@ -101,6 +101,7 @@ import com.maddyhome.idea.vim.group.NumberChangeListener
 import com.maddyhome.idea.vim.group.OptionGroup
 import com.maddyhome.idea.vim.group.ScrollOptionsChangeListener
 import com.maddyhome.idea.vim.group.WindowJumpsChangeListener
+import com.maddyhome.idea.vim.group.startBackendUndoSteps
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
@@ -395,6 +396,8 @@ object VimListenerManager {
       // Initialise the local options. We MUST do this before anything has the chance to query options
       val vimEditor = editor.vim
       VimPlugin.getOptionGroup().initialiseLocalOptions(vimEditor, openingEditor, scenario)
+
+      startBackendUndoSteps(editor)
 
       val eventFacade = EventFacade.getInstance()
       eventFacade.addEditorMouseListener(editor, EditorMouseHandler, perEditorDisposable)
