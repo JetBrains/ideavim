@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.group
 
 import com.intellij.ide.impl.UndoRemoteBehaviorService
 import com.intellij.openapi.editor.Document
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.impl.editorId
 import com.intellij.openapi.util.Key
 import com.intellij.util.PlatformUtils
@@ -23,6 +24,18 @@ import com.maddyhome.idea.vim.newapi.ij
  */
 internal fun isUndoStackOnBackend(): Boolean =
   PlatformUtils.isJetBrainsClient() && !UndoRemoteBehaviorService.isSpeculativeUndoEnabled()
+
+/**
+ * Makes the changes made before IdeaVim saw the document one undo step, apart from the changes of the first command.
+ *
+ * Without it, the first command in the document would wait for the backend even if nothing changed, and the modal
+ * progress of the call would drop the keys typed meanwhile.
+ */
+internal fun startBackendUndoSteps(editor: Editor) {
+  if (!isUndoStackOnBackend()) return
+  val document = editor.document
+  if (document.getUserData(UNDO_STEP_CLOSED_AT) == null) document.rememberUndoStepClosed()
+}
 
 /**
  * Makes the changes of the previous IdeaVim command a separate undo step on the backend, see
