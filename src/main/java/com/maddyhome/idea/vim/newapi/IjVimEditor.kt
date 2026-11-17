@@ -88,8 +88,7 @@ open class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase() {
   override val jumpListId: String
     get() {
       if (!injector.globalOptions().ideawindowjumps) return projectId
-      val windowId = injector.windowIdService.getWindowId(this) ?: return projectId
-      return "$projectId/$windowId"
+      return injector.windowIdService.getWindowScopeId(this) ?: projectId
     }
 
   override fun updateMode(mode: Mode) {
