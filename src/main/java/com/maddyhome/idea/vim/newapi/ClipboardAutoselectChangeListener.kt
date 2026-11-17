@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.annotations.TestOnly
+import java.awt.GraphicsEnvironment
 
 /**
  * Keeps the platform's own PRIMARY updates in line with `autoselect` in 'clipboard'.
@@ -35,7 +36,10 @@ import org.jetbrains.annotations.TestOnly
 internal object ClipboardAutoselectChangeListener : GlobalOptionChangeListener {
   private const val UPDATE_PRIMARY_REGISTRY_KEY = "editor.caret.update.primary.selection"
 
-  private var systemSelectionSupported: () -> Boolean = { CopyPasteManager.getInstance().isSystemSelectionSupported }
+  // Headless AWT throws on the PRIMARY lookup instead of returning null
+  private var systemSelectionSupported: () -> Boolean = {
+    !GraphicsEnvironment.isHeadless() && CopyPasteManager.getInstance().isSystemSelectionSupported
+  }
 
   override fun onGlobalOptionChanged() {
     if (OptionConstants.clipboard_autoselect in injector.globalOptions().clipboard || !systemSelectionSupported()) {
