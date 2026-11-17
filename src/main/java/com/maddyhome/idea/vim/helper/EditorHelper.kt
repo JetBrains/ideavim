@@ -21,8 +21,6 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileEditor.impl.EditorWindow
-import com.intellij.openapi.util.Key
-import com.intellij.openapi.util.UserDataHolder
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.originalFileOrSelf
 import com.intellij.testFramework.LightVirtualFile
@@ -53,8 +51,10 @@ import kotlin.math.roundToLong
 object EditorHelper {
   const val PYTHON_CONSOLE_FILE_NAME: String = "Python Console.py"
   const val PYTHON_CONSOLE_TOOL_WINDOW_ID: String = "Python Console"
-  private const val PYDEV_CONSOLE_KEY_NAME = "PYDEV_CONSOLE_KEY"
-  private const val AI_ASSISTANT_INPUT_EDITOR_KEY_NAME = "AI_ASSISTANT_INPUT_EDITOR"
+  private val PYDEV_CONSOLE_KEY = NamedKey("PYDEV_CONSOLE_KEY")
+  private val AI_ASSISTANT_INPUT_EDITOR_KEY = NamedKey("AI_ASSISTANT_INPUT_EDITOR")
+  private val COMMIT_MESSAGE_KEY = NamedKey("Vcs.CommitMessage.Panel")
+  private val KOTLIN_DECOMPILED_FILE_KEY = NamedKey("IS_KOTLIN_DECOMPILED_FILE")
   private const val AI_ASSISTANT_INPUT_FILE_NAME_PREFIX = "AIAssistantInput-"
 
   private const val MAX_STICKY_LINES_ADJUSTMENTS = 3
@@ -662,7 +662,7 @@ object EditorHelper {
     return file.name.contains(PYTHON_CONSOLE_FILE_NAME) || file.path.contains(PYTHON_CONSOLE_FILE_NAME)
   }
 
-  private fun isMarkedAsPythonConsole(file: VirtualFile): Boolean = hasUserDataFlag(file, PYDEV_CONSOLE_KEY_NAME)
+  private fun isMarkedAsPythonConsole(file: VirtualFile): Boolean = PYDEV_CONSOLE_KEY.getUserData(file) == true
 
   /**
    * Checks if the editor is the prompt input of an AI chat: one described by a [ChatInputProvider] (e.g. AIR), or
@@ -679,13 +679,8 @@ object EditorHelper {
   fun isChatInput(editor: Editor): Boolean {
     if (editor.isViewer) return false
     if (ChatInputProvider.forEditor(editor) != null) return true
-    if (hasUserDataFlag(editor, AI_ASSISTANT_INPUT_EDITOR_KEY_NAME)) return true
+    if (AI_ASSISTANT_INPUT_EDITOR_KEY.getUserData(editor) == true) return true
     return getVirtualFile(editor)?.name?.startsWith(AI_ASSISTANT_INPUT_FILE_NAME_PREFIX) == true
-  }
-
-  private fun hasUserDataFlag(holder: UserDataHolder, keyName: String): Boolean {
-    @Suppress("DEPRECATION") val key = Key.findKeyByName(keyName) ?: return false
-    return holder.getUserData(key) == true
   }
 
   /**
@@ -693,8 +688,7 @@ object EditorHelper {
    */
   @JvmStatic
   fun isCommitWindowEditor(editor: Editor): Boolean {
-    @Suppress("DEPRECATION") val dataKey = Key.findKeyByName("Vcs.CommitMessage.Panel")
-    if (dataKey != null && editor.document.getUserData(dataKey) != null) return true
+    if (COMMIT_MESSAGE_KEY.getUserData(editor.document) != null) return true
     return getVirtualFile(editor)?.name?.contains("Dummy.txt") == true
   }
 
@@ -714,7 +708,7 @@ object EditorHelper {
   @JvmStatic
   fun isKotlinClassDecompiledToJavaFile(editor: Editor): Boolean {
     val file = getVirtualFile(editor) ?: return false
-    return hasUserDataFlag(file, "IS_KOTLIN_DECOMPILED_FILE")
+    return KOTLIN_DECOMPILED_FILE_KEY.getUserData(file) == true
   }
 
   /**

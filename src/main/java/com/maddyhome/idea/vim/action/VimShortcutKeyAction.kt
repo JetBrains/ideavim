@@ -28,7 +28,6 @@ import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.impl.EditorComponentImpl
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbAware
-import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.registry.Registry
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
@@ -40,6 +39,7 @@ import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.helper.ActionEventKeyStrokeExtractor
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.HandlerInjector
+import com.maddyhome.idea.vim.helper.NamedKey
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
@@ -199,9 +199,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
     }
 
     // Workaround for smart step into
-    @Suppress("DEPRECATION", "LocalVariableName", "VariableNaming")
-    val SMART_STEP_INPLACE_DATA = Key.findKeyByName("SMART_STEP_INPLACE_DATA")
-    if (SMART_STEP_INPLACE_DATA != null && editor.getUserData(SMART_STEP_INPLACE_DATA) != null) {
+    if (SMART_STEP_INPLACE_DATA.getUserData(editor) != null) {
       LOG.trace("Do not execute shortcut because of smart step")
       return ActionEnableStatus.no("Smart step into is active", LogLevel.INFO)
     }
@@ -355,6 +353,8 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
   }
 
   companion object {
+    private val SMART_STEP_INPLACE_DATA = NamedKey("SMART_STEP_INPLACE_DATA")
+
     // Keymap id of the console execute action (com.intellij.execution.console.ConsoleExecuteAction). The id constant
     // itself is not public in the platform, so we mirror it here.
     private const val CONSOLE_EXECUTE_ACTION_ID = "Console.Execute"

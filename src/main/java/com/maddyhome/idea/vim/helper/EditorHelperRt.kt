@@ -73,11 +73,12 @@ internal val Editor.isIdeaVimDisabledHere: Boolean
  * AI chat prompt inputs  are opt-in via the `chat` value of 'ideaeditor'.
  */
 private fun Editor.isAllowedFileEditor(): Boolean {
-  return EditorHelper.isCommitWindowEditor(this)
-    || EditorHelper.isKotlinClassDecompiledToJavaFile(this)
+  // This runs on every keystroke, so the cheap and most common checks go first
+  return EditorHelper.isFileEditor(this)
     || EditorHelper.isDiffEditor(this)
-    || EditorHelper.isFileEditor(this)
     || EditorHelper.isCommandHistoryWindow(this)
+    || EditorHelper.isCommitWindowEditor(this)
+    || EditorHelper.isKotlinClassDecompiledToJavaFile(this)
     || isEnabledConsole()
     || isEnabledMainEditor()
     || isEnabledChatInput()
@@ -88,8 +89,8 @@ private fun Editor.isAllowedFileEditor(): Boolean {
  */
 internal fun Editor.isEnabledConsole(): Boolean {
   val enabledEditors = injector.globalIjOptions().ideaeditor
-  return (EditorHelper.isPythonConsole(this) && enabledEditors.contains(IjOptionConstants.ideaeditor_python))
-    || (EditorHelper.isRunConsole(this) && enabledEditors.contains(IjOptionConstants.ideaeditor_debug))
+  return (enabledEditors.contains(IjOptionConstants.ideaeditor_python) && EditorHelper.isPythonConsole(this))
+    || (enabledEditors.contains(IjOptionConstants.ideaeditor_debug) && EditorHelper.isRunConsole(this))
 }
 
 /**
