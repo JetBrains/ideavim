@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.listener
 
 import com.intellij.codeWithMe.ClientId
 import com.intellij.codeWithMe.ClientId.Companion.isLocal
+import com.intellij.ide.AppLifecycleListener
 import com.intellij.ide.ui.UISettings
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
@@ -275,6 +276,10 @@ object VimListenerManager {
       busConnection.subscribe(FileOpenedSyncListener.TOPIC, VimEditorFactoryListener)
       busConnection.subscribe(VirtualFileManager.VFS_CHANGES, BufNewFileTracker)
       busConnection.subscribe(FileDocumentManagerListener.TOPIC, BufWriteListener)
+      // The IDE saves its settings before it disposes plugins, so the registry override has to go before that
+      busConnection.subscribe(AppLifecycleListener.TOPIC, object : AppLifecycleListener {
+        override fun beforeAppWillBeClosed(isRestart: Boolean) = ClipboardAutoselectChangeListener.restore()
+      })
 
       OutsideEditorKeyDispatcher.getInstance().installListeners()
 

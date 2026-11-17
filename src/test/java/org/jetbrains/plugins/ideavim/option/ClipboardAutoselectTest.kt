@@ -9,7 +9,9 @@
 package org.jetbrains.plugins.ideavim.option
 
 import com.intellij.openapi.util.registry.Registry
+import com.intellij.openapi.util.registry.RegistryValueSource
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.ClipboardAutoselectChangeListener
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -95,35 +97,82 @@ class ClipboardAutoselectTest : VimTestCase() {
     configureByText("Lorem ipsum")
     assertTrue(platformUpdatesPrimary())
 
-    enterCommand("set clipboard-=autoselect")
-    assertFalse(platformUpdatesPrimary())
+    withSystemSelection {
+      enterCommand("set clipboard-=autoselect")
+      assertFalse(platformUpdatesPrimary())
 
-    enterCommand("set clipboard+=autoselect")
-    assertTrue(platformUpdatesPrimary())
+      enterCommand("set clipboard+=autoselect")
+      assertTrue(platformUpdatesPrimary())
+    }
   }
 
   @Test
   fun `test resetting clipboard restores platform PRIMARY update`() {
     configureByText("Lorem ipsum")
-    enterCommand("set clipboard-=autoselect")
-    assertFalse(platformUpdatesPrimary())
+    withSystemSelection {
+      enterCommand("set clipboard-=autoselect")
+      assertFalse(platformUpdatesPrimary())
 
-    enterCommand("set clipboard&")
-    assertTrue(platformUpdatesPrimary())
+      enterCommand("set clipboard&")
+      assertTrue(platformUpdatesPrimary())
+    }
+  }
+
+  // Restored to the default, not saved as a user setting, so it's not written to the IDE settings
+  @Test
+  fun `test restored platform PRIMARY update is not stored`() {
+    configureByText("Lorem ipsum")
+    withSystemSelection {
+      enterCommand("set clipboard-=autoselect")
+      enterCommand("set clipboard+=autoselect")
+      assertFalse(Registry.get(PRIMARY_REGISTRY_KEY).isChangedFromDefault())
+    }
+  }
+
+  // The override is saved with the settings, so the next start sees it as the current value
+  @Test
+  fun `test platform PRIMARY update disabled by an earlier session is restored`() {
+    configureByText("Lorem ipsum")
+    val registryValue = Registry.get(PRIMARY_REGISTRY_KEY)
+    registryValue.setValue("false", RegistryValueSource.SYSTEM)
+    try {
+      withSystemSelection {
+        enterCommand("set clipboard-=autoselect")
+        enterCommand("set clipboard+=autoselect")
+        assertTrue(platformUpdatesPrimary())
+      }
+    } finally {
+      registryValue.resetToDefault()
+    }
+  }
+
+  @Test
+  fun `test platform PRIMARY update is kept where there is no PRIMARY`() {
+    configureByText("Lorem ipsum")
+    ClipboardAutoselectChangeListener.withSystemSelectionSupported(false) {
+      enterCommand("set clipboard-=autoselect")
+      assertTrue(platformUpdatesPrimary())
+    }
   }
 
   @Test
   fun `test user-disabled platform PRIMARY update stays disabled`() {
     configureByText("Lorem ipsum")
     val registryValue = Registry.get(PRIMARY_REGISTRY_KEY)
-    registryValue.setValue(false)
+    registryValue.setValue("false", RegistryValueSource.USER)
     try {
-      enterCommand("set clipboard-=autoselect")
-      enterCommand("set clipboard+=autoselect")
-      assertFalse(platformUpdatesPrimary())
+      withSystemSelection {
+        enterCommand("set clipboard-=autoselect")
+        enterCommand("set clipboard+=autoselect")
+        assertFalse(platformUpdatesPrimary())
+      }
     } finally {
       registryValue.resetToDefault()
     }
+  }
+
+  private fun withSystemSelection(action: () -> Unit) {
+    ClipboardAutoselectChangeListener.withSystemSelectionSupported(true, action)
   }
 
   companion object {
