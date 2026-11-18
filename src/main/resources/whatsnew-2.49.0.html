@@ -1,0 +1,519 @@
+<!--
+  ~ Copyright 2003-2026 The IdeaVim authors
+  ~
+  ~ Use of this source code is governed by an MIT-style
+  ~ license that can be found in the LICENSE.txt file or at
+  ~ https://opensource.org/licenses/MIT.
+  -->
+
+<!doctype html>
+<html data-theme="__THEME__" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <title>What's New in IdeaVim __VERSION__</title>
+  <style>
+      /* Light theme (default). The IDE theme is injected as data-theme on <html>;
+         prefers-color-scheme is the fallback when the page is viewed standalone. */
+      :root {
+          --bg: #eceef1;
+          --term-bg: #ffffff;
+          --titlebar: #e3e6ea;
+          --border: #d7dbe0;
+          --fg: #1a1c1f;
+          --fg-dim: #5b6168;
+          --prompt: #067d17; /* green prompt */
+          --accent: #871094; /* magenta */
+          --link: #0033b3;
+          --key: #0d6efd;
+          --string: #067d17;
+          --comment: #8c8c8c;
+          --code-bg: #f4f5f7;
+          --code-border: #e3e6ea;
+          --dot1: #ff5f56;
+          --dot2: #ffbd2e;
+          --dot3: #27c93f;
+          --shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+      }
+
+      :root[data-theme="dark"] {
+          --bg: #131417;
+          --term-bg: #1e1f22;
+          --titlebar: #2b2d30;
+          --border: #393b40;
+          --fg: #dfe1e5;
+          --fg-dim: #9aa0a6;
+          --prompt: #57965c;
+          --accent: #c77dbb;
+          --link: #56a8f5;
+          --key: #2aacb8;
+          --string: #6aab73;
+          --comment: #7a7e85;
+          --code-bg: #16171a;
+          --code-border: #393b40;
+          --dot1: #ff5f56;
+          --dot2: #ffbd2e;
+          --dot3: #27c93f;
+          --shadow: 0 12px 48px rgba(0, 0, 0, 0.55);
+      }
+
+      @media (prefers-color-scheme: dark) {
+          :root:not([data-theme="light"]) {
+              --bg: #131417;
+              --term-bg: #1e1f22;
+              --titlebar: #2b2d30;
+              --border: #393b40;
+              --fg: #dfe1e5;
+              --fg-dim: #9aa0a6;
+              --prompt: #57965c;
+              --accent: #c77dbb;
+              --link: #56a8f5;
+              --key: #2aacb8;
+              --string: #6aab73;
+              --comment: #7a7e85;
+              --code-bg: #16171a;
+              --code-border: #393b40;
+              --dot1: #ff5f56;
+              --dot2: #ffbd2e;
+              --dot3: #27c93f;
+              --shadow: 0 12px 48px rgba(0, 0, 0, 0.55);
+          }
+      }
+
+      * {
+          box-sizing: border-box;
+      }
+
+      body {
+          margin: 0;
+          background: var(--bg);
+          color: var(--fg);
+          font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+          font-size: 14.5px;
+          line-height: 1.7;
+          -webkit-font-smoothing: antialiased;
+          padding: 32px 16px 64px;
+      }
+
+      /* Terminal window -------------------------------------------------- */
+      .term {
+          max-width: 760px;
+          margin: 0 auto;
+          background: var(--term-bg);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          box-shadow: var(--shadow);
+          overflow: hidden;
+      }
+
+      .titlebar {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 11px 14px;
+          background: var(--titlebar);
+          border-bottom: 1px solid var(--border);
+      }
+
+      .dot {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+      }
+
+      .dot.r {
+          background: var(--dot1);
+      }
+
+      .dot.y {
+          background: var(--dot2);
+      }
+
+      .dot.g {
+          background: var(--dot3);
+      }
+
+      .titlebar .title {
+          flex: 1 1 auto;
+          text-align: center;
+          font-size: 12.5px;
+          color: var(--fg-dim);
+          margin-right: 44px; /* balance the dots */
+      }
+
+      .body {
+          padding: 26px 30px 30px;
+      }
+
+      /* The intro "command" --------------------------------------------- */
+      .runline {
+          margin: 0 0 6px;
+      }
+
+      .runline .p {
+          color: var(--prompt);
+          font-weight: 700;
+      }
+
+      .runline .cmd {
+          color: var(--fg);
+      }
+
+      .runline .flag {
+          color: var(--key);
+      }
+
+      .out {
+          color: var(--fg-dim);
+          margin: 0 0 28px;
+      }
+
+      .out .v {
+          color: var(--accent);
+          font-weight: 700;
+      }
+
+      /* Blog content ----------------------------------------------------- */
+      h2 {
+          font-size: 17px;
+          font-weight: 700;
+          margin: 0px 0 4px;
+          color: var(--fg);
+          letter-spacing: -0.01em;
+      }
+
+      h2::before {
+          content: "❯ ";
+          color: var(--prompt);
+          font-weight: 700;
+      }
+
+      .kicker {
+          font-size: 12px;
+          color: var(--accent);
+          text-transform: lowercase;
+          letter-spacing: 0.04em;
+          margin: 0 0 10px;
+      }
+
+      .kicker::before {
+          content: "# ";
+          color: var(--comment);
+      }
+
+      p {
+          margin: 0 0 14px;
+      }
+
+      p.note {
+          color: var(--fg-dim);
+      }
+
+      .section {
+          margin-bottom: 30px;
+      }
+
+      .section + .section {
+          border-top: 1px dashed var(--border);
+          padding-top: 4px;
+      }
+
+      /* Inline tokens ---------------------------------------------------- */
+      code, kbd {
+          font-family: inherit;
+          font-size: 13px;
+          background: var(--code-bg);
+          border: 1px solid var(--code-border);
+          border-radius: 5px;
+          padding: 1px 6px;
+          white-space: nowrap;
+      }
+
+      kbd {
+          color: var(--key);
+      }
+
+      code {
+          color: var(--accent);
+      }
+
+      /* Terminal output / code blocks ----------------------------------- */
+      pre {
+          background: var(--code-bg);
+          border: 1px solid var(--code-border);
+          border-radius: 8px;
+          padding: 14px 16px;
+          margin: 0 0 14px;
+          overflow-x: auto;
+          line-height: 1.7;
+          font-size: 13px;
+      }
+
+      pre .cm {
+          color: var(--comment);
+      }
+
+      pre .str {
+          color: var(--string);
+      }
+
+      pre .key {
+          color: var(--key);
+      }
+
+      pre .p {
+          color: var(--prompt);
+      }
+
+      /* "Also worth a look" grid ---------------------------------------- */
+      .grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 14px;
+          margin-top: 6px;
+      }
+
+      @media (max-width: 560px) {
+          .grid {
+              grid-template-columns: 1fr;
+          }
+      }
+
+      .mini {
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          padding: 14px 16px;
+      }
+
+      .mini h3 {
+          margin: 0 0 6px;
+          font-size: 14px;
+      }
+
+      .mini h3::before {
+          content: "$ ";
+          color: var(--prompt);
+      }
+
+      .mini p {
+          margin: 0;
+          font-size: 13px;
+          color: var(--fg-dim);
+      }
+
+      /* Fixes list ------------------------------------------------------- */
+      ul {
+          margin: 4px 0 0;
+          padding: 0;
+          list-style: none;
+      }
+
+      li {
+          margin-bottom: 8px;
+          color: var(--fg-dim);
+          padding-left: 1.6em;
+          text-indent: -1.6em;
+      }
+
+      li::before {
+          content: "+ ";
+          color: var(--prompt);
+          font-weight: 700;
+      }
+
+      li strong {
+          color: var(--fg);
+          font-weight: 700;
+      }
+
+      /* Footer prompt ---------------------------------------------------- */
+      footer {
+          margin-top: 34px;
+          padding-top: 18px;
+          border-top: 1px solid var(--border);
+          color: var(--fg-dim);
+          font-size: 13px;
+      }
+
+      footer .p {
+          color: var(--prompt);
+          font-weight: 700;
+      }
+
+      footer a {
+          color: var(--link);
+          text-decoration: none;
+      }
+
+      footer a:hover {
+          text-decoration: underline;
+      }
+
+      .caret {
+          display: inline-block;
+          width: 0.6em;
+          height: 1.05em;
+          background: var(--fg);
+          vertical-align: text-bottom;
+          animation: blink 1.1s steps(1) infinite;
+      }
+
+      @keyframes blink {
+          50% {
+              background: transparent;
+          }
+      }
+  </style>
+</head>
+<body>
+
+<div class="term">
+  <div class="titlebar">
+    <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+    <span class="title">ideavim — whats-new — 80×24</span>
+  </div>
+
+  <div class="body">
+    <p class="runline"><span class="p">~ $</span> <span class="cmd">ideavim</span>
+    </p>
+    <p class="out">Here's what landed in <span class="v">__VERSION__</span>.</p>
+
+    <!-- command-line window -->
+    <div class="section">
+      <p class="kicker">command line · cmdline-window</p>
+      <h2>Edit long commands with Vim motions</h2>
+      <p>Press <kbd>&lt;C-F&gt;</kbd> while typing an Ex command or a <kbd>/</kbd> or <kbd>?</kbd> search to open
+        the command-line window. What you've typed so far becomes its last line, so a long command or pattern can be
+        fixed up with ordinary Normal mode motions. Press <kbd>&lt;CR&gt;</kbd> on any line to run it.</p>
+      <pre>:%s/someLongIdentifier/other<span class="key">&lt;C-F&gt;</span>   <span class="cm">" open the command-line window</span>
+<span class="key">bcw</span>newName<span class="key">&lt;Esc&gt;</span>                      <span class="cm">" edit it like any other text</span>
+<span class="key">&lt;CR&gt;</span>                                <span class="cm">" run the line under the caret</span></pre>
+    </div>
+
+    <!-- fugitive -->
+    <div class="section">
+      <p class="kicker">new plugin · git</p>
+      <h2><code>:Ggrep</code> and the quickfix list</h2>
+      <p>The bundled <strong>fugitive</strong> extension emulates the <code>:Ggrep</code> command of vim-fugitive.
+        It runs <code>git grep</code>, so only the files tracked by Git are searched, and jumps to the first match.
+        Every match goes to the quickfix list, which you can walk through or show in its own window.</p>
+      <pre><span class="str">Plug 'tpope/vim-fugitive'</span>
+
+:Ggrep foo              <span class="cm">" search tracked files, jump to the first match</span>
+:Ggrep! foo             <span class="cm">" collect the matches without jumping</span>
+:cnext / :cprevious     <span class="cm">" walk through the matches</span>
+:cnfile / :cpfile       <span class="cm">" ... or file by file</span>
+:copen                  <span class="cm">" show them all, &lt;CR&gt; jumps to one</span></pre>
+      <p class="note"><code>:cfirst</code>, <code>:clast</code> and <code>:cclose</code> work too.</p>
+    </div>
+
+    <!-- :actionlist -->
+    <div class="section">
+      <p class="kicker">ex commands · actions</p>
+      <h2>Search and run actions from <code>:actionlist</code></h2>
+      <p><code>:actionlist</code> now opens in a read-only buffer, like <code>:help</code> and the quickfix list,
+        instead of a pager. Search it with <kbd>/</kbd>, move around with your usual motions, and press
+        <kbd>&lt;CR&gt;</kbd> on a line to run that action in the editor you opened the list from.</p>
+      <pre>:actionlist Goto      <span class="cm">" list the actions whose ID matches</span>
+<span class="key">/</span>Declaration<span class="key">&lt;CR&gt;</span>      <span class="cm">" search the list</span>
+<span class="key">&lt;CR&gt;</span>                  <span class="cm">" run the action on the current line</span></pre>
+    </div>
+
+    <!-- clipboard autoselect -->
+    <div class="section">
+      <p class="kicker">clipboard · x11</p>
+      <h2>Control what reaches the PRIMARY selection</h2>
+      <p>The <code>'clipboard'</code> option now supports the <code>autoselect</code> flag. It is on by default,
+        so Visual and mouse selections are copied to the X11 PRIMARY selection (the <code>*</code> register).
+        Turn it off if you'd rather keep PRIMARY to yourself.</p>
+      <pre><span class="str">set clipboard-=autoselect</span>   <span class="cm">" don't copy selections to PRIMARY</span></pre>
+    </div>
+
+    <!-- Also worth a look -->
+    <div class="section">
+      <p class="kicker">also worth a look</p>
+      <div class="grid">
+        <div class="mini">
+          <h3><kbd>CTRL-T</kbd> after Ctrl+Click</h3>
+          <p>Ctrl+Click, Go to Type Declaration, Go to Implementation and mappings such as
+            <code>nmap gi &lt;Action&gt;(GotoImplementation)</code> now push onto the tag stack, so
+            <kbd>CTRL-T</kbd> brings you back.</p>
+        </div>
+        <div class="mini">
+          <h3><kbd>&lt;C-O&gt;</kbd> back into diffs</h3>
+          <p>Jumps made in a diff tab now bring back the diff, on the same side, instead of the plain file, even
+            after Go to Declaration.</p>
+        </div>
+        <div class="mini">
+          <h3>Surround in <code>:normal</code></h3>
+          <p><code>:normal yss"</code> works, <code>:1,3normal yss&lt;b&gt;</code> wraps each line, and
+            <kbd>S</kbd> in Visual block mode surrounds every line of the block.</p>
+        </div>
+        <div class="mini">
+          <h3>Smoother scrolling</h3>
+          <p>Scrolling now handles soft wraps, block inlays and notebook outputs properly, and
+            <kbd>CTRL-E</kbd>/<kbd>CTRL-Y</kbd> step through tall inlays one row at a time.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Polish & fixes -->
+    <div class="section">
+      <p class="kicker">polish &amp; fixes</p>
+      <ul>
+        <li><strong>No freezes while typing</strong> — typing in large projects no longer freezes the UI.
+        </li>
+        <li><strong>Undo in remote development</strong> — in Rider and CLion, <kbd>u</kbd> undoes one command at a
+          time, works right after leaving Insert mode, and the first edit in a document is no longer lost.
+        </li>
+        <li><strong><kbd>Esc</kbd> in Rider completion</strong> — it leaves Insert mode in remote development even
+          when the popup shows a type or overloads, and <code>sethandler &lt;Esc&gt; i:ide</code> only closes the
+          popup, as configured.
+        </li>
+        <li><strong>Pasting from other apps on X11</strong> — <kbd>p</kbd> from the <code>+</code> register no
+          longer pastes nothing the first time.
+        </li>
+        <li><strong>Blockwise <code>"+y</code></strong> — on systems without PRIMARY it is pasted blockwise again.
+        </li>
+        <li><strong><code>ideaput</code> keeps your clipboard</strong> — in remote development, <kbd>p</kbd> no
+          longer replaces what another application copied.
+        </li>
+        <li><strong>Sticky lines and <code>'scrolloff'</code></strong> — moving left and right no longer makes the
+          editor scroll back and forth.
+        </li>
+        <li><strong><code>cc</code> and <kbd>S</kbd> in C#</strong> — Rider now indents the emptied line.
+        </li>
+        <li><strong>New lines in the AI chat</strong> — <kbd>o</kbd>, <kbd>O</kbd>, <kbd>&lt;C-J&gt;</kbd>,
+          <kbd>&lt;C-M&gt;</kbd> and mappings ending in <code>&lt;CR&gt;</code> break the line in the prompt.
+        </li>
+        <li><strong>Literal carriage return</strong> — <code>&lt;C-V&gt;&lt;CR&gt;</code> in Insert mode no longer
+          raises an error.
+        </li>
+        <li><strong>Prompts that aren't searches</strong> — <code>'incsearch'</code> no longer moves the caret
+          while you type a surround tag name or a <code>&lt;C-R&gt;=</code> expression.
+        </li>
+        <li><strong>Turning IdeaVim off</strong> — extensions such as NERDTree stop handling keys in the Project
+          tool window.
+        </li>
+        <li><strong>Closing tabs from actions</strong> — no more "Editor is already disposed" errors after an
+          action closes the editor.
+        </li>
+        <li><strong>Mode widget</strong> — no opaque rectangle on the status bar when a terminal or agent tab is
+          selected.
+        </li>
+      </ul>
+    </div>
+
+    <footer>
+      <p><span class="p">~ $</span> # thanks for using IdeaVim — happy editing<span class="caret"></span></p>
+      <p>
+        <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">full-changelog</a> ·
+        <a href="https://youtrack.jetbrains.com/issues/VIM">report-an-issue</a> ·
+        <a href="https://jb.gg/ideavim-eap">join-the-eap</a>
+      </p>
+    </footer>
+  </div>
+</div>
+
+</body>
+</html>
