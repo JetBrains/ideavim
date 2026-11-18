@@ -1189,6 +1189,52 @@ https://github.com/kana/vim-textobj-line/blob/master/doc/textobj-line.txt
 </details>
 
 <details>
+<summary><h2>textobj-quote: Text objects for typographic quotes</h2></summary>
+
+Original plugin: [vim-textobj-quote](https://github.com/preservim/vim-textobj-quote).
+
+### Summary:
+Adds text objects for text between typographic (curly) quotes, such as “double” and ‘single’ quotes.
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'preservim/vim-textobj-quote'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plugin 'preservim/vim-textobj-quote'</code>
+      <br/>
+      <code>Plug 'https://github.com/preservim/vim-textobj-quote'</code>
+      <br/>
+      <code>Plug 'reedes/vim-textobj-quote'</code>
+      <br/>
+      <code>set textobj-quote</code>
+      </details>
+
+### Instructions
+
+- `iq` and `aq` select the text inside “double” quotes, without and with the quotes.
+- `iQ` and `aQ` do the same for ‘single’ quotes.
+
+They work with any operator and in Visual mode, e.g. `ciq`, `daQ` or `viq`. A `’` followed by a letter or a digit is
+an apostrophe and doesn't close a quote, so `viQ` in `‘I’d rather not relive the ’70s,’ she said.` selects the whole
+sentence between the outer quotes. Nested quotes of the same kind are skipped. A count isn't supported.
+
+The following variables are supported:
+
+- `let g:textobj#quote#doubleMotion = 'x'` and `let g:textobj#quote#singleMotion = 'X'` change the `q` and `Q` keys
+  of the mappings. They must be set before the plugin is enabled. The mappings can also be created with
+  `<Plug>(textobj-quote-select-d-i)`, `<Plug>(textobj-quote-select-d-a)`, `<Plug>(textobj-quote-select-s-i)` and
+  `<Plug>(textobj-quote-select-s-a)`.
+- `let g:textobj#quote#doubleDefault = '„“'` and `let g:textobj#quote#singleDefault = '‚‘'` change the opening and
+  closing quote characters, e.g. for German.
+
+Educating quotes while typing, `%` matching of quotes and the `<Plug>ReplaceWith*` and `<Plug>SurroundWith*` mappings
+of the original plugin aren't supported.
+
+https://github.com/preservim/vim-textobj-quote/blob/master/README.markdown
+
+</details>
+
+<details>
 <summary><h2>textobj-user: Framework for defining your own text objects</h2></summary>
 
 Original plugin: [vim-textobj-user](https://github.com/kana/vim-textobj-user).

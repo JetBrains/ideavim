@@ -465,6 +465,15 @@
       </aliases>
     </vimExtension>
 
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.textobjquote.VimTextObjQuoteExtension"
+                  name="textobj-quote">
+      <aliases>
+        <alias name="preservim/vim-textobj-quote"/>
+        <alias name="reedes/vim-textobj-quote"/>
+        <alias name="https://github.com/preservim/vim-textobj-quote"/>
+      </aliases>
+    </vimExtension>
+
     <vimExtension implementation="com.maddyhome.idea.vim.extension.targets.TargetsExtension"
                   name="targets">
       <aliases>

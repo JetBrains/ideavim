@@ -27,6 +27,7 @@ usual beta standards.
 
 ### Features:
 * [VIM-2363](https://youtrack.jetbrains.com/issue/VIM-2363) New `lion` extension emulates [vim-lion](https://github.com/tommcdo/vim-lion). Enable it with `Plug 'tommcdo/vim-lion'`. `glip=` aligns the `=` signs of a paragraph by adding spaces before them, and `gLip:` aligns the text after the `:` signs. Works with any motion and in Visual mode, supports a count, `glip2,` to start at the second comma, `gl{motion}<Space>` to align words and `gl{motion}/` to align to a pattern. See the [documentation](https://github.com/JetBrains/ideavim/blob/master/doc/IdeaVim%20Plugins.md)
+* [VIM-2726](https://youtrack.jetbrains.com/issue/VIM-2726) New `textobj-quote` extension emulates [vim-textobj-quote](https://github.com/preservim/vim-textobj-quote). Enable it with `Plug 'preservim/vim-textobj-quote'`. `iq`/`aq` select the text inside “double” quotes and `iQ`/`aQ` inside ‘single’ quotes, without and with the quotes, e.g. `ciq` or `daQ`. An apostrophe such as in `don’t` isn't taken for a closing quote. The keys and the quote characters can be changed with the `g:textobj#quote#doubleMotion`, `g:textobj#quote#singleMotion`, `g:textobj#quote#doubleDefault` and `g:textobj#quote#singleDefault` variables. See the [documentation](https://github.com/JetBrains/ideavim/blob/master/doc/IdeaVim%20Plugins.md)
 
 ### Fixes:
 
