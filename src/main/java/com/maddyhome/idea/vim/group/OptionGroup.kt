@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.group
 
 import com.intellij.application.options.CodeStyle
 import com.intellij.codeStyle.AbstractConvertLineSeparatorsAction
+import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
@@ -482,7 +483,7 @@ private class ColorColumnOptionValueProvider(private val colorColumnOption: Stri
     }
 
     val ijEditor = editor.ij
-    val language = ijEditor.project?.let { TextEditorImpl.getDocumentLanguage(ijEditor) }
+    val language = getDocumentLanguage(ijEditor)
     val softMargins = CodeStyle.getSettings(ijEditor).getSoftMargins(language)
     return VimString(buildString {
       softMargins.joinTo(this, ",")
@@ -549,7 +550,7 @@ private class ColorColumnOptionValueProvider(private val colorColumnOption: Stri
   override fun resetLocalExternalValueToGlobal(editor: VimEditor) {
     // Reset the current settings back to default by setting both the flag and the visual guides
     val ijEditor = editor.ij
-    val language = ijEditor.project?.let { TextEditorImpl.getDocumentLanguage(ijEditor) }
+    val language = getDocumentLanguage(ijEditor)
 
     // Remember to only update if the value has changed! We don't want to force the global-local values to local only
     if (ijEditor.settings.isRightMarginShown != EditorSettingsExternalizable.getInstance().isRightMarginShown) {
@@ -1176,7 +1177,7 @@ private class TextWidthOptionMapper(textWidthOption: NumberOption) :
     // If there's no project, we won't have a language for the editor (this will happen with the fallback window, which
     // is really a TextComponentEditor). In this case, we
     val ijEditor = editor.ij
-    val language = ijEditor.project?.let { TextEditorImpl.getDocumentLanguage(ijEditor) }
+    val language = getDocumentLanguage(ijEditor)
     if (CodeStyle.getSettings(ijEditor).isWrapOnTyping(language)) {
       return CodeStyle.getSettings(ijEditor).getRightMargin(language).asVimInt()
     }
@@ -1218,7 +1219,7 @@ private class TextWidthOptionMapper(textWidthOption: NumberOption) :
     // 'colorcolumn' option handle it. We can make sure it's always got a value of "+0" to show the 'textwidth' guide,
     // and the user can disable all visual guides with `:set colorcolumn=0`.
     val ijEditor = editor.ij
-    val language = ijEditor.project?.let { TextEditorImpl.getDocumentLanguage(ijEditor) }
+    val language = getDocumentLanguage(ijEditor)
 
     // Remember to only update if the value has changed! We don't want to force the global-local value to be local only
     val globalRightMargin = CodeStyle.getSettings(ijEditor).getRightMargin(language)
@@ -1382,4 +1383,10 @@ private class FoldLevelOptionMapper : LocalOptionValueOverride<VimInt> {
     newValue: OptionValue<VimInt>,
   ): Boolean = storedValue == null ||
     (storedValue is OptionValue.Default && newValue is OptionValue.Default)
+}
+
+
+private fun getDocumentLanguage(editor: Editor): Language? {
+  if (editor.project == null) return null
+  return ApplicationManager.getApplication().runReadAction<Language?> { TextEditorImpl.getDocumentLanguage(editor) }
 }
