@@ -371,7 +371,7 @@ register:               AT (DIGIT | lowercaseAlphabeticChar | uppercaseAlphabeti
 // todo argumentDeclaration but without default values
 lambda:                 L_CURLY WS* argumentsDeclaration WS* ARROW WS* expr WS* R_CURLY;
 
-variable:               (variableScope COLON)? variableName;
+variable:               (variableScope COLON)? (anyCaseNameWithDigitsAndUnderscores NUM)* variableName;
 variableName:           curlyBracesName;
 variableScope:          anyScope;
 

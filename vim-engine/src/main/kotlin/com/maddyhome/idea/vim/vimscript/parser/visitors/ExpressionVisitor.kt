@@ -421,7 +421,11 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
 
   override fun visitVariable(ctx: VariableContext): VariableExpression {
     val scope = if (ctx.variableScope() == null) null else Scope.getByValue(ctx.variableScope().text)
-    val result = VariableExpression(scope, visitCurlyBracesName(ctx.variableName().curlyBracesName()))
+    val name = prependAutoloadPrefix(
+      ctx.anyCaseNameWithDigitsAndUnderscores(),
+      visitCurlyBracesName(ctx.variableName().curlyBracesName()),
+    )
+    val result = VariableExpression(scope, name)
     result.originalString = ctx.text
     return result
   }
