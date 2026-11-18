@@ -35,7 +35,6 @@ usual beta standards.
 ### Fixes:
 
 * [VIM-4346](https://youtrack.jetbrains.com/issue/VIM-4346) Fixed [`'incsearch'`](https://vimhelp.org/options.txt.html#%27incsearch%27) searching for the text typed into prompts that are not searches. Typing a tag name after `vt<St` in the `surround` extension no longer moves the caret or changes the Visual selection, and `<Esc>` in that prompt keeps the selection. The `<C-R>=` expression prompt in Insert mode no longer moves the caret either, and `<C-F>` there no longer opens the command-line window
-* Fixed [`'langmap'`](https://vimhelp.org/options.txt.html#%27langmap%27) being applied twice to keys typed after the start of a mapping that did not match. With `set langmap=ig,gE` and a mapping starting with `g`, typing `ii` now runs `gg` instead of `gE`
 * [VIM-4374](https://youtrack.jetbrains.com/issue/VIM-4374) Fixed Ctrl+Click on a symbol not adding an entry to the [tag stack](https://vimhelp.org/tagsrch.txt.html#tag-stack). [`CTRL-T`](https://vimhelp.org/tagsrch.txt.html#CTRL-T) now returns to where the caret was before the click, as it does after `CTRL-]`, instead of reporting `E73: Tag stack empty` or going back to an older tag jump. The same goes for Ctrl+Shift+Click (Go to Type Declaration), Ctrl+Alt+Click (Go to Implementation), their keyboard shortcuts, and mappings such as `nmap gi <Action>(GotoImplementation)` or `:action` running `GotoDeclaration`, `GotoDeclarationOnly`, `GotoTypeDeclaration` or `GotoImplementation`
 * [VIM-4351](https://youtrack.jetbrains.com/issue/VIM-4351) Fixed [`<C-O>`](https://vimhelp.org/motion.txt.html#CTRL-O) going back to the plain file instead of the diff tab where the jump was made. Jumps made in a diff now bring back the diff on the same side, also after Go to Declaration with Cmd+B or Ctrl+Click and in remote development. `<C-O>` also no longer stays where the caret already is after clicking another file in the Commit tool window, and no longer reports an error after jumping to another file
 * [VIM-4329](https://youtrack.jetbrains.com/issue/VIM-4329) Fixed vertical scrolling around block inlays and soft wraps. `zt`, `CTRL-E`, `CTRL-F` and moving up with [`'scrolloff'`](https://vimhelp.org/options.txt.html#%27scrolloff%27) no longer stop in the second half of a soft-wrapped file, `zb` on a rendered doc comment shows all of it, editing a notebook cell next to a tall output no longer scrolls the caret off the screen, and `CTRL-E`/`CTRL-Y` step through a tall inlay one row at a time
@@ -58,16 +57,10 @@ usual beta standards.
 * [VIM-4374](https://youtrack.jetbrains.com/issue/VIM-4374) `gd` and `gD` now add an entry to the [tag stack](https://vimhelp.org/tagsrch.txt.html#tag-stack), so [`CTRL-T`](https://vimhelp.org/tagsrch.txt.html#CTRL-T) returns from them. In IdeaVim they jump with the IDE's Go to Declaration, the same navigation as `CTRL-]`, rather than searching the text for the word as Vim does
 
 ### Merged PRs:
-* [2142](https://github.com/JetBrains/ideavim/pull/2142) by [1grzyb1](https://github.com/1grzyb1): VIM-2374 I and A move to begginig/end of multi selection
-* [2143](https://github.com/JetBrains/ideavim/pull/2143) by [1grzyb1](https://github.com/1grzyb1): VIM-1309 Don't move caret on middle paste in x11
 * [2146](https://github.com/JetBrains/ideavim/pull/2146) by [1grzyb1](https://github.com/1grzyb1): VIM-3113 support autoselect option
 * [2149](https://github.com/JetBrains/ideavim/pull/2149) by [1grzyb1](https://github.com/1grzyb1): VIM-2200 Open the command-line window with <C-F> from the command line
-* [2147](https://github.com/JetBrains/ideavim/pull/2147) by [1grzyb1](https://github.com/1grzyb1): VIM-4269 speed search on popups with nerdtree
 * [2153](https://github.com/JetBrains/ideavim/pull/2153) by [1grzyb1](https://github.com/1grzyb1): VIM-2342 Add fugitive extension
-* [2154](https://github.com/JetBrains/ideavim/pull/2154) by [1grzyb1](https://github.com/1grzyb1): VIM-4349 parse ' and ` keycodes in mappings
 * [2157](https://github.com/JetBrains/ideavim/pull/2157) by [1grzyb1](https://github.com/1grzyb1): VIM-4346 Fix surround tag
-* [2158](https://github.com/JetBrains/ideavim/pull/2158) by [1grzyb1](https://github.com/1grzyb1): VIM-4329 Fix k movement scrolling with so=9999
-* [2141](https://github.com/JetBrains/ideavim/pull/2141) by [citizenmatt](https://github.com/citizenmatt): Fix incorrect langmap when replaying failed map
 * [2166](https://github.com/JetBrains/ideavim/pull/2166) by [1grzyb1](https://github.com/1grzyb1): VIM-4351 support C-O jump list in diff view
 * [2171](https://github.com/JetBrains/ideavim/pull/2171) by [1grzyb1](https://github.com/1grzyb1): VIM-4364 Type carriage return as line break in Insert mode
 * [2173](https://github.com/JetBrains/ideavim/pull/2173) by [1grzyb1](https://github.com/1grzyb1): VIM-4365 Open a new line with o and O in the AIR prompt
@@ -136,6 +129,7 @@ usual beta standards.
 * [VIM-1309](https://youtrack.jetbrains.com/issue/VIM-1309) Middle-click paste on Linux (X11) in Insert mode now pastes the `*` register at the caret, as in Vim, instead of moving the caret to the mouse position first
 * [VIM-4269](https://youtrack.jetbrains.com/issue/VIM-4269) Fixed `/` in [NERDTree](https://github.com/JetBrains/ideavim/blob/master/doc/NERDTree-support.md) not opening speed search in trees outside tool windows, such as the File Structure popup
 * [VIM-4349](https://youtrack.jetbrains.com/issue/VIM-4349) Fixed mappings of `'` and `` ` `` with a modifier being triggered by unrelated keys — `nmap <A-'> w` no longer runs on `<A-Right>`, and ``nmap <A-`> w`` no longer runs on keypad `0` with Alt. Mapping a character that only a shifted key types, such as `<A-%>`, now reports an error suggesting to map the key itself, e.g. `<A-S-5>`
+* Fixed [`'langmap'`](https://vimhelp.org/options.txt.html#%27langmap%27) being applied twice to keys typed after the start of a mapping that did not match. With `set langmap=ig,gE` and a mapping starting with `g`, typing `ii` now runs `gg` instead of `gE`
 
 ### Merged PRs:
 * [2082](https://github.com/JetBrains/ideavim/pull/2082) by [1grzyb1](https://github.com/1grzyb1): VIM-748 changing multiple commands with |
@@ -155,6 +149,12 @@ usual beta standards.
 * [2103](https://github.com/JetBrains/ideavim/pull/2103) by [citizenmatt](https://github.com/citizenmatt): Implement :function command to list functions
 * [2086](https://github.com/JetBrains/ideavim/pull/2086) by [valis](https://github.com/valis): Don't treat quotes inside non-string tokens as string delimiters in %
 * [2035](https://github.com/JetBrains/ideavim/pull/2035) by [AndDe-gourav](https://github.com/AndDe-gourav): Todo removing not selecting new line char
+* [2142](https://github.com/JetBrains/ideavim/pull/2142) by [1grzyb1](https://github.com/1grzyb1): VIM-2374 I and A move to begginig/end of multi selection
+* [2143](https://github.com/JetBrains/ideavim/pull/2143) by [1grzyb1](https://github.com/1grzyb1): VIM-1309 Don't move caret on middle paste in x11
+* [2147](https://github.com/JetBrains/ideavim/pull/2147) by [1grzyb1](https://github.com/1grzyb1): VIM-4269 speed search on popups with nerdtree
+* [2154](https://github.com/JetBrains/ideavim/pull/2154) by [1grzyb1](https://github.com/1grzyb1): VIM-4349 parse ' and ` keycodes in mappings
+* [2158](https://github.com/JetBrains/ideavim/pull/2158) by [1grzyb1](https://github.com/1grzyb1): VIM-4329 Fix k movement scrolling with so=9999
+* [2141](https://github.com/JetBrains/ideavim/pull/2141) by [citizenmatt](https://github.com/citizenmatt): Fix incorrect langmap when replaying failed map
 
 ## 2.47.3, 2026-10-05
 
