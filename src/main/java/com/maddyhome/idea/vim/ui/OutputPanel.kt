@@ -272,6 +272,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       textPane.foreground = defaultForeground
       promptComponent.foreground = defaultForeground
       statusComponent.foreground = defaultForeground
+      textPane.background = editor.colorsScheme.defaultBackground
     } catch (e: Exception) {
       // in tests `editor.colorScheme` is unsupported
     }

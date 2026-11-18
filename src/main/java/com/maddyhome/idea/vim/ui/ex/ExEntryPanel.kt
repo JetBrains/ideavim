@@ -394,6 +394,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   private fun applyColorScheme(editor: Editor) {
     val foregroundColour = editor.colorsScheme.defaultForeground
     entry.setForeground(foregroundColour)
+    entry.setBackground(editor.colorsScheme.defaultBackground)
     // TODO: Introduce IdeaVim colour scheme for "SpecialKey"?
     val whitespaceColour = editor.colorsScheme.getColor(EditorColors.WHITESPACES_COLOR)
     entry.setSpecialKeyForeground(whitespaceColour ?: foregroundColour)
