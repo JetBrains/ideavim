@@ -34,6 +34,7 @@ usual beta standards.
 * Fixed `p` sometimes pasting nothing from the `+` register on X11 for text copied in another application, so that only a second `p` worked
 * Fixed text yanked blockwise with `"+y` being pasted characterwise on systems without a PRIMARY selection
 * [VIM-4375](https://youtrack.jetbrains.com/issue/VIM-4375) Fixed the mode widget painting an opaque rectangle over the status bar when a terminal or agent tab is selected in the editor area
+* Fixed mappings being applied to the character inserted with [`CTRL-V`](https://vimhelp.org/insert.txt.html#i_CTRL-V) or [`CTRL-K`](https://vimhelp.org/insert.txt.html#i_CTRL-K) in Insert mode. With `inoremap a b`, typing `<C-V>a` now inserts `a`
 
 ### Merged PRs:
 * [2166](https://github.com/JetBrains/ideavim/pull/2166) by [1grzyb1](https://github.com/1grzyb1): VIM-4351 support C-O jump list in diff view
