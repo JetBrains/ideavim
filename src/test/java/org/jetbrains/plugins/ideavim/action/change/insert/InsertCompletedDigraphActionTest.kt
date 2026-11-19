@@ -55,4 +55,18 @@ class InsertCompletedDigraphActionTest : VimTestCase() {
       enterCommand("digraph OK 9450")
     }
   }
+
+  @Test
+  fun `test digraph characters are not mapped`() {
+    doTest(listOf("i", "<C-K>OK", "<Esc>"), "", "✓") {
+      enterCommand("inoremap O X")
+    }
+  }
+
+  @Test
+  fun `test inserted digraph is not mapped`() {
+    doTest(listOf("i", "<C-K>OK", "<Esc>"), "", "✓") {
+      enterCommand("inoremap ✓ X")
+    }
+  }
 }

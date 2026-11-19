@@ -231,4 +231,25 @@ class InsertCompletedLiteralActionTest : VimTestCase() {
     checkInsert("<C-^>", 30.toChar().toString())
     checkInsert("<C-_>", 31.toChar().toString())
   }
+
+  @Test
+  fun `test character after literal start is not mapped`() {
+    doTest(listOf("i", "<C-V>a", "<Esc>"), "", "a") {
+      enterCommand("inoremap a b")
+    }
+  }
+
+  @Test
+  fun `test digits of literal code are not mapped`() {
+    doTest(listOf("i", "<C-V>065", "<Esc>"), "", "A") {
+      enterCommand("inoremap 6 x")
+    }
+  }
+
+  @Test
+  fun `test mappings apply again after literal`() {
+    doTest(listOf("i", "<C-V>aa", "<Esc>"), "", "ab") {
+      enterCommand("inoremap a b")
+    }
+  }
 }

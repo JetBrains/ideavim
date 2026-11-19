@@ -61,16 +61,16 @@ enum class KeySource(val allowsKeyMapping: Boolean) {
   /**
    * The key was generated from a digraph with `<C-K>` or `<C-Q>`
    *
-   * The key will be mapped.
+   * The key is inserted as it is, without mappings.
    */
-  DIGRAPH(true),
+  DIGRAPH(false),
 
   /**
    * The key was generated as a literal value with `<C-V>`
    *
-   * The key will be mapped
+   * The key is inserted as it is, without mappings.
    */
-  LITERAL(true),
+  LITERAL(false),
 
   /**
    * The key was created by playing back a macro
