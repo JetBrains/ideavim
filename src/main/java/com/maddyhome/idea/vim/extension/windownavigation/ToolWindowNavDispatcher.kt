@@ -13,16 +13,17 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowType
 import com.intellij.openapi.wm.ex.ToolWindowManagerEx
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.extension.ShortcutDispatcher
 import com.maddyhome.idea.vim.group.WindowGroup
+import java.awt.Component
 import java.awt.Point
 import java.awt.Rectangle
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
-import javax.swing.JComponent
 import javax.swing.KeyStroke
 import javax.swing.SwingUtilities
 
@@ -73,6 +74,11 @@ internal class ToolWindowNavDispatcher : ShortcutDispatcher<NavDirection>(
 
   override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
+  val isInSequence: Boolean
+    get() = keyStrokes.isNotEmpty()
+
+  fun cancelSequence() = keyStrokes.clear()
+
   companion object {
     const val PLUGIN_NAME = "ToolWindowNav"
 
@@ -85,7 +91,7 @@ private object ToolWindowNavListener : ShortcutDispatcher.Listener<NavDirection>
       val project = e.project ?: return
       val component = e.getData(PlatformDataKeys.CONTEXT_COMPONENT) ?: return
 
-      val twComponent = findToolWindowComponent(component, project) ?: return
+      val twComponent = findDockedToolWindow(component, project)?.component ?: return
       if (!twComponent.isShowing) return
 
       val loc = twComponent.locationOnScreen
@@ -104,23 +110,20 @@ private object ToolWindowNavListener : ShortcutDispatcher.Listener<NavDirection>
     keyStrokes.clear()
     injector.messages.indicateError()
   }
+}
 
-  private fun findToolWindowComponent(
-    component: java.awt.Component,
-    project: Project,
-  ): JComponent? {
-    val twm = ToolWindowManagerEx.getInstanceEx(project)
-    for (id in twm.toolWindowIds) {
-      val tw = twm.getToolWindow(id) ?: continue
-      if (!tw.isVisible) continue
-      if (tw.type == ToolWindowType.FLOATING || tw.type == ToolWindowType.WINDOWED) continue
-      val twComp = tw.component ?: continue
-      if (SwingUtilities.isDescendingFrom(component, twComp)) {
-        return twComp
-      }
+internal fun findDockedToolWindow(component: Component, project: Project): ToolWindow? {
+  val twm = ToolWindowManagerEx.getInstanceEx(project)
+  for (id in twm.toolWindowIds) {
+    val tw = twm.getToolWindow(id) ?: continue
+    if (!tw.isVisible) continue
+    if (tw.type == ToolWindowType.FLOATING || tw.type == ToolWindowType.WINDOWED) continue
+    val twComp = tw.component
+    if (SwingUtilities.isDescendingFrom(component, twComp)) {
+      return tw
     }
-    return null
   }
+  return null
 }
 
 private fun isCtrlW(keyEvent: KeyEvent): Boolean {

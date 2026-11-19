@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.extension.windownavigation
 
+import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.wm.ToolWindowManager
@@ -28,6 +29,7 @@ internal class ToolWindowNavEverywhere : VimExtension {
   override fun getName() = PLUGIN_NAME
 
   private var registeredComponent: JComponent? = null
+  private val terminalNavDispatcher = TerminalNavDispatcher()
 
   val focusListener = PropertyChangeListener { evt ->
     val newFocusOwner = evt.newValue as? JComponent
@@ -47,11 +49,13 @@ internal class ToolWindowNavEverywhere : VimExtension {
   override fun init() {
     KeyboardFocusManager.getCurrentKeyboardFocusManager()
       .addPropertyChangeListener("focusOwner", focusListener)
+    IdeEventQueue.getInstance().addDispatcher(terminalNavDispatcher, null)
   }
 
   override fun dispose() {
     KeyboardFocusManager.getCurrentKeyboardFocusManager()
       .removePropertyChangeListener("focusOwner", focusListener)
+    IdeEventQueue.getInstance().removeDispatcher(terminalNavDispatcher)
     // The focus listener is gone, so it can no longer unregister the shortcut from the focused component
     registeredComponent?.let { service<ToolWindowNavDispatcher>().unregisterCustomShortcutSet(it) }
     registeredComponent = null

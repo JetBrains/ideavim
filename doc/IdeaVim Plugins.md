@@ -1430,8 +1430,8 @@ To edit a cell, press `Enter` or `F2`.
 
 ### Known limitations
 
-- **Terminal.** By default the terminal sends `<C-W>` to the shell. To use `<C-W>h`/`j`/`k`/`l` there,
-  disable *Settings | Tools | Terminal | Override IDE shortcuts*.
+- **Terminal.** `<C-W>` doesn't reach the shell in a docked terminal, so it no longer deletes the previous
+  word there.
 - **AI Chat** and **web-based views** (e.g. Markdown preview) may not react to `<C-W>` or the hints
   shortcut. Press `Esc` to return to the editor, or open another tool window with its shortcut
   (e.g. `Alt+1` / `Cmd+1` for Project).
