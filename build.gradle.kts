@@ -127,6 +127,8 @@ dependencies {
     // Tests for diff previews that follow a tree of changes, which lives in this module (see :ideavim-vcs)
     testBundledModule("intellij.platform.vcs.impl")
     testBundledModule("intellij.platform.vcs.impl.shared")
+    // TerminalNavDispatcherTest runs the terminal's own key dispatcher
+    testBundledPlugin("org.jetbrains.plugins.terminal")
 
     pluginComposedModule(runtimeOnly(project(":ideavim-common")))
     pluginModule(runtimeOnly(project(":ideavim-frontend")))
