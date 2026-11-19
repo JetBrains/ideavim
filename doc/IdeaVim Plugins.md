@@ -1227,8 +1227,13 @@ The following variables are supported:
 - `let g:textobj#quote#doubleDefault = '„“'` and `let g:textobj#quote#singleDefault = '‚‘'` change the opening and
   closing quote characters, e.g. for German.
 
-Educating quotes while typing, `%` matching of quotes and the `<Plug>ReplaceWith*` and `<Plug>SurroundWith*` mappings
-of the original plugin aren't supported.
+`:Educate` turns straight quotes typed in Insert mode into typographic ones in the current buffer: `"` becomes `“` at
+the start of a line, after a space or after one of `[({&`, and `”` elsewhere, and `'` becomes `‘` or `’` the same way,
+so `don't` is typed as `don’t`. `:NoEducate` turns it off and `:ToggleEducate` switches it. `<C-V>"` inserts a straight
+quote while educating. `let g:textobj#quote#educate = 1` educates quotes in all buffers.
+
+`%` matching of quotes and the `<Plug>ReplaceWith*` and `<Plug>SurroundWith*` mappings of the original plugin aren't
+supported.
 
 https://github.com/preservim/vim-textobj-quote/blob/master/README.markdown
 
