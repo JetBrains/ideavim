@@ -93,7 +93,8 @@ abstract class IdeaVimRiderTestBase {
       context.frontendIDEContext.applyVMOptionsPatch { addSystemProperty("request.trial", true) }
     }
 
-    bgRun = context.runIdeWithDriver()
+    // One IDE runs all tests of a class, and the default timeout of 10 minutes is shorter than some classes
+    bgRun = context.runIdeWithDriver(runTimeout = 30.minutes)
     driver = bgRun.driver
 
     driver.withContext { waitForIndicators(10.minutes) }
