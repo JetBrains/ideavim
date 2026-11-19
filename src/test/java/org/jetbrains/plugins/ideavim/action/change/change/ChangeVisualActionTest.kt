@@ -10,6 +10,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.change
 
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
@@ -201,6 +202,36 @@ class ChangeVisualActionTest : VimTestCase() {
         
       """.trimIndent(),
       Mode.NORMAL(),
+    )
+  }
+
+  // VIM-2608
+  @Test
+  fun `test change visual block when visual columns differ from buffer columns`() {
+    configureByText(
+      """
+        |\t\t\tLine ${c}1 Text
+        |\t\t\tLine 2 Text
+        |\t\t\tLine 3 Text
+      """.trimMargin(),
+    )
+    typeText("<C-V>jjcX")
+    ApplicationManager.getApplication().invokeAndWait {
+      val editor = fixture.editor
+      editor.foldingModel.runBatchFoldingOperation {
+        for (line in 1..2) {
+          val lineStart = editor.document.getLineStartOffset(line)
+          editor.foldingModel.addFoldRegion(lineStart, lineStart + 2, "")!!.isExpanded = false
+        }
+      }
+    }
+    typeText("<Esc>")
+    assertState(
+      """
+        |\t\t\tLine X Text
+        |\t\t\tLine X Text
+        |\t\t\tLine X Text
+      """.trimMargin(),
     )
   }
 }
