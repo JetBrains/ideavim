@@ -16,9 +16,12 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.TextObjectVisualType
+import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.addCommand
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
@@ -28,7 +31,11 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.state.mode.Mode.OP_PENDING
 import com.maddyhome.idea.vim.state.mode.Mode.VISUAL
+import com.maddyhome.idea.vim.vimscript.model.VimPluginContext
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import java.util.function.Consumer
 import kotlin.math.max
 
@@ -45,6 +52,14 @@ class VimTextObjQuoteExtension : VimExtension {
         putKeyMappingIfMissing(MappingMode.XO, keys, owner, plug, true)
       }
     }
+
+    addCommand("Educate", EducateCommandHandler { true })
+    addCommand("NoEducate", EducateCommandHandler { false })
+    addCommand("ToggleEducate", EducateCommandHandler { !it })
+    for (kind in QuoteKind.entries) {
+      val key = injector.parser.parseKeys(kind.straightQuote.toString())
+      putExtensionHandlerMapping(MappingMode.I, key, owner, EducateHandler(kind), false)
+    }
   }
 
   internal enum class QuoteKind(
@@ -53,10 +68,14 @@ class VimTextObjQuoteExtension : VimExtension {
     val defaultMotion: String,
     private val pairVariable: String,
     private val defaultPair: String,
+    val straightQuote: Char,
   ) {
-    DOUBLE("d", "textobj#quote#doubleMotion", "q", "textobj#quote#doubleDefault", "“”"),
-    SINGLE("s", "textobj#quote#singleMotion", "Q", "textobj#quote#singleDefault", "‘’"),
+    DOUBLE("d", "textobj#quote#doubleMotion", "q", "textobj#quote#doubleDefault", "“”", '"'),
+    SINGLE("s", "textobj#quote#singleMotion", "Q", "textobj#quote#singleDefault", "‘’", '\''),
     ;
+
+    val other: QuoteKind
+      get() = if (this == DOUBLE) SINGLE else DOUBLE
 
     fun plug(isInner: Boolean): String = "<Plug>(textobj-quote-select-$plugName-${if (isInner) "i" else "a"})"
 
@@ -102,7 +121,7 @@ class VimTextObjQuoteExtension : VimExtension {
     private val isInner: Boolean,
     private val startQuote: Char,
     private val endQuote: Char,
-    private val endQuoteMayBeApostrophe: Boolean = false
+    private val endQuoteMayBeApostrophe: Boolean = false,
   ) : TextObjectActionHandler() {
     override fun getRange(
       editor: VimEditor,
@@ -154,6 +173,61 @@ class VimTextObjQuoteExtension : VimExtension {
       get() = TextObjectVisualType.CHARACTER_WISE
 
     override val supportsLinewiseDeletePromotion: Boolean = false
+  }
+}
+
+private const val EDUCATE_BUFFER_VARIABLE = "textobj_quote_educate_mapped"
+private const val EDUCATE_GLOBAL_VARIABLE = "textobj#quote#educate"
+
+private fun isEducating(editor: VimEditor, context: ExecutionContext): Boolean {
+  val value = injector.variableService.getNullableVariableValue(
+    VariableExpression(Scope.BUFFER_VARIABLE, EDUCATE_BUFFER_VARIABLE),
+    editor,
+    context,
+    VimPluginContext,
+  ) ?: injector.variableService.getGlobalVariableValue(EDUCATE_GLOBAL_VARIABLE)
+  return value?.toVimNumber()?.booleanValue ?: false
+}
+
+private class EducateCommandHandler(private val newState: (Boolean) -> Boolean) : CommandAliasHandler {
+  override fun execute(command: String, range: Range, editor: VimEditor, context: ExecutionContext) {
+    val educate = newState(isEducating(editor, context))
+    injector.variableService.storeVariable(
+      VariableExpression(Scope.BUFFER_VARIABLE, EDUCATE_BUFFER_VARIABLE),
+      if (educate) VimInt.ONE else VimInt.ZERO,
+      editor,
+      context,
+      VimPluginContext,
+    )
+  }
+}
+
+private class EducateHandler(private val kind: VimTextObjQuoteExtension.QuoteKind) : ExtensionHandler {
+  override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
+    if (!isEducating(editor, context)) {
+      injector.changeGroup.type(editor, context, kind.straightQuote)
+      return
+    }
+
+    val quotes = kind.quotes()
+    val text = editor.text()
+    val quotesByCaret = editor.carets().associateWith { caret ->
+      if (opensQuote(text.getOrNull(caret.offset - 1))) quotes[0] else quotes[1]
+    }
+    val quote = quotesByCaret.values.distinct().singleOrNull()
+    if (quote != null) {
+      injector.changeGroup.type(editor, context, quote)
+      return
+    }
+    quotesByCaret.forEach { (caret, caretQuote) -> injector.changeGroup.insertText(editor, caret, caretQuote.toString()) }
+  }
+
+  private fun opensQuote(charBeforeCaret: Char?): Boolean =
+    charBeforeCaret == null || charBeforeCaret.isWhitespace() || charBeforeCaret in OPENING_CHARS ||
+      charBeforeCaret in kind.other.straightQuote.toString() + kind.other.quotes()[0]
+
+  companion object {
+    private const val OPENING_CHARS = "[({&"
   }
 }
 
