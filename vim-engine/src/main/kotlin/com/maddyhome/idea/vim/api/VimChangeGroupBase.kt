@@ -364,28 +364,26 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     editor.runBatchCaretOperation {
       for (caret in editor.nativeCarets()) {
         if (repeatLines > 0) {
-          val visualLine = caret.getVisualPosition().line
           val bufferLine = caret.getBufferPosition().line
           val position = editor.bufferPositionToOffset(BufferPosition(bufferLine, repeatColumn, false))
           for (i in 0 until repeatLines) {
+            val line = bufferLine + i
             if (repeatAppend &&
               (repeatColumn < VimMotionGroupBase.LAST_COLUMN) &&
-              (injector.engineEditorHelper.getVisualLineLength(editor, visualLine + i) < repeatColumn)
+              (lineEndColumn(editor, line) < repeatColumn)
             ) {
-              val pad = injector.engineEditorHelper.pad(editor, bufferLine + i, repeatColumn)
+              val pad = injector.engineEditorHelper.pad(editor, line, repeatColumn)
               if (pad.isNotEmpty()) {
-                val offset = editor.getLineEndOffset(bufferLine + i)
+                val offset = editor.getLineEndOffset(line)
                 insertText(editor, caret, offset, pad)
               }
             }
             val updatedCount = if (started) (if (i == 0) count else count + 1) else count
             if (repeatColumn >= VimMotionGroupBase.LAST_COLUMN) {
-              caret.moveToOffset(injector.motion.moveCaretToLineEnd(editor, bufferLine + i, true))
+              caret.moveToOffset(injector.motion.moveCaretToLineEnd(editor, line, true))
               repeatInsertText(editor, context, updatedCount)
-            } else if (injector.engineEditorHelper.getVisualLineLength(editor, visualLine + i) >= repeatColumn) {
-              val visualPosition = VimVisualPosition(visualLine + i, repeatColumn, false)
-              val inlaysCount = injector.engineEditorHelper.amountOfInlaysBeforeVisualPosition(editor, visualPosition)
-              caret.moveToVisualPosition(VimVisualPosition(visualLine + i, repeatColumn + inlaysCount, false))
+            } else if (lineEndColumn(editor, line) >= repeatColumn) {
+              caret.moveToInlayAwareOffset(editor.bufferPositionToOffset(BufferPosition(line, repeatColumn, false)))
               repeatInsertText(editor, context, updatedCount)
             }
           }
@@ -401,6 +399,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     repeatColumn = 0
     repeatAppend = false
   }
+
+  private fun lineEndColumn(editor: VimEditor, line: Int): Int =
+    editor.offsetToBufferPosition(editor.getLineEndOffset(line)).column
 
   /** Text we have appended to [strokes], remembered so that a change taking it back can cancel the recording. */
   private class RecordedText(
