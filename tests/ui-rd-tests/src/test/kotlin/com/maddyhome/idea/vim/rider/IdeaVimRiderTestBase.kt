@@ -86,7 +86,12 @@ abstract class IdeaVimRiderTestBase {
       context.frontendIDEContext.useTestIdeaVimRc()
     }
     // Without a license, Rider runs on a trial. GitHub Actions passes a missing secret as an empty string
-    context.setLicense(System.getenv("RIDER_LICENSE_KEY")?.takeIf { it.isNotBlank() })
+    val license = System.getenv("RIDER_LICENSE_KEY")?.takeIf { it.isNotBlank() }
+    context.setLicense(license)
+    if (license == null && context is IDERemDevTestContext) {
+      // The JetBrains Client holds the license and doesn't start a trial by itself: it shows the activation dialog
+      context.frontendIDEContext.applyVMOptionsPatch { addSystemProperty("request.trial", true) }
+    }
 
     bgRun = context.runIdeWithDriver()
     driver = bgRun.driver
