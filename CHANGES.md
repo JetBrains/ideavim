@@ -33,6 +33,8 @@ usual beta standards.
 * Fixed `p` sometimes pasting nothing from the `+` register on X11 for text copied in another application, so that only a second `p` worked
 * Fixed text yanked blockwise with `"+y` being pasted characterwise on systems without a PRIMARY selection
 * [VIM-4375](https://youtrack.jetbrains.com/issue/VIM-4375) Fixed the mode widget painting an opaque rectangle over the status bar when a terminal or agent tab is selected in the editor area
+* [VIM-4332](https://youtrack.jetbrains.com/issue/VIM-4332) Fixed the command line and the output of commands such as `:echo` being unreadable when the editor colour scheme differs from the IDE theme, e.g. a light colour scheme in a dark theme. Their background now comes from the editor colour scheme, like the text
+* [VIM-4380](https://youtrack.jetbrains.com/issue/VIM-4380) Fixed an error when opening a diff viewer in IntelliJ 2026.3
 
 ### Merged PRs:
 * [2166](https://github.com/JetBrains/ideavim/pull/2166) by [1grzyb1](https://github.com/1grzyb1): VIM-4351 support C-O jump list in diff view
