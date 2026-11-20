@@ -1031,6 +1031,28 @@ internal fun findNextOpeningDelimiter(editor: Editor, offset: Int, caretOffset: 
   return null
 }
 
+/**
+ * The nearest opening delimiter of any block that starts at or before [offset]. Whether comments and strings are
+ * skipped depends on where the cursor, at [caretOffset], is.
+ */
+internal fun findPreviousOpeningDelimiter(editor: Editor, offset: Int, caretOffset: Int): Delimiter? {
+  val vimEditor = editor.vim
+  val skipContext = SkipContext(editor, caretOffset)
+  val patterns = blockPatterns(editor)
+  val lastLine = vimEditor.offsetToBufferPosition(offset).line
+  val firstLine = max(0, lastLine - BLOCK_SEARCH_LINES)
+  for (line in lastLine downTo firstLine) {
+    val lineStart = vimEditor.getLineStartOffset(line)
+    val lineEnd = vimEditor.getLineEndOffset(line)
+    val delimiter = patterns
+      .flatMap { findMatches(vimEditor, it.openingPattern, lineStart, lineEnd) }
+      .filter { it.range.startOffset <= offset && !skipContext.isSkipped(it.range.startOffset) }
+      .maxByOrNull { it.range.startOffset }
+    if (delimiter != null) return Delimiter(delimiter.range.startOffset, delimiter.range.endOffset)
+  }
+  return null
+}
+
 private fun blockPatterns(editor: Editor): List<BlockPatterns> {
   val virtualFile = EditorHelper.getVirtualFile(editor)
   val languageBlocks = FileTypePatterns.getMatchupPatterns(virtualFile, editor.vim)?.blocks.orEmpty()

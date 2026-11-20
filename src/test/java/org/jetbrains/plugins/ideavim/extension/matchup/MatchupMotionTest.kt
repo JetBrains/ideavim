@@ -1092,4 +1092,193 @@ class MatchupMotionTest : VimTestCase() {
       fileName = "text.txt",
     )
   }
+
+  @Test
+  fun `test inside previous block motion goes inside the previous block`() {
+    doTest(
+      "Q",
+      """
+        foo(a, b) bar(c, d${c})
+      """.trimIndent(),
+      """
+        foo(a, b) bar(${c}c, d)
+      """.trimIndent(),
+      fileName = "text.txt",
+      afterEditorInitialized = {
+        enterCommand("nmap Q <Plug>(matchup-Z%)")
+        enterCommand("xmap Q <Plug>(matchup-Z%)")
+      },
+    )
+  }
+
+  @Test
+  fun `test inside previous block motion from right inside a block goes to the block before`() {
+    doTest(
+      "Q",
+      """
+        foo(a, b) bar(${c}c, d)
+      """.trimIndent(),
+      """
+        foo(${c}a, b) bar(c, d)
+      """.trimIndent(),
+      fileName = "text.txt",
+      afterEditorInitialized = {
+        enterCommand("nmap Q <Plug>(matchup-Z%)")
+        enterCommand("xmap Q <Plug>(matchup-Z%)")
+      },
+    )
+  }
+
+  @Test
+  fun `test inside previous block motion from an opening delimiter goes to the block before`() {
+    doTest(
+      "Q",
+      """
+        foo(a, b) bar${c}(c, d)
+      """.trimIndent(),
+      """
+        foo(${c}a, b) bar(c, d)
+      """.trimIndent(),
+      fileName = "text.txt",
+      afterEditorInitialized = {
+        enterCommand("nmap Q <Plug>(matchup-Z%)")
+        enterCommand("xmap Q <Plug>(matchup-Z%)")
+      },
+    )
+  }
+
+  @Test
+  fun `test inside previous block motion goes after the previous opening keyword`() {
+    doTest(
+      "Q",
+      """
+        if x
+          a
+        end
+        if y
+          ${c}b
+        end
+      """.trimIndent(),
+      """
+        if x
+          a
+        end
+        if${c} y
+          b
+        end
+      """.trimIndent(),
+      fileName = "ruby.rb",
+      afterEditorInitialized = {
+        enterCommand("nmap Q <Plug>(matchup-Z%)")
+        enterCommand("xmap Q <Plug>(matchup-Z%)")
+      },
+    )
+  }
+
+  @Test
+  fun `test inside previous block motion skips the indent after an opening keyword at the end of a line`() {
+    doTest(
+      "Q",
+      """
+        foo.each do
+          bar
+        end
+        baz${c}
+      """.trimIndent(),
+      """
+        foo.each do
+          ${c}bar
+        end
+        baz
+      """.trimIndent(),
+      fileName = "ruby.rb",
+      afterEditorInitialized = {
+        enterCommand("nmap Q <Plug>(matchup-Z%)")
+        enterCommand("xmap Q <Plug>(matchup-Z%)")
+      },
+    )
+  }
+
+  @Test
+  fun `test inside previous block motion from right inside a do block goes to the block before`() {
+    doTest(
+      "Q",
+      """
+        if x
+          a
+        end
+        foo.each do
+          ${c}bar
+        end
+      """.trimIndent(),
+      """
+        if${c} x
+          a
+        end
+        foo.each do
+          bar
+        end
+      """.trimIndent(),
+      fileName = "ruby.rb",
+      afterEditorInitialized = {
+        enterCommand("nmap Q <Plug>(matchup-Z%)")
+        enterCommand("xmap Q <Plug>(matchup-Z%)")
+      },
+    )
+  }
+
+  @Test
+  fun `test inside previous block motion with a count goes to the same block`() {
+    doTest(
+      "2Q",
+      """
+        foo(a, b) bar(c, d) baz(e${c})
+      """.trimIndent(),
+      """
+        foo(a, b) bar(c, d) baz(${c}e)
+      """.trimIndent(),
+      fileName = "text.txt",
+      afterEditorInitialized = {
+        enterCommand("nmap Q <Plug>(matchup-Z%)")
+        enterCommand("xmap Q <Plug>(matchup-Z%)")
+      },
+    )
+  }
+
+  @Test
+  fun `test inside previous block motion without a previous block does not move`() {
+    doTest(
+      "Q",
+      """
+        foo ${c}bar
+      """.trimIndent(),
+      """
+        foo ${c}bar
+      """.trimIndent(),
+      fileName = "text.txt",
+      afterEditorInitialized = {
+        enterCommand("nmap Q <Plug>(matchup-Z%)")
+        enterCommand("xmap Q <Plug>(matchup-Z%)")
+      },
+    )
+  }
+
+  @Test
+  fun `test inside previous block motion in visual mode extends the selection`() {
+    doTest(
+      "vQ",
+      """
+        foo(a, b) bar(c, d${c})
+      """.trimIndent(),
+      """
+        foo(a, b) bar(${s}${c}c, d)${se}
+      """.trimIndent(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+      fileName = "text.txt",
+      afterEditorInitialized = {
+        enterCommand("nmap Q <Plug>(matchup-Z%)")
+        enterCommand("xmap Q <Plug>(matchup-Z%)")
+      },
+    )
+  }
 }
