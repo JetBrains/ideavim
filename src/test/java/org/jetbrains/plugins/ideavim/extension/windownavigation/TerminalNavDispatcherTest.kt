@@ -9,7 +9,6 @@
 package org.jetbrains.plugins.ideavim.extension.windownavigation
 
 import com.intellij.ide.IdeEventQueue
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.ActionUiKind
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -23,8 +22,6 @@ import com.intellij.openapi.extensions.ExtensionPoint
 import com.intellij.openapi.util.Disposer
 import com.intellij.terminal.JBTerminalSystemSettingsProviderBase
 import com.intellij.terminal.frontend.view.TerminalAllowedActionsProvider
-import com.intellij.terminal.frontend.view.impl.TerminalEventsHandler
-import com.intellij.terminal.frontend.view.impl.TimedKeyEvent
 import com.maddyhome.idea.vim.extension.windownavigation.TerminalNavDispatcher
 import com.maddyhome.idea.vim.extension.windownavigation.ToolWindowNavDispatcher
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -42,6 +39,7 @@ import java.awt.KeyboardFocusManager
 import java.awt.event.FocusEvent
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
+import java.lang.reflect.Proxy
 
 /**
  * Runs the key dispatcher of the terminal itself. If the terminal starts to take the keys before the dispatchers that
@@ -223,16 +221,7 @@ class TerminalNavDispatcherTest : VimTestCase() {
   private fun startTerminal() {
     registerAllowedActionsExtensionPoint()
     val disposable = Disposer.newDisposable(fixture.testRootDisposable)
-    val handler = object : TerminalEventsHandler {
-      override fun keyPressed(e: TimedKeyEvent) {
-        shellKeys.add("pressed ${keyText(e.original)}")
-      }
-
-      override fun keyTyped(e: TimedKeyEvent) {
-        shellKeys.add("typed ${keyText(e.original)}")
-      }
-    }
-    setupKeyEventHandling.invoke(null, editor, overridingIdeShortcuts(), handler, disposable)
+    setupKeyEventsHandling.invoke(null, editor, overridingIdeShortcuts(), shellKeysHandler(), disposable)
     // AWT drops a focus event for a component that can't have the focus, which is any component in a headless test
     val focusGained = FocusEvent(editor.contentComponent, FocusEvent.FOCUS_GAINED)
     editor.contentComponent.focusListeners.forEach { it.focusGained(focusGained) }
@@ -310,15 +299,28 @@ class TerminalNavDispatcherTest : VimTestCase() {
     IdeEventQueue.getInstance().dispatchEvent(event)
   }
 
-  // The function the terminal view sets up the key handling with. It is internal, hence the reflection
-  private val setupKeyEventHandling = Class.forName("com.intellij.terminal.frontend.view.impl.TerminalEventDispatcherKt")
-    .getMethod(
-      "setupKeyEventHandling",
-      EditorEx::class.java,
-      JBTerminalSystemSettingsProviderBase::class.java,
-      TerminalEventsHandler::class.java,
-      Disposable::class.java,
-    )
+  // The function the terminal view sets up the key handling with. It is internal and its name and handler type differ
+  // between the platform versions, hence the reflection
+  private val setupKeyEventsHandling = Class.forName("com.intellij.terminal.frontend.view.impl.TerminalEventDispatcherKt")
+    .methods.single { it.name == "setupKeyEventHandling" || it.name == "setupKeyEventsHandling" }
+
+  private fun shellKeysHandler(): Any {
+    val handlerType = setupKeyEventsHandling.parameterTypes[2]
+    return Proxy.newProxyInstance(handlerType.classLoader, arrayOf(handlerType)) { proxy, method, args ->
+      when (method.name) {
+        "keyPressed" -> shellKeys.add("pressed ${keyText(keyEvent(args[0]))}")
+        "keyTyped" -> shellKeys.add("typed ${keyText(keyEvent(args[0]))}")
+        "equals" -> return@newProxyInstance proxy === args[0]
+        "hashCode" -> return@newProxyInstance System.identityHashCode(proxy)
+        "toString" -> return@newProxyInstance "shell keys handler"
+      }
+      null
+    }
+  }
+
+  // Older platforms wrap the key event in TimedKeyEvent
+  private fun keyEvent(event: Any): KeyEvent =
+    event as? KeyEvent ?: event.javaClass.getMethod("getOriginal").invoke(event) as KeyEvent
 
   private fun onEdt(block: () -> Unit) {
     ApplicationManager.getApplication().invokeAndWait(block)
