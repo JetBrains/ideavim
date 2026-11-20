@@ -35,6 +35,8 @@ usual beta standards.
 * Fixed text yanked blockwise with `"+y` being pasted characterwise on systems without a PRIMARY selection
 * [VIM-4375](https://youtrack.jetbrains.com/issue/VIM-4375) Fixed the mode widget painting an opaque rectangle over the status bar when a terminal or agent tab is selected in the editor area
 * Fixed mappings being applied to the character inserted with [`CTRL-V`](https://vimhelp.org/insert.txt.html#i_CTRL-V) or [`CTRL-K`](https://vimhelp.org/insert.txt.html#i_CTRL-K) in Insert mode. With `inoremap a b`, typing `<C-V>a` now inserts `a`
+* [VIM-4332](https://youtrack.jetbrains.com/issue/VIM-4332) Fixed unreadable text in the command line and the output of commands such as `:echo` when the editor colour scheme doesn't match the IDE theme, for example a light colour scheme in a dark theme. The background now comes from the editor colour scheme, like the text
+* [VIM-2608](https://youtrack.jetbrains.com/issue/VIM-2608) Fixed Visual block insert and change, such as `<C-V>jjcX<Esc>`, putting the text one character too early on the following lines when they start with tabs or contain collapsed folds
 
 ### Merged PRs:
 * [2166](https://github.com/JetBrains/ideavim/pull/2166) by [1grzyb1](https://github.com/1grzyb1): VIM-4351 support C-O jump list in diff view
