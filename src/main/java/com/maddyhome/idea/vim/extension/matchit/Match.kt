@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.normalizeOffset
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -49,6 +50,8 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.contains
+import kotlin.math.max
+import kotlin.math.min
 
 class MatchAction : MotionActionHandler.ForEachCaret() {
   var reverse = false
@@ -158,9 +161,11 @@ data class LanguagePatterns(
   val closings: PatternsTable,
   val reversedOpenings: PatternsTable,
   val reversedClosings: PatternsTable,
+  val blocks: List<BlockPatterns> = emptyList(),
 ) {
   // Helper constructor for languages that don't need reversed patterns.
-  constructor(openings: PatternsTable, closings: PatternsTable) : this(openings, closings, openings, closings)
+  constructor(openings: PatternsTable, closings: PatternsTable, blocks: List<BlockPatterns> = emptyList()) :
+    this(openings, closings, openings, closings, blocks)
 
   operator fun plus(newLanguagePatterns: LanguagePatterns): LanguagePatterns {
     return LanguagePatterns(
@@ -168,6 +173,7 @@ data class LanguagePatterns(
       this.closings + newLanguagePatterns.closings,
       this.reversedOpenings + newLanguagePatterns.reversedOpenings,
       this.reversedClosings + newLanguagePatterns.reversedClosings,
+      this.blocks + newLanguagePatterns.blocks,
     )
   }
 
@@ -177,7 +183,11 @@ data class LanguagePatterns(
     operator fun invoke(openingPattern: String, closingPattern: String): LanguagePatterns {
       val openingPatternsTable = linkedMapOf(openingPattern to Pair(openingPattern, closingPattern))
       val closingPatternsTable = linkedMapOf(closingPattern to Pair(openingPattern, closingPattern))
-      return LanguagePatterns(openingPatternsTable, closingPatternsTable)
+      return LanguagePatterns(
+        openingPatternsTable,
+        closingPatternsTable,
+        listOf(BlockPatterns(openingPattern, closingPattern)),
+      )
     }
 
     operator fun invoke(openingPattern: String, middlePattern: String, closingPattern: String): LanguagePatterns {
@@ -196,10 +206,26 @@ data class LanguagePatterns(
       val reversedClosings =
         linkedMapOf(middleAndClosingPatterns to Pair(openingAndMiddlePatterns, middleAndClosingPatterns))
 
-      return LanguagePatterns(openings, closings, reversedOpenings, reversedClosings)
+      return LanguagePatterns(
+        openings,
+        closings,
+        reversedOpenings,
+        reversedClosings,
+        listOf(BlockPatterns(openingPattern, closingPattern)),
+      )
     }
   }
 }
+
+/**
+ * The strict opening and closing patterns of a block, i.e. without its middle patterns. When [hasBackReference] is set,
+ * both patterns capture a name in their first group, and an opening only pairs with a closing of the same name.
+ */
+data class BlockPatterns(
+  val openingPattern: String,
+  val closingPattern: String,
+  val hasBackReference: Boolean = false,
+)
 
 /**
  * All the information we need to find a match.
@@ -279,7 +305,8 @@ object FileTypePatterns {
       LanguagePatterns("<", ">") +
         LanguagePatterns(
           linkedMapOf(openingTagPattern to htmlSearchPair),
-          linkedMapOf(closingTagPattern to htmlSearchPair)
+          linkedMapOf(closingTagPattern to htmlSearchPair),
+          listOf(BlockPatterns(openingTagPattern, closingTagPattern, hasBackReference = true)),
         )
       )
   }
@@ -322,8 +349,11 @@ object FileTypePatterns {
     val openingDoc = """\%(<<<\)\@3<=\s*'\=\(\w\+\)'\="""
     val closingDoc = """^\s*\(\w\+\)\s*[,;]"""
     val docSearchPair = Pair("""\%(<<<\)\@3<=\s*'\=%s'\=""", "%s")
-    val docPatterns =
-      LanguagePatterns(linkedMapOf(openingDoc to docSearchPair), linkedMapOf(closingDoc to docSearchPair))
+    val docPatterns = LanguagePatterns(
+      linkedMapOf(openingDoc to docSearchPair),
+      linkedMapOf(closingDoc to docSearchPair),
+      listOf(BlockPatterns(openingDoc, closingDoc, hasBackReference = true)),
+    )
 
     return (
       LanguagePatterns("""<\@1<=?\%(php\|=\)\=""", """?>""") +
@@ -775,4 +805,143 @@ fun isQuoted(psiElement: PsiElement?): Boolean {
   val type = getElementType(psiElement)
   return type == "STRING_LITERAL" || type == "XML_ATTRIBUTE_VALUE_TOKEN" ||
     type == "string content" // Ruby specific.
+}
+
+/**
+ * A match of a block's opening or closing pattern, covering `[startOffset, endOffset)`.
+ */
+internal data class Delimiter(val startOffset: Int, val endOffset: Int)
+
+internal data class Block(val opening: Delimiter, val closing: Delimiter)
+
+private const val BLOCK_SEARCH_LINES = 1500
+
+/**
+ * The blocks containing [offset], innermost first. Brackets from 'matchpairs' are blocks too, so are the language's
+ * opening and closing words, while middle words such as "else" are ignored.
+ */
+internal fun findSurroundingBlocks(editor: Editor, offset: Int): List<Block> {
+  val vimEditor = editor.vim
+  val skipContext = SkipContext(editor, offset)
+  val searchStart = blockSearchStart(vimEditor, offset)
+  val searchEnd = blockSearchEnd(vimEditor, offset)
+  return blockPatterns(editor)
+    .flatMap { findBlocks(vimEditor, it, searchStart, searchEnd, skipContext) }
+    .filter { it.opening.startOffset <= offset && offset < it.closing.endOffset }
+    .sortedWith(compareByDescending<Block> { it.opening.startOffset }.thenBy { it.closing.endOffset })
+}
+
+/**
+ * The opening delimiter of any block that the cursor at [offset] is on.
+ */
+internal fun findOpeningDelimiterAt(editor: Editor, offset: Int): Delimiter? {
+  val vimEditor = editor.vim
+  val lineStart = vimEditor.getLineStartForOffset(offset)
+  val lineEnd = vimEditor.getLineEndForOffset(offset)
+  return blockPatterns(editor)
+    .flatMap { findMatches(vimEditor, it.openingPattern, lineStart, lineEnd) }
+    .filter { it.range.startOffset <= offset && offset < it.range.endOffset }
+    .maxByOrNull { it.range.startOffset }
+    ?.let { Delimiter(it.range.startOffset, it.range.endOffset) }
+}
+
+/**
+ * The first opening delimiter of any block that starts at or after [offset]. Whether comments and strings are skipped
+ * depends on where the cursor, at [caretOffset], is.
+ */
+internal fun findNextOpeningDelimiter(editor: Editor, offset: Int, caretOffset: Int): Delimiter? {
+  val vimEditor = editor.vim
+  val skipContext = SkipContext(editor, caretOffset)
+  val patterns = blockPatterns(editor)
+  val firstLine = vimEditor.offsetToBufferPosition(offset).line
+  val lastLine = min(vimEditor.lineCount() - 1, firstLine + BLOCK_SEARCH_LINES)
+  for (line in firstLine..lastLine) {
+    val lineStart = max(offset, vimEditor.getLineStartOffset(line))
+    val lineEnd = vimEditor.getLineEndOffset(line)
+    val delimiter = patterns
+      .flatMap { findMatches(vimEditor, it.openingPattern, lineStart, lineEnd) }
+      .filter { it.range.startOffset >= offset && !skipContext.isSkipped(it.range.startOffset) }
+      .minByOrNull { it.range.startOffset }
+    if (delimiter != null) return Delimiter(delimiter.range.startOffset, delimiter.range.endOffset)
+  }
+  return null
+}
+
+private fun blockPatterns(editor: Editor): List<BlockPatterns> {
+  val virtualFile = EditorHelper.getVirtualFile(editor)
+  val languageBlocks = FileTypePatterns.getMatchupPatterns(virtualFile, editor.vim)?.blocks.orEmpty()
+  return languageBlocks + matchPairBlocks(editor.vim)
+}
+
+private fun matchPairBlocks(editor: VimEditor): List<BlockPatterns> {
+  return injector.options(editor).matchpairs
+    .filter { it.length == 3 }
+    .map { BlockPatterns(literalPattern(it[0]), literalPattern(it[2])) }
+}
+
+private fun literalPattern(char: Char): String = if (char == '\\') """\V\\""" else """\V$char"""
+
+private fun blockSearchStart(editor: VimEditor, offset: Int): Int {
+  val line = editor.offsetToBufferPosition(offset).line
+  return editor.getLineStartOffset(max(0, line - BLOCK_SEARCH_LINES))
+}
+
+private fun blockSearchEnd(editor: VimEditor, offset: Int): Int {
+  val line = editor.offsetToBufferPosition(offset).line
+  return editor.getLineEndOffset(min(editor.lineCount() - 1, line + BLOCK_SEARCH_LINES))
+}
+
+/**
+ * Pairs up the openings and closings of one kind of block with a stack. A closing that carries a name pairs with the
+ * nearest opening of the same name, and the openings above it, e.g. HTML void elements such as `<br>`, are dropped.
+ */
+private fun findBlocks(
+  editor: VimEditor,
+  patterns: BlockPatterns,
+  startOffset: Int,
+  endOffset: Int,
+  skipContext: SkipContext,
+): List<Block> {
+  val matches = collectPairMatches(editor, patterns.openingPattern, patterns.closingPattern, startOffset, endOffset)
+    .filterNot { skipContext.isSkipped(it.startOffset) }
+
+  val openings = mutableListOf<Pair<Delimiter, String?>>()
+  val blocks = mutableListOf<Block>()
+  for (match in matches) {
+    val delimiter = Delimiter(match.startOffset, match.endOffset)
+    val name = if (patterns.hasBackReference) {
+      val pattern = if (match.isClosing) patterns.closingPattern else patterns.openingPattern
+      findBackReference(editor, pattern, match.startOffset)
+    } else {
+      null
+    }
+
+    if (match.isClosing) {
+      val openingIndex = openings.indexOfLast { it.second == name }
+      if (openingIndex >= 0) {
+        blocks.add(Block(openings[openingIndex].first, delimiter))
+        openings.subList(openingIndex, openings.size).clear()
+        continue
+      }
+      if (!match.isOpening) continue
+    }
+    openings.add(delimiter to name)
+  }
+  return blocks
+}
+
+/**
+ * Comments and strings are skipped unless the cursor is in one of them.
+ */
+private class SkipContext(editor: Editor, caretOffset: Int) {
+  private val psiFile = PsiHelper.getFile(editor)
+  private val skipCommentsAndStrings = !isCommentOrString(psiFile?.findElementAt(caretOffset))
+
+  fun isSkipped(offset: Int): Boolean {
+    val psiElement = psiFile?.findElementAt(offset)
+    if (isSkippedRubyElement(psiElement) || isGlobalSkippedElement(psiElement)) return true
+    return skipCommentsAndStrings && isCommentOrString(psiElement)
+  }
+
+  private fun isCommentOrString(psiElement: PsiElement?): Boolean = isComment(psiElement) || isQuoted(psiElement)
 }
