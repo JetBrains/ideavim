@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.matchit.MatchHandler
+import java.util.EnumSet
 
 /**
  * Port of matchup.vim (https://github.com/chrisbra/matchit)
@@ -70,6 +71,13 @@ internal class Matchup : VimExtension {
     putBlockMotion("[%", BlockMotion.START)
     putBlockMotion("]%", BlockMotion.END)
     putBlockMotion("z%", BlockMotion.INSIDE)
+    VimExtensionFacade.putExtensionHandlerMapping(
+      EnumSet.of(MappingMode.NORMAL, MappingMode.VISUAL),
+      injector.parser.parseKeys("<Plug>(matchup-Z%)"),
+      owner,
+      BlockMotionHandler(BlockMotion.INSIDE_PREVIOUS),
+      false
+    )
 
     putBlockTextObject("i%", isInner = true)
     putBlockTextObject("a%", isInner = false)

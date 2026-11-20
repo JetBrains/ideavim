@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.matchit.Block
 import com.maddyhome.idea.vim.extension.matchit.findNextOpeningDelimiter
 import com.maddyhome.idea.vim.extension.matchit.findOpeningDelimiterAt
+import com.maddyhome.idea.vim.extension.matchit.findPreviousOpeningDelimiter
 import com.maddyhome.idea.vim.extension.matchit.findSurroundingBlocks
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.newapi.ij
@@ -38,6 +39,9 @@ internal enum class BlockMotion {
 
   /** `z%` */
   INSIDE,
+
+  /** `Z%`, which has no operator-pending mapping. */
+  INSIDE_PREVIOUS,
 }
 
 internal class BlockMotionHandler(private val motion: BlockMotion) : ExtensionHandler {
@@ -97,6 +101,8 @@ private class BlockMotionTextObject(
       BlockMotion.INSIDE -> findInsideOffset(ijEditor, caretOffset, this.count)?.let {
         if (isForcedCharacterwise) it else previousPosition(text, skipWhitespace(text, it))
       }
+
+      BlockMotion.INSIDE_PREVIOUS -> findInsidePreviousOffset(ijEditor, caretOffset, this.count)
     } ?: return null
 
     val cursorEnd = if (motion == BlockMotion.START && !isForcedCharacterwise) {
@@ -115,6 +121,8 @@ private fun findMotionOffset(editor: Editor, caretOffset: Int, count: Int, motio
     BlockMotion.INSIDE -> findInsideOffset(editor, caretOffset, count)?.let {
       skipIndent(editor.document.charsSequence, it)
     }
+
+    BlockMotion.INSIDE_PREVIOUS -> findInsidePreviousOffset(editor, caretOffset, count)
   }
 }
 
@@ -141,6 +149,28 @@ private fun findInsideOffset(editor: Editor, caretOffset: Int, count: Int): Int?
   repeat(count - 1) {
     delimiter = findNextOpeningDelimiter(editor, target, caretOffset) ?: return null
     target = nextPosition(text, delimiter.endOffset - 1)
+  }
+  return target
+}
+
+/**
+ * The position right after the nearest opening delimiter that comes before the cursor, skipping the indent after it.
+ * Each repetition starts over from where the search for the previous one stopped, which for a block found on the first
+ * try is the same place, so a count rarely makes a difference.
+ */
+private fun findInsidePreviousOffset(editor: Editor, caretOffset: Int, count: Int): Int? {
+  val text = editor.document.charsSequence
+  var searchOffset = caretOffset
+  var target: Int? = null
+  repeat(count) {
+    findOpeningDelimiterAt(editor, searchOffset)?.let { searchOffset = previousPosition(text, it.startOffset) }
+    for (attempt in 0 until 2) {
+      val delimiter = findPreviousOpeningDelimiter(editor, searchOffset, caretOffset) ?: return null
+      val inside = skipIndent(text, nextPosition(text, delimiter.endOffset - 1))
+      target = inside
+      if (inside < caretOffset) break
+      searchOffset = max(delimiter.startOffset - 1, 0)
+    }
   }
   return target
 }
