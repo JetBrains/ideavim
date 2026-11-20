@@ -9,9 +9,13 @@
 <!-- Split-mode (Remote Dev) specific registrations.
      This module only loads when intellij.platform.frontend.split is available,
      which provides access to intellij.rd.client and its extension points. -->
-<idea-plugin package="com.maddyhome.idea.vim">
+<idea-plugin package="com.maddyhome.idea.vim.split">
   <dependencies>
     <module name="intellij.platform.frontend.split"/>
+    <module name="intellij.rd.client"/>
     <module name="IdeaVIM.ideavim-frontend"/>
   </dependencies>
+  <extensions defaultExtensionNs="IdeaVIM">
+    <backendPasteAwaiter implementation="com.maddyhome.idea.vim.split.BackendPasteAwaiterImpl"/>
+  </extensions>
 </idea-plugin>

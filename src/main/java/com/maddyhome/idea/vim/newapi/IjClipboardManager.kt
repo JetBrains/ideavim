@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.api.VimClipboardManager
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimCopiedText
+import com.maddyhome.idea.vim.group.copy.BackendPasteCompletion
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import java.awt.datatransfer.Transferable
 
@@ -43,12 +44,15 @@ internal class IjClipboardManager(
 
   override fun setClipboardContent(editor: VimEditor, context: ExecutionContext, textData: VimCopiedText): Boolean {
     require(textData is IjVimCopiedText)
+    BackendPasteCompletion.getInstance().dropPendingRestores()
     return IjClipboardSelection.write(textData.text, textData.text, textData.transferableData) != null
   }
 
   @Deprecated("Please use com.maddyhome.idea.vim.api.VimClipboardManager#setClipboardText")
-  override fun setClipboardText(text: String, rawText: String, transferableData: List<Any>): Transferable? =
-    IjClipboardSelection.write(text, rawText, transferableData)
+  override fun setClipboardText(text: String, rawText: String, transferableData: List<Any>): Transferable? {
+    BackendPasteCompletion.getInstance().dropPendingRestores()
+    return IjClipboardSelection.write(text, rawText, transferableData)
+  }
 
   override fun getPrimaryContent(editor: VimEditor, context: ExecutionContext): IjVimCopiedText? = primary.read()
 
