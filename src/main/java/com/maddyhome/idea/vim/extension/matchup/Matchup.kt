@@ -66,5 +66,15 @@ internal class Matchup : VimExtension {
       injector.parser.parseKeys("<Plug>(ReverseMatchupMotion)"),
       true
     )
+
+    putBlockMotion("[%", BlockMotion.START)
+    putBlockMotion("]%", BlockMotion.END)
+    putBlockMotion("z%", BlockMotion.INSIDE)
+  }
+
+  private fun putBlockMotion(keys: String, motion: BlockMotion) {
+    val plug = injector.parser.parseKeys("<Plug>(matchup-$keys)")
+    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, plug, owner, BlockMotionHandler(motion), false)
+    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys(keys), owner, plug, true)
   }
 }
