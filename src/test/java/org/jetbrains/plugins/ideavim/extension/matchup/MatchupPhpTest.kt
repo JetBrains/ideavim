@@ -38,7 +38,7 @@ class MatchupPhpTest : VimTestCase() {
     doTest(
       "%",
       "<${c}h1>Heading</h1>",
-      "<h1>Heading<$c/h1>",
+      "<h1>Heading</h${c}1>",
       Mode.NORMAL(),
       fileName = "file.php",
     )
@@ -243,7 +243,7 @@ class MatchupPhpTest : VimTestCase() {
       """
         if (true):
           echo "true";
-        ${c}endif;
+        endi${c}f;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -283,7 +283,7 @@ class MatchupPhpTest : VimTestCase() {
       """
         if (x > 0):
           echo "x is greater than 0";
-        ${c}else:
+        els${c}e:
           echo "x is not greater than 0";
         endif;
       """.trimIndent(),
@@ -307,7 +307,7 @@ class MatchupPhpTest : VimTestCase() {
           echo "x is greater than 0";
         else:
           echo "x is not greater than 0";
-        ${c}endif;
+        endi${c}f;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -351,7 +351,7 @@ class MatchupPhpTest : VimTestCase() {
       """
         if (first):
           echo "first"
-        ${c}elseif (second):
+        elsei${c}f (second):
           echo "second"
         else:
           echo "false"
@@ -379,7 +379,7 @@ class MatchupPhpTest : VimTestCase() {
           echo "first"
         elseif (second):
           echo "second"
-        ${c}else:
+        els${c}e:
           echo "false"
         endif;
       """.trimIndent(),
@@ -429,7 +429,7 @@ class MatchupPhpTest : VimTestCase() {
       """.trimIndent(),
       """
         switch (x):
-          ${c}case "one":
+          cas${c}e "one":
             echo "one";
             continue;
           case "two":
@@ -459,7 +459,7 @@ class MatchupPhpTest : VimTestCase() {
         switch (x):
           case "one":
             echo "one";
-            ${c}continue;
+            continu${c}e;
           case "two":
             echo "two";
             break;
@@ -488,7 +488,7 @@ class MatchupPhpTest : VimTestCase() {
           case "one":
             echo "one";
             continue;
-          ${c}case "two":
+          cas${c}e "two":
             echo "two";
             break;
         endswitch;
@@ -518,7 +518,7 @@ class MatchupPhpTest : VimTestCase() {
             continue;
           case "two":
             echo "two";
-            ${c}break;
+            brea${c}k;
         endswitch;
       """.trimIndent(),
       fileName = "file.php",
@@ -547,7 +547,7 @@ class MatchupPhpTest : VimTestCase() {
           case "two":
             echo "two";
             break;
-        ${c}endswitch;
+        endswitc${c}h;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -593,7 +593,7 @@ class MatchupPhpTest : VimTestCase() {
       """
         while (i <= 10):
           echo i
-        ${c}endwhile;
+        endwhil${c}e;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -634,7 +634,7 @@ class MatchupPhpTest : VimTestCase() {
         while (n <= 10):
           echo n
           if (n % 2 == 0):
-            ${c}continue;
+            continu${c}e;
           endif;
           n++;
         endwhile;
@@ -663,7 +663,7 @@ class MatchupPhpTest : VimTestCase() {
             continue;
           endif;
           n++;
-        ${c}endwhile;
+        endwhil${c}e;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -712,7 +712,7 @@ class MatchupPhpTest : VimTestCase() {
         while (n <= 10):
           echo n
           if (n % 2 == 0):
-            ${c}break;
+            brea${c}k;
           endif;
           n++;
         endwhile;
@@ -741,7 +741,7 @@ class MatchupPhpTest : VimTestCase() {
             break;
           endif;
           n++;
-        ${c}endwhile;
+        endwhil${c}e;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -781,7 +781,7 @@ class MatchupPhpTest : VimTestCase() {
         while (): ${c}while (): endwhile; endwhile;
       """.trimIndent(),
       """
-        while (): while (): ${c}endwhile; endwhile;
+        while (): while (): endwhil${c}e; endwhile;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -813,7 +813,7 @@ class MatchupPhpTest : VimTestCase() {
       """
         for (i = 1; i <= 5; i++):
           echo i;
-        ${c}endfor;
+        endfo${c}r;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -849,7 +849,7 @@ class MatchupPhpTest : VimTestCase() {
       """.trimIndent(),
       """
         for (i = 1; i <= 5; i++):
-          if (i == 1) ${c}continue;
+          if (i == 1) continu${c}e;
           echo i;
         endfor;
       """.trimIndent(),
@@ -871,7 +871,7 @@ class MatchupPhpTest : VimTestCase() {
         for (i = 1; i <= 5; i++):
           if (i == 1) continue;
           echo i;
-        ${c}endfor;
+        endfo${c}r;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -909,7 +909,7 @@ class MatchupPhpTest : VimTestCase() {
       """.trimIndent(),
       """
         for (i = 1; i <= 5; i++):
-          if (i == 1) ${c}break;
+          if (i == 1) brea${c}k;
           echo i;
         endfor;
       """.trimIndent(),
@@ -931,7 +931,7 @@ class MatchupPhpTest : VimTestCase() {
         for (i = 1; i <= 5; i++):
           if (i == 1) break;
           echo i;
-        ${c}endfor;
+        endfo${c}r;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -969,7 +969,7 @@ class MatchupPhpTest : VimTestCase() {
       """
         foreach (nums as n):
           echo n;
-        ${c}endforeach;
+        endforeac${c}h;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -1005,7 +1005,7 @@ class MatchupPhpTest : VimTestCase() {
       """.trimIndent(),
       """
         foreach (nums as n):
-          if (n == 1): ${c}continue
+          if (n == 1): continu${c}e
           echo n;
         endforeach;
       """.trimIndent(),
@@ -1027,7 +1027,7 @@ class MatchupPhpTest : VimTestCase() {
         foreach (nums as n):
           if (n == 1): continue
           echo n;
-        ${c}endforeach;
+        endforeac${c}h;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -1065,7 +1065,7 @@ class MatchupPhpTest : VimTestCase() {
       """.trimIndent(),
       """
         foreach (nums as n):
-          if (n == 1): ${c}break
+          if (n == 1): brea${c}k
           echo n;
         endforeach;
       """.trimIndent(),
@@ -1087,7 +1087,7 @@ class MatchupPhpTest : VimTestCase() {
         foreach (nums as n):
           if (n == 1): break
           echo n;
-        ${c}endforeach;
+        endforeac${c}h;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -1125,7 +1125,7 @@ class MatchupPhpTest : VimTestCase() {
       """
         m = <<<EOT
         message
-        ${c}EOT;
+        EO${c}T;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -1161,7 +1161,7 @@ class MatchupPhpTest : VimTestCase() {
       """
         m = <<<'EOT'
         nowdoc
-        ${c}EOT;
+        EO${c}T;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -1197,7 +1197,7 @@ class MatchupPhpTest : VimTestCase() {
       """
         values = [<<<'EOD'
           a
-          ${c}EOD, 'c d e'];
+          EO${c}D, 'c d e'];
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -1233,7 +1233,7 @@ class MatchupPhpTest : VimTestCase() {
       """
         do {
           n++;
-        } ${c}while (n <= 10);
+        } while (n <= 10)${c};
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -1268,7 +1268,7 @@ class MatchupPhpTest : VimTestCase() {
       """.trimIndent(),
       """
         do {
-          if (n == 2) { ${c}continue; }
+          if (n == 2) { continu${c}e; }
         } while (n <= 10);
       """.trimIndent(),
       fileName = "file.php",
@@ -1287,7 +1287,7 @@ class MatchupPhpTest : VimTestCase() {
       """
         do {
           if (n == 2) { continue; }
-        } ${c}while (n <= 10);
+        } while (n <= 10)${c};
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -1322,7 +1322,7 @@ class MatchupPhpTest : VimTestCase() {
       """.trimIndent(),
       """
         do {
-          if (n == 2) { ${c}break; }
+          if (n == 2) { brea${c}k; }
         } while (n <= 10);
       """.trimIndent(),
       fileName = "file.php",
@@ -1341,7 +1341,7 @@ class MatchupPhpTest : VimTestCase() {
       """
         do {
           if (n == 2) { break; }
-        } ${c}while (n <= 10);
+        } while (n <= 10)${c};
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -1568,7 +1568,7 @@ class MatchupPhpTest : VimTestCase() {
       """
         if (true):
           echo "true";
-        ${c}endif;
+        endi${c}f;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -1608,7 +1608,7 @@ class MatchupPhpTest : VimTestCase() {
           echo "x is greater than 0";
         else:
           echo "x is not greater than 0";
-        ${c}endif;
+        endi${c}f;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -1762,7 +1762,7 @@ class MatchupPhpTest : VimTestCase() {
           case "two":
             echo "two";
             break;
-        ${c}endswitch;
+        endswitc${c}h;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -1920,7 +1920,7 @@ class MatchupPhpTest : VimTestCase() {
       """
         while (i <= 10):
           echo i
-        ${c}endwhile;
+        endwhil${c}e;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -1964,7 +1964,7 @@ class MatchupPhpTest : VimTestCase() {
             continue;
           endif;
           n++;
-        ${c}endwhile;
+        endwhil${c}e;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -2042,7 +2042,7 @@ class MatchupPhpTest : VimTestCase() {
             break;
           endif;
           n++;
-        ${c}endwhile;
+        endwhil${c}e;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -2108,7 +2108,7 @@ class MatchupPhpTest : VimTestCase() {
         while (): ${c}while (): endwhile; endwhile;
       """.trimIndent(),
       """
-        while (): while (): ${c}endwhile; endwhile;
+        while (): while (): endwhil${c}e; endwhile;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -2140,7 +2140,7 @@ class MatchupPhpTest : VimTestCase() {
       """
         for (i = 1; i <= 5; i++):
           echo i;
-        ${c}endfor;
+        endfo${c}r;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -2178,7 +2178,7 @@ class MatchupPhpTest : VimTestCase() {
         for (i = 1; i <= 5; i++):
           if (i == 1) continue;
           echo i;
-        ${c}endfor;
+        endfo${c}r;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -2238,7 +2238,7 @@ class MatchupPhpTest : VimTestCase() {
         for (i = 1; i <= 5; i++):
           if (i == 1) break;
           echo i;
-        ${c}endfor;
+        endfo${c}r;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -2296,7 +2296,7 @@ class MatchupPhpTest : VimTestCase() {
       """
         foreach (nums as n):
           echo n;
-        ${c}endforeach;
+        endforeac${c}h;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -2334,7 +2334,7 @@ class MatchupPhpTest : VimTestCase() {
         foreach (nums as n):
           if (n == 1): continue
           echo n;
-        ${c}endforeach;
+        endforeac${c}h;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -2394,7 +2394,7 @@ class MatchupPhpTest : VimTestCase() {
         foreach (nums as n):
           if (n == 1): break
           echo n;
-        ${c}endforeach;
+        endforeac${c}h;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -2452,7 +2452,7 @@ class MatchupPhpTest : VimTestCase() {
       """
         m = <<<EOT
         message
-        ${c}EOT;
+        EO${c}T;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -2488,7 +2488,7 @@ class MatchupPhpTest : VimTestCase() {
       """
         m = <<<'EOT'
         nowdoc
-        ${c}EOT;
+        EO${c}T;
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -2524,7 +2524,7 @@ class MatchupPhpTest : VimTestCase() {
       """
         do {
           n++;
-        } ${c}while (n <= 10);
+        } while (n <= 10)${c};
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -2560,7 +2560,7 @@ class MatchupPhpTest : VimTestCase() {
       """
         do {
           if (n == 2) { continue; }
-        } ${c}while (n <= 10);
+        } while (n <= 10)${c};
       """.trimIndent(),
       fileName = "file.php",
     )
@@ -2614,7 +2614,7 @@ class MatchupPhpTest : VimTestCase() {
       """
         do {
           if (n == 2) { break; }
-        } ${c}while (n <= 10);
+        } while (n <= 10)${c};
       """.trimIndent(),
       fileName = "file.php",
     )

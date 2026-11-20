@@ -71,9 +71,9 @@ class MatchupJavaTest : VimJavaTestCase() {
          }
       """.trimIndent(),
       """
-         if (true) {
-         } ${c}else {
-         }
+        if (true) {
+        } els${c}e {
+        }
       """.trimIndent(),
       fileType = JavaFileType.INSTANCE,
     )
@@ -107,9 +107,9 @@ class MatchupJavaTest : VimJavaTestCase() {
          }
       """.trimIndent(),
       """
-         if (true) {
-         } ${c}else if(false) {
-         }
+        if (true) {
+        } else i${c}f(false) {
+        }
       """.trimIndent(),
       fileType = JavaFileType.INSTANCE,
     )
@@ -126,10 +126,10 @@ class MatchupJavaTest : VimJavaTestCase() {
          }
       """.trimIndent(),
       """
-         if (true) {
-         } else if(false) {
-         } ${c}else {
-         }
+        if (true) {
+        } else if(false) {
+        } els${c}e {
+        }
       """.trimIndent(),
       fileType = JavaFileType.INSTANCE,
     )
@@ -145,9 +145,9 @@ class MatchupJavaTest : VimJavaTestCase() {
           } while (true);
       """.trimIndent(),
       """
-          do {
-            System.out.println("Hey");
-          } ${c}while (true);
+        do {
+          System.out.println("Hey");
+        } whil${c}e (true);
       """.trimIndent(),
       fileType = JavaFileType.INSTANCE,
     )
@@ -183,11 +183,11 @@ class MatchupJavaTest : VimJavaTestCase() {
           }
       """.trimIndent(),
       """
-          try {
-            System.out.println("Hey");
-          } ${c}catch (Exception ex) {
-            System.out.println("Failed");
-          }
+        try {
+          System.out.println("Hey");
+        } catc${c}h (Exception ex) {
+          System.out.println("Failed");
+        }
       """.trimIndent(),
       fileType = JavaFileType.INSTANCE,
     )
@@ -205,11 +205,11 @@ class MatchupJavaTest : VimJavaTestCase() {
           }
       """.trimIndent(),
       """
-          try {
-            System.out.println("Hey");
-          } ${c}finally {
-            System.out.println("Failed");
-          }
+        try {
+          System.out.println("Hey");
+        } finall${c}y {
+          System.out.println("Failed");
+        }
       """.trimIndent(),
       fileType = JavaFileType.INSTANCE,
     )
@@ -229,13 +229,13 @@ class MatchupJavaTest : VimJavaTestCase() {
           }
       """.trimIndent(),
       """
-          try {
-            System.out.println("Hey");
-          } catch (Exception ex) {
-            System.out.println("SomeIssue");
-          } ${c}finally {
-            System.out.println("Failed");
-          }
+        try {
+          System.out.println("Hey");
+        } catch (Exception ex) {
+          System.out.println("SomeIssue");
+        } finall${c}y {
+          System.out.println("Failed");
+        }
       """.trimIndent(),
       fileType = JavaFileType.INSTANCE,
     )

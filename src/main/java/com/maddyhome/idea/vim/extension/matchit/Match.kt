@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.Direction
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
@@ -44,6 +45,7 @@ import com.maddyhome.idea.vim.regexp.VimRegex
 import com.maddyhome.idea.vim.regexp.VimRegexException
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.vimscript.model.VimPluginContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
@@ -59,7 +61,7 @@ class MatchAction : MotionActionHandler.ForEachCaret() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
-  override val supportsLinewiseDeletePromotion: Boolean = false
+  override var supportsLinewiseDeletePromotion: Boolean = false
 
   override fun getOffset(
     editor: VimEditor,
@@ -78,14 +80,21 @@ class MatchAction : MotionActionHandler.ForEachCaret() {
   override var motionType: MotionType = MotionType.INCLUSIVE
 }
 
-private fun getMatchupOffset(editor: Editor, caret: Caret, count0: Int, isInOpPending: Boolean, reverse: Boolean): Int {
+private fun getMatchupOffset(
+  editor: Editor,
+  caret: Caret,
+  count0: Int,
+  isInOpPending: Boolean,
+  reverse: Boolean,
+  isCursorAtEnd: Boolean = false,
+): Int {
   val caretOffset = caretOffsetWithinLine(editor, caret)
 
   val motionOffset = if (count0 > 0) {
     // A count turns % into the "jump to a percentage of the file" motion, which matchit doesn't extend.
     VimPlugin.getMotion().moveCaretToLinePercent(editor.vim, caret.vim, count0)
   } else {
-    findExtendedPairOffset(editor, caretOffset, isInOpPending, reverse)
+    findExtendedPairOffset(editor, caretOffset, isInOpPending, reverse, isCursorAtEnd)
       ?: getMotionOffset(VimPlugin.getMotion().moveCaretToMatchingPair(editor.vim, caret.vim))
   }
 
@@ -96,7 +105,11 @@ private fun getMatchupOffset(editor: Editor, caret: Caret, count0: Int, isInOpPe
   }
 }
 
-class MatchHandler(private val reverse: Boolean) : ExtensionHandler {
+/**
+ * With [isMatchup], the cursor lands on the end of a middle or closing word it jumps forward to, unless
+ * `g:matchup_motion_cursor_end` is 0, and `d%` over whole lines deletes the lines.
+ */
+class MatchHandler(private val reverse: Boolean, private val isMatchup: Boolean = false) : ExtensionHandler {
 
   override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
     val keyHandler = KeyHandler.getInstance()
@@ -108,12 +121,16 @@ class MatchHandler(private val reverse: Boolean) : ExtensionHandler {
     // Normally we want to jump to the start of the matching pair. But when moving forward in operator
     // pending mode, we want to include the entire match. isInOpPending makes that distinction.
     if (editor.mode is Mode.OP_PENDING) {
+      val forcedMotion = keyState.commandBuilder.forcedMotion
       val matchitAction = MatchAction()
       matchitAction.reverse = reverse
-      matchitAction.isInOpPending = true
+      // A forced characterwise motion turns this into an exclusive one, which for matchup leaves out the whole word.
+      matchitAction.isInOpPending = !(isMatchup && forcedMotion == SelectionType.CHARACTER_WISE)
+      matchitAction.supportsLinewiseDeletePromotion = isMatchup && forcedMotion == null
 
       keyState.commandBuilder.addAction(matchitAction)
     } else {
+      val isCursorAtEnd = isMatchup && getGlobalIntVariable(editor, "matchup_motion_cursor_end", 1) != 0
       editor.sortedCarets().forEach { caret ->
         injector.jumpService.saveJumpLocation(editor)
         caret.moveToOffset(
@@ -122,11 +139,26 @@ class MatchHandler(private val reverse: Boolean) : ExtensionHandler {
             caret.ij,
             operatorArguments.count0,
             isInOpPending = false,
-            reverse
+            reverse,
+            isCursorAtEnd,
           )
         )
       }
     }
+  }
+}
+
+internal fun getGlobalIntVariable(editor: VimEditor, name: String, default: Int): Int {
+  val value = injector.variableService.getNullableVariableValue(
+    VariableExpression(Scope.GLOBAL_VARIABLE, name),
+    editor,
+    injector.executionContextManager.getEditorExecutionContext(editor),
+    VimPluginContext
+  ) ?: return default
+  return try {
+    value.toVimNumber().value
+  } catch (e: ExException) {
+    default
   }
 }
 
@@ -541,18 +573,30 @@ private fun caretOffsetWithinLine(editor: Editor, caret: Caret): Int {
  * the cursor beats the bracket under it, which is what makes template tags such as "{% ... %}" usable. A bracket the
  * cursor is on still wins over a pattern that merely spans it, e.g. the "[" of an attribute inside an HTML tag.
  */
-private fun findExtendedPairOffset(editor: Editor, caretOffset: Int, isInOpPending: Boolean, reverse: Boolean): Int? {
+private fun findExtendedPairOffset(
+  editor: Editor,
+  caretOffset: Int,
+  isInOpPending: Boolean,
+  reverse: Boolean,
+  isCursorAtEnd: Boolean,
+): Int? {
   val virtualFile = EditorHelper.getVirtualFile(editor)
   val patterns = FileTypePatterns.getMatchupPatterns(virtualFile, editor.vim) ?: return null
   val caretIsOnDefaultPair = editor.document.charsSequence[caretOffset] in DEFAULT_PAIRS
 
   val offset = if (reverse) {
     findMatchingPair(
-      editor, caretOffset, isInOpPending, patterns.reversedOpenings, patterns.reversedClosings, caretIsOnDefaultPair
+      editor,
+      caretOffset,
+      isInOpPending,
+      patterns.reversedOpenings,
+      patterns.reversedClosings,
+      caretIsOnDefaultPair,
+      isCursorAtEnd,
     )
   } else {
     findMatchingPair(
-      editor, caretOffset, isInOpPending, patterns.openings, patterns.closings, caretIsOnDefaultPair
+      editor, caretOffset, isInOpPending, patterns.openings, patterns.closings, caretIsOnDefaultPair, isCursorAtEnd
     )
   }
   return offset.takeIf { it >= 0 }
@@ -572,6 +616,7 @@ fun findMatchingPair(
   openings: PatternsTable,
   closings: PatternsTable,
   onlyMatchesStartingOnCaret: Boolean = false,
+  isCursorAtEnd: Boolean = false,
 ): Int {
   val vimEditor = editor.vim
   val initialPattern =
@@ -593,7 +638,12 @@ fun findMatchingPair(
   )
 
   val matchingPairOffset = if (initialPattern.direction == Direction.FORWARDS) {
-    findClosingPair(editor, isInOpPending, searchParams)
+    val landing = when {
+      isInOpPending -> Landing.END
+      isCursorAtEnd -> Landing.END_OF_DELIMITER
+      else -> Landing.START
+    }
+    findClosingPair(editor, landing, searchParams, openings.keys + closings.keys)
   } else {
     findOpeningPair(editor, searchParams)
   }
@@ -698,10 +748,28 @@ private fun Pair<Int, Int>.isNestedIn(ranges: Set<Pair<Int, Int>>): Boolean {
 }
 
 /**
+ * Where in the matching pattern a forward jump ends.
+ */
+private enum class Landing {
+  START,
+
+  /** The last character, for an operator to include the whole pattern. */
+  END,
+
+  /** The last character that belongs to the pattern rather than to another delimiter, e.g. not the ">" of "</div>". */
+  END_OF_DELIMITER,
+}
+
+/**
  * Finds the first closing pattern that no opening pattern has claimed yet. As we come across opening patterns we push
  * their offsets onto a stack, and pop whenever we come across a closing one, crossing that item off the search.
  */
-private fun findClosingPair(editor: Editor, isInOpPending: Boolean, searchParams: MatchupSearchParams): Int {
+private fun findClosingPair(
+  editor: Editor,
+  landing: Landing,
+  searchParams: MatchupSearchParams,
+  languagePatterns: Collection<String>,
+): Int {
   val matches = collectPairMatches(
     editor.vim,
     searchParams.targetOpeningPattern,
@@ -712,19 +780,19 @@ private fun findClosingPair(editor: Editor, isInOpPending: Boolean, searchParams
 
   val unmatchedOpeningPairs: Deque<Int> = ArrayDeque()
   for (match in matches) {
-    val matchOffset = if (isInOpPending) match.endOffset - 1 else match.startOffset
+    val matchOffset = if (landing == Landing.END) match.endOffset - 1 else match.startOffset
     if (matchShouldBeSkipped(editor, matchOffset, searchParams.skipComments, searchParams.skipStrings)) continue
 
     when {
       // A middle pattern, e.g. "elsif", may appear any number of times between a strict opening and a strict closing.
       match.isMiddle -> {
-        if (unmatchedOpeningPairs.isEmpty()) return matchOffset
+        if (unmatchedOpeningPairs.isEmpty()) return landingOffset(editor, match, landing, languagePatterns)
         unmatchedOpeningPairs.pop()
         unmatchedOpeningPairs.push(matchOffset)
       }
 
       match.isOpening -> unmatchedOpeningPairs.push(matchOffset)
-      unmatchedOpeningPairs.isEmpty() -> return matchOffset
+      unmatchedOpeningPairs.isEmpty() -> return landingOffset(editor, match, landing, languagePatterns)
       else -> unmatchedOpeningPairs.pop()
     }
   }
@@ -763,6 +831,31 @@ fun findOpeningPair(editor: Editor, searchParams: MatchupSearchParams): Int {
   }
 
   return if (unmatchedOpeningPairs.isEmpty()) -1 else unmatchedOpeningPairs.pop()
+}
+
+private fun landingOffset(editor: Editor, match: PairMatch, landing: Landing, languagePatterns: Collection<String>): Int {
+  return when (landing) {
+    Landing.START -> match.startOffset
+    Landing.END -> match.endOffset - 1
+    Landing.END_OF_DELIMITER -> {
+      var offset = match.endOffset - 1
+      while (offset > match.startOffset && isStartOfOtherDelimiter(editor, offset, languagePatterns)) offset--
+      offset
+    }
+  }
+}
+
+/**
+ * Whether another delimiter starts at [offset], e.g. the ">" that ends "</div>".
+ */
+private fun isStartOfOtherDelimiter(editor: Editor, offset: Int, languagePatterns: Collection<String>): Boolean {
+  if (editor.document.charsSequence[offset] in DEFAULT_PAIRS) return true
+  val vimEditor = editor.vim
+  val lineStart = vimEditor.getLineStartForOffset(offset)
+  val lineEnd = vimEditor.getLineEndForOffset(offset)
+  return languagePatterns.any { pattern ->
+    findMatches(vimEditor, pattern, lineStart, lineEnd).any { it.range.startOffset == offset }
+  }
 }
 
 fun containsDefaultPairs(chars: CharSequence): Boolean {

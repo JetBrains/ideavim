@@ -182,11 +182,10 @@ class MatchupGeneralTest : VimTestCase() {
         end
       """.trimIndent(),
       """
-              if x == 0
-                puts "Zero"
-              $c
-                puts "Positive"
-              end
+        if x == 0
+          puts "Zero"
+          ${c}puts "Positive"
+        end
       """.trimIndent(),
       fileName = "ruby.rb",
     )

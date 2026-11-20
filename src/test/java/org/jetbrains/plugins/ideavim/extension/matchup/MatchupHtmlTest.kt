@@ -31,7 +31,7 @@ class MatchupHtmlTest : VimTestCase() {
         <${c}h1>Heading</h1>
       """.trimIndent(),
       """
-        <h1>Heading<$c/h1>
+        <h1>Heading</h${c}1>
       """.trimIndent(),
       Mode.NORMAL(),
       HtmlFileType.INSTANCE,
@@ -65,7 +65,7 @@ class MatchupHtmlTest : VimTestCase() {
       """
         <div>
           <p>paragraph body</p>
-        <$c/div>
+        </di${c}v>
       """.trimIndent(),
       Mode.NORMAL(),
       HtmlFileType.INSTANCE,
@@ -107,7 +107,7 @@ class MatchupHtmlTest : VimTestCase() {
           <div>
             <div>contents</div>
           </div>
-        <$c/div>
+        </di${c}v>
       """.trimIndent(),
       Mode.NORMAL(),
       HtmlFileType.INSTANCE,
@@ -125,7 +125,7 @@ class MatchupHtmlTest : VimTestCase() {
       """.trimIndent(),
       """
         <div>
-          <div>contents<$c/div>
+          <div>contents</di${c}v>
         </div>
       """.trimIndent(),
       Mode.NORMAL(),
@@ -183,7 +183,7 @@ class MatchupHtmlTest : VimTestCase() {
         <h1 class="he${c}adline">Post HeadLine</h1>
       """.trimIndent(),
       """
-        <h1 class="headline">Post HeadLine<$c/h1>
+        <h1 class="headline">Post HeadLine</h${c}1>
       """.trimIndent(),
       Mode.NORMAL(),
       HtmlFileType.INSTANCE,
@@ -367,7 +367,7 @@ class MatchupHtmlTest : VimTestCase() {
         <div [ng${c}If]="someCondition()">{{displayValue}}</div>
       """.trimIndent(),
       """
-        <div [ngIf]="someCondition()">{{displayValue}}<$c/div>
+        <div [ngIf]="someCondition()">{{displayValue}}</di${c}v>
       """.trimIndent(),
       Mode.NORMAL(),
       HtmlFileType.INSTANCE,
@@ -423,12 +423,12 @@ class MatchupHtmlTest : VimTestCase() {
         <!-- <div> -->
         <!-- This div is completely commented out -->
         <!-- </div> -->
-        
+
         <div>
           <p>paragraph 1</p>
           <!-- </div> -->
           <p>paragraph 2</p>
-        <$c/div>
+        </di${c}v>
       """.trimIndent(),
       Mode.NORMAL(),
       HtmlFileType.INSTANCE,
@@ -454,12 +454,12 @@ class MatchupHtmlTest : VimTestCase() {
         <!-- <div> -->
         <!-- This div is completely commented out -->
         <!-- </div> -->
-        
+
         <div>
           <!-- This <div> holds paragraphs -->
           <p>paragraph 1</p>
           <p>paragraph 2</p>
-        <$c/div>
+        </di${c}v>
       """.trimIndent(),
       Mode.NORMAL(),
       HtmlFileType.INSTANCE,
@@ -478,7 +478,7 @@ class MatchupHtmlTest : VimTestCase() {
       """
         <!-- <div> -->
         <!--   This div is commented out -->
-        <!-- <$c/div> -->
+        <!-- </di${c}v> -->
       """.trimIndent(),
       Mode.NORMAL(),
       HtmlFileType.INSTANCE,
@@ -590,7 +590,7 @@ class MatchupHtmlTest : VimTestCase() {
         <h1 id="title"
            class="red right-aligned">
            Header Content
-        <$c/h1>
+        </h${c}1>
       """.trimIndent(),
       Mode.NORMAL(),
       HtmlFileType.INSTANCE,
@@ -620,7 +620,7 @@ class MatchupHtmlTest : VimTestCase() {
       """
         <Box>
           <BoxHeading></BoxHeading>
-        <${c}/Box>
+        </Bo${c}x>
       """.trimIndent(),
       Mode.NORMAL(),
       HtmlFileType.INSTANCE,
@@ -658,7 +658,7 @@ class MatchupHtmlTest : VimTestCase() {
         <${c}h1>Heading</h1>
       """.trimIndent(),
       """
-        <h1>Heading<$c/h1>
+        <h1>Heading</h${c}1>
       """.trimIndent(),
       Mode.NORMAL(),
       HtmlFileType.INSTANCE,
@@ -696,7 +696,7 @@ class MatchupHtmlTest : VimTestCase() {
           <div>
             <div>contents</div>
           </div>
-        <$c/div>
+        </di${c}v>
       """.trimIndent(),
       Mode.NORMAL(),
       HtmlFileType.INSTANCE,
@@ -714,7 +714,7 @@ class MatchupHtmlTest : VimTestCase() {
       """.trimIndent(),
       """
         <div>
-          <div>contents<$c/div>
+          <div>contents</di${c}v>
         </div>
       """.trimIndent(),
       Mode.NORMAL(),
@@ -772,7 +772,7 @@ class MatchupHtmlTest : VimTestCase() {
         <h1 class="he${c}adline">Post HeadLine</h1>
       """.trimIndent(),
       """
-        <h1 class="headline">Post HeadLine<$c/h1>
+        <h1 class="headline">Post HeadLine</h${c}1>
       """.trimIndent(),
       Mode.NORMAL(),
       HtmlFileType.INSTANCE,
@@ -926,7 +926,7 @@ class MatchupHtmlTest : VimTestCase() {
         <div [ng${c}If]="someCondition()">{{displayValue}}</div>
       """.trimIndent(),
       """
-        <div [ngIf]="someCondition()">{{displayValue}}<$c/div>
+        <div [ngIf]="someCondition()">{{displayValue}}</di${c}v>
       """.trimIndent(),
       Mode.NORMAL(),
       HtmlFileType.INSTANCE,
@@ -982,12 +982,12 @@ class MatchupHtmlTest : VimTestCase() {
         <!-- <div> -->
         <!-- This div is completely commented out -->
         <!-- </div> -->
-        
+
         <div>
           <p>paragraph 1</p>
           <!-- </div> -->
           <p>paragraph 2</p>
-        <$c/div>
+        </di${c}v>
       """.trimIndent(),
       Mode.NORMAL(),
       HtmlFileType.INSTANCE,
@@ -1013,12 +1013,12 @@ class MatchupHtmlTest : VimTestCase() {
         <!-- <div> -->
         <!-- This div is completely commented out -->
         <!-- </div> -->
-        
+
         <div>
           <!-- This <div> holds paragraphs -->
           <p>paragraph 1</p>
           <p>paragraph 2</p>
-        <$c/div>
+        </di${c}v>
       """.trimIndent(),
       Mode.NORMAL(),
       HtmlFileType.INSTANCE,
@@ -1037,7 +1037,7 @@ class MatchupHtmlTest : VimTestCase() {
       """
         <!-- <div> -->
         <!--   This div is commented out -->
-        <!-- <$c/div> -->
+        <!-- </di${c}v> -->
       """.trimIndent(),
       Mode.NORMAL(),
       HtmlFileType.INSTANCE,
@@ -1158,7 +1158,7 @@ class MatchupHtmlTest : VimTestCase() {
       """
         <Box>
           <BoxHeading></BoxHeading>
-        <${c}/Box>
+        </Bo${c}x>
       """.trimIndent(),
       Mode.NORMAL(),
       HtmlFileType.INSTANCE,

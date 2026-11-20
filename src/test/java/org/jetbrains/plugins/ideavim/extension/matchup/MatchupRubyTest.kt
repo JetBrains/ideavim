@@ -33,7 +33,7 @@ class MatchupRubyTest : VimTestCase() {
       """
         if some_boolean
           puts "result is true"
-        ${c}end
+        en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -44,7 +44,7 @@ class MatchupRubyTest : VimTestCase() {
     doTest(
       "%",
       """ $c  if some_boolean puts "result is true" end""",
-      """   if some_boolean puts "result is true" ${c}end""",
+      """   if some_boolean puts "result is true" en${c}d""",
       fileName = "ruby.rb",
     )
   }
@@ -54,7 +54,7 @@ class MatchupRubyTest : VimTestCase() {
     doTest(
       "%",
       """ $c class Foo end""",
-      """  class Foo ${c}end""",
+      """  class Foo en${c}d""",
       fileName = "ruby.rb",
     )
   }
@@ -91,7 +91,7 @@ class MatchupRubyTest : VimTestCase() {
       """
         if some_boolean
           puts "result is true"
-        ${c}else
+        els${c}e
           puts "result is false"
         end
       """.trimIndent(),
@@ -115,7 +115,7 @@ class MatchupRubyTest : VimTestCase() {
           puts "result is true"
         else
           puts "result is false"
-        ${c}end
+        en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -159,7 +159,7 @@ class MatchupRubyTest : VimTestCase() {
       """
         if first_value
           puts "first value is true"
-        ${c}elsif second_value
+        elsi${c}f second_value
           puts "second value is true"
         else
           puts "both values are false"
@@ -187,7 +187,7 @@ class MatchupRubyTest : VimTestCase() {
           puts "first value is true"
         elsif second_value
           puts "second value is true"
-        ${c}else
+        els${c}e
           puts "both values are false"
         end
       """.trimIndent(),
@@ -211,7 +211,7 @@ class MatchupRubyTest : VimTestCase() {
           puts "first value is true"
         elsif second_value
           puts "second value is true"
-        ${c}end
+        en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -237,7 +237,7 @@ class MatchupRubyTest : VimTestCase() {
           puts "first value is true"
         elsif second_value
           puts "second value is true"
-        ${c}elsif third_value
+        elsi${c}f third_value
           puts "third value is true"
         else
           puts "all values are false"
@@ -267,7 +267,7 @@ class MatchupRubyTest : VimTestCase() {
             puts "Found target"
             break
           end
-        ${c}end
+        en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -301,7 +301,7 @@ class MatchupRubyTest : VimTestCase() {
           elsif i > 4 
             puts "Greater than 4"
           end
-        ${c}end
+        en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -325,7 +325,7 @@ class MatchupRubyTest : VimTestCase() {
         for s in ["foo", "bar", "baz"]
           if s == target
             puts "Found target"
-            ${c}break
+            brea${c}k
           end
         end
       """.trimIndent(),
@@ -352,7 +352,7 @@ class MatchupRubyTest : VimTestCase() {
           if s == target
             puts "Found target"
             break
-          ${c}end
+          en${c}d
         end
       """.trimIndent(),
       fileName = "ruby.rb",
@@ -427,7 +427,7 @@ class MatchupRubyTest : VimTestCase() {
           def some_method
             puts "hello!"
           end
-        ${c}end
+        en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -470,7 +470,7 @@ class MatchupRubyTest : VimTestCase() {
         class SomeRubyClass
           def some_method
             puts "hello!"
-          ${c}end
+          en${c}d
         end
       """.trimIndent(),
       fileName = "ruby.rb",
@@ -531,7 +531,7 @@ class MatchupRubyTest : VimTestCase() {
             puts "I am the outer method"
           end
 
-        ${c}end
+        en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -561,7 +561,7 @@ class MatchupRubyTest : VimTestCase() {
               puts "Greater than 3"
             end
           end
-        ${c}end
+        en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -594,7 +594,7 @@ class MatchupRubyTest : VimTestCase() {
     doTest(
       "%",
       """puts "This line has two statements"; ${c}if true then puts "true" end""",
-      """puts "This line has two statements"; if true then puts "true" ${c}end""",
+      """puts "This line has two statements"; if true then puts "true" en${c}d""",
       fileName = "ruby.rb",
     )
   }
@@ -614,7 +614,7 @@ class MatchupRubyTest : VimTestCase() {
     doTest(
       "%",
       """puts "This line has ${c}two statements"; if true then puts "true" end""",
-      """puts "This line has two statements"; if true then puts "true" ${c}end""",
+      """puts "This line has two statements"; if true then puts "true" en${c}d""",
       fileName = "ruby.rb",
     )
   }
@@ -624,7 +624,7 @@ class MatchupRubyTest : VimTestCase() {
     doTest(
       "%",
       """puts "This line has two statements"; ${c}unless nil then puts "not nil" end""",
-      """puts "This line has two statements"; unless nil then puts "not nil" ${c}end""",
+      """puts "This line has two statements"; unless nil then puts "not nil" en${c}d""",
       fileName = "ruby.rb",
     )
   }
@@ -691,7 +691,7 @@ class MatchupRubyTest : VimTestCase() {
           else
             puts "Odd"
           end
-        ${c}end
+        en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -713,7 +713,7 @@ class MatchupRubyTest : VimTestCase() {
           def my_function
             return true
           end
-        ${c}end
+        en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -758,7 +758,7 @@ class MatchupRubyTest : VimTestCase() {
           while x >= 0 
             puts x
             x = x - 1
-          ${c}end        
+          en${c}d        
         end
       """.trimIndent(),
       fileName = "ruby.rb",
@@ -784,7 +784,7 @@ class MatchupRubyTest : VimTestCase() {
         def open_file(file_name)
           begin
             file = open(file_name)
-          ${c}rescue
+          rescu${c}e
             puts "File could not be opened"
           ensure
             file.close
@@ -816,7 +816,7 @@ class MatchupRubyTest : VimTestCase() {
             file = open(file_name)
           rescue
             puts "File could not be opened"
-          ${c}ensure
+          ensur${c}e
             file.close
           end
         end
@@ -848,7 +848,7 @@ class MatchupRubyTest : VimTestCase() {
             puts "File could not be opened"
           ensure
             file.close
-          ${c}end
+          en${c}d
         end
       """.trimIndent(),
       fileName = "ruby.rb",
@@ -902,7 +902,7 @@ class MatchupRubyTest : VimTestCase() {
           puts "Loop forever"
           raise
         rescue
-          ${c}retry
+          retr${c}y
         end
       """.trimIndent(),
       fileName = "ruby.rb",
@@ -927,7 +927,7 @@ class MatchupRubyTest : VimTestCase() {
           raise
         rescue
           retry
-        ${c}end
+        en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -973,7 +973,7 @@ class MatchupRubyTest : VimTestCase() {
       """.trimIndent(),
       """
         case age
-          ${c}when 0 .. 12
+          whe${c}n 0 .. 12
             puts "Child"
           when 13 .. 18
             puts "Youth"
@@ -1003,7 +1003,7 @@ class MatchupRubyTest : VimTestCase() {
         case age
           when 0 .. 12
             puts "Child"
-          ${c}when 13 .. 18
+          whe${c}n 13 .. 18
             puts "Youth"
           else
             puts "Adult"
@@ -1035,7 +1035,7 @@ class MatchupRubyTest : VimTestCase() {
             puts "Youth"
           else
             puts "Adult"
-        ${c}end
+        en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -1081,7 +1081,7 @@ class MatchupRubyTest : VimTestCase() {
       """
         until var == 11
           var = var + 1
-        ${c}end
+        en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -1105,7 +1105,7 @@ class MatchupRubyTest : VimTestCase() {
         10.times do |i|
           puts "Iteration #{i}"
           if i > 2
-            ${c}redo
+            red${c}o
           elsif i == 3
             next
           end
@@ -1134,7 +1134,7 @@ class MatchupRubyTest : VimTestCase() {
           puts "Iteration #{i}"
           if i > 2
             redo
-          ${c}elsif i == 3
+          elsi${c}f i == 3
             next
           end
         end
@@ -1163,7 +1163,7 @@ class MatchupRubyTest : VimTestCase() {
           if i > 2
             redo
           elsif i == 3
-            ${c}next
+            nex${c}t
           end
         end
       """.trimIndent(),
@@ -1192,7 +1192,7 @@ class MatchupRubyTest : VimTestCase() {
             redo
           elsif i == 3
             next
-          ${c}end
+          en${c}d
         end
       """.trimIndent(),
       fileName = "ruby.rb",
@@ -1211,7 +1211,7 @@ class MatchupRubyTest : VimTestCase() {
       """
         =begin
           end comment
-        =${c}end
+        =en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -1259,7 +1259,7 @@ class MatchupRubyTest : VimTestCase() {
               clean_up()
             end
           end
-        ${c}end
+        en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -1395,7 +1395,7 @@ class MatchupRubyTest : VimTestCase() {
           puts "result is true"
         else
           puts "result is false"
-        ${c}end
+        en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -1610,7 +1610,7 @@ class MatchupRubyTest : VimTestCase() {
           if s == target
             puts "Found target"
             break
-          ${c}end
+          en${c}d
         end
       """.trimIndent(),
       fileName = "ruby.rb",
@@ -1637,7 +1637,7 @@ class MatchupRubyTest : VimTestCase() {
             puts "Found target"
             break
           end
-        ${c}end
+        en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -1681,7 +1681,7 @@ class MatchupRubyTest : VimTestCase() {
           def some_method
             puts "hello!"
           end
-        ${c}end
+        en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -1702,7 +1702,7 @@ class MatchupRubyTest : VimTestCase() {
         class SomeRubyClass
           def some_method
             puts "hello!"
-          ${c}end
+          en${c}d
         end
       """.trimIndent(),
       fileName = "ruby.rb",
@@ -1885,7 +1885,7 @@ class MatchupRubyTest : VimTestCase() {
           else
             puts "Odd"
           end
-        ${c}end
+        en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -1907,7 +1907,7 @@ class MatchupRubyTest : VimTestCase() {
           def my_function
             return true
           end
-        ${c}end
+        en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -2048,7 +2048,7 @@ class MatchupRubyTest : VimTestCase() {
             puts "File could not be opened"
           ensure
             file.close
-          ${c}end
+          en${c}d
         end
       """.trimIndent(),
       fileName = "ruby.rb",
@@ -2120,7 +2120,7 @@ class MatchupRubyTest : VimTestCase() {
           while x >= 0 
             puts x
             x = x - 1
-          ${c}end        
+          en${c}d        
         end
       """.trimIndent(),
       fileName = "ruby.rb",
@@ -2173,7 +2173,7 @@ class MatchupRubyTest : VimTestCase() {
             puts "Youth"
           else
             puts "Adult"
-        ${c}end
+        en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -2321,7 +2321,7 @@ class MatchupRubyTest : VimTestCase() {
       """
         until var == 11
           var = var + 1
-        ${c}end
+        en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -2451,7 +2451,7 @@ class MatchupRubyTest : VimTestCase() {
       """
         =begin
           end comment
-        =${c}end
+        =en${c}d
       """.trimIndent(),
       fileName = "ruby.rb",
     )
@@ -2480,7 +2480,7 @@ class MatchupRubyTest : VimTestCase() {
     doTest(
       "g%",
       """puts "This line has ${c}two statements"; if true then puts "true" end""",
-      """puts "This line has two statements"; if true then puts "true" ${c}end""",
+      """puts "This line has two statements"; if true then puts "true" en${c}d""",
       fileName = "ruby.rb",
     )
   }
@@ -2490,7 +2490,7 @@ class MatchupRubyTest : VimTestCase() {
     doTest(
       "g%",
       """ $c  class Foo end""",
-      """   class Foo ${c}end""",
+      """   class Foo en${c}d""",
       fileName = "ruby.rb",
     )
   }
@@ -2509,7 +2509,7 @@ class MatchupRubyTest : VimTestCase() {
         <div><${c}div>contents</div></div>
       """.trimIndent(),
       """
-        <div><div>contents<$c/div></div>
+        <div><div>contents</di${c}v></div>
       """.trimIndent(),
       fileName = "ruby-template.html.erb",
     )
@@ -2535,7 +2535,7 @@ class MatchupRubyTest : VimTestCase() {
           <% end %>
           <%= yield %>
           <%= render 'layouts/footer' %>
-        <$c/div>
+        </di${c}v>
       """.trimIndent(),
       fileName = "ruby-template.html.erb",
     )
@@ -2558,7 +2558,7 @@ class MatchupRubyTest : VimTestCase() {
         <div class="container">
           <% flash.each do |message_type, message| %>
             <div class="alert alert-<%= message_type %>"><%= message %></div>
-          <% ${c}end %>
+          <% en${c}d %>
           <%= yield %>
           <%= render 'layouts/footer' %>
         </div>
@@ -2670,7 +2670,7 @@ class MatchupRubyTest : VimTestCase() {
               <% end %>
               <td><%= link_to "Show", book %></td>
             </tr>
-          <% ${c}end %>
+          <% en${c}d %>
         </tbody>
       """.trimIndent(),
       fileName = "ruby-template.html.erb",
@@ -2703,7 +2703,7 @@ class MatchupRubyTest : VimTestCase() {
               <td><%= book.title %></td>
               <% if book.content %>
                 <td><%= book.content %></td>
-              <% ${c}else %>
+              <% els${c}e %>
                 <td> N/A </td>
               <% end %>
               <td><%= link_to "Show", book %></td>
@@ -2743,7 +2743,7 @@ class MatchupRubyTest : VimTestCase() {
                 <td><%= book.content %></td>
               <% else %>
                 <td> N/A </td>
-              <% ${c}end %>
+              <% en${c}d %>
               <td><%= link_to "Show", book %></td>
             </tr>
           <% end %>
