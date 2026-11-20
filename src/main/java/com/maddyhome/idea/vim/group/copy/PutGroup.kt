@@ -139,7 +139,9 @@ internal class PutGroup : VimPutBase() {
     }
 
     val registerChar = text.registerChar
-    if (registerChar != null && registerChar == RegisterConstants.CLIPBOARD_REGISTER) {
+    // While the clipboard waits to be put back, the + register was read from the content it's put back to
+    val clipboardRestorePending = BackendPasteCompletion.getInstance().pendingContent() != null
+    if (registerChar != null && registerChar == RegisterConstants.CLIPBOARD_REGISTER && !clipboardRestorePending) {
       // On X11 the IDE clipboard can miss the text of another application even though the register was read (see
       // IjClipboardManager.getContents), and the IDE paste would then insert nothing. The register holds the clipboard
       // text, so it is put into the clipboard and kept there.
@@ -148,8 +150,8 @@ internal class PutGroup : VimPutBase() {
       }
       (pasteProvider as IjPasteProvider).pasteProvider.performPaste(context)
     } else {
-      pasteKeepingClipboard(text) {
-        (pasteProvider as IjPasteProvider).pasteProvider.performPaste(context)
+      pasteKeepingClipboard(text, context) {
+        (pasteProvider as IjPasteProvider).pasteProvider.performPaste(it)
       }
     }
 
@@ -198,11 +200,14 @@ internal class PutGroup : VimPutBase() {
    * - If the clipboard already holds the same text, the register text is merged into that item. The clipboard didn't
    *   change, so nothing is removed: removing would lose the item of the user.
    * - A clipboard without history, like the one of the frontend in split mode, can't remove anything. It still holds
-   *   the register text after the removal, so the previous content is set back.
+   *   the register text after the removal, so the previous content is set back. That frontend syncs its clipboard to
+   *   the backend, which pastes again, so the clipboard is put back after the backend paste (see
+   *   [BackendPasteCompletion]).
    */
-  private fun pasteKeepingClipboard(text: ProcessedTextData, doPaste: () -> Unit) {
+  private fun pasteKeepingClipboard(text: ProcessedTextData, context: DataContext, doPaste: (DataContext) -> Unit) {
     val clipboard = CopyPasteManager.getInstance()
-    val previousContent = clipboard.allContents.firstOrNull()
+    val backendPasteCompletion = BackendPasteCompletion.getInstance()
+    val previousContent = backendPasteCompletion.pendingContent() ?: clipboard.allContents.firstOrNull()
     val historySizeBefore = clipboard.allContents.size
 
     val registerText = text.copiedText.text
@@ -210,9 +215,7 @@ internal class PutGroup : VimPutBase() {
 
     val registerAddedToHistory = clipboard.allContents.size != historySizeBefore
     val registerReplacedOtherText = previousContent?.getText().let { it != null && it != registerText }
-    try {
-      doPaste()
-    } finally {
+    backendPasteCompletion.paste(context, previousContent, registerText, doPaste) {
       if (registerAddedToHistory || registerReplacedOtherText) {
         (clipboard as? CopyPasteManagerEx)?.removeContent(registerContent)
       }

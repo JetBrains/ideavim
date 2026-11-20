@@ -19,6 +19,8 @@
     </extensionPoint>
     <extensionPoint interface="com.maddyhome.idea.vim.ide.ClionNovaProvider" dynamic="true" name="clionNovaProvider"/>
     <extensionPoint interface="com.maddyhome.idea.vim.ide.RiderProvider" dynamic="true" name="riderProvider"/>
+    <extensionPoint interface="com.maddyhome.idea.vim.group.copy.BackendPasteAwaiter" dynamic="true"
+                    name="backendPasteAwaiter"/>
     <extensionPoint interface="com.maddyhome.idea.vim.key.IdeaVimDisablerExtensionPoint" dynamic="true"
                     name="internal.disabler"/>
   </extensionPoints>

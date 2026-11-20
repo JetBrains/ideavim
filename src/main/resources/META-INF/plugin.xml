@@ -50,6 +50,7 @@
   <content>
     <module name="IdeaVIM.ideavim-common" loading="embedded"/>
     <module name="IdeaVIM.ideavim-frontend"/>
+    <module name="IdeaVIM.ideavim-frontend-split"/>
     <module name="IdeaVIM.ideavim-backend"/>
     <!-- Two variants of the bookmark backend; each self-gates so exactly one activates per IDE:
          -bookmarks depends on intellij.platform.bookmarks (2026.2+), -bookmarks-core uses platform

@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.codeInsight.editorActions.TextBlockTransferable
 import com.intellij.ide.CopyPasteManagerEx
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.group.copy.BackendPasteCompletion
 import java.awt.HeadlessException
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
@@ -21,12 +22,14 @@ import java.io.IOException
 
 /**
  * The CLIPBOARD selection, the regular clipboard of every system, reached through the IDE clipboard
- * (`CopyPasteManagerEx`), which keeps the IDE metadata of a copy and the clipboard history.
+ * (`CopyPasteManagerEx`), which keeps the IDE metadata of a copy and the clipboard history. While a put waits for the
+ * backend of split mode, the clipboard holds the put text, and the content it's put back to afterwards is read.
  *
  * The parameters replace the clipboards in tests.
  */
 internal class IjClipboardSelection(
   private val ideClipboardContents: () -> Transferable? = { CopyPasteManagerEx.getInstanceEx().contents },
+  private val pendingRestoreContents: () -> Transferable? = { BackendPasteCompletion.getInstance().pendingContent() },
   private val x11ClipboardText: () -> String? = ::readX11ClipboardText,
 ) {
   /** The text in the clipboard with its IDE metadata, or null if the clipboard has no text. */
@@ -39,6 +42,7 @@ internal class IjClipboardSelection(
    * system clipboard is read directly then, with the regular AWT timeout, as the `*` register already does.
    */
   private fun getContents(): Transferable? {
+    pendingRestoreContents()?.let { return it }
     val ideContents = ideClipboardContents()
     if (ideContents != null && ideContents.isDataFlavorSupported(DataFlavor.stringFlavor)) return ideContents
     val text = x11ClipboardText() ?: return ideContents
