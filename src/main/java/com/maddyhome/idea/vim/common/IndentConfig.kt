@@ -37,6 +37,10 @@ class IndentConfig private constructor(indentOptions: IndentOptions) : VimIndent
     return "\t".repeat(tabCount) + " ".repeat(spaceCount)
   }
 
+  override fun getIndentWidth(indent: CharSequence): Int {
+    return indent.fold(0) { width, char -> if (char == '\t') width - width % tabSize + tabSize else width + 1 }
+  }
+
   companion object {
     @JvmStatic
     fun create(editor: Editor): IndentConfig {
