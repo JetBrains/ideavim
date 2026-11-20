@@ -211,20 +211,22 @@ data class LanguagePatterns(
         closings,
         reversedOpenings,
         reversedClosings,
-        listOf(BlockPatterns(openingPattern, closingPattern)),
+        listOf(BlockPatterns(openingPattern, closingPattern, middlePattern = middlePattern)),
       )
     }
   }
 }
 
 /**
- * The strict opening and closing patterns of a block, i.e. without its middle patterns. When [hasBackReference] is set,
- * both patterns capture a name in their first group, and an opening only pairs with a closing of the same name.
+ * The patterns of a block, with its middle words kept apart from the opening and closing ones. When [hasBackReference]
+ * is set, the opening and closing patterns capture a name in their first group, and an opening only pairs with a
+ * closing of the same name.
  */
 data class BlockPatterns(
   val openingPattern: String,
   val closingPattern: String,
   val hasBackReference: Boolean = false,
+  val middlePattern: String? = null,
 )
 
 /**
@@ -278,6 +280,13 @@ object FileTypePatterns {
     return listOfNotNull(filePatterns, getUserPatterns(editor)).reduceOrNull(LanguagePatterns::plus)
   }
 
+  fun isHtmlLike(virtualFile: VirtualFile?): Boolean {
+    val fileTypeName = virtualFile?.fileType?.name
+    val fileExtension = virtualFile?.extension
+    return fileTypeName in htmlLikeFileTypes || fileTypeName == "RHTML" || fileExtension == "erb" ||
+      fileTypeName == "PHP" || fileExtension == "php"
+  }
+
   private val htmlLikeFileTypes = setOf(
     "HTML", "XML", "XHTML", "JSP", "JavaScript", "JSX Harmony",
     "TypeScript", "TypeScript JSX", "Vue.js", "Handlebars/Mustache",
@@ -300,13 +309,15 @@ object FileTypePatterns {
     val openingTagPattern = """<\@1<=\($tagNamePattern\)\%(\s[^<>]*\%(".*"\)\=\)\="""
     val closingTagPattern = """<\@1<=/\($tagNamePattern\)>\@="""
     val htmlSearchPair = Pair("""<\@1<=%s\%(\s[^<>]*\%(".*"\)\=\)\=>\@=""", """<\@1<=/%s>""")
+    // A block's opening tag runs up to its ">", so that the text inside the block starts after it.
+    val blockOpeningTagPattern = """<\@1<=\($tagNamePattern\)[^>]*\%(>\|$\)"""
 
     return (
       LanguagePatterns("<", ">") +
         LanguagePatterns(
           linkedMapOf(openingTagPattern to htmlSearchPair),
           linkedMapOf(closingTagPattern to htmlSearchPair),
-          listOf(BlockPatterns(openingTagPattern, closingTagPattern, hasBackReference = true)),
+          listOf(BlockPatterns(blockOpeningTagPattern, closingTagPattern, hasBackReference = true)),
         )
       )
   }
@@ -812,7 +823,12 @@ fun isQuoted(psiElement: PsiElement?): Boolean {
  */
 internal data class Delimiter(val startOffset: Int, val endOffset: Int)
 
-internal data class Block(val opening: Delimiter, val closing: Delimiter)
+/**
+ * A block from its opening to its closing delimiter, with the middle ones, such as "else", in between.
+ */
+internal data class Block(val opening: Delimiter, val closing: Delimiter, val middles: List<Delimiter> = emptyList()) {
+  val delimiters: List<Delimiter> get() = listOf(opening) + middles + closing
+}
 
 private const val BLOCK_SEARCH_LINES = 1500
 
@@ -894,6 +910,7 @@ private fun blockSearchEnd(editor: VimEditor, offset: Int): Int {
 /**
  * Pairs up the openings and closings of one kind of block with a stack. A closing that carries a name pairs with the
  * nearest opening of the same name, and the openings above it, e.g. HTML void elements such as `<br>`, are dropped.
+ * A middle word belongs to the innermost opening that is still open.
  */
 private fun findBlocks(
   editor: VimEditor,
@@ -902,13 +919,21 @@ private fun findBlocks(
   endOffset: Int,
   skipContext: SkipContext,
 ): List<Block> {
-  val matches = collectPairMatches(editor, patterns.openingPattern, patterns.closingPattern, startOffset, endOffset)
+  val pairMatches = collectPairMatches(editor, patterns.openingPattern, patterns.closingPattern, startOffset, endOffset)
+  val middleMatches = patterns.middlePattern?.let { findMatchRanges(editor, it, startOffset, endOffset) }.orEmpty()
+    .map { PairMatch(it.first, it.second, isOpening = false, isClosing = false) }
+  val matches = (pairMatches + middleMatches)
     .filterNot { skipContext.isSkipped(it.startOffset) }
+    .sortedBy { it.startOffset }
 
-  val openings = mutableListOf<Pair<Delimiter, String?>>()
+  val openings = mutableListOf<OpenBlock>()
   val blocks = mutableListOf<Block>()
   for (match in matches) {
     val delimiter = Delimiter(match.startOffset, match.endOffset)
+    if (!match.isOpening && !match.isClosing) {
+      openings.lastOrNull()?.middles?.add(delimiter)
+      continue
+    }
     val name = if (patterns.hasBackReference) {
       val pattern = if (match.isClosing) patterns.closingPattern else patterns.openingPattern
       findBackReference(editor, pattern, match.startOffset)
@@ -917,17 +942,22 @@ private fun findBlocks(
     }
 
     if (match.isClosing) {
-      val openingIndex = openings.indexOfLast { it.second == name }
+      val openingIndex = openings.indexOfLast { it.name == name }
       if (openingIndex >= 0) {
-        blocks.add(Block(openings[openingIndex].first, delimiter))
+        val opening = openings[openingIndex]
+        blocks.add(Block(opening.delimiter, delimiter, opening.middles))
         openings.subList(openingIndex, openings.size).clear()
         continue
       }
       if (!match.isOpening) continue
     }
-    openings.add(delimiter to name)
+    openings.add(OpenBlock(delimiter, name))
   }
   return blocks
+}
+
+private class OpenBlock(val delimiter: Delimiter, val name: String?) {
+  val middles = mutableListOf<Delimiter>()
 }
 
 /**

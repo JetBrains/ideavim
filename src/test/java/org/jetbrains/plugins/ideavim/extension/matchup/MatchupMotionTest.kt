@@ -1027,6 +1027,24 @@ class MatchupMotionTest : VimTestCase() {
   }
 
   @Test
+  fun `test inside block motion into html tag`() {
+    doTest(
+      "z%",
+      """
+        <div$c>
+          <p>hello</p>
+        </div>
+      """.trimIndent(),
+      """
+        <div>
+          $c<p>hello</p>
+        </div>
+      """.trimIndent(),
+      fileType = HtmlFileType.INSTANCE,
+    )
+  }
+
+  @Test
   fun `test block start motion in visual mode extends selection`() {
     doTest(
       "v[%",
