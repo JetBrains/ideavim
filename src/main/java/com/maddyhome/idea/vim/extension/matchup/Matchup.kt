@@ -70,6 +70,15 @@ internal class Matchup : VimExtension {
     putBlockMotion("[%", BlockMotion.START)
     putBlockMotion("]%", BlockMotion.END)
     putBlockMotion("z%", BlockMotion.INSIDE)
+
+    putBlockTextObject("i%", isInner = true)
+    putBlockTextObject("a%", isInner = false)
+  }
+
+  private fun putBlockTextObject(keys: String, isInner: Boolean) {
+    val plug = injector.parser.parseKeys("<Plug>(matchup-$keys)")
+    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.XO, plug, owner, BlockTextObjectHandler(isInner), false)
+    putKeyMappingIfMissing(MappingMode.XO, injector.parser.parseKeys(keys), owner, plug, true)
   }
 
   private fun putBlockMotion(keys: String, motion: BlockMotion) {
