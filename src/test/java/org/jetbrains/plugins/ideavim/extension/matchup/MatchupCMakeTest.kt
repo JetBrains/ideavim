@@ -35,7 +35,7 @@ class MatchupCMakeTest : VimTestCase() {
       """
         if (CMAKE_SYSTEM_NAME MATCHES "Linux")
           message("Linux")
-        ${c}else()
+        els${c}e()
           message("Non-linux system")
         endif()
       """.trimIndent(),
@@ -59,7 +59,7 @@ class MatchupCMakeTest : VimTestCase() {
           message("Linux")
         else()
           message("Non-linux system")
-        ${c}endif()
+        endi${c}f()
       """.trimIndent(),
       fileName = "CMakeLists.txt",
     )
@@ -105,7 +105,7 @@ class MatchupCMakeTest : VimTestCase() {
       """
         if (CMAKE_SYSTEM_NAME MATCHES "Linux")
           message("Linux")
-        ${c}elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin")
+        elsei${c}f (CMAKE_SYSTEM_NAME MATCHES "Darwin")
           message("MacOS")
         elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
           message("Windows")
@@ -137,7 +137,7 @@ class MatchupCMakeTest : VimTestCase() {
           message("Linux")
         elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin")
           message("MacOS")
-        ${c}elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
+        elsei${c}f (CMAKE_SYSTEM_NAME MATCHES "Windows")
           message("Windows")
         else()
           message("Unknown system")
@@ -169,7 +169,7 @@ class MatchupCMakeTest : VimTestCase() {
           message("MacOS")
         elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
           message("Windows")
-        ${c}else()
+        els${c}e()
           message("Unknown system")
         endif()
       """.trimIndent(),
@@ -201,7 +201,7 @@ class MatchupCMakeTest : VimTestCase() {
           message("Windows")
         else()
           message("Unknown system")
-        ${c}endif()
+        endi${c}f()
       """.trimIndent(),
       fileName = "CMakeLists.txt",
     )
@@ -249,7 +249,7 @@ class MatchupCMakeTest : VimTestCase() {
       """
         foreach(X IN LISTS A B C)
           message(STATUS "X=${"\${X}"}")
-        ${c}endforeach()
+        endforeac${c}h()
       """.trimIndent(),
       fileName = "CMakeLists.txt",
     )
@@ -288,7 +288,7 @@ class MatchupCMakeTest : VimTestCase() {
       """
         foreach(X IN LISTS A B C)
           if (X MATCHES "FOO")
-            ${c}break
+            brea${c}k
           endif()
           message(STATUS "X=${"\${X}"}")
         endforeach()
@@ -315,7 +315,7 @@ class MatchupCMakeTest : VimTestCase() {
             break
           endif()
           message(STATUS "X=${"\${X}"}")
-        ${c}endforeach()
+        endforeac${c}h()
       """.trimIndent(),
       fileName = "CMakeLists.txt",
     )
@@ -333,7 +333,7 @@ class MatchupCMakeTest : VimTestCase() {
       """
         while(${"\${index}"} LESS 10)
           MATH(EXPR VAR "${"\${index}"}+1")
-        ${c}endwhile()
+        endwhil${c}e()
       """.trimIndent(),
       fileName = "CMakeLists.txt",
     )
@@ -373,7 +373,7 @@ class MatchupCMakeTest : VimTestCase() {
         while (TRUE)
           MATH(EXPR VAR "${"\${index}+1\""}")
           if (${"\${index}"} EQUAL 5)
-            ${c}break
+            brea${c}k
           endif()
         endwhile()
       """.trimIndent(),
@@ -399,7 +399,7 @@ class MatchupCMakeTest : VimTestCase() {
           if (${"\${index}"} EQUAL 5)
             break
           endif()
-        ${c}endwhile()
+        endwhil${c}e()
       """.trimIndent(),
       fileName = "CMakeLists.txt",
     )
@@ -417,7 +417,7 @@ class MatchupCMakeTest : VimTestCase() {
       """
         function(foo)
           bar(x y z)
-        ${c}endfunction()
+        endfunctio${c}n()
       """.trimIndent(),
       fileName = "CMakeLists.txt",
     )
@@ -453,7 +453,7 @@ class MatchupCMakeTest : VimTestCase() {
       """
         macro(Foo arg)
           message("arg = ${"\${arg}\""}")
-        ${c}endmacro()
+        endmacr${c}o()
       """.trimIndent(),
       fileName = "CMakeLists.txt",
     )
@@ -495,7 +495,7 @@ class MatchupCMakeTest : VimTestCase() {
           message("Linux")
         else()
           message("Non-linux system")
-        ${c}endif()
+        endi${c}f()
       """.trimIndent(),
       fileName = "CMakeLists.txt",
     )
@@ -569,7 +569,7 @@ class MatchupCMakeTest : VimTestCase() {
           message("Windows")
         else()
           message("Unknown system")
-        ${c}endif()
+        endi${c}f()
       """.trimIndent(),
       fileName = "CMakeLists.txt",
     )
@@ -707,7 +707,7 @@ class MatchupCMakeTest : VimTestCase() {
       """
         foreach(X IN LISTS A B C)
           message(STATUS "X=${"\${X}"}")
-        ${c}endforeach()
+        endforeac${c}h()
       """.trimIndent(),
       fileName = "CMakeLists.txt",
     )
@@ -749,7 +749,7 @@ class MatchupCMakeTest : VimTestCase() {
             break
           endif()
           message(STATUS "X=${"\${X}"}")
-        ${c}endforeach()
+        endforeac${c}h()
       """.trimIndent(),
       fileName = "CMakeLists.txt",
     )
@@ -815,7 +815,7 @@ class MatchupCMakeTest : VimTestCase() {
       """
         while(${"\${index}"} LESS 10)
           MATH(EXPR VAR "${"\${index}"}+1")
-        ${c}endwhile()
+        endwhil${c}e()
       """.trimIndent(),
       fileName = "CMakeLists.txt",
     )
@@ -857,7 +857,7 @@ class MatchupCMakeTest : VimTestCase() {
           if (${"\${index}"} EQUAL 5)
             break
           endif()
-        ${c}endwhile()
+        endwhil${c}e()
       """.trimIndent(),
       fileName = "CMakeLists.txt",
     )
@@ -923,7 +923,7 @@ class MatchupCMakeTest : VimTestCase() {
       """
         function(foo)
           bar(x y z)
-        ${c}endfunction()
+        endfunctio${c}n()
       """.trimIndent(),
       fileName = "CMakeLists.txt",
     )
@@ -959,7 +959,7 @@ class MatchupCMakeTest : VimTestCase() {
       """
         macro(Foo arg)
           message("arg = ${"\${arg}\""}")
-        ${c}endmacro()
+        endmacr${c}o()
       """.trimIndent(),
       fileName = "CMakeLists.txt",
     )

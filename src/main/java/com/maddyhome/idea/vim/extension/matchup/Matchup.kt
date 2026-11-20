@@ -27,14 +27,14 @@ internal class Matchup : VimExtension {
       MappingMode.NXO,
       injector.parser.parseKeys("<Plug>(MatchupMotion)"),
       owner,
-      MatchHandler(false),
+      MatchHandler(false, isMatchup = true),
       false
     )
     VimExtensionFacade.putExtensionHandlerMapping(
       MappingMode.NXO,
       injector.parser.parseKeys("<Plug>(MatchupMotion)"),
       owner,
-      MatchHandler(false),
+      MatchHandler(false, isMatchup = true),
       false
     )
     putKeyMappingIfMissing(
@@ -49,14 +49,14 @@ internal class Matchup : VimExtension {
       MappingMode.NXO,
       injector.parser.parseKeys("<Plug>(ReverseMatchupMotion)"),
       owner,
-      MatchHandler(true),
+      MatchHandler(true, isMatchup = true),
       false
     )
     VimExtensionFacade.putExtensionHandlerMapping(
       MappingMode.NXO,
       injector.parser.parseKeys("<Plug>(ReverseMatchupMotion)"),
       owner,
-      MatchHandler(true),
+      MatchHandler(true, isMatchup = true),
       false
     )
     putKeyMappingIfMissing(

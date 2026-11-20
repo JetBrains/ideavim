@@ -31,7 +31,7 @@ class MatchupCTest : VimTestCase() {
       """.trimIndent(),
       """
         #if !defined (VAL_1)
-        $c#endif
+        #endi${c}f
       """.trimIndent(),
       fileName = "main.c",
     )
@@ -47,7 +47,7 @@ class MatchupCTest : VimTestCase() {
       """.trimIndent(),
       """
            #if !defined (VAL_1)
-        $c#endif
+        #endi${c}f
       """.trimIndent(),
       fileName = "main.c",
     )
@@ -66,7 +66,7 @@ class MatchupCTest : VimTestCase() {
       """
         #if !defined (VAL_1)
           #define VAL_1 1
-        $c#elif !defined (VAL_2)
+        #eli${c}f !defined (VAL_2)
           #define VAL_2 2
       """.trimIndent(),
       fileName = "main.c",
@@ -86,7 +86,7 @@ class MatchupCTest : VimTestCase() {
       """
         #if !defined (VAL_1)
           #define VAL_1 1
-        $c#else
+        #els${c}e
           #define VAL_2 2
       """.trimIndent(),
       fileName = "main.c",
@@ -103,7 +103,7 @@ class MatchupCTest : VimTestCase() {
       """.trimIndent(),
       """
         #elif !defined (VAL_2)
-        $c#else
+        #els${c}e
       """.trimIndent(),
       fileName = "main.c",
     )
@@ -119,7 +119,7 @@ class MatchupCTest : VimTestCase() {
       """.trimIndent(),
       """
            #elif !defined (VAL_2)
-        $c#else
+        #els${c}e
       """.trimIndent(),
       fileName = "main.c",
     )
@@ -135,7 +135,7 @@ class MatchupCTest : VimTestCase() {
       """.trimIndent(),
       """
         #else
-        $c#endif
+        #endi${c}f
       """.trimIndent(),
       fileName = "main.c",
     )
@@ -151,7 +151,7 @@ class MatchupCTest : VimTestCase() {
       """.trimIndent(),
       """
            #else !defined (VAL_2)
-        $c#endif
+        #endi${c}f
       """.trimIndent(),
       fileName = "main.c",
     )
@@ -193,7 +193,7 @@ class MatchupCTest : VimTestCase() {
       """.trimIndent(),
       """
         #ifdef DEBUG
-        $c#endif
+        #endi${c}f
       """.trimIndent(),
       fileName = "main.c",
     )
@@ -209,7 +209,7 @@ class MatchupCTest : VimTestCase() {
       """.trimIndent(),
       """
         #ifdef DEBUG
-        $c#elif PROD
+        #eli${c}f PROD
       """.trimIndent(),
       fileName = "main.c",
     )
@@ -225,7 +225,7 @@ class MatchupCTest : VimTestCase() {
       """.trimIndent(),
       """
         #ifdef DEBUG
-        $c#else
+        #els${c}e
       """.trimIndent(),
       fileName = "main.c",
     )
@@ -257,7 +257,7 @@ class MatchupCTest : VimTestCase() {
       """.trimIndent(),
       """
         #ifndef DEBUG
-        $c#endif
+        #endi${c}f
       """.trimIndent(),
       fileName = "main.c",
     )
@@ -273,7 +273,7 @@ class MatchupCTest : VimTestCase() {
       """.trimIndent(),
       """
         #ifndef DEBUG
-        $c#elif PROD
+        #eli${c}f PROD
       """.trimIndent(),
       fileName = "main.c",
     )
@@ -289,7 +289,7 @@ class MatchupCTest : VimTestCase() {
       """.trimIndent(),
       """
         #ifndef DEBUG
-        $c#else
+        #els${c}e
       """.trimIndent(),
       fileName = "main.c",
     )
@@ -337,7 +337,7 @@ class MatchupCTest : VimTestCase() {
       """.trimIndent(),
       """
         #  if DEBUG
-        $c#endif
+        #endi${c}f
       """.trimIndent(),
       fileName = "main.c",
     )
@@ -356,7 +356,7 @@ class MatchupCTest : VimTestCase() {
       """
         #ifdef CONDITION1
         #  ifdef CONDITION2
-        $c#  endif
+        #  endi${c}f
         #endif
       """.trimIndent(),
       fileName = "main.c",
@@ -377,7 +377,7 @@ class MatchupCTest : VimTestCase() {
       """.trimIndent(),
       """
         #if !defined (VAL_1)
-        $c#endif
+        #endi${c}f
       """.trimIndent(),
       fileName = "main.c",
     )
@@ -393,7 +393,7 @@ class MatchupCTest : VimTestCase() {
       """.trimIndent(),
       """
            #if !defined (VAL_1)
-        $c#endif
+        #endi${c}f
       """.trimIndent(),
       fileName = "main.c",
     )
@@ -507,7 +507,7 @@ class MatchupCTest : VimTestCase() {
       """.trimIndent(),
       """
         #ifdef DEBUG
-        $c#endif
+        #endi${c}f
       """.trimIndent(),
       fileName = "main.c",
     )
@@ -571,7 +571,7 @@ class MatchupCTest : VimTestCase() {
       """.trimIndent(),
       """
         #ifndef DEBUG
-        $c#endif
+        #endi${c}f
       """.trimIndent(),
       fileName = "main.c",
     )

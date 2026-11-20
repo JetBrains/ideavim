@@ -35,7 +35,7 @@ class MatchupGNUMakeTest : VimTestCase() {
         define VAR
           first line
           second line
-        ${c}endef
+        ende${c}f
       """.trimIndent(),
       fileName = "Makefile",
     )
@@ -73,7 +73,7 @@ class MatchupGNUMakeTest : VimTestCase() {
       """
         ifdef var
           $(info defined)
-        ${c}endif
+        endi${c}f
       """.trimIndent(),
       fileName = "Makefile",
     )
@@ -109,7 +109,7 @@ class MatchupGNUMakeTest : VimTestCase() {
       """
         ifndef VAR
           $(info not defined)
-        ${c}endif
+        endi${c}f
       """.trimIndent(),
       fileName = "Makefile",
     )
@@ -145,7 +145,7 @@ class MatchupGNUMakeTest : VimTestCase() {
       """
         ifeq (, $(var))
           $(info empty)
-        ${c}endif
+        endi${c}f
       """.trimIndent(),
       fileName = "Makefile",
     )
@@ -181,7 +181,7 @@ class MatchupGNUMakeTest : VimTestCase() {
       """
         ifneq (, $(var))
           $(info not empty)
-        ${c}endif
+        endi${c}f
       """.trimIndent(),
       fileName = "Makefile",
     )
@@ -239,7 +239,7 @@ class MatchupGNUMakeTest : VimTestCase() {
       """
         ifeq ($(TARGET),x86)
           $(info x86)
-        ${c}else ifeq ($(TARGET),x86_64)
+        else ife${c}q ($(TARGET),x86_64)
           $(info x86_64)
         else
           $(info not x86 based)
@@ -267,7 +267,7 @@ class MatchupGNUMakeTest : VimTestCase() {
           $(info x86)
         else ifeq ($(TARGET),x86_64)
           $(info x86_64)
-        ${c}else
+        els${c}e
           $(info not x86 based)
         endif
       """.trimIndent(),
@@ -293,7 +293,7 @@ class MatchupGNUMakeTest : VimTestCase() {
           $(info x86)
         else ifeq ($(TARGET),x86_64)
           $(info x86_64)
-        ${c}else
+        els${c}e
           $(info not x86 based)
         endif
       """.trimIndent(),
@@ -321,7 +321,7 @@ class MatchupGNUMakeTest : VimTestCase() {
           $(info x86_64)
         else
           $(info not x86 based)
-        ${c}endif
+        endi${c}f
       """.trimIndent(),
       fileName = "Makefile",
     )
@@ -369,7 +369,7 @@ class MatchupGNUMakeTest : VimTestCase() {
       """
         ifneq ($(TARGET),x86)
           $(info not x86)
-        ${c}else ifneq ($(TARGET),x86_64)
+        else ifne${c}q ($(TARGET),x86_64)
           $(info not x86_64)
         else
           $(info x86 based)
@@ -397,7 +397,7 @@ class MatchupGNUMakeTest : VimTestCase() {
           $(info not x86)
         else ifneq ($(TARGET),x86_64)
           $(info not x86_64)
-        ${c}else
+        els${c}e
           $(info x86 based)
         endif
       """.trimIndent(),
@@ -423,7 +423,7 @@ class MatchupGNUMakeTest : VimTestCase() {
           $(info not x86)
         else ifneq ($(TARGET),x86_64)
           $(info not x86_64)
-        ${c}else
+        els${c}e
           $(info x86 based)
         endif
       """.trimIndent(),
@@ -451,7 +451,7 @@ class MatchupGNUMakeTest : VimTestCase() {
           $(info not x86_64)
         else
           $(info x86 based)
-        ${c}endif
+        endi${c}f
       """.trimIndent(),
       fileName = "Makefile",
     )
@@ -499,7 +499,7 @@ class MatchupGNUMakeTest : VimTestCase() {
         define VAR
           first line
           second line
-        ${c}endef
+        ende${c}f
       """.trimIndent(),
       fileName = "Makefile",
     )
@@ -537,7 +537,7 @@ class MatchupGNUMakeTest : VimTestCase() {
       """
         ifdef var
           $(info defined)
-        ${c}endif
+        endi${c}f
       """.trimIndent(),
       fileName = "Makefile",
     )
@@ -573,7 +573,7 @@ class MatchupGNUMakeTest : VimTestCase() {
       """
         ifndef VAR
           $(info not defined)
-        ${c}endif
+        endi${c}f
       """.trimIndent(),
       fileName = "Makefile",
     )
@@ -609,7 +609,7 @@ class MatchupGNUMakeTest : VimTestCase() {
       """
         ifeq (, $(var))
           $(info empty)
-        ${c}endif
+        endi${c}f
       """.trimIndent(),
       fileName = "Makefile",
     )
@@ -645,7 +645,7 @@ class MatchupGNUMakeTest : VimTestCase() {
       """
         ifneq (, $(var))
           $(info not empty)
-        ${c}endif
+        endi${c}f
       """.trimIndent(),
       fileName = "Makefile",
     )
@@ -707,7 +707,7 @@ class MatchupGNUMakeTest : VimTestCase() {
           $(info x86_64)
         else
           $(info not x86 based)
-        ${c}endif
+        endi${c}f
       """.trimIndent(),
       fileName = "Makefile",
     )
@@ -837,7 +837,7 @@ class MatchupGNUMakeTest : VimTestCase() {
           $(info not x86_64)
         else
           $(info x86 based)
-        ${c}endif
+        endi${c}f
       """.trimIndent(),
       fileName = "Makefile",
     )

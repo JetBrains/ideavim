@@ -48,7 +48,7 @@ class MatchupMatchWordsTest : VimTestCase() {
         procedure CalculateTotals;
         begin
           Total := Total + Price;
-        ${c}end
+        en${c}d
       """.trimIndent(),
       afterEditorInitialized = { enterCommand("let b:match_words = 'begin:end'") },
     )
@@ -90,7 +90,7 @@ class MatchupMatchWordsTest : VimTestCase() {
       """
         if Total > Limit then
           Warn;
-        ${c}else
+        els${c}e
           Accept;
         endif
       """.trimIndent(),
@@ -115,7 +115,7 @@ class MatchupMatchWordsTest : VimTestCase() {
           begin
             Total := Total + Price;
           end
-        ${c}end
+        en${c}d
       """.trimIndent(),
       afterEditorInitialized = { enterCommand("let b:match_words = 'begin:end'") },
     )
@@ -138,7 +138,7 @@ class MatchupMatchWordsTest : VimTestCase() {
           Warn;
         else
           Accept;
-        ${c}endif
+        endi${c}f
       """.trimIndent(),
       afterEditorInitialized = { enterCommand("let b:match_words = 'if:else:endif'") },
     )
@@ -157,7 +157,7 @@ class MatchupMatchWordsTest : VimTestCase() {
       """
         repeat
           Total := Total + Price;
-        ${c}until Total > Limit
+        unti${c}l Total > Limit
       """.trimIndent(),
       afterEditorInitialized = { enterCommand("let b:match_words = 'begin:end,repeat:until'") },
     )
@@ -177,7 +177,7 @@ class MatchupMatchWordsTest : VimTestCase() {
       """
         <div>
           begin
-          ${c}end
+          en${c}d
         </div>
       """.trimIndent(),
       fileType = HtmlFileType.INSTANCE,
@@ -198,7 +198,7 @@ class MatchupMatchWordsTest : VimTestCase() {
       """
         if Total > Limit then
           Warn;
-        ${c}endif
+        endi${c}f
       """.trimIndent(),
       afterEditorInitialized = { enterCommand("""let b:match_words = '\<if\>:\<endif\>'""") },
     )
@@ -221,7 +221,7 @@ class MatchupMatchWordsTest : VimTestCase() {
       """
         if Total > Limit then
           Warn;
-        ${c}elsif Total > 0 then
+        elsi${c}f Total > 0 then
           Accept;
         else
           Reject;
@@ -251,7 +251,7 @@ class MatchupMatchWordsTest : VimTestCase() {
       """
         foreach (${'$'}items as ${'$'}item):
           echo ${'$'}item;
-        ${c}endforeach;
+        endforeac${c}h;
       """.trimIndent(),
       afterEditorInitialized = { enterCommand("""let b:match_words = 'foreach\s*(.*)\s*\::endforeach'""") },
     )
@@ -274,7 +274,7 @@ class MatchupMatchWordsTest : VimTestCase() {
       """
         section alpha, beta
           threshold = 10
-        ${c}endsection
+        endsectio${c}n
       """.trimIndent(),
       afterEditorInitialized = { enterCommand("""let b:match_words = 'section .*\, .*:endsection'""") },
     )
@@ -301,7 +301,7 @@ class MatchupMatchWordsTest : VimTestCase() {
       """
         {% for item in items %}
           <p>{{ item }}</p>
-        ${c}{% endfor %}
+        {% endfor ${c}%}
       """.trimIndent(),
       afterEditorInitialized = { enterCommand("""let b:match_words = '{% for .* %}:{% endfor %}'""") },
     )
@@ -370,11 +370,11 @@ class MatchupMatchWordsTest : VimTestCase() {
       """
         begin
           Total := Total + Price;
-        ${c}end
+        en${c}d
 
         begin
           Total := Total - Discount;
-        ${c}end
+        en${c}d
       """.trimIndent(),
       afterEditorInitialized = { enterCommand("let b:match_words = 'begin:end'") },
     )
@@ -405,7 +405,7 @@ class MatchupMatchWordsTest : VimTestCase() {
     doTest(
       "%",
       """a <${c}tag> is born</tag>""",
-      """a <tag> is born${c}</tag>""",
+      """a <tag> is born</ta${c}g>""",
       afterEditorInitialized = { enterCommand("let b:match_words = '<:>,<tag>:</tag>'") },
     )
   }
