@@ -453,6 +453,40 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest(listOf("dsb"), before, after, Mode.NORMAL())
   }
 
+  // VIM-2742
+  @Test
+  fun `test delete multiline surrounding parens with block inside`() {
+    val before = """
+      function someFnc() {}
+      someFnc(${c}
+        {
+          test: ""
+        }
+      );
+    """.trimIndent()
+    val after = """
+      function someFnc() {}
+      someFnc{
+          test: ""
+        }
+      ;
+    """.trimIndent()
+
+    doTest("ds(", before, after, Mode.NORMAL())
+  }
+
+  @Test
+  fun `test delete surrounding with opening bracket trims inner spaces`() {
+    doTest("ds(", "foo( ${c}a )", "foo${c}a", Mode.NORMAL())
+    doTest("ds{", "foo{ ${c}a }", "foo${c}a", Mode.NORMAL())
+    doTest("ds[", "foo[ ${c}a ]", "foo${c}a", Mode.NORMAL())
+  }
+
+  @Test
+  fun `test delete surrounding with closing bracket keeps inner spaces`() {
+    doTest("ds)", "foo( ${c}a )", "foo${c} a ", Mode.NORMAL())
+  }
+
   // VIM-2227
   @Test
   fun testDeleteInvalidSurroundingCharacter() {
