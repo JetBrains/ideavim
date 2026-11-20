@@ -17,6 +17,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndForOffset
@@ -59,6 +60,12 @@ class MatchAction : MotionActionHandler.ForEachCaret() {
   var reverse = false
   var isInOpPending = false
 
+  /** The biggest count that repeats the jump rather than going to a percentage of the file, see [isPercentJump]. */
+  var maxRepeatCount: Int? = null
+
+  /** The count given to the motion, e.g. the 2 of `d2%`, which the handler takes off the command. */
+  var count0: Int? = null
+
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override var supportsLinewiseDeletePromotion: Boolean = false
@@ -70,14 +77,32 @@ class MatchAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return getMatchupOffset(editor.ij, caret.ij, operatorArguments.count0, isInOpPending, reverse).toMotionOrError()
+    return getMatchupOffset(
+      editor.ij,
+      caret.ij,
+      count0 ?: operatorArguments.count0,
+      isInOpPending,
+      reverse,
+      maxRepeatCount = maxRepeatCount,
+    ).toMotionOrError()
   }
 
   override fun process(cmd: Command) {
-    motionType = if (cmd.rawCount != 0) MotionType.LINE_WISE else MotionType.INCLUSIVE
+    val isPercentJump = isPercentJump(count0 ?: cmd.rawCount, reverse, maxRepeatCount)
+    motionType = if (isPercentJump) MotionType.LINE_WISE else MotionType.INCLUSIVE
   }
 
   override var motionType: MotionType = MotionType.INCLUSIVE
+}
+
+/**
+ * A count turns % into the "jump to a percentage of the file" motion. Matchit doesn't extend that, while matchup only
+ * does so for a count above [maxRepeatCount], and repeats the jump for a smaller one. Its g% always repeats.
+ */
+private fun isPercentJump(count0: Int, reverse: Boolean, maxRepeatCount: Int?): Boolean {
+  if (count0 <= 0) return false
+  if (maxRepeatCount == null) return true
+  return !reverse && count0 > maxRepeatCount
 }
 
 private fun getMatchupOffset(
@@ -87,22 +112,39 @@ private fun getMatchupOffset(
   isInOpPending: Boolean,
   reverse: Boolean,
   isCursorAtEnd: Boolean = false,
+  maxRepeatCount: Int? = null,
 ): Int {
-  val caretOffset = caretOffsetWithinLine(editor, caret)
-
-  val motionOffset = if (count0 > 0) {
-    // A count turns % into the "jump to a percentage of the file" motion, which matchit doesn't extend.
-    VimPlugin.getMotion().moveCaretToLinePercent(editor.vim, caret.vim, count0)
-  } else {
-    findExtendedPairOffset(editor, caretOffset, isInOpPending, reverse, isCursorAtEnd)
-      ?: getMotionOffset(VimPlugin.getMotion().moveCaretToMatchingPair(editor.vim, caret.vim))
+  if (isPercentJump(count0, reverse, maxRepeatCount)) {
+    return VimPlugin.getMotion().moveCaretToLinePercent(editor.vim, caret.vim, count0)
   }
 
-  return when {
-    motionOffset == null -> -1
-    motionOffset < 0 -> motionOffset
-    else -> editor.vim.normalizeOffset(motionOffset, false)
+  var offset = caret.offset
+  repeat(max(count0, 1)) { jump ->
+    val jumpOffset = findPairOffset(editor, caret.vim, offset, isInOpPending, reverse, isCursorAtEnd)
+    if (jumpOffset == null || jumpOffset < 0) return if (jump == 0) jumpOffset ?: -1 else offset
+    offset = editor.vim.normalizeOffset(jumpOffset, false)
   }
+  return offset
+}
+
+private fun findPairOffset(
+  editor: Editor,
+  caret: ImmutableVimCaret,
+  offset: Int,
+  isInOpPending: Boolean,
+  reverse: Boolean,
+  isCursorAtEnd: Boolean,
+): Int? {
+  val offsetWithinLine = offsetWithinLine(editor, offset)
+  return findExtendedPairOffset(editor, offsetWithinLine, isInOpPending, reverse, isCursorAtEnd)
+    ?: getMotionOffset(VimPlugin.getMotion().moveCaretToMatchingPair(editor.vim, CaretAtOffset(caret, offset)))
+}
+
+/**
+ * [caret] moved to [offset], for searches that start from a caret.
+ */
+private class CaretAtOffset(caret: ImmutableVimCaret, override val offset: Int) : ImmutableVimCaret by caret {
+  override fun getBufferPosition(): BufferPosition = editor.offsetToBufferPosition(offset)
 }
 
 /**
@@ -127,10 +169,15 @@ class MatchHandler(private val reverse: Boolean, private val isMatchup: Boolean 
       // A forced characterwise motion turns this into an exclusive one, which for matchup leaves out the whole word.
       matchitAction.isInOpPending = !(isMatchup && forcedMotion == SelectionType.CHARACTER_WISE)
       matchitAction.supportsLinewiseDeletePromotion = isMatchup && forcedMotion == null
+      if (isMatchup) {
+        matchitAction.maxRepeatCount = maxRepeatCount(editor)
+        matchitAction.count0 = operatorArguments.count0
+      }
 
       keyState.commandBuilder.addAction(matchitAction)
     } else {
       val isCursorAtEnd = isMatchup && getGlobalIntVariable(editor, "matchup_motion_cursor_end", 1) != 0
+      val maxRepeatCount = if (isMatchup) maxRepeatCount(editor) else null
       editor.sortedCarets().forEach { caret ->
         injector.jumpService.saveJumpLocation(editor)
         caret.moveToOffset(
@@ -141,10 +188,19 @@ class MatchHandler(private val reverse: Boolean, private val isMatchup: Boolean 
             isInOpPending = false,
             reverse,
             isCursorAtEnd,
+            maxRepeatCount,
           )
         )
       }
     }
+  }
+
+  /**
+   * `g:matchup_motion_override_Npercent`, where 0 always goes to a percentage, and 100 or more never does.
+   */
+  private fun maxRepeatCount(editor: VimEditor): Int {
+    val maxRepeatCount = getGlobalIntVariable(editor, "matchup_motion_override_Npercent", 6)
+    return if (maxRepeatCount >= 100) Int.MAX_VALUE else maxRepeatCount
   }
 }
 
@@ -558,10 +614,9 @@ fun String.withBackReference(backReference: String?): String {
 /**
  * Visual mode can leave the cursor one past the end of the line, where there is no character to match on.
  */
-private fun caretOffsetWithinLine(editor: Editor, caret: Caret): Int {
-  val caretOffset = caret.offset
-  val lineEndOffset = editor.vim.getLineEndOffset(caret.logicalPosition.line, true)
-  return if (caretOffset > 0 && caretOffset == lineEndOffset) caretOffset - 1 else caretOffset
+private fun offsetWithinLine(editor: Editor, offset: Int): Int {
+  val lineEndOffset = editor.vim.getLineEndForOffset(offset)
+  return if (offset > 0 && offset == lineEndOffset) offset - 1 else offset
 }
 
 /**
