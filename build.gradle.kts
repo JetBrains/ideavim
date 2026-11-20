@@ -132,6 +132,7 @@ dependencies {
 
     pluginComposedModule(runtimeOnly(project(":ideavim-common")))
     pluginModule(runtimeOnly(project(":ideavim-frontend")))
+    pluginModule(runtimeOnly(project(":ideavim-frontend-split")))
     pluginModule(runtimeOnly(project(":ideavim-backend")))
     pluginModule(runtimeOnly(project(":ideavim-backend-bookmarks")))
     pluginModule(runtimeOnly(project(":ideavim-backend-bookmarks-core")))

@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.newapi.IjClipboardSelection
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import java.awt.datatransfer.DataFlavor
+import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.UnsupportedFlavorException
 import kotlin.test.assertEquals
@@ -28,10 +29,15 @@ import kotlin.test.assertNull
 class ClipboardX11FallbackTest : VimTestCase() {
   private var x11Reads = 0
 
-  private fun readClipboard(ideContents: Transferable?, x11Text: String?): VimCopiedText? {
+  private fun readClipboard(
+    ideContents: Transferable?,
+    x11Text: String?,
+    pendingRestoreContents: Transferable? = null,
+  ): VimCopiedText? {
     configureByText("${c}Lorem ipsum")
     val clipboard = IjClipboardSelection(
       ideClipboardContents = { ideContents },
+      pendingRestoreContents = { pendingRestoreContents },
       x11ClipboardText = {
         x11Reads++
         x11Text
@@ -77,6 +83,17 @@ class ClipboardX11FallbackTest : VimTestCase() {
     val content = readClipboard(ideContents = NoTextTransferable, x11Text = null)
     assertNull(content)
     assertEquals(1, x11Reads)
+  }
+
+  @Test
+  fun `test content put back after the backend paste is read without X11`() {
+    val content = readClipboard(
+      ideContents = StringSelection("REGISTER"),
+      x11Text = "REGISTER",
+      pendingRestoreContents = NoTextTransferable,
+    )
+    assertNull(content)
+    assertEquals(0, x11Reads)
   }
 
   private object NoTextTransferable : Transferable {
