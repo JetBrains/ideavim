@@ -18,6 +18,11 @@ interface VimIndentConfig {
   fun createIndentBySize(size: Int): String
 
   /**
+   * width in spaces of the given leading white space
+   */
+  fun getIndentWidth(indent: CharSequence): Int
+
+  /**
    * Whether the IDE has been asked to keep the indent of a line that holds nothing else.
    *
    * Vim deletes such an indent when Insert mode is left without anything being typed, so that `o<Esc>` leaves an empty

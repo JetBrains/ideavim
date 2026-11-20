@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.action.change.shift
 
 import com.intellij.application.options.CodeStyle
 import com.intellij.ide.highlighter.JavaFileType
+import com.intellij.openapi.application.ApplicationManager
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimJavaTestCase
@@ -34,6 +35,28 @@ class ShiftRightLinesActionTest : VimJavaTestCase() {
     usingTabs {
       configureByJavaText(before)
       typeText(">>".repeat(4))
+      assertState(after)
+    }
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `repeated visual shift with tabs when editor tab size differs`() {
+    val before = """
+      |${c}ONE
+      |TWO
+      |THREE
+    """.trimMargin()
+    val after = """
+      |...${c}ONE
+      |...TWO
+      |...THREE
+    """.trimMargin().dotToTab()
+
+    usingTabs {
+      configureByJavaText(before)
+      ApplicationManager.getApplication().invokeAndWait { fixture.editor.settings.setTabSize(3) }
+      typeText("V2j>gv>gv>gv>gv>gv<gv>gv<gv<")
       assertState(after)
     }
   }
