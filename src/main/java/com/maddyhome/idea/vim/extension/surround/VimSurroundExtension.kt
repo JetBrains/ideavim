@@ -269,11 +269,10 @@ internal class VimSurroundExtension : VimExtension {
         surroundings
           .filter { it.isValidSurrounding } // we do nothing with carets that are not inside the surrounding
           .map { surrounding ->
-            val innerValue = injector.parser.toPrintableString(surrounding.innerText!!)
-            val text = newSurround?.let {
-              val trimmedValue = if (newSurround.shouldTrim) innerValue.trim() else innerValue
-              it.first + trimmedValue + it.second
-            } ?: innerValue
+            val rawInnerValue = injector.parser.toPrintableString(surrounding.innerText!!)
+            val shouldTrim = charFrom in OPENING_BRACKETS || newSurround?.shouldTrim == true
+            val innerValue = if (shouldTrim) rawInnerValue.trim { it == ' ' || it == '\t' } else rawInnerValue
+            val text = newSurround?.let { it.first + innerValue + it.second } ?: innerValue
             val textData =
               PutData.TextData(null, injector.clipboardManager.dumbCopiedText(text), SelectionType.CHARACTER_WISE)
             val putData =
@@ -380,6 +379,8 @@ private const val OPERATOR_FUNC = "SurroundOperatorFunc"
 private val tagNameAndAttributesCapturePattern = "([^\\s>]+)([^>]*)>?".toPattern()
 
 private data class SurroundPair(val first: String, val second: String, val shouldTrim: Boolean)
+
+private const val OPENING_BRACKETS = "([{<"
 
 private val SURROUND_PAIRS = mapOf(
   'b' to SurroundPair("(", ")", false),
