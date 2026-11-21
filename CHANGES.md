@@ -33,7 +33,11 @@ usual beta standards.
 
 * Fixed `p` sometimes pasting nothing from the `+` register on X11 for text copied in another application, so that only a second `p` worked
 * Fixed text yanked blockwise with `"+y` being pasted characterwise on systems without a PRIMARY selection
-* [VIM-4259](https://youtrack.jetbrains.com/issue/VIM-4259) Fixed `p` with `clipboard=ideaput` pasting the system clipboard instead of the register in remote development on 2026.3
+* [VIM-2742](https://youtrack.jetbrains.com/issue/VIM-2742) Fixed `ds(`, `ds[`, `ds{` and `ds<` in the `surround` extension keeping the spaces inside the brackets. As in vim-surround, `ds(` now turns `foo( a )` into `fooa`, while `ds)` keeps the spaces. Deleting brackets around multiline content no longer joins its lines
+* [VIM-2609](https://youtrack.jetbrains.com/issue/VIM-2609) Fixed `>>` and `<<` adding stray spaces after tabs when the editor tab size differs from the code style tab size, e.g. in language injections or with indent detection
+* [VIM-2608](https://youtrack.jetbrains.com/issue/VIM-2608) Fixed Visual block `c` and `I` inserting the text one character too early on the following lines when they start with tabs or contain collapsed folds
+* [VIM-4332](https://youtrack.jetbrains.com/issue/VIM-4332) Fixed the command line and its output panel drawing dark text on a dark background when a light editor colour scheme is used with a dark IDE theme
+* [VIM-4380](https://youtrack.jetbrains.com/issue/VIM-4380) Fixed a read access error when opening a diff viewer on 2026.3
 * [VIM-4375](https://youtrack.jetbrains.com/issue/VIM-4375) Fixed the mode widget painting an opaque rectangle over the status bar when a terminal or agent tab is selected in the editor area
 * Fixed mappings being applied to the character inserted with [`CTRL-V`](https://vimhelp.org/insert.txt.html#i_CTRL-V) or [`CTRL-K`](https://vimhelp.org/insert.txt.html#i_CTRL-K) in Insert mode. With `inoremap a b`, typing `<C-V>a` now inserts `a`
 
@@ -57,6 +61,12 @@ usual beta standards.
 * [2199](https://github.com/JetBrains/ideavim/pull/2199) by [1grzyb1](https://github.com/1grzyb1): VIM-4379 Do not scan all keys on every keystroke
 * [2200](https://github.com/JetBrains/ideavim/pull/2200) by [1grzyb1](https://github.com/1grzyb1): VIM-4370 Don't wait for the backend before the first command in a document
 * [2184](https://github.com/JetBrains/ideavim/pull/2184) by [pppobear](https://github.com/pppobear): Fix(VIM-4375): Avoid opaque background for empty mode widget
+
+## 2.49.1, 2026-11-20
+
+### Fixes:
+
+* [VIM-4259](https://youtrack.jetbrains.com/issue/VIM-4259) Fixed `p` with `clipboard=ideaput` pasting the system clipboard instead of the register in remote development on 2026.3
 
 ## 2.49.0, 2026-11-18
 
