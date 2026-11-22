@@ -284,6 +284,7 @@ object Options {
     )
   )
   val visualbell: ToggleOption = addOption(ToggleOption("visualbell", GLOBAL, "vb", false))
+  val errorbells: ToggleOption = addOption(ToggleOption("errorbells", GLOBAL, "eb", false))
   val whichwrap: StringListOption = addOption(
     StringListOption(
       "whichwrap",

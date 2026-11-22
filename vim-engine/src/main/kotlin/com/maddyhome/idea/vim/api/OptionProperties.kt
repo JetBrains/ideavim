@@ -21,6 +21,7 @@ open class GlobalOptions(scope: OptionAccessScope) : OptionsPropertiesBase(scope
   val clipboard: StringListOptionValue by optionProperty(Options.clipboard)
   var cmdheight: Int by optionProperty(Options.cmdheight)
   var digraph: Boolean by optionProperty(Options.digraph)
+  var errorbells: Boolean by optionProperty(Options.errorbells)
   var gdefault: Boolean by optionProperty(Options.gdefault)
   val guicursor: StringListOptionValue by optionProperty(Options.guicursor)
   var history: Int by optionProperty(Options.history)
