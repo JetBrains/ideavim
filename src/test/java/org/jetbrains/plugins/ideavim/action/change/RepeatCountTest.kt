@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.action.change
 
-import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -90,21 +89,24 @@ class RepeatCountTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(
-    originalVimAfter = "XXXXX${c}Xipsum dolor",
-    description = "`3rX` should leave the caret on the last replaced character (column 2), as vim does " +
-      "(verified against nvim: `3rX` on \"Lorem ipsum dolor\" ends at column 2). IdeaVim leaves it at " +
-      "column 0, so the following `l` and `.` both land one column too far left.",
-    shouldBeFixed = true,
-  )
+  @Test
+  fun `test replace character with a count`() {
+    // Vim leaves the caret on the last replaced character, see `:h r`
+    doTest(
+      "3rX",
+      "${c}Lorem ipsum dolor",
+      "XX${c}Xem ipsum dolor",
+    )
+  }
+
   @Test
   fun `test repeat replace character with a count`() {
-    // `3rX` replaces three characters; `r` does not advance the caret, so repeating the keys three
-    // times would only replace one
+    // `3rX` leaves the caret on the last replaced character, so `l` moves to the next one and `.`
+    // replaces from there. (Vim/Neovim: "XXXXX Xipsum dolor" with the caret on the last X)
     doTest(
       "3rX" + "l" + ".",
       "${c}Lorem ipsum dolor",
-      "X${c}XXXm ipsum dolor",
+      "XXXXX${c}Xipsum dolor",
     )
   }
 

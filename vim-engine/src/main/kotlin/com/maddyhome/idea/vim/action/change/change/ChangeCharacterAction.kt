@@ -82,6 +82,11 @@ private fun changeCharacter(editor: VimEditor, caret: VimCaret, count: Int, ch: 
   }
   val text = buildString(count) { repeat(num) { append(ch) } }
   injector.changeGroup.replaceText(editor, caret, offset, offset + count, text)
+  if (ch != '\n') {
+    // Vim leaves the caret on the last replaced character, see `:h r`. With a count of one this is
+    // a no-op, as the caret is already positioned on the replaced character.
+    caret.moveToInlayAwareOffset(offset + count - 1)
+  }
 
   // Indent new line if we replaced with a newline
   if (ch == '\n') {
