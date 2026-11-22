@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.action.change
 
-import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -149,18 +148,10 @@ class RepeatInsertCommandsTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(
-    originalVimAfter = """
-        Lorem Xipsum dolor
-        ${c}Xsit amet consectetur
-    """,
-    description = "In vim, repeating a `gi` insert behaves like `i` at the caret, so the `.` inserts on " +
-      "line 2. IdeaVim re-executes `gi` itself, which jumps back to the previous insert position, so the " +
-      "`.` inserts next to the original change and `.` can never be used to apply a `gi` insert elsewhere.",
-    shouldBeFixed = true,
-  )
   @Test
   fun `test repeat insert at previous insert position`() {
+    // In vim, repeating a `gi` insert behaves like `i` at the caret: the `.` inserts on line 2, not back at the
+    // previous insert position (:help gi). Verified against Vim 9.1.
     doTest(
       "giX<Esc>" + "j0" + ".",
       """
@@ -168,8 +159,8 @@ class RepeatInsertCommandsTest : VimTestCase() {
         sit amet consectetur
       """.trimIndent(),
       """
-        Lorem X${c}Xipsum dolor
-        sit amet consectetur
+        Lorem Xipsum dolor
+        ${c}Xsit amet consectetur
       """.trimIndent(),
     )
   }

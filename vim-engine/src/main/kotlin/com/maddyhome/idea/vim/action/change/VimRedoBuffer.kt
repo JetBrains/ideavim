@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.action.change
 
+import com.maddyhome.idea.vim.action.change.insert.InsertAtPreviousInsertAction
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
@@ -198,6 +199,7 @@ private class Recording {
   private var hasChange = false
   private var changeRegister: Char? = null
   private var changeCount = 0
+  private var changeStartsWithGi = false
 
   private var isVisual = false
 
@@ -242,6 +244,7 @@ private class Recording {
     changeRegister = command.register
     changeCount = command.rawCount
     changeStart = commandStart
+    changeStartsWithGi = command.action is InsertAtPreviousInsertAction
   }
 
   fun isChangeFinishedIn(mode: Mode) = hasChange && !mode.isInsertSession()
@@ -267,12 +270,24 @@ private class Recording {
     // count on its command but not in the recorded keys, and rendering it would apply it twice
     val prefixIndices = countIndices + registerIndices
     return RecordedChange(
-      keys = keys.filterIndexed { index, _ -> index !in prefixIndices },
+      keys = keys.filterIndexed { index, _ -> index !in prefixIndices }.replayGiAsInsert(),
       register = changeRegister.takeIf { registerIndices.isNotEmpty() },
       count = if (countIndices.isEmpty()) 0 else changeCount,
       isVisual = false,
     )
   }
+
+  /**
+   * Repeating a `gi` insert behaves like repeating an `i` insert: the text goes at the current caret position, not
+   * back at the previous insert position (`:help gi`). Vim's redo machinery replays the insert itself, so the `gi`
+   * that started it is effectively replaced by `i` - we do the same by rewriting the recorded keys.
+   */
+  private fun List<KeyStroke>.replayGiAsInsert(): List<KeyStroke> =
+    if (changeStartsWithGi && take(2) == injector.parser.stringToKeys("gi")) {
+      listOf(KeyStroke.getKeyStroke('i')) + drop(2)
+    } else {
+      this
+    }
 
   /**
    * The operator alone, replayed after `1v` to reselect an area of the same size (`:help v_1v`, Vim's
