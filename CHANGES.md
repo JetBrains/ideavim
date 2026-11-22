@@ -36,6 +36,10 @@ usual beta standards.
 * [VIM-4259](https://youtrack.jetbrains.com/issue/VIM-4259) Fixed `p` with `clipboard=ideaput` pasting the system clipboard instead of the register in remote development on 2026.3
 * [VIM-4375](https://youtrack.jetbrains.com/issue/VIM-4375) Fixed the mode widget painting an opaque rectangle over the status bar when a terminal or agent tab is selected in the editor area
 * Fixed mappings being applied to the character inserted with [`CTRL-V`](https://vimhelp.org/insert.txt.html#i_CTRL-V) or [`CTRL-K`](https://vimhelp.org/insert.txt.html#i_CTRL-K) in Insert mode. With `inoremap a b`, typing `<C-V>a` now inserts `a`
+* [VIM-4332](https://youtrack.jetbrains.com/issue/VIM-4332) Fixed the command line and the output panel showing dark text on a dark background when a light editor colour scheme is used with a dark IDE theme
+* [VIM-2608](https://youtrack.jetbrains.com/issue/VIM-2608) Fixed Visual block insert and change, such as `<C-V>jjcX`, putting the text one character too early on the following lines when they contain tabs or collapsed folds
+* [VIM-2609](https://youtrack.jetbrains.com/issue/VIM-2609) Fixed `>` and `<` adding stray spaces after the tabs of the indent when the editor tab size differs from the code style tab size, e.g. in language injections or with detected indents
+* [VIM-2742](https://youtrack.jetbrains.com/issue/VIM-2742) Fixed `ds(`, `ds[`, `ds{` and `ds<` in the `surround` extension keeping the spaces between the bracket and its content. As in vim-surround, deleting with the opening bracket now trims them, e.g. `ds(` on `( foo )` gives `foo`, while `ds)` keeps them
 
 ### Merged PRs:
 * [2166](https://github.com/JetBrains/ideavim/pull/2166) by [1grzyb1](https://github.com/1grzyb1): VIM-4351 support C-O jump list in diff view
