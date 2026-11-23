@@ -709,6 +709,70 @@ https://github.com/adelarsq/vim-matchit/blob/master/doc/matchit.txt
 </details>
 
 <details>
+<summary><h2>matchup: Even better % navigation and highlighting of matching words</h2></summary>
+
+Original plugin: [vim-matchup](https://github.com/andymass/vim-matchup).
+
+### Summary:
+Extends `%` the way matchit does, jumping between the words of a block such as `if`, `else` and `end`, and adds
+motions and text objects for blocks, highlighting of the matching words and commands that delete or change them.
+It replaces matchit, so don't enable both.
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'andymass/vim-matchup'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plug 'vim-matchup'</code>
+      <br/>
+      <code>Plug 'https://github.com/andymass/vim-matchup'</code>
+      <br/>
+      <code>set matchup</code>
+      </details>
+
+### Instructions
+
+| Keys | Mode | Action |
+|------|------|--------|
+| `%` | n, x, o | Next word of the block, landing on the end of the word. `{count}%` repeats it for a count up to 6, a bigger count goes to that percentage of the file |
+| `g%` | n, x, o | Previous word of the block |
+| `[%` / `]%` | n, x, o | Start / end of the surrounding block |
+| `z%` | n, x, o | Inside the next block |
+| `<Plug>(matchup-Z%)` | n, x | Inside the previous block. No default key |
+| `i%` / `a%` | x, o | Inside of the block, or the whole block. Without a count, the part between two neighbouring words, e.g. from `if` to `else` |
+| `ds%` / `cs%` | n | Delete or change the surrounding words. Needs `let g:matchup_surround_enabled = 1` |
+| `<Plug>(matchup-hi-surround)` | n | Highlight the surrounding block until the cursor moves. No default key |
+
+Each key is also available as `<Plug>(matchup-{keys})`, e.g. `<Plug>(matchup-%)`.
+
+`cs%` reads one character. A bracket puts its pair around the block, e.g. `cs%(` turns `if`/`end` into `(`/`)`, any
+other character goes on both sides. With the surround extension enabled, the character is a surround target, so
+`cs%t` asks for a tag.
+
+The words of the block under the cursor are highlighted with the color of matching braces. The brackets of
+`'matchpairs'` are highlighted by the IDE itself. When the match is off screen, its line is shown in a hint.
+`:NoMatchParen` and `:DoMatchParen` turn the highlighting off and on.
+
+Supported variables:
+- `g:matchup_matchparen_enabled`, `b:matchup_matchparen_enabled`: set to 0 to turn off the highlighting
+- `g:matchup_matchparen_offscreen`: `{}` or `{'method': 'status_manual'}` turns off the hint for an off-screen match
+- `g:matchup_matchparen_singleton`: highlight a word without a match
+- `g:matchup_matchparen_stopline`: how many lines away to look for the match to highlight, 400 by default
+- `g:matchup_matchparen_nomode`: modes without highlighting, e.g. `'i'`
+- `g:matchup_matchparen_hi_surround_always`: always highlight the surrounding block
+- `g:matchup_matchparen_deferred`, `g:matchup_matchparen_deferred_show_delay`,
+  `g:matchup_matchparen_deferred_hide_delay`: highlight only once the cursor stops moving
+- `g:matchup_motion_cursor_end`: set to 0 to land on the start of the word
+- `g:matchup_motion_override_Npercent`: the biggest count that repeats `%`, 6 by default
+- `g:matchup_delim_stopline`: how many lines away `%` looks for the match, 1500 by default
+- `g:matchup_surround_enabled`: set to 1 for the `ds%` and `cs%` keys
+
+Your own pairs can be defined in the `b:match_words` buffer variable, the same way as for matchit.
+
+https://github.com/andymass/vim-matchup/blob/master/doc/matchup.txt
+
+</details>
+
+<details>
 <summary><h2>Mini.ai: Extend and create a/i textobjects (IMPORTANT: The plugin is not related with artificial intelligence)</h2></summary>
 
 ### Summary:
