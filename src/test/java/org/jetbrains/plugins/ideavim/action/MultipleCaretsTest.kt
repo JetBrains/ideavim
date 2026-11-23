@@ -1203,7 +1203,7 @@ $c  tw${c}o
   @Test
   fun testChangeCharacterActionWithCount() {
     typeTextInFile(injector.parser.parseKeys("2rz"), "on${c}e ${c}t${c}w${c}o th${c}r${c}ee")
-    assertState("on${c}zz${c}z${c}z${c}zzth${c}z${c}zz")
+    assertState("onz${c}zz${c}z${c}z${c}zthz${c}z${c}z")
   }
 
   @Test

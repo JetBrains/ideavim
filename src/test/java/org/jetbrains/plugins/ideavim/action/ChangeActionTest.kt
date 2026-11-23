@@ -737,13 +737,12 @@ quux
   }
 
   // |r|
-  @VimBehaviorDiffers(originalVimAfter = "foXX${c}Xr\n")
   @Test
   fun testReplaceMultipleCharsWithCount() {
     doTest(
       "3rX",
       "fo${c}obar\n",
-      "fo${c}XXXr\n",
+      "foXX${c}Xr\n",
       Mode.NORMAL(),
     )
   }
