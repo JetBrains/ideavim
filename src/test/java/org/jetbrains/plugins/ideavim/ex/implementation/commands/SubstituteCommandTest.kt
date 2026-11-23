@@ -1695,4 +1695,20 @@ class SubstituteCommandTest : VimTestCase() {
         "\t\t\tmakeProperty(\"age\", { b, v -> (b as? Ageable)?.age = v }),\n",
     )
   }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test lowercase escape in replacement lowercases first letter on each line in visual selection`() {
+    configureByText(
+      "${c}Country: string\n" +
+        "Currency: string\n" +
+        "Symbol: string\n",
+    )
+    typeText("VG", ":'<,'>s/\\([A-Z]\\)/\\l\\1/<Enter>")
+    assertState(
+      "country: string\n" +
+        "currency: string\n" +
+        "${c}symbol: string\n",
+    )
+  }
 }
