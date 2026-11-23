@@ -866,6 +866,11 @@ class VimSurroundExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
+  fun `test delete surround in macro`() {
+    doTest("qqds(qj0@q", "${c}(test1)\n(test2)", "test1\n${c}test2", Mode.NORMAL())
+  }
+
   companion object {
     @JvmStatic
     fun removeWhiteSpaceWithClosingBracketParams() = listOf(
