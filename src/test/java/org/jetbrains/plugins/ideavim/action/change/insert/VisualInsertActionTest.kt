@@ -216,4 +216,15 @@ class VisualInsertActionTest : VimTestCase() {
       Mode.INSERT,
     )
   }
+
+  @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
+  @Test
+  fun `test undo block insert with a single undo`() {
+    doTest(
+      listOf("f2<C-V>3jI1<Esc>", "u"),
+      "0${c}2\n02\n02\n02",
+      "0${c}2\n02\n02\n02",
+      Mode.NORMAL(),
+    )
+  }
 }
