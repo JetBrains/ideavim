@@ -24,6 +24,13 @@ internal class IjVimMessages : VimMessagesBase() {
   private var error = false
   private var lastBeepTimeMillis = 0L
 
+  /**
+   * How many times the bell was asked to ring in unit-test mode. There is nothing to beep with there, so the bell is
+   * counted instead of rung, and tests read this.
+   */
+  var unitTestBellCount: Int = 0
+    private set
+
   override fun showMessage(editor: VimEditor, message: String?) {
     injector.outputPanel.clear(editor, injector.executionContextManager.getEditorExecutionContext(editor))
     showMessageInternal(editor, message, MessageType.STANDARD)
@@ -32,12 +39,13 @@ internal class IjVimMessages : VimMessagesBase() {
   override fun showErrorMessage(editor: VimEditor, message: String?) {
     injector.outputPanel.clear(editor, injector.executionContextManager.getEditorExecutionContext(editor))
     showMessageInternal(editor, message, MessageType.ERROR)
-    indicateError()
+    // In Vim the bell of an error message only rings when 'errorbells' is set (:help 'errorbells')
+    indicateError(ringBell = injector.globalOptions().errorbells)
   }
 
   override fun appendErrorMessage(editor: VimEditor, message: String?) {
     showMessageInternal(editor, message, MessageType.ERROR)
-    indicateError()
+    indicateError(ringBell = injector.globalOptions().errorbells)
   }
 
   private fun showMessageInternal(editor: VimEditor, message: String?, messageType: MessageType) {
@@ -70,18 +78,29 @@ internal class IjVimMessages : VimMessagesBase() {
   }
 
   override fun indicateError() {
+    // An error without a message rings the bell whatever 'errorbells' is (:help 'errorbells')
+    indicateError(ringBell = true)
+  }
+
+  private fun indicateError(ringBell: Boolean) {
     error = true
-    if (!ApplicationManager.getApplication().isUnitTestMode) {
-      // In Vim the bell rings for error messages only if 'errorbells' is set (:help 'errorbells');
-      // 'visualbell' silences it as well
-      if (injector.globalOptions().errorbells && !injector.globalOptions().visualbell) {
-        // Vim only allows a beep once every half second - :help 'visualbell'
-        val currentTimeMillis = System.currentTimeMillis()
-        if (currentTimeMillis - lastBeepTimeMillis > 500) {
-          Toolkit.getDefaultToolkit().beep()
-          lastBeepTimeMillis = currentTimeMillis
-        }
-      }
+    // 'visualbell' silences both kinds of bell
+    if (ringBell && !injector.globalOptions().visualbell) {
+      beep()
+    }
+  }
+
+  private fun beep() {
+    if (ApplicationManager.getApplication().isUnitTestMode) {
+      unitTestBellCount++
+      return
+    }
+
+    // Vim only allows a beep once every half second - :help 'visualbell'
+    val currentTimeMillis = System.currentTimeMillis()
+    if (currentTimeMillis - lastBeepTimeMillis > 500) {
+      Toolkit.getDefaultToolkit().beep()
+      lastBeepTimeMillis = currentTimeMillis
     }
   }
 
