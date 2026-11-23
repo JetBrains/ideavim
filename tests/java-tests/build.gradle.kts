@@ -27,6 +27,15 @@ val ideaType: String by project
 val ideaVersion: String by project
 val javaVersion: String by project
 
+val ideaBranchNumber = ideaVersion.substringBefore('-').split('.').let { parts ->
+  val head = parts[0].toIntOrNull() ?: Int.MAX_VALUE // LATEST-EAP-SNAPSHOT
+  val isProductVersion = head > 1000                // 2026.2 rather than 262.8665.258
+  if (isProductVersion) (head % 100) * 10 + (parts.getOrNull(1)?.toIntOrNull() ?: 1) else head
+}
+
+// In 2026.3 XML, the local process service and the test runner moved from the core to bundled plugins
+val isAtLeast263 = ideaBranchNumber >= 263
+
 repositories {
   maven { url = uri("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2") }
   intellijPlatform {
@@ -54,6 +63,7 @@ dependencies {
     testFramework(TestFrameworkType.Platform)
     testFramework(TestFrameworkType.JUnit5)
     bundledPlugins("com.intellij.java", "org.jetbrains.plugins.yaml", "org.jetbrains.plugins.textmate")
+    if (isAtLeast263) bundledPlugin("com.intellij.xml")
   }
 }
 
@@ -69,7 +79,16 @@ tasks {
     // error in any of them is rethrown as a failure of whichever IdeaVim test ran first.
     systemProperty(
       "idea.load.plugins.id",
-      "com.intellij,com.intellij.java,org.jetbrains.plugins.yaml,org.jetbrains.plugins.textmate,IdeaVIM",
+      listOfNotNull(
+        "com.intellij",
+        "com.intellij.java",
+        "org.jetbrains.plugins.yaml",
+        "org.jetbrains.plugins.textmate",
+        "com.intellij.xml".takeIf { isAtLeast263 },
+        "com.intellij.modules.pty4j".takeIf { isAtLeast263 },
+        "com.intellij.platform.testRunner".takeIf { isAtLeast263 },
+        "IdeaVIM",
+      ).joinToString(","),
     )
 
     // Set teamcity env variable locally to run additional tests for leaks.
