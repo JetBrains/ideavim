@@ -384,4 +384,9 @@ class MotionQuoteActionTest : VimTestCase() {
   fun `test delete inner quote when line ends with escaped backslashes`() {
     doTest("di\"", """foo "pa${c}th\\\\" bar""", """foo "$c" bar""")
   }
+
+  @Test
+  fun `test delete around quote on closing quote after line with odd number of quotes`() {
+    doTest("da\"", "\"\"\"\na \"text${c}\"", "\"\"\"\n${c}a")
+  }
 }
