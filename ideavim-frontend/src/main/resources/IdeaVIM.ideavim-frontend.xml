@@ -377,6 +377,7 @@
     <vimExtension implementation="com.maddyhome.idea.vim.extension.matchup.Matchup" name="matchup">
       <aliases>
         <alias name="vim-matchup"/>
+        <alias name="andymass/vim-matchup"/>
         <alias name="https://github.com/andymass/vim-matchup"/>
       </aliases>
     </vimExtension>
