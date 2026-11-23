@@ -54,6 +54,13 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(29)
   }
 
+  @Test
+  fun `test search for unfinished collection matches literal bracket`() {
+    configureByText("${c}foo [bar] baz")
+    enterSearch("[")
+    assertOffset(4)
+  }
+
   // VIM-146
   @Test
   fun `test end of line with highlighting`() {
