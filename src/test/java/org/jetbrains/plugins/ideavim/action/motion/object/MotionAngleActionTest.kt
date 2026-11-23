@@ -317,4 +317,25 @@ class MotionAngleActionTest : VimTestCase() {
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
+
+  @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, description = "Because of some reason the neovim hangs when trying to get the text")
+  fun `test change inner angle bracket does not extend over other generics`() {
+    doTest(
+      "ci<",
+      """
+        |impl<'a> WriteBinary for Range<SID,$c u16> {
+        |    fn write<C: WriteContext>(ctxt: &mut C, range: Self) -> Result<(), WriteError> {
+        |    }
+        |}
+      """.trimMargin(),
+      """
+        |impl<'a> WriteBinary for Range<$c> {
+        |    fn write<C: WriteContext>(ctxt: &mut C, range: Self) -> Result<(), WriteError> {
+        |    }
+        |}
+      """.trimMargin(),
+      Mode.INSERT,
+    )
+  }
 }
