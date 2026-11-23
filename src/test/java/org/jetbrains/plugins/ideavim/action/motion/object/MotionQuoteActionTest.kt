@@ -379,4 +379,9 @@ class MotionQuoteActionTest : VimTestCase() {
   fun `test inner quote without a count does not include the quotes`() {
     doTest("di\"", "foo \"b${c}ar\" baz", "foo \"${c}\" baz")
   }
+
+  @Test
+  fun `test delete inner quote when line ends with escaped backslashes`() {
+    doTest("di\"", """foo "pa${c}th\\\\" bar""", """foo "$c" bar""")
+  }
 }
