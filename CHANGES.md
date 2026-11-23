@@ -33,9 +33,12 @@ usual beta standards.
 
 * Fixed `p` sometimes pasting nothing from the `+` register on X11 for text copied in another application, so that only a second `p` worked
 * Fixed text yanked blockwise with `"+y` being pasted characterwise on systems without a PRIMARY selection
-* [VIM-4259](https://youtrack.jetbrains.com/issue/VIM-4259) Fixed `p` with `clipboard=ideaput` pasting the system clipboard instead of the register in remote development on 2026.3
 * [VIM-4375](https://youtrack.jetbrains.com/issue/VIM-4375) Fixed the mode widget painting an opaque rectangle over the status bar when a terminal or agent tab is selected in the editor area
 * Fixed mappings being applied to the character inserted with [`CTRL-V`](https://vimhelp.org/insert.txt.html#i_CTRL-V) or [`CTRL-K`](https://vimhelp.org/insert.txt.html#i_CTRL-K) in Insert mode. With `inoremap a b`, typing `<C-V>a` now inserts `a`
+* [VIM-4332](https://youtrack.jetbrains.com/issue/VIM-4332) Fixed the command line and its output panel showing dark text on a dark background when a light editor colour scheme is used with a dark IDE theme. The background now comes from the editor colour scheme, like the text
+* [VIM-2608](https://youtrack.jetbrains.com/issue/VIM-2608) Fixed Visual block insert and change, such as `<C-V>jjcX<Esc>`, putting the text one character too early on the other lines when they start with tabs or contain collapsed folds
+* [VIM-2609](https://youtrack.jetbrains.com/issue/VIM-2609) Fixed `>` and `<` adding stray spaces after the tabs of the indent when the editor tab size differs from the code style tab size, e.g. in language injections or with detected indents
+* [VIM-2742](https://youtrack.jetbrains.com/issue/VIM-2742) Fixed `ds(`, `ds[`, `ds{` and `ds<` in the `surround` extension leaving the spaces inside the brackets. As in vim-surround, `ds(` turns `foo( a )` into `fooa`, while `ds)` keeps the spaces
 
 ### Merged PRs:
 * [2166](https://github.com/JetBrains/ideavim/pull/2166) by [1grzyb1](https://github.com/1grzyb1): VIM-4351 support C-O jump list in diff view
@@ -57,6 +60,21 @@ usual beta standards.
 * [2199](https://github.com/JetBrains/ideavim/pull/2199) by [1grzyb1](https://github.com/1grzyb1): VIM-4379 Do not scan all keys on every keystroke
 * [2200](https://github.com/JetBrains/ideavim/pull/2200) by [1grzyb1](https://github.com/1grzyb1): VIM-4370 Don't wait for the backend before the first command in a document
 * [2184](https://github.com/JetBrains/ideavim/pull/2184) by [pppobear](https://github.com/pppobear): Fix(VIM-4375): Avoid opaque background for empty mode widget
+* [2202](https://github.com/JetBrains/ideavim/pull/2202) by [1grzyb1](https://github.com/1grzyb1): VIM-2363 Add lion extension
+* [2205](https://github.com/JetBrains/ideavim/pull/2205) by [1grzyb1](https://github.com/1grzyb1): VIM-4332 Take command line background from the editor colour scheme
+* [2209](https://github.com/JetBrains/ideavim/pull/2209) by [1grzyb1](https://github.com/1grzyb1): VIM-2726 Add textobj-quote extension
+* [2211](https://github.com/JetBrains/ideavim/pull/2211) by [1grzyb1](https://github.com/1grzyb1): VIM-2608 Place block insert replay at buffer columns
+* [2215](https://github.com/JetBrains/ideavim/pull/2215) by [1grzyb1](https://github.com/1grzyb1): VIM-2609 Measure line indent with the code style tab size when shifting
+* [2216](https://github.com/JetBrains/ideavim/pull/2216) by [1grzyb1](https://github.com/1grzyb1): VIM-2742 Trim inner spaces when deleting surround with an opening bracket
+
+## 2.49.1, 2026-11-20
+
+### Fixes:
+
+* [VIM-4259](https://youtrack.jetbrains.com/issue/VIM-4259) Fixed `p` with `clipboard=ideaput` pasting the system clipboard instead of the register in remote development on 2026.3
+
+### Merged PRs:
+* [2214](https://github.com/JetBrains/ideavim/pull/2214) by [1grzyb1](https://github.com/1grzyb1): VIM-4259 Put the clipboard back after the backend paste in split mode
 
 ## 2.49.0, 2026-11-18
 
