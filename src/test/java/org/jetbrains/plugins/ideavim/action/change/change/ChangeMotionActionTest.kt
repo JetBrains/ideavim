@@ -486,4 +486,19 @@ class ChangeMotionActionTest : VimTestCase() {
       enterCommand("set noideaoldundo")
     }
   }
+
+  @Test
+  fun `test change to last line keeps caret on the changed line`() {
+    doTest(
+      "2ggcG",
+      """
+        |Line First
+        |Line Second
+        |Line Third
+        |Rest of the file
+      """.trimMargin(),
+      "Line First\n$c",
+      Mode.INSERT,
+    )
+  }
 }
