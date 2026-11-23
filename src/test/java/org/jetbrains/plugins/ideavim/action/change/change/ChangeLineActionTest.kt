@@ -305,4 +305,14 @@ class ChangeLineActionTest : VimTestCase() {
       """.trimIndent(),
     )
   }
+
+  @Test
+  fun `test S on first of several empty lines`() {
+    doTest(
+      "S",
+      "$c\n\n\n",
+      "$c\n\n\n",
+      Mode.INSERT,
+    )
+  }
 }
