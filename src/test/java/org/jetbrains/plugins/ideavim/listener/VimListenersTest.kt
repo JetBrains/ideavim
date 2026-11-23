@@ -10,6 +10,9 @@ package org.jetbrains.plugins.ideavim.listener
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ComponentManagerEx
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.EditorFactory
+import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
@@ -19,6 +22,8 @@ import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.replaceService
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.helper.vimInitialised
+import com.maddyhome.idea.vim.key.IdeaVimDisablerExtensionPoint
 import com.maddyhome.idea.vim.listener.VimListenerTestObject
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.AfterEach
@@ -26,6 +31,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 class VimListenersTest : VimTestCase() {
   @BeforeEach
@@ -98,5 +104,27 @@ class VimListenersTest : VimTestCase() {
     } finally {
       VimPlugin.setEnabled(true)
     }
+  }
+
+  @Test
+  fun `releasing an editor that became supported after it was created`() {
+    configureByText("XYZ")
+
+    var disabled = true
+    val disabler = object : IdeaVimDisablerExtensionPoint {
+      override fun isDisabledForEditor(editor: Editor) = disabled
+    }
+    ExtensionPointName.create<IdeaVimDisablerExtensionPoint>("IdeaVIM.internal.disabler").point
+      .registerExtension(disabler, fixture.testRootDisposable)
+
+    ApplicationManager.getApplication().invokeAndWait {
+      val editor = EditorFactory.getInstance().createEditor(fixture.editor.document, fixture.project)
+      assertFalse(editor.vimInitialised)
+
+      disabled = false
+      EditorFactory.getInstance().releaseEditor(editor)
+    }
+
+    assertEquals(0, VimListenerTestObject.disposedCounter)
   }
 }
