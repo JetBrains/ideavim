@@ -190,4 +190,25 @@ class MatchupPercentTest : VimTestCase() {
       fileName = "ruby.rb",
     )
   }
+
+  @Test
+  fun `test match beyond the stopline is not found`() {
+    configureByText("")
+    executeVimscript("let g:matchup_delim_stopline = 2")
+    doTest("%", "${c}if x\n  a\n  b\n  c\nend", "${c}if x\n  a\n  b\n  c\nend", fileName = "test.rb")
+  }
+
+  @Test
+  fun `test match within the stopline is found`() {
+    configureByText("")
+    executeVimscript("let g:matchup_delim_stopline = 4")
+    doTest("%", "${c}if x\n  a\n  b\n  c\nend", "if x\n  a\n  b\n  c\nen${c}d", fileName = "test.rb")
+  }
+
+  @Test
+  fun `test match back beyond the stopline is not found`() {
+    configureByText("")
+    executeVimscript("let g:matchup_delim_stopline = 2")
+    doTest("%", "if x\n  a\n  b\n  c\n${c}end", "if x\n  a\n  b\n  c\n${c}end", fileName = "test.rb")
+  }
 }
