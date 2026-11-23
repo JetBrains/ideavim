@@ -86,17 +86,16 @@ private fun changeCharacter(editor: VimEditor, caret: VimCaret, count: Int, ch: 
     // Vim leaves the caret on the last replaced character, see `:h r`. With a count of one this is
     // a no-op, as the caret is already positioned on the replaced character.
     caret.moveToInlayAwareOffset(offset + count - 1)
+    return true
   }
 
   // Indent new line if we replaced with a newline
-  if (ch == '\n') {
-    injector.changeGroup.insertText(editor, caret, offset + 1, space!!)
-    var slen = space.length
-    if (slen == 0) {
-      slen++
-    }
-    caret.moveToInlayAwareOffset(offset + slen)
+  injector.changeGroup.insertText(editor, caret, offset + 1, space!!)
+  var slen = space.length
+  if (slen == 0) {
+    slen++
   }
+  caret.moveToInlayAwareOffset(offset + slen)
   return true
 }
 
