@@ -374,4 +374,9 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
     typeText(injector.parser.parseKeys("vi("))
     assertSelection("\${vars.joinToString(\", \")}")
   }
+
+  @Test
+  fun `test change inner paren with caret on closing paren of empty parens`() {
+    doTest("ci)foo<Esc>", "(${c})", "(fo${c}o)")
+  }
 }
