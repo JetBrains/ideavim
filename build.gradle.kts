@@ -71,6 +71,10 @@ val ideaBranchNumber = ideaVersion.substringBefore('-').split('.').let { parts -
 // com.intellij.ide.bookmark.* left lib/app.jar for a bundled plugin in 2026.2; older
 // product-info.json files list neither the plugin id nor the module, which fails resolution.
 val bookmarksIsSeparatePlugin = ideaBranchNumber >= 262
+
+// In 2026.3 XML, VCS and the local process service moved from the core to bundled plugins, and the bookmarks
+// plugin was renamed to com.intellij.bookmarks, keeping the old id only as an alias
+val isAtLeast263 = ideaBranchNumber >= 263
 val ideaType: String by project
 val instrumentPluginCode: String by project
 val remoteRobotVersion: String by project
@@ -129,6 +133,11 @@ dependencies {
     testBundledModule("intellij.platform.vcs.impl.shared")
     // TerminalNavDispatcherTest runs the terminal's own key dispatcher
     testBundledPlugin("org.jetbrains.plugins.terminal")
+    if (isAtLeast263) {
+      testBundledPlugins("com.intellij.xml", "com.intellij.platform.vcs")
+      testBundledModule("intellij.platform.vcs")
+      testBundledModule("intellij.platform.vcs.core")
+    }
 
     pluginComposedModule(runtimeOnly(project(":ideavim-common")))
     pluginModule(runtimeOnly(project(":ideavim-frontend")))
@@ -147,6 +156,9 @@ dependencies {
     pluginModule(runtimeOnly(project(":ideavim-rpc")))
 
     bundledModule("intellij.spellchecker")
+    // Not on older versions, where its classes are in the core: its dependencies would go first on the test classpath
+    // and shadow the libraries of the core
+    if (isAtLeast263) bundledModule("intellij.platform.rpc.topics")
     if (bookmarksIsSeparatePlugin) bundledPlugin("intellij.bookmarks.plugin")
   }
 
@@ -235,7 +247,11 @@ tasks {
         "com.intellij",
         "IdeaVIM",
         "AceJump",
-        "intellij.bookmarks.plugin".takeIf { bookmarksIsSeparatePlugin },
+        "intellij.bookmarks.plugin".takeIf { bookmarksIsSeparatePlugin && !isAtLeast263 },
+        "com.intellij.bookmarks".takeIf { isAtLeast263 },
+        "com.intellij.xml".takeIf { isAtLeast263 },
+        "com.intellij.platform.vcs".takeIf { isAtLeast263 },
+        "com.intellij.modules.pty4j".takeIf { isAtLeast263 },
       ).joinToString(","),
     )
 

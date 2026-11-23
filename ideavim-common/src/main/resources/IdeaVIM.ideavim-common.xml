@@ -8,6 +8,9 @@
 
 <idea-plugin>
   <!-- Shared code loaded in ALL product modes (monolith, client, backend). -->
+  <dependencies>
+    <module name="intellij.platform.rpc.topics"/>
+  </dependencies>
 
   <!-- No dependency on intellij.platform.rpc here: it doesn't exist in 2025.3, and an unresolved dependency of this
        embedded module disables the whole plugin. IdeaVIM.ideavim-rpc (optional) carries it instead. -->

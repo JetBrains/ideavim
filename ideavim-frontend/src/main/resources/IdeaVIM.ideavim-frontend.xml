@@ -9,6 +9,7 @@
 <idea-plugin>
   <dependencies>
     <module name="intellij.platform.frontend"/>
+    <module name="intellij.platform.rpc.topics"/>
     <module name="IdeaVIM.ideavim-common"/>
   </dependencies>
 
