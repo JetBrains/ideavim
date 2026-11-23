@@ -434,4 +434,11 @@ $c("("")")
       """.trimIndent()
     )
   }
+
+  @Test
+  fun `test percent match nested parens in regex text`() {
+    configureByText("""('^abc/${c}(?P<user_id>\d+)/$',)""")
+    typeText("%")
+    assertState("""('^abc/(?P<user_id>\d+$c)/$',)""")
+  }
 }
