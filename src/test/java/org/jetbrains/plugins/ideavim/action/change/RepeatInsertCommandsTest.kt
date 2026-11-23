@@ -164,4 +164,72 @@ class RepeatInsertCommandsTest : VimTestCase() {
       """.trimIndent(),
     )
   }
+
+  @Test
+  fun `test repeat insert at previous insert position started by a mapping`() {
+    // A change made through a mapping is repeated by running the mapping again, but that must not bring back the `gi`
+    // it runs: the repeat is still an insert at the caret (:help gi). Verified against Vim 9.1.
+    doTest(
+      ":nmap \\d gi<CR>" + "iX<Esc>" + "j0" + "\\dY<Esc>" + "j0" + ".",
+      """
+        Lorem ${c}ipsum dolor
+        sit amet consectetur
+      """.trimIndent(),
+      """
+        Lorem XYipsum dolor
+        ${c}Ysit amet consectetur
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun `test repeat insert at previous insert position started by a mapping keeps the count typed before the mapping`() {
+    // Verified against Vim 9.1: `2\dY<Esc>` inserts `YY` at the previous insert position, and `.` inserts `YY` at
+    // the caret
+    doTest(
+      ":nmap \\d gi<CR>" + "iX<Esc>" + "j0" + "2\\dY<Esc>" + "j0" + ".",
+      """
+        Lorem ${c}ipsum dolor
+        sit amet consectetur
+      """.trimIndent(),
+      """
+        Lorem XYYipsum dolor
+        Y${c}Ysit amet consectetur
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun `test repeat insert at previous insert position started by a mapping keeps the count of the mapping`() {
+    // The count is part of the mapping: so far, only running the mapping again applied it. Verified against Vim 9.1:
+    // the repeat inserts `ZZ` at the caret
+    doTest(
+      ":nmap xy 2gi<CR>" + "iX<Esc>" + "j0" + "xyZ<Esc>" + "j0" + ".",
+      """
+        Lorem ${c}ipsum dolor
+        sit amet consectetur
+      """.trimIndent(),
+      """
+        Lorem XZZipsum dolor
+        Z${c}Zsit amet consectetur
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun `test repeat insert at previous insert position typed in front of a mapping that starts with gi`() {
+    // The `y` typed after `gi` is on record before it's known not to start the `gix` mapping, and it's the first
+    // character of the insert. Verified against Vim 9.1
+    doTest(
+      ":nmap gix dd<CR>" + "iQ<Esc>" + "j0" + "giyZ<Esc>" + "j0" + ".",
+      """
+        Lorem ${c}ipsum dolor
+        sit amet consectetur
+      """.trimIndent(),
+      """
+        Lorem QyZipsum dolor
+        y${c}Zsit amet consectetur
+      """.trimIndent(),
+    )
+  }
 }
