@@ -43,7 +43,7 @@ class MatchupLargeFileTest : IdeaVimLargeFileTestBase() {
           openFile(path)
           setup.commands.forEach { typeVim(":$it\n") }
           measure("${setup.name} | ${Path(path).name}", "matchup.${setup.key}.${metricFile(path)}") {
-            movesIn(lines)
+            movesIn(lines, isHtml = path.endsWith(".html"), withPercent = setup.key != "off")
           }
         }
       }
@@ -67,17 +67,22 @@ class MatchupLargeFileTest : IdeaVimLargeFileTestBase() {
     timings.forEach { (op, samples) -> publishMetric("$metric.${OP_KEYS.getValue(op)}", median(samples)) }
   }
 
-  /** The middle of the file, from the start of a block, where the cursor is on its opening word. */
-  private fun movesIn(lines: Int): Map<String, Long> {
+  /**
+   * From the opening word of a block in the middle of the file. Without matchup, `%` doesn't jump between words, so
+   * it isn't measured then.
+   */
+  private fun movesIn(lines: Int, isHtml: Boolean, withPercent: Boolean): Map<String, Long> {
     val fileName = checkNotNull(selectedEditorState()).fileName
     val start = lines / 2 - (lines / 2) % 3
-    typeVim("${start + 1}G0l")
+    typeVim(if (isHtml) "${start + 1}G^l" else "${start + 1}G^")
     check(waitUntil(pollMs = 20) { selectedEditorState()?.caretLine == start }) { "Caret did not move to $start" }
 
     val j = measureNavigation(EditorState(fileName, start + MOVES)) { typeText("j".repeat(MOVES)) }
     val k = measureNavigation(EditorState(fileName, start)) { typeText("k".repeat(MOVES)) }
-    val percent = measureNavigation(EditorState(fileName, start + 2)) { typeText("%%") }
-    return linkedMapOf("${MOVES}j" to j, "${MOVES}k" to k, "%%" to percent)
+    if (!withPercent) return linkedMapOf("${MOVES}j" to j, "${MOVES}k" to k)
+    // From "if" to "else", and from an opening tag to its closing one
+    val percent = measureNavigation(EditorState(fileName, start + if (isHtml) 2 else 1)) { typeText("%") }
+    return linkedMapOf("${MOVES}j" to j, "${MOVES}k" to k, "%" to percent)
   }
 
   private fun minMedianMax(values: List<Long>): String = "${values.min()}/${median(values)}/${values.max()}"
@@ -98,7 +103,7 @@ class MatchupLargeFileTest : IdeaVimLargeFileTestBase() {
       Setup("matchup, surround always", "surround", listOf("let g:matchup_matchparen_hi_surround_always = 1")),
     )
 
-    private val OP_KEYS = mapOf("${MOVES}j" to "down", "${MOVES}k" to "up", "%%" to "percent")
+    private val OP_KEYS = mapOf("${MOVES}j" to "down", "${MOVES}k" to "up", "%" to "percent")
 
     private fun rubyPath(lines: Int) = "src/blocks${lines / 1000}k.rb"
     private fun htmlPath(lines: Int) = "src/blocks${lines / 1000}k.html"
