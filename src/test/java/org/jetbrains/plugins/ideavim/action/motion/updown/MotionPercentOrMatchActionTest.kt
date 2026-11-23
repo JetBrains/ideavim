@@ -407,4 +407,31 @@ $c("("")")
     typeText("%")
     assertState("foo(bar)\n$c")
   }
+
+  @Test
+  fun `test percent match with opening brace in string`() {
+    configureByText(
+      """
+        void test(int flag, char* buf, const size_t buf_size)
+        {
+            if (flag)
+            {
+                snprintf(buf, buf_size, "{");
+            $c}
+        }
+      """.trimIndent()
+    )
+    typeText("%")
+    assertState(
+      """
+        void test(int flag, char* buf, const size_t buf_size)
+        {
+            if (flag)
+            $c{
+                snprintf(buf, buf_size, "{");
+            }
+        }
+      """.trimIndent()
+    )
+  }
 }
