@@ -55,6 +55,9 @@ interface FileRemoteApi : RemoteApi<Unit> {
   suspend fun listFilesForCompletion(pathPrefix: String, projectId: ProjectId?): List<String>
   suspend fun createFile(filename: String, projectId: ProjectId?, content: String?)
 
+  /** @return the path of the new empty scratch file, or null when it could not be created */
+  suspend fun createScratchFile(projectId: ProjectId?): String?
+
   /**
    * Reads a resource bundled with the plugin as UTF-8 text.
    *
