@@ -369,6 +369,17 @@ internal class VimSurroundExtension : VimExtension {
   }
 }
 
+/**
+ * Surrounds [range] like `ys` does once its motion is done, reading the tag or the function name first when [c] asks
+ * for one. The cursor ends up at the start of the range.
+ */
+internal fun surroundRange(caret: VimCaret, context: ExecutionContext, range: TextRange, c: Char) {
+  withSurroundPair(c, caret.editor, context) { pair ->
+    performSurround(pair, range, caret)
+    caret.moveToOffset(range.startOffset)
+  }
+}
+
 private val LOG = logger<VimSurroundExtension>()
 
 private const val REGISTER = '"'

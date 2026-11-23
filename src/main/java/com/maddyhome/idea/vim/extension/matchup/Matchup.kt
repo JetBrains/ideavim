@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.extension.matchup
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.VimExtension
@@ -90,6 +91,9 @@ internal class Matchup : VimExtension {
       HighlightSurroundingHandler(matchParen),
       false
     )
+    putBlockSurround("ds%", isChange = false)
+    putBlockSurround("cs%", isChange = true)
+
     VimExtensionFacade.addCommand("NoMatchParen", MatchParenCommandHandler(matchParen, isEnabled = false))
     VimExtensionFacade.addCommand("DoMatchParen", MatchParenCommandHandler(matchParen, isEnabled = true))
     matchParen.attach()
@@ -98,6 +102,17 @@ internal class Matchup : VimExtension {
   override fun dispose() {
     matchParen.detach()
     super.dispose()
+  }
+
+  /**
+   * The default keys need `g:matchup_surround_enabled`.
+   */
+  private fun putBlockSurround(keys: String, isChange: Boolean) {
+    val plug = injector.parser.parseKeys("<Plug>(matchup-$keys)")
+    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.N, plug, owner, BlockSurroundHandler(isChange), false)
+    val isEnabled = VimPlugin.getVariableService().getGlobalVariableValue("matchup_surround_enabled")
+      ?.toVimNumber()?.booleanValue ?: false
+    if (isEnabled) putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys(keys), owner, plug, true)
   }
 
   private fun putBlockTextObject(keys: String, isInner: Boolean) {
