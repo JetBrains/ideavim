@@ -60,6 +60,12 @@ interface VimFile {
   fun findFile(filename: String, context: ExecutionContext): String? = null
 
   /**
+   * Creates a new empty scratch file, which IdeaVim uses as an unnamed buffer.
+   * Returns its absolute path, or null if it could not be created.
+   */
+  fun createScratchFile(context: ExecutionContext): String? = null
+
+  /**
    * Lists files and directories matching a partial path prefix for command-line completion.
    *
    * @param pathPrefix The partial path typed by the user (may be empty, relative, absolute, or start with ~/)

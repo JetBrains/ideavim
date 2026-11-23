@@ -61,6 +61,10 @@ class IjFileGroup : VimFileBase() {
     return rpc { FileRemoteApi.getInstance().findFile(filename, extractProjectId(context)) }
   }
 
+  override fun createScratchFile(context: ExecutionContext): String? {
+    return rpc { FileRemoteApi.getInstance().createScratchFile(extractProjectId(context)) }
+  }
+
   override fun closeFile(editor: VimEditor, context: ExecutionContext) {
     val project = PlatformDataKeys.PROJECT.getData((context.context as DataContext))
     if (project != null) {

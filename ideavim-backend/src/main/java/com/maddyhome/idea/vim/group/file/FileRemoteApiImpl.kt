@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.group.file
 
+import com.intellij.ide.scratch.ScratchRootType
 import com.intellij.ide.vfs.VirtualFileId
 import com.intellij.ide.vfs.virtualFile
 import com.intellij.openapi.application.ApplicationManager
@@ -18,6 +19,7 @@ import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.impl.EditorId
 import com.intellij.openapi.editor.impl.findEditorOrNull
+import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
@@ -215,6 +217,11 @@ internal class FileRemoteApiImpl : FileRemoteApi {
         content?.toByteArray()?.let { file?.setBinaryContent(it) }
       }
     }
+  }
+
+  override suspend fun createScratchFile(projectId: ProjectId?): String? = onEdt {
+    val project = projectId?.findProjectOrNull() ?: return@onEdt null
+    ScratchRootType.getInstance().createScratchFile(project, "scratch.txt", PlainTextLanguage.INSTANCE, "")?.path
   }
 
   override suspend fun readResource(resource: String): String? = javaClass.classLoader
