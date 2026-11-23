@@ -1681,4 +1681,18 @@ class SubstituteCommandTest : VimTestCase() {
     enterCommand("%s/^  //g")
     assertState("a  b\nc  d\n${c}e  f\n")
   }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test visual line substitute with g flag does not touch the following line`() {
+    configureByText(
+      "\t\t\t${c}makeProperty(\"age\", { b, v -> (b as? Ageable)?.age = v }),\n" +
+        "\t\t\tmakeProperty(\"age\", { b, v -> (b as? Ageable)?.age = v }),\n",
+    )
+    typeText("V", ":'<,'>s/age/a/g<Enter>")
+    assertState(
+      "\t\t\t${c}makeProperty(\"a\", { b, v -> (b as? Ageable)?.a = v }),\n" +
+        "\t\t\tmakeProperty(\"age\", { b, v -> (b as? Ageable)?.age = v }),\n",
+    )
+  }
 }
