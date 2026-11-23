@@ -480,4 +480,22 @@ class RepeatChangeActionTest : VimTestCase() {
           """.trimIndent()
     doTest(keys, before, after, Mode.NORMAL())
   }
+
+  @Test
+  fun `test repeat change to end of line on following lines`() {
+    doTest(
+      listOf("c$.Dispose();<Esc>", "j0f=", ".", "j0f=", "."),
+      """
+        |  interpolationOutputPoses ${c}= new NativeArray<JiggleTransform>(list.ToArray(), Allocator.Persistent);
+        |  simulationOutputRootPositions = new NativeArray<float3>(list.ToArray(), Allocator.Persistent);
+        |  interpolationCurrentRootPositions = new NativeArray<float3>(list.ToArray(), Allocator.Persistent);
+      """.trimMargin(),
+      """
+        |  interpolationOutputPoses .Dispose();
+        |  simulationOutputRootPositions .Dispose();
+        |  interpolationCurrentRootPositions .Dispose()${c};
+      """.trimMargin(),
+      Mode.NORMAL(),
+    )
+  }
 }
