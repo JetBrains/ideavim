@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.action.change
 
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.action.change.insert.InsertAtPreviousInsertAction
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -26,7 +27,7 @@ import javax.swing.KeyStroke
  * renames for us (VIM-1153). Replaying the keys asks the IDE to do its part again where the repeat is happening.
  *
  * Only unmapped keys are recorded, the same keys a macro records, so a change made through a mapping is repeated by
- * running the mapping again.
+ * running the mapping again - except for a `gi` insert, which is repeated as the `i` insert it behaves like.
  */
 object VimRedoBuffer {
   private var lastChange: RecordedChange? = null
@@ -199,7 +200,9 @@ private class Recording {
   private var hasChange = false
   private var changeRegister: Char? = null
   private var changeCount = 0
-  private var changeStartsWithGi = false
+
+  /** True once the keys of the change's command were replaced - see [replaceCommandKeys]. */
+  private var areCommandKeysReplaced = false
 
   private var isVisual = false
 
@@ -244,8 +247,23 @@ private class Recording {
     changeRegister = command.register
     changeCount = command.rawCount
     changeStart = commandStart
-    changeStartsWithGi = command.action is InsertAtPreviousInsertAction
+    // Repeating a `gi` insert behaves like repeating an `i` insert: the text goes at the current caret position, not
+    // back at the previous insert position (`:help gi`). So the keys that ran it are replayed as an `i` instead,
+    // whether it was typed or a mapping ran it
+    if (command.action is InsertAtPreviousInsertAction && isCommandOnRecord) {
+      replaceCommandKeys(KeyStroke.getKeyStroke('i'))
+    }
   }
+
+  /**
+   * Whether what ran the command being entered is on record, to be replayed in its place when the change is repeated.
+   *
+   * It isn't while a macro is playing: the keys a macro plays are never recorded, so what is on record is the `@r`
+   * that started it, and running the macro again is how `.` repeats a change made by one. Nor while the mapping that
+   * ran the command still has keys to play: those won't be recorded either, so only the mapping can repeat them.
+   */
+  private val isCommandOnRecord: Boolean
+    get() = !injector.macro.isExecutingMacro && KeyHandler.getInstance().keyStack.isEmpty()
 
   fun isChangeFinishedIn(mode: Mode) = hasChange && !mode.isInsertSession()
 
@@ -267,27 +285,36 @@ private class Recording {
     check(hasChange) { "No change to record" }
     if (isVisual) return visualChange()
     // Only a prefix that was really typed is rendered again. A change made through a mapping carries the mapping's
-    // count on its command but not in the recorded keys, and rendering it would apply it twice
+    // count on its command but not in the recorded keys, and rendering it would apply it twice - unless the keys of
+    // the mapping were replaced, as nothing applies that count then
     val prefixIndices = countIndices + registerIndices
     return RecordedChange(
-      keys = keys.filterIndexed { index, _ -> index !in prefixIndices }.replayGiAsInsert(),
+      keys = keys.filterIndexed { index, _ -> index !in prefixIndices },
       register = changeRegister.takeIf { registerIndices.isNotEmpty() },
-      count = if (countIndices.isEmpty()) 0 else changeCount,
+      count = if (countIndices.isEmpty() && !areCommandKeysReplaced) 0 else changeCount,
       isVisual = false,
     )
   }
 
   /**
-   * Repeating a `gi` insert behaves like repeating an `i` insert: the text goes at the current caret position, not
-   * back at the previous insert position (`:help gi`). Vim's redo machinery replays the insert itself, so the `gi`
-   * that started it is effectively replaced by `i` - we do the same by rewriting the recorded keys.
+   * Replaces the keys on record for the command being entered with [newKeys], for `.` to replay these instead.
+   *
+   * The `["x][count]` typed in front of the command is left alone: it is rendered rather than replayed, see
+   * [toChange]. A count that came with the replaced keys - one given by a mapping - is rendered from then on as well.
    */
-  private fun List<KeyStroke>.replayGiAsInsert(): List<KeyStroke> =
-    if (changeStartsWithGi && take(2) == injector.parser.stringToKeys("gi")) {
-      listOf(KeyStroke.getKeyStroke('i')) + drop(2)
-    } else {
-      this
-    }
+  private fun replaceCommandKeys(vararg newKeys: KeyStroke) {
+    val prefixIndices = countIndices + registerIndices
+    val commandKeysStart = (commandStart until keys.size).firstOrNull { it !in prefixIndices } ?: keys.size
+    // A typed `gi` takes two keys. More can be on record after it: what was typed next, to tell whether it starts a
+    // mapping, is replayed as the first text of the insert once the mapping is given up
+    val isTypedGi = keys.subList(commandKeysStart, minOf(commandKeysStart + 2, keys.size)) == keysOf("gi")
+    val commandKeysEnd = if (isTypedGi) commandKeysStart + 2 else keys.size
+    val typedAfterGi = keys.subList(commandKeysEnd, keys.size).toList()
+    keys.subList(commandKeysStart, keys.size).clear()
+    newKeys.forEach { add(it) }
+    typedAfterGi.forEach { add(it) }
+    areCommandKeysReplaced = true
+  }
 
   /**
    * The operator alone, replayed after `1v` to reselect an area of the same size (`:help v_1v`, Vim's
