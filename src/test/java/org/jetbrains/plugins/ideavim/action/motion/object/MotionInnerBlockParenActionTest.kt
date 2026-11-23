@@ -367,4 +367,11 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
+
+  @Test
+  fun `test inner paren selects interpolated expression in string template`() {
+    configureByText("d(\$vfn) / d(\${vars.join${c}ToString(\", \")})")
+    typeText(injector.parser.parseKeys("vi("))
+    assertSelection("\${vars.joinToString(\", \")}")
+  }
 }
