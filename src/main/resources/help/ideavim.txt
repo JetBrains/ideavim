@@ -1817,6 +1817,9 @@ zf                      Create a closed fold over the Visual selection.
 :ec[ho]                 Evaluate each {expr} and display the results separated
                         by spaces.
 
+                                                                *:ene* *:enew*
+:ene[w]                 Open a new scratch file in the current editor window.
+
                                                              *:exe* *:execute*
 :exe[cute]              Evaluate each {expr} and execute the resulting string
                         as an Ex command. Multiple arguments are joined with a
@@ -1923,6 +1926,11 @@ zf                      Create a closed fold over the Visual selection.
 
                                                    *:n* *:next* *:bn* *:bnext*
 :n[ext] :bn[ext]        Go to the [count]th next editor tab.
+
+                                                                        *:new*
+:new                    Split the current editor window horizontally and open
+                        a new scratch file in the new split. With [file], open
+                        it instead.
 
                                                           *:noh* *:nohlsearch*
 :noh[lsearch]           Stop highlighting matches of the last search pattern
@@ -2108,6 +2116,11 @@ zf                      Create a closed fold over the Visual selection.
                                                            *:vert* *:vertical*
 :vert[ical]             Run :resize {cmd} on the window width instead of its
                         height, e.g. :vertical resize +5.
+
+                                                                *:vne* *:vnew*
+:vne[w]                 Split the current editor window vertically and open a
+                        new scratch file in the new split. With [file], open
+                        it instead.
 
                                                                  *:w* *:write*
 :w[rite]                Save the current file. With {file}, write [range]
