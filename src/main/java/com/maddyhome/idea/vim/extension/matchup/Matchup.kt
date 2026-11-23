@@ -20,6 +20,7 @@ import java.util.EnumSet
  * Port of matchup.vim (https://github.com/chrisbra/matchit)
  */
 internal class Matchup : VimExtension {
+  private val matchParen = MatchParen()
 
   override fun getName(): String = "matchup"
 
@@ -81,6 +82,22 @@ internal class Matchup : VimExtension {
 
     putBlockTextObject("i%", isInner = true)
     putBlockTextObject("a%", isInner = false)
+
+    VimExtensionFacade.putExtensionHandlerMapping(
+      MappingMode.N,
+      injector.parser.parseKeys("<Plug>(matchup-hi-surround)"),
+      owner,
+      HighlightSurroundingHandler(matchParen),
+      false
+    )
+    VimExtensionFacade.addCommand("NoMatchParen", MatchParenCommandHandler(matchParen, isEnabled = false))
+    VimExtensionFacade.addCommand("DoMatchParen", MatchParenCommandHandler(matchParen, isEnabled = true))
+    matchParen.attach()
+  }
+
+  override fun dispose() {
+    matchParen.detach()
+    super.dispose()
   }
 
   private fun putBlockTextObject(keys: String, isInner: Boolean) {
