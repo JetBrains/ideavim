@@ -551,4 +551,12 @@ class MacroActionTest : VimTestCase() {
     typeText("qa", "i<Tab><Tab>aaaa<Esc>", "q")
     assertRegister('a', "i^I^Iaaaa^[")
   }
+
+  @Test
+  fun `test macro stops when searched pattern is not found`() {
+    configureByText("${c}lorem ipsum dolor")
+    enterCommand("""let @a = "/zzz\<CR>daw"""")
+    typeText("@a")
+    assertState("${c}lorem ipsum dolor")
+  }
 }
