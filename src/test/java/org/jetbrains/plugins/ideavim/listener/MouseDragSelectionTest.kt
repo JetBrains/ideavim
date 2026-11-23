@@ -226,6 +226,25 @@ class MouseDragSelectionTest : VimTestCase() {
     assertSelection("consec")
   }
 
+  @Test
+  fun `mouse=a -- drag after a drag that was never released enters Visual mode`() {
+    configureByText(TEXT)
+    enterCommand("set mouse=a")
+
+    // The release never arrives when the editor is closed or switched while the button is held
+    ApplicationManager.getApplication().invokeAndWait {
+      EditorMouseFixture(fixture.editor as EditorImpl)
+        .pressAt(0, 0)
+        .dragTo(0, 3)
+        .dragTo(0, 5)
+    }
+
+    dragOverSecondLine()
+
+    assertSelection("consec")
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+  }
+
   private fun dragOverSecondLine() {
     ApplicationManager.getApplication().invokeAndWait {
       EditorMouseFixture(fixture.editor as EditorImpl)
