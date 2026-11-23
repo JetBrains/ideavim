@@ -1673,4 +1673,12 @@ class SubstituteCommandTest : VimTestCase() {
         ")\n",
     )
   }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test g flag removes only leading spaces anchored to line start`() {
+    configureByText("${c}  a  b\n  c  d\n  e  f\n")
+    enterCommand("%s/^  //g")
+    assertState("a  b\nc  d\n${c}e  f\n")
+  }
 }
