@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.extension.matchit
 
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
@@ -984,12 +985,17 @@ private const val BLOCK_SEARCH_LINES = 1500
  * The blocks containing [offset], innermost first. Brackets from 'matchpairs' are blocks too, so are the language's
  * opening and closing words, while middle words such as "else" are ignored.
  */
-internal fun findSurroundingBlocks(editor: Editor, offset: Int): List<Block> {
+internal fun findSurroundingBlocks(
+  editor: Editor,
+  offset: Int,
+  searchLines: Int = BLOCK_SEARCH_LINES,
+  patterns: List<BlockPatterns> = blockPatterns(editor),
+): List<Block> {
   val vimEditor = editor.vim
   val skipContext = SkipContext(editor, offset)
-  val searchStart = blockSearchStart(vimEditor, offset)
-  val searchEnd = blockSearchEnd(vimEditor, offset)
-  return blockPatterns(editor)
+  val searchStart = blockSearchStart(vimEditor, offset, searchLines)
+  val searchEnd = blockSearchEnd(vimEditor, offset, searchLines)
+  return patterns
     .flatMap { findBlocks(vimEditor, it, searchStart, searchEnd, skipContext) }
     .filter { it.opening.startOffset <= offset && offset < it.closing.endOffset }
     .sortedWith(compareByDescending<Block> { it.opening.startOffset }.thenBy { it.closing.endOffset })
@@ -1053,10 +1059,46 @@ internal fun findPreviousOpeningDelimiter(editor: Editor, offset: Int, caretOffs
   return null
 }
 
-private fun blockPatterns(editor: Editor): List<BlockPatterns> {
+internal fun blockPatterns(editor: Editor): List<BlockPatterns> = wordBlockPatterns(editor) + matchPairBlocks(editor.vim)
+
+/**
+ * The blocks of the language's words and of `b:match_words`, without the brackets of 'matchpairs'.
+ */
+internal fun wordBlockPatterns(editor: Editor): List<BlockPatterns> {
   val virtualFile = EditorHelper.getVirtualFile(editor)
-  val languageBlocks = FileTypePatterns.getMatchupPatterns(virtualFile, editor.vim)?.blocks.orEmpty()
-  return languageBlocks + matchPairBlocks(editor.vim)
+  return FileTypePatterns.getMatchupPatterns(virtualFile, editor.vim)?.blocks.orEmpty()
+}
+
+/**
+ * The delimiter the cursor at [offset] is on, with the block it belongs to, or a null block when it belongs to none
+ * within [searchLines] lines of the cursor. The smallest delimiter wins when several contain the cursor.
+ */
+internal fun findDelimiterAt(
+  editor: Editor,
+  offset: Int,
+  patterns: List<BlockPatterns>,
+  searchLines: Int,
+): Pair<Delimiter, Block?>? {
+  val vimEditor = editor.vim
+  val lineStart = vimEditor.getLineStartForOffset(offset)
+  val lineEnd = vimEditor.getLineEndForOffset(offset)
+  val (delimiter, blockPatterns) = patterns
+    .flatMap { blockPatterns ->
+      listOfNotNull(blockPatterns.openingPattern, blockPatterns.middlePattern, blockPatterns.closingPattern)
+        .flatMap { findMatches(vimEditor, it, lineStart, lineEnd) }
+        .filter { it.range.startOffset <= offset && offset < it.range.endOffset }
+        .map { Delimiter(it.range.startOffset, it.range.endOffset) to blockPatterns }
+    }
+    .minByOrNull { (delimiter, _) -> delimiter.endOffset - delimiter.startOffset }
+    ?: return null
+
+  val skipContext = SkipContext(editor, offset)
+  if (skipContext.isSkipped(delimiter.startOffset)) return null
+  val searchStart = blockSearchStart(vimEditor, offset, searchLines)
+  val searchEnd = blockSearchEnd(vimEditor, offset, searchLines)
+  val block = findBlocks(vimEditor, blockPatterns, searchStart, searchEnd, skipContext)
+    .firstOrNull { block -> block.delimiters.any { it.startOffset == delimiter.startOffset } }
+  return delimiter to block
 }
 
 private fun matchPairBlocks(editor: VimEditor): List<BlockPatterns> {
@@ -1067,14 +1109,14 @@ private fun matchPairBlocks(editor: VimEditor): List<BlockPatterns> {
 
 private fun literalPattern(char: Char): String = if (char == '\\') """\V\\""" else """\V$char"""
 
-private fun blockSearchStart(editor: VimEditor, offset: Int): Int {
+private fun blockSearchStart(editor: VimEditor, offset: Int, searchLines: Int): Int {
   val line = editor.offsetToBufferPosition(offset).line
-  return editor.getLineStartOffset(max(0, line - BLOCK_SEARCH_LINES))
+  return editor.getLineStartOffset(max(0, line - searchLines))
 }
 
-private fun blockSearchEnd(editor: VimEditor, offset: Int): Int {
+private fun blockSearchEnd(editor: VimEditor, offset: Int, searchLines: Int): Int {
   val line = editor.offsetToBufferPosition(offset).line
-  return editor.getLineEndOffset(min(editor.lineCount() - 1, line + BLOCK_SEARCH_LINES))
+  return editor.getLineEndOffset(min(editor.lineCount() - 1, line + searchLines))
 }
 
 /**
@@ -1099,6 +1141,7 @@ private fun findBlocks(
   val openings = mutableListOf<OpenBlock>()
   val blocks = mutableListOf<Block>()
   for (match in matches) {
+    ProgressManager.checkCanceled()
     val delimiter = Delimiter(match.startOffset, match.endOffset)
     if (!match.isOpening && !match.isClosing) {
       openings.lastOrNull()?.middles?.add(delimiter)
