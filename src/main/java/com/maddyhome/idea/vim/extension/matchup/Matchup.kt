@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.extension.matchit.MatchHandler
 import java.util.EnumSet
 
 /**
- * Port of matchup.vim (https://github.com/chrisbra/matchit)
+ * Port of vim-matchup (https://github.com/andymass/vim-matchup)
  */
 internal class Matchup : VimExtension {
   private val matchParen = MatchParen()
@@ -26,49 +26,8 @@ internal class Matchup : VimExtension {
   override fun getName(): String = "matchup"
 
   override fun init() {
-    VimExtensionFacade.putExtensionHandlerMapping(
-      MappingMode.NXO,
-      injector.parser.parseKeys("<Plug>(MatchupMotion)"),
-      owner,
-      MatchHandler(false, isMatchup = true),
-      false
-    )
-    VimExtensionFacade.putExtensionHandlerMapping(
-      MappingMode.NXO,
-      injector.parser.parseKeys("<Plug>(MatchupMotion)"),
-      owner,
-      MatchHandler(false, isMatchup = true),
-      false
-    )
-    putKeyMappingIfMissing(
-      MappingMode.NXO,
-      injector.parser.parseKeys("%"),
-      owner,
-      injector.parser.parseKeys("<Plug>(MatchupMotion)"),
-      true
-    )
-
-    VimExtensionFacade.putExtensionHandlerMapping(
-      MappingMode.NXO,
-      injector.parser.parseKeys("<Plug>(ReverseMatchupMotion)"),
-      owner,
-      MatchHandler(true, isMatchup = true),
-      false
-    )
-    VimExtensionFacade.putExtensionHandlerMapping(
-      MappingMode.NXO,
-      injector.parser.parseKeys("<Plug>(ReverseMatchupMotion)"),
-      owner,
-      MatchHandler(true, isMatchup = true),
-      false
-    )
-    putKeyMappingIfMissing(
-      MappingMode.NXO,
-      injector.parser.parseKeys("g%"),
-      owner,
-      injector.parser.parseKeys("<Plug>(ReverseMatchupMotion)"),
-      true
-    )
+    putMatchMotion("%", reverse = false)
+    putMatchMotion("g%", reverse = true)
 
     putBlockMotion("[%", BlockMotion.START)
     putBlockMotion("]%", BlockMotion.END)
@@ -102,6 +61,14 @@ internal class Matchup : VimExtension {
   override fun dispose() {
     matchParen.detach()
     super.dispose()
+  }
+
+  private fun putMatchMotion(keys: String, reverse: Boolean) {
+    val plug = injector.parser.parseKeys("<Plug>(matchup-$keys)")
+    VimExtensionFacade.putExtensionHandlerMapping(
+      MappingMode.NXO, plug, owner, MatchHandler(reverse, isMatchup = true), false
+    )
+    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys(keys), owner, plug, true)
   }
 
   /**
