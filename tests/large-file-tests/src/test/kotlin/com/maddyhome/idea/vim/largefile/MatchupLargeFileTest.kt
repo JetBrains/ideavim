@@ -15,6 +15,7 @@ import kotlin.io.path.name
 
 /**
  * Measures moving around large files with matchup's match highlighting, compared to the same moves without matchup.
+ * `%` is measured with matchit too, which unlike matchup looks for the match in the whole file.
  *
  * Every line of the files is a word of a block, so every move of the cursor looks for the block it's on. The
  * highlighting runs in the background and shouldn't make moving slower, nor freeze the UI.
@@ -99,7 +100,8 @@ class MatchupLargeFileTest : IdeaVimLargeFileTestBase() {
 
     private val SETUPS = listOf(
       Setup("no matchup", "off", listOf("set nomatchup")),
-      Setup("matchup", "on", listOf("set matchup")),
+      Setup("matchit", "matchit", listOf("set matchit")),
+      Setup("matchup", "on", listOf("set nomatchit", "set matchup")),
       Setup("matchup, surround always", "surround", listOf("let g:matchup_matchparen_hi_surround_always = 1")),
     )
 

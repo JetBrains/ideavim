@@ -67,6 +67,9 @@ class MatchAction : MotionActionHandler.ForEachCaret() {
   /** The count given to the motion, e.g. the 2 of `d2%`, which the handler takes off the command. */
   var count0: Int? = null
 
+  /** How many lines away from the cursor the pair is searched for, or null for the whole file. */
+  var searchLines: Int? = null
+
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override var supportsLinewiseDeletePromotion: Boolean = false
@@ -85,6 +88,7 @@ class MatchAction : MotionActionHandler.ForEachCaret() {
       isInOpPending,
       reverse,
       maxRepeatCount = maxRepeatCount,
+      searchLines = searchLines,
     ).toMotionOrError()
   }
 
@@ -114,6 +118,7 @@ private fun getMatchupOffset(
   reverse: Boolean,
   isCursorAtEnd: Boolean = false,
   maxRepeatCount: Int? = null,
+  searchLines: Int? = null,
 ): Int {
   if (isPercentJump(count0, reverse, maxRepeatCount)) {
     return VimPlugin.getMotion().moveCaretToLinePercent(editor.vim, caret.vim, count0)
@@ -121,7 +126,7 @@ private fun getMatchupOffset(
 
   var offset = caret.offset
   repeat(max(count0, 1)) { jump ->
-    val jumpOffset = findPairOffset(editor, caret.vim, offset, isInOpPending, reverse, isCursorAtEnd)
+    val jumpOffset = findPairOffset(editor, caret.vim, offset, isInOpPending, reverse, isCursorAtEnd, searchLines)
     if (jumpOffset == null || jumpOffset < 0) return if (jump == 0) jumpOffset ?: -1 else offset
     offset = editor.vim.normalizeOffset(jumpOffset, false)
   }
@@ -135,9 +140,10 @@ private fun findPairOffset(
   isInOpPending: Boolean,
   reverse: Boolean,
   isCursorAtEnd: Boolean,
+  searchLines: Int?,
 ): Int? {
   val offsetWithinLine = offsetWithinLine(editor, offset)
-  return findExtendedPairOffset(editor, offsetWithinLine, isInOpPending, reverse, isCursorAtEnd)
+  return findExtendedPairOffset(editor, offsetWithinLine, isInOpPending, reverse, isCursorAtEnd, searchLines)
     ?: getMotionOffset(VimPlugin.getMotion().moveCaretToMatchingPair(editor.vim, CaretAtOffset(caret, offset)))
 }
 
@@ -173,12 +179,14 @@ class MatchHandler(private val reverse: Boolean, private val isMatchup: Boolean 
       if (isMatchup) {
         matchitAction.maxRepeatCount = maxRepeatCount(editor)
         matchitAction.count0 = operatorArguments.count0
+        matchitAction.searchLines = delimStopline(editor)
       }
 
       keyState.commandBuilder.addAction(matchitAction)
     } else {
       val isCursorAtEnd = isMatchup && getGlobalIntVariable(editor, "matchup_motion_cursor_end", 1) != 0
       val maxRepeatCount = if (isMatchup) maxRepeatCount(editor) else null
+      val searchLines = if (isMatchup) delimStopline(editor) else null
       editor.sortedCarets().forEach { caret ->
         injector.jumpService.saveJumpLocation(editor)
         caret.moveToOffset(
@@ -190,11 +198,18 @@ class MatchHandler(private val reverse: Boolean, private val isMatchup: Boolean 
             reverse,
             isCursorAtEnd,
             maxRepeatCount,
+            searchLines,
           )
         )
       }
     }
   }
+
+  /**
+   * `g:matchup_delim_stopline`, how many lines away matchup looks for the matching word.
+   */
+  private fun delimStopline(editor: VimEditor): Int =
+    getGlobalIntVariable(editor, "matchup_delim_stopline", BLOCK_SEARCH_LINES)
 
   /**
    * `g:matchup_motion_override_Npercent`, where 0 always goes to a percentage, and 100 or more never does.
@@ -331,6 +346,8 @@ data class MatchupSearchParams(
   // But if we are in comment, then we only want to match on things in comments. The same goes for quotes.
   val skipComments: Boolean,
   val skipStrings: Boolean,
+  /** How many lines away from the cursor the pair is searched for, or null for the whole file. */
+  val searchLines: Int? = null,
 )
 
 /**
@@ -635,6 +652,7 @@ private fun findExtendedPairOffset(
   isInOpPending: Boolean,
   reverse: Boolean,
   isCursorAtEnd: Boolean,
+  searchLines: Int?,
 ): Int? {
   val virtualFile = EditorHelper.getVirtualFile(editor)
   val patterns = FileTypePatterns.getMatchupPatterns(virtualFile, editor.vim) ?: return null
@@ -649,10 +667,18 @@ private fun findExtendedPairOffset(
       patterns.reversedClosings,
       caretIsOnDefaultPair,
       isCursorAtEnd,
+      searchLines,
     )
   } else {
     findMatchingPair(
-      editor, caretOffset, isInOpPending, patterns.openings, patterns.closings, caretIsOnDefaultPair, isCursorAtEnd
+      editor,
+      caretOffset,
+      isInOpPending,
+      patterns.openings,
+      patterns.closings,
+      caretIsOnDefaultPair,
+      isCursorAtEnd,
+      searchLines,
     )
   }
   return offset.takeIf { it >= 0 }
@@ -673,6 +699,7 @@ fun findMatchingPair(
   closings: PatternsTable,
   onlyMatchesStartingOnCaret: Boolean = false,
   isCursorAtEnd: Boolean = false,
+  searchLines: Int? = null,
 ): Int {
   val vimEditor = editor.vim
   val initialPattern =
@@ -691,6 +718,7 @@ fun findMatchingPair(
     initialPattern.searchPair.second.withBackReference(backReference),
     skipComments = !isComment(initialPsiElement),
     skipStrings = !isQuoted(initialPsiElement),
+    searchLines = searchLines,
   )
 
   val matchingPairOffset = if (initialPattern.direction == Direction.FORWARDS) {
@@ -782,8 +810,10 @@ private fun collectPairMatches(
   val openings = findMatchRanges(editor, openingPattern, startOffset, endOffset)
   val closings = findMatchRanges(editor, closingPattern, startOffset, endOffset)
 
+  val nestedOpenings = openings.nestedIn(closings)
+  val nestedClosings = closings.nestedIn(openings)
   return (openings + closings)
-    .filter { (it in openings && !it.isNestedIn(closings)) || (it in closings && !it.isNestedIn(openings)) }
+    .filter { (it in openings && it !in nestedOpenings) || (it in closings && it !in nestedClosings) }
     .map { PairMatch(it.first, it.second, isOpening = it in openings, isClosing = it in closings) }
     .sortedBy { it.startOffset }
 }
@@ -799,8 +829,40 @@ private fun findMatchRanges(
     .toSet()
 }
 
-private fun Pair<Int, Int>.isNestedIn(ranges: Set<Pair<Int, Int>>): Boolean {
-  return ranges.any { it != this && first >= it.first && second <= it.second }
+/**
+ * The ranges that lie inside another range of [outer], without being the same range.
+ *
+ * Both sets can hold a match of every line of a large file, so instead of comparing each range with every outer one,
+ * a range is looked up among the outer ranges sorted by start: it is nested when one that starts before it ends at or
+ * after its end, or one that starts with it ends after it.
+ */
+private fun Set<Pair<Int, Int>>.nestedIn(outer: Set<Pair<Int, Int>>): Set<Pair<Int, Int>> {
+  if (isEmpty() || outer.isEmpty()) return emptySet()
+  val sortedOuter = outer.sortedBy { it.first }
+  val starts = IntArray(sortedOuter.size) { sortedOuter[it].first }
+  val maxEndUpTo = IntArray(sortedOuter.size)
+  sortedOuter.forEachIndexed { index, range ->
+    maxEndUpTo[index] = if (index == 0) range.second else max(maxEndUpTo[index - 1], range.second)
+  }
+  val maxEndByStart = HashMap<Int, Int>()
+  sortedOuter.forEach { (start, end) -> maxEndByStart.merge(start, end, ::max) }
+
+  return filterTo(HashSet()) { (start, end) ->
+    val firstWithSameStart = starts.lowerBound(start)
+    (firstWithSameStart > 0 && maxEndUpTo[firstWithSameStart - 1] >= end) ||
+      (maxEndByStart[start] ?: Int.MIN_VALUE) > end
+  }
+}
+
+/** The index of the first element that isn't smaller than [value], in a sorted array. */
+private fun IntArray.lowerBound(value: Int): Int {
+  var low = 0
+  var high = size
+  while (low < high) {
+    val middle = (low + high) ushr 1
+    if (this[middle] < value) low = middle + 1 else high = middle
+  }
+  return low
 }
 
 /**
@@ -831,7 +893,8 @@ private fun findClosingPair(
     searchParams.targetOpeningPattern,
     searchParams.targetClosingPattern,
     searchParams.initialPatternEnd,
-    editor.document.textLength,
+    searchParams.searchLines?.let { blockSearchEnd(editor.vim, searchParams.initialPatternEnd, it) }
+      ?: editor.document.textLength,
   )
 
   val unmatchedOpeningPairs: Deque<Int> = ArrayDeque()
@@ -865,7 +928,7 @@ fun findOpeningPair(editor: Editor, searchParams: MatchupSearchParams): Int {
     editor.vim,
     searchParams.targetOpeningPattern,
     searchParams.targetClosingPattern,
-    0,
+    searchParams.searchLines?.let { blockSearchStart(editor.vim, searchParams.initialPatternStart, it) } ?: 0,
     searchParams.initialPatternStart,
   )
 
