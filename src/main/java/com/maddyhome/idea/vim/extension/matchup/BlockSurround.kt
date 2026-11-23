@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.extension.matchup
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.MutableVimEditor
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getMappingInfo
 import com.maddyhome.idea.vim.api.injector
@@ -18,8 +19,9 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.ExtensionHandler
+import com.maddyhome.idea.vim.extension.matchit.Block
 import com.maddyhome.idea.vim.extension.matchit.findSurroundingBlocks
-import com.maddyhome.idea.vim.extension.surround.surroundRange
+import com.maddyhome.idea.vim.extension.surround.surroundAfter
 import com.maddyhome.idea.vim.newapi.ij
 
 /**
@@ -36,10 +38,31 @@ internal class BlockSurroundHandler(private val isChange: Boolean) : ExtensionHa
   override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
     val caret = editor.primaryCaret()
     val block = findSurroundingBlocks(editor.ij, caret.offset).getOrNull(operatorArguments.count1 - 1) ?: return
-    val c = if (isChange) injector.keyGroup.getChar(editor)?.takeUnless { it in CANCEL_CHARS } ?: return else null
-    val isSurround = c != null && isSurroundEnabled()
-    val (left, right) = if (c == null || isSurround) "" to "" else replacementPair(c)
+    if (!isChange) {
+      replaceWords(editor, context, caret, block, "", "")
+      return
+    }
+    val c = injector.keyGroup.getChar(editor)?.takeUnless { it in CANCEL_CHARS } ?: return
+    if (isSurroundEnabled()) {
+      surroundAfter(caret, context, c) { replaceWords(editor, context, caret, block, "", "") }
+    } else {
+      val (left, right) = replacementPair(c)
+      replaceWords(editor, context, caret, block, left, right)
+    }
+  }
 
+  /**
+   * Replaces the opening word of [block] with [left] and the closing one with [right], and returns the range between
+   * them.
+   */
+  private fun replaceWords(
+    editor: VimEditor,
+    context: ExecutionContext,
+    caret: VimCaret,
+    block: Block,
+    left: String,
+    right: String,
+  ): TextRange {
     val opening = block.opening
     val closing = block.closing
     val text = editor.text()
@@ -53,10 +76,9 @@ internal class BlockSurroundHandler(private val isChange: Boolean) : ExtensionHa
     injector.registerGroup.storeText(editor, context, injector.registerGroup.currentRegister, deleted)
 
     val closingStart = closing.startOffset - (opening.endOffset - opening.startOffset) + left.length
-    val inside = TextRange(opening.startOffset, closingStart)
     injector.markService.setChangeMarks(caret, TextRange(opening.startOffset, closingStart + right.length))
     caret.moveToOffset(opening.startOffset)
-    if (isSurround && c != null) surroundRange(caret, context, inside, c)
+    return TextRange(opening.startOffset, closingStart)
   }
 
   private fun replacementPair(c: Char): Pair<String, String> {

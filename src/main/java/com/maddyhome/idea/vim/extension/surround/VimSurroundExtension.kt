@@ -370,11 +370,13 @@ internal class VimSurroundExtension : VimExtension {
 }
 
 /**
- * Surrounds [range] like `ys` does once its motion is done, reading the tag or the function name first when [c] asks
- * for one. The cursor ends up at the start of the range.
+ * Surrounds the range that [edit] returns like `ys` does once its motion is done. When [c] asks for a tag or a function
+ * name, it is read first, and [edit] only runs once it's known, in the same command as the surround, so that a single
+ * undo reverts both. The cursor ends up at the start of the range.
  */
-internal fun surroundRange(caret: VimCaret, context: ExecutionContext, range: TextRange, c: Char) {
+internal fun surroundAfter(caret: VimCaret, context: ExecutionContext, c: Char, edit: () -> TextRange) {
   withSurroundPair(c, caret.editor, context) { pair ->
+    val range = edit()
     performSurround(pair, range, caret)
     caret.moveToOffset(range.startOffset)
   }
