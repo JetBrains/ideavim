@@ -137,6 +137,18 @@ class MatchupSurroundTest : VimTestCase() {
   }
 
   @Test
+  fun `test undo change to a tag with surround`() {
+    enableExtensions("surround")
+    doTest("cs%tdiv<CR>u", "foo(b${c}ar)", "foo(b${c}ar)", fileName = "test.rb")
+  }
+
+  @Test
+  fun `test change to a tag cancelled in the prompt with surround`() {
+    enableExtensions("surround")
+    doTest("cs%tdiv<Esc>", "foo(b${c}ar)", "foo(b${c}ar)", fileName = "test.rb")
+  }
+
+  @Test
   fun `test plug mappings without the default keys`() {
     executeVimscript("set nomatchup")
     executeVimscript("let g:matchup_surround_enabled = 0")
