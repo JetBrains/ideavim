@@ -389,4 +389,51 @@ class MotionQuoteActionTest : VimTestCase() {
   fun `test delete around quote on closing quote after line with odd number of quotes`() {
     doTest("da\"", "\"\"\"\na \"text${c}\"", "\"\"\"\n${c}a")
   }
+
+  @Test
+  fun `test outer single quote with exclusive selection puts caret after closing quote`() {
+    doTest(
+      "va'",
+      "more than 'v${c}im'. IdeaVim",
+      "more than${s} 'vim'${c}${se}. IdeaVim",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    ) {
+      enterCommand("set selection=exclusive")
+    }
+  }
+
+  @Test
+  fun `test inner single quote with exclusive selection puts caret on closing quote`() {
+    doTest(
+      "vi'",
+      "more than 'v${c}im'. IdeaVim",
+      "more than '${s}vim${c}${se}'. IdeaVim",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    ) {
+      enterCommand("set selection=exclusive")
+    }
+  }
+
+  @Test
+  fun `test outer double quote at end of line with exclusive selection`() {
+    doTest(
+      "va\"",
+      "foo \"b${c}ar\"\nbaz",
+      "foo${s} \"bar\"${c}${se}\nbaz",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    ) {
+      enterCommand("set selection=exclusive")
+    }
+  }
+
+  @Test
+  fun `test delete selected outer single quote with exclusive selection`() {
+    doTest(
+      listOf("va'", "d"),
+      "more than 'v${c}im'. IdeaVim",
+      "more than${c}. IdeaVim",
+    ) {
+      enterCommand("set selection=exclusive")
+    }
+  }
 }
