@@ -49,14 +49,10 @@ internal class RangeFunctionHandler : BuiltinFunctionHandler<VimList>(minArity =
       1  // Default stride is always 1
     }
 
-    // Check for invalid range (max more than one before start)
+    // Check for invalid range (max more than one before start). When max is exactly one before start (in the direction
+    // of the stride), the loops below produce an empty list
     if ((stride > 0 && max < expr - 1) || (stride < 0 && max > expr + 1)) {
       throw exExceptionMessage("E727")
-    }
-
-    // When maximum is one before start, return empty list
-    if (max == expr - 1) {
-      return VimList(mutableListOf())
     }
 
     val result = mutableListOf<VimDataType>()

@@ -53,6 +53,16 @@ class RangeFunctionTest : VimTestCase() {
   }
 
   @Test
+  fun `test range with negative stride ending one before start`() {
+    assertCommandOutput("echo range(1, 0, -1)", "[1, 0]")
+  }
+
+  @Test
+  fun `test range with negative stride max one after start returns empty`() {
+    assertCommandOutput("echo range(1, 2, -1)", "[]")
+  }
+
+  @Test
   fun `test range single element`() {
     assertCommandOutput("echo range(5, 5)", "[5]")
   }
