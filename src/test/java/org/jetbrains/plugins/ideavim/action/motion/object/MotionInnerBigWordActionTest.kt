@@ -467,18 +467,12 @@ class MotionInnerBigWordActionTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(
-    originalVimAfter = "${s}Lorem${c}${se} ipsum dolor sit amet, consectetur adipiscing elit",
-    description = "Text objects are implicitly inclusive, because they set the selection." +
-      "Vim modifies the caret offset of inclusive motions when in exclusive selection mode. " +
-      "Fix this when IdeaVim also handles inclusive motions in exclusive selection mode."
-  )
   @Test
   fun `test select WORD with exclusive selection`() {
     doTest(
       "viW",
       "Lo${c}rem ipsum dolor sit amet, consectetur adipiscing elit",
-      "${s}Lore${c}${se}m ipsum dolor sit amet, consectetur adipiscing elit",
+      "${s}Lorem${c}${se} ipsum dolor sit amet, consectetur adipiscing elit",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     ) {
       enterCommand("set selection=exclusive")
