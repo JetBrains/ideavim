@@ -182,6 +182,9 @@ interface VimInjector {
   /** Opens the URL or file under the cursor for the `gx` command. See [VimExternalOpener]. */
   val externalOpener: VimExternalOpener
 
+  /** Rings the bell for an error. See [VimBell]. */
+  val bell: VimBell
+
   val quickFixService: QuickFixService
 }
 

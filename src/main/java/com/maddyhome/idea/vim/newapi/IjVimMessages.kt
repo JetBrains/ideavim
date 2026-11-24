@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.newapi
 
-import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.api.MessageType
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMessagesBase
@@ -16,20 +15,11 @@ import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.EngineMessageHelper
 import com.maddyhome.idea.vim.ui.ShowCmd
-import java.awt.Toolkit
 
 internal class IjVimMessages : VimMessagesBase() {
 
   private var message: String? = null
   private var error = false
-  private var lastBeepTimeMillis = 0L
-
-  /**
-   * How many times the bell was asked to ring in unit-test mode. There is nothing to beep with there, so the bell is
-   * counted instead of rung, and tests read this.
-   */
-  var unitTestBellCount: Int = 0
-    private set
 
   override fun showMessage(editor: VimEditor, message: String?) {
     injector.outputPanel.clear(editor, injector.executionContextManager.getEditorExecutionContext(editor))
@@ -86,21 +76,7 @@ internal class IjVimMessages : VimMessagesBase() {
     error = true
     // 'visualbell' silences both kinds of bell
     if (ringBell && !injector.globalOptions().visualbell) {
-      beep()
-    }
-  }
-
-  private fun beep() {
-    if (ApplicationManager.getApplication().isUnitTestMode) {
-      unitTestBellCount++
-      return
-    }
-
-    // Vim only allows a beep once every half second - :help 'visualbell'
-    val currentTimeMillis = System.currentTimeMillis()
-    if (currentTimeMillis - lastBeepTimeMillis > 500) {
-      Toolkit.getDefaultToolkit().beep()
-      lastBeepTimeMillis = currentTimeMillis
+      injector.bell.ring()
     }
   }
 
