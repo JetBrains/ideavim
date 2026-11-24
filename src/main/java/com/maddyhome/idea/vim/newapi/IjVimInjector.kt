@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.api.SystemInfoService
 import com.maddyhome.idea.vim.api.VimAbbreviationGroup
 import com.maddyhome.idea.vim.api.VimActionExecutor
 import com.maddyhome.idea.vim.api.VimApplication
+import com.maddyhome.idea.vim.api.VimBell
 import com.maddyhome.idea.vim.api.VimChangeGroup
 import com.maddyhome.idea.vim.api.VimClipboardManager
 import com.maddyhome.idea.vim.api.VimCommandGroup
@@ -248,6 +249,8 @@ internal class IjVimInjector : VimInjectorBase() {
   override val pluginActivator: VimPluginActivator
     get() = service()
   override val externalOpener: VimExternalOpener
+    get() = service()
+  override val bell: VimBell
     get() = service()
   override val quickFixService: QuickFixService
     get() = service()

@@ -7,23 +7,24 @@
  */
 package org.jetbrains.plugins.ideavim.option
 
+import com.maddyhome.idea.vim.api.VimBell
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
-import com.maddyhome.idea.vim.newapi.IjVimMessages
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.mock.MockTestCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
-import kotlin.test.assertEquals
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 // VIM-485 |'errorbells'| |'noerrorbells'|
 @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-class ErrorbellsOptionTest : VimTestCase() {
+class ErrorbellsOptionTest : MockTestCase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
@@ -63,51 +64,54 @@ class ErrorbellsOptionTest : VimTestCase() {
   // message, such as `k` on the first line (:help 'errorbells'). Verified in Vim 9.1 with the bell replaced by a
   // visible marker.
 
+  // The bell is a mock service, so the tests assert its calls instead of listening for the beep
+
   @Test
   fun `test an error message does not ring the bell with noerrorbells`() {
+    val bell = mockService(VimBell::class.java)
     enterCommand("set noerrorbells")
-    assertEquals(0, bellsRungBy { enterCommand("s/found/replaced") })
+    enterCommand("s/found/replaced")
     assertPluginErrorMessage("E486: Pattern not found: found")
+    verify(bell, never()).ring()
   }
 
   // The fixture is a single line, so `k` fails and nothing is shown for it
   @Test
   fun `test an error without a message rings the bell with noerrorbells`() {
+    val bell = mockService(VimBell::class.java)
     enterCommand("set noerrorbells")
-    assertEquals(1, bellsRungBy { typeText(injector.parser.parseKeys("k")) })
+    typeText(injector.parser.parseKeys("k"))
+    verify(bell).ring()
   }
 
   @Test
   fun `test an error message rings the bell with errorbells`() {
+    val bell = mockService(VimBell::class.java)
     enterCommand("set errorbells")
-    assertEquals(1, bellsRungBy { enterCommand("s/found/replaced") })
+    enterCommand("s/found/replaced")
     assertPluginErrorMessage("E486: Pattern not found: found")
+    verify(bell).ring()
   }
 
   @Test
   fun `test an error without a message rings the bell with errorbells`() {
+    val bell = mockService(VimBell::class.java)
     enterCommand("set errorbells")
-    assertEquals(1, bellsRungBy { typeText(injector.parser.parseKeys("k")) })
+    typeText(injector.parser.parseKeys("k"))
+    verify(bell).ring()
   }
 
   @Test
   fun `test an error message of an unknown command follows errorbells`() {
+    val bell = mockService(VimBell::class.java)
     // Unlike `:s`, an unknown command reports its message by appending it to the output
     enterCommand("set noerrorbells")
-    assertEquals(0, bellsRungBy { enterCommand("nosuchcommand") })
+    enterCommand("nosuchcommand")
     assertPluginErrorMessage("E492: Not an editor command: nosuchcommand")
+    verify(bell, never()).ring()
 
     enterCommand("set errorbells")
-    assertEquals(1, bellsRungBy { enterCommand("nosuchcommand") })
-  }
-
-  // The beep itself is skipped in unit-test mode, so the tests count how many times the bell was asked to ring
-  private fun bellsRungBy(action: () -> Unit): Int {
-    val messages = injector.messages as IjVimMessages
-    injector.messages.clearError()
-    val bellsBefore = messages.unitTestBellCount
-    action()
-    assertTrue(injector.messages.isError(), "The action should report an error")
-    return messages.unitTestBellCount - bellsBefore
+    enterCommand("nosuchcommand")
+    verify(bell).ring()
   }
 }
