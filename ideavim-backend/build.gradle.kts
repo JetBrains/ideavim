@@ -46,6 +46,7 @@ dependencies {
     create(ideaType, ideaVersion) { this.useInstaller = useInstaller }
 
     bundledModule("intellij.platform.rpc.backend")
+    bundledModule("intellij.platform.rpc.topics")
   }
 }
 

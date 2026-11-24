@@ -12,10 +12,12 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.testFramework.PlatformTestUtil
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimJavaTestCase
+import org.jetbrains.plugins.ideavim.waitUntil
 import org.junit.jupiter.api.Test
 import java.awt.event.InputEvent
 import java.awt.event.MouseEvent
@@ -59,11 +61,11 @@ class CtrlClickTagStackTest : VimJavaTestCase() {
     configureByJavaText(text)
 
     typeText("<C-]>")
-    assertPosition(1, 9)
+    assertNavigatedTo(1, 9)
 
     typeText("<C-T>")
     assertPluginError(false)
-    assertPosition(5, 8)
+    assertNavigatedTo(5, 8)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
@@ -72,11 +74,11 @@ class CtrlClickTagStackTest : VimJavaTestCase() {
     configureByJavaText(text)
 
     ctrlClickGotoDeclaration()
-    assertPosition(1, 9)
+    assertNavigatedTo(1, 9)
 
     typeText("<C-T>")
     assertPluginError(false)
-    assertPosition(5, 8)
+    assertNavigatedTo(5, 8)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
@@ -101,17 +103,17 @@ class CtrlClickTagStackTest : VimJavaTestCase() {
 
     // An older tag jump that leaves an entry for line 8 on the stack
     typeText("<C-]>")
-    assertPosition(4, 9)
+    assertNavigatedTo(4, 9)
     typeText("10G^")
-    assertPosition(9, 8)
+    assertNavigatedTo(9, 8)
 
     ctrlClickGotoDeclaration()
-    assertPosition(1, 9)
+    assertNavigatedTo(1, 9)
 
     // Back to where the Ctrl+Click was made, not to where the older <C-]> started
     typeText("<C-T>")
     assertPluginError(false)
-    assertPosition(9, 8)
+    assertNavigatedTo(9, 8)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
@@ -120,15 +122,15 @@ class CtrlClickTagStackTest : VimJavaTestCase() {
     configureByJavaText(text)
 
     ctrlClickGotoDeclaration()
-    assertPosition(1, 9)
+    assertNavigatedTo(1, 9)
 
     performIdeAction(IdeActions.ACTION_GOTO_BACK)
-    assertPosition(5, 8)
+    assertNavigatedTo(5, 8)
 
     // Only the Ctrl+Click is on the stack, so the first <C-T> stays here and the second finds the bottom
     typeText("<C-T>")
     assertPluginError(false)
-    assertPosition(5, 8)
+    assertNavigatedTo(5, 8)
 
     typeText("<C-T>")
     assertPluginError(true)
@@ -141,17 +143,17 @@ class CtrlClickTagStackTest : VimJavaTestCase() {
     configureByJavaText(text)
 
     ctrlClickGotoDeclaration()
-    assertPosition(1, 9)
+    assertNavigatedTo(1, 9)
 
     performIdeAction(IdeActions.ACTION_GOTO_BACK)
-    assertPosition(5, 8)
+    assertNavigatedTo(5, 8)
 
     performIdeAction(IdeActions.ACTION_GOTO_FORWARD)
-    assertPosition(1, 9)
+    assertNavigatedTo(1, 9)
 
     typeText("<C-T>")
     assertPluginError(false)
-    assertPosition(5, 8)
+    assertNavigatedTo(5, 8)
 
     typeText("<C-T>")
     assertPluginError(true)
@@ -179,28 +181,28 @@ class CtrlClickTagStackTest : VimJavaTestCase() {
     )
 
     ctrlClickGotoDeclaration()
-    assertPosition(1, 9)
+    assertNavigatedTo(1, 9)
 
     typeText("10G^")
     ctrlClickGotoDeclaration()
-    assertPosition(4, 9)
+    assertNavigatedTo(4, 9)
 
     // The same place and the same tag as the first entry, but a new tag jump all the same
     typeText("9G^")
     ctrlClickGotoDeclaration()
-    assertPosition(1, 9)
+    assertNavigatedTo(1, 9)
 
     typeText("<C-T>")
     assertPluginError(false)
-    assertPosition(8, 8)
+    assertNavigatedTo(8, 8)
 
     typeText("<C-T>")
     assertPluginError(false)
-    assertPosition(9, 8)
+    assertNavigatedTo(9, 8)
 
     typeText("<C-T>")
     assertPluginError(false)
-    assertPosition(8, 8)
+    assertNavigatedTo(8, 8)
   }
 
   // Ctrl+Click has two siblings that are also jumps to a definition: Ctrl+Shift+Click and Ctrl+Alt+Click
@@ -225,11 +227,11 @@ class CtrlClickTagStackTest : VimJavaTestCase() {
     )
 
     clickWithShortcut(IdeActions.ACTION_GOTO_TYPE_DECLARATION, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)
-    assertPosition(7, 6)
+    assertNavigatedTo(7, 6)
 
     typeText("<C-T>")
     assertPluginError(false)
-    assertPosition(3, 8)
+    assertNavigatedTo(3, 8)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
@@ -238,11 +240,11 @@ class CtrlClickTagStackTest : VimJavaTestCase() {
     configureByJavaText(implementationText)
 
     clickWithShortcut(IdeActions.ACTION_GOTO_IMPLEMENTATION, InputEvent.CTRL_DOWN_MASK or InputEvent.ALT_DOWN_MASK)
-    assertPosition(5, 16)
+    assertNavigatedTo(5, 16)
 
     typeText("<C-T>")
     assertPluginError(false)
-    assertPosition(11, 10)
+    assertNavigatedTo(11, 10)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
@@ -251,11 +253,11 @@ class CtrlClickTagStackTest : VimJavaTestCase() {
     configureByJavaText(text)
 
     performIdeAction("GotoDeclarationOnly")
-    assertPosition(1, 9)
+    assertNavigatedTo(1, 9)
 
     typeText("<C-T>")
     assertPluginError(false)
-    assertPosition(5, 8)
+    assertNavigatedTo(5, 8)
   }
 
   // A mapping to an IDE action is a user's own way of making the same jump, so it must be recorded too
@@ -267,11 +269,11 @@ class CtrlClickTagStackTest : VimJavaTestCase() {
     enterCommand("nmap gb <Action>(GotoDeclaration)")
 
     typeText("gb")
-    assertPosition(1, 9)
+    assertNavigatedTo(1, 9)
 
     typeText("<C-T>")
     assertPluginError(false)
-    assertPosition(5, 8)
+    assertNavigatedTo(5, 8)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
@@ -281,11 +283,11 @@ class CtrlClickTagStackTest : VimJavaTestCase() {
     enterCommand("nmap gi <Action>(GotoImplementation)")
 
     typeText("gi")
-    assertPosition(5, 16)
+    assertNavigatedTo(5, 16)
 
     typeText("<C-T>")
     assertPluginError(false)
-    assertPosition(11, 10)
+    assertNavigatedTo(11, 10)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
@@ -294,11 +296,11 @@ class CtrlClickTagStackTest : VimJavaTestCase() {
     configureByJavaText(text)
 
     enterCommand("action GotoDeclaration")
-    assertPosition(1, 9)
+    assertNavigatedTo(1, 9)
 
     typeText("<C-T>")
     assertPluginError(false)
-    assertPosition(5, 8)
+    assertNavigatedTo(5, 8)
   }
 
   // The Vim commands that run the same IDE action must still push exactly what they pushed before
@@ -309,15 +311,25 @@ class CtrlClickTagStackTest : VimJavaTestCase() {
     configureByJavaText(text)
 
     typeText("<C-]>")
-    assertPosition(1, 9)
+    assertNavigatedTo(1, 9)
 
     typeText("<C-T>")
     assertPluginError(false)
-    assertPosition(5, 8)
+    assertNavigatedTo(5, 8)
 
     typeText("<C-T>")
     assertPluginError(true)
     assertPluginErrorMessage("E555: At bottom of tag stack")
+  }
+
+  /** Navigation of the platform finishes asynchronously since 2026.3, so the caret may get there after the action */
+  private fun assertNavigatedTo(line: Int, column: Int) {
+    waitUntil(5_000) {
+      var position: LogicalPosition? = null
+      ApplicationManager.getApplication().invokeAndWait { position = fixture.editor.caretModel.logicalPosition }
+      position == LogicalPosition(line, column)
+    }
+    assertPosition(line, column)
   }
 
   /**

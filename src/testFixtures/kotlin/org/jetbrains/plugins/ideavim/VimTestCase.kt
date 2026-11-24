@@ -188,11 +188,13 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
       isRightMarginShown = false  // Otherwise we get `colorcolumn=+0`
       isWhitespacesShown = IjOptions.list.defaultValue.booleanValue
       isLineNumbersShown = Options.number.defaultValue.booleanValue
-      lineNumeration = if (IjOptions.relativenumber.defaultValue.booleanValue) {
-        if (isLineNumbersShown) EditorSettings.LineNumerationType.HYBRID else EditorSettings.LineNumerationType.RELATIVE
-      } else {
-        EditorSettings.LineNumerationType.ABSOLUTE
-      }
+      setLineNumeration(
+        if (IjOptions.relativenumber.defaultValue.booleanValue) {
+          if (isLineNumbersShown) EditorSettings.LineNumerationType.HYBRID else EditorSettings.LineNumerationType.RELATIVE
+        } else {
+          EditorSettings.LineNumerationType.ABSOLUTE
+        }
+      )
       softWrapFileMasks = "*"
       isUseSoftWraps = IjOptions.wrap.defaultValue.booleanValue
 

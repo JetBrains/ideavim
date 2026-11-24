@@ -94,7 +94,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
       assertCommandOutput("set relativenumber?", "norelativenumber")
 
       EditorSettingsExternalizable.getInstance().isLineNumbersShown = true
-      EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.HYBRID
+      EditorSettingsExternalizable.getInstance().setLineNumeration(LineNumerationType.HYBRID)
       assertCommandOutput("set number?", "  number")
       assertCommandOutput("set relativenumber?", "  relativenumber")
     }
@@ -108,7 +108,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
       assertCommandOutput("setlocal relativenumber?", "norelativenumber")
 
       EditorSettingsExternalizable.getInstance().isLineNumbersShown = true
-      EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.HYBRID
+      EditorSettingsExternalizable.getInstance().setLineNumeration(LineNumerationType.HYBRID)
       assertCommandOutput("setlocal number?", "  number")
       assertCommandOutput("setlocal relativenumber?", "  relativenumber")
     }
@@ -301,14 +301,14 @@ class LineNumberOptionsMapperTest : VimTestCase() {
   fun `test setting global numeration type IDE value will not update explicitly set value`() {
     enterCommand("set number relativenumber")
 
-    EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.ABSOLUTE
+    EditorSettingsExternalizable.getInstance().setLineNumeration(LineNumerationType.ABSOLUTE)
     assertCommandOutput("setlocal relativenumber?", "  relativenumber")
     assertCommandOutput("set relativenumber?", "  relativenumber")
     assertCommandOutput("setglobal relativenumber?", "  relativenumber")
 
     enterCommand("set norelativenumber")
 
-    EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.HYBRID
+    EditorSettingsExternalizable.getInstance().setLineNumeration(LineNumerationType.HYBRID)
     assertCommandOutput("setlocal relativenumber?", "norelativenumber")
     assertCommandOutput("set relativenumber?", "norelativenumber")
     assertCommandOutput("setglobal relativenumber?", "norelativenumber")
@@ -341,7 +341,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
   fun `test setting global numeration type IDE value will update effective Vim value set during plugin startup`() {
     // Default value is ABSOLUTE. Update the global value to something different, but make sure the Vim options are default
     ApplicationManager.getApplication().invokeAndWait {
-      EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.RELATIVE
+      EditorSettingsExternalizable.getInstance().setLineNumeration(LineNumerationType.RELATIVE)
       injector.optionGroup.resetAllOptionsForTesting()
 
       try {
@@ -351,7 +351,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
         injector.optionGroup.endInitVimRc()
       }
 
-      EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.ABSOLUTE
+      EditorSettingsExternalizable.getInstance().setLineNumeration(LineNumerationType.ABSOLUTE)
       assertCommandOutput("setlocal relativenumber?", "norelativenumber")
       assertCommandOutput("set relativenumber?", "norelativenumber")
       assertCommandOutput("setglobal relativenumber?", "norelativenumber")
@@ -362,7 +362,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
   fun `test reset 'number' to default copies current global intellij setting`() {
     ApplicationManager.getApplication().invokeAndWait {
       EditorSettingsExternalizable.getInstance().isLineNumbersShown = true
-      EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.ABSOLUTE
+      EditorSettingsExternalizable.getInstance().setLineNumeration(LineNumerationType.ABSOLUTE)
       fixture.editor.settings.isLineNumbersShown = false
       assertCommandOutput("set number?", "nonumber")
 
@@ -382,7 +382,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
     ApplicationManager.getApplication().invokeAndWait {
       ApplicationManager.getApplication().runReadAction {
         EditorSettingsExternalizable.getInstance().isLineNumbersShown = true
-        EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.RELATIVE
+        EditorSettingsExternalizable.getInstance().setLineNumeration(LineNumerationType.RELATIVE)
         injector.optionGroup.resetAllOptionsForTesting()  // So changing the global values does not modify IdeaVim's values
 
         // Value becomes External(true) because the user is explicitly setting it
@@ -405,7 +405,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
   fun `test local reset 'number' to default copies current global intellij setting`() {
     ApplicationManager.getApplication().invokeAndWait {
       EditorSettingsExternalizable.getInstance().isLineNumbersShown = true
-      EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.ABSOLUTE
+      EditorSettingsExternalizable.getInstance().setLineNumeration(LineNumerationType.ABSOLUTE)
       fixture.editor.settings.isLineNumbersShown = false
       assertCommandOutput("set number?", "nonumber")
 
@@ -424,7 +424,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
   fun `test reset local 'relativenumber' to default copies current global intellij setting`() {
     ApplicationManager.getApplication().invokeAndWait {
       EditorSettingsExternalizable.getInstance().isLineNumbersShown = true
-      EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.RELATIVE
+      EditorSettingsExternalizable.getInstance().setLineNumeration(LineNumerationType.RELATIVE)
       injector.optionGroup.resetAllOptionsForTesting()  // So changing the global values does not modify IdeaVim's values
 
       // Value becomes External(true) because the user is explicitly setting it
@@ -455,7 +455,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
     // Changing the global setting should update the new editor
     ApplicationManager.getApplication().invokeAndWait {
       EditorSettingsExternalizable.getInstance().isLineNumbersShown = true
-      EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.ABSOLUTE
+      EditorSettingsExternalizable.getInstance().setLineNumeration(LineNumerationType.ABSOLUTE)
     }
     assertCommandOutput("set number?", "  number")
   }
@@ -473,7 +473,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
 
       // Changing the global setting should update the new editor
       EditorSettingsExternalizable.getInstance().isLineNumbersShown = true
-      EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.RELATIVE
+      EditorSettingsExternalizable.getInstance().setLineNumeration(LineNumerationType.RELATIVE)
       assertCommandOutput("set relativenumber?", "  relativenumber")
     }
   }
@@ -594,7 +594,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
   fun `test setting global numeration type IDE value will update effective Vim value in new window initialised during startup`() {
     // Default value is ABSOLUTE. Update the global value to something different, but make sure the Vim options are default
     ApplicationManager.getApplication().invokeAndWait {
-      EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.RELATIVE
+      EditorSettingsExternalizable.getInstance().setLineNumeration(LineNumerationType.RELATIVE)
       injector.optionGroup.resetAllOptionsForTesting()
 
       try {
@@ -607,7 +607,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
       switchToNewFile("bbb.txt", "lorem ipsum")
       assertCommandOutput("set relativenumber?", "  relativenumber")
 
-      EditorSettingsExternalizable.getInstance().lineNumeration = LineNumerationType.ABSOLUTE
+      EditorSettingsExternalizable.getInstance().setLineNumeration(LineNumerationType.ABSOLUTE)
       assertCommandOutput("setlocal relativenumber?", "norelativenumber")
       assertCommandOutput("set relativenumber?", "norelativenumber")
       assertCommandOutput("setglobal relativenumber?", "norelativenumber")

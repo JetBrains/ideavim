@@ -39,6 +39,7 @@ import com.intellij.openapi.util.UserDataHolder
 import com.intellij.openapi.vcs.FilePath
 import com.intellij.openapi.vcs.FileStatus
 import com.intellij.openapi.vcs.changes.Change
+import com.intellij.openapi.vcs.changes.ChangeViewDiffRequestProcessor
 import com.intellij.openapi.vcs.changes.ChangeViewDiffRequestProcessor.ChangeWrapper
 import com.intellij.openapi.vcs.changes.ChangeViewDiffRequestProcessor.Wrapper
 import com.intellij.openapi.vcs.changes.ChangesUtil
@@ -60,6 +61,8 @@ import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimSplitWindowTestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.waitUntil
+import org.junit.jupiter.api.Assumptions.assumeFalse
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
@@ -287,7 +290,8 @@ class DiffEditorJumpTest : VimSplitWindowTestCase() {
   @Test
   fun `test control-O selects the file of the jump in the tree of changes when the platform can show a change`() {
     val otherFile = createFile("Other.txt", "other\nlines\n")
-    val preview = openChangesPreview(changedFile to before, otherFile to "other\n", canShowChange = true)
+    assumeTrue(platformCanShowChange)
+    val preview = openChangesPreview(changedFile to before, otherFile to "other\n")
     recordJump(sideEditor(preview, Side.RIGHT), line = 2, column = 3)
     selectInChangesView(preview, otherFile)
 
@@ -299,6 +303,7 @@ class DiffEditorJumpTest : VimSplitWindowTestCase() {
 
   @Test
   fun `test control-O leaves the selection in the tree of changes when the platform cannot show a change`() {
+    assumeFalse(platformCanShowChange)
     val otherFile = createFile("Other.txt", "other\nlines\n")
     val preview = openChangesPreview(changedFile to before, otherFile to "other\n")
     recordJump(sideEditor(preview, Side.RIGHT), line = 2, column = 3)
@@ -552,17 +557,13 @@ class DiffEditorJumpTest : VimSplitWindowTestCase() {
    * A diff preview that follows the selection of a tree of changes, as the Commit tool window, VCS Log and Shelf show
    * one. Selecting another file in the tree shows it in the same tab
    */
-  private fun openChangesPreview(
-    vararg changes: Pair<VirtualFile, String>,
-    canShowChange: Boolean = false,
-  ): VirtualFile {
+  private fun openChangesPreview(vararg changes: Pair<VirtualFile, String>): VirtualFile {
     val processorChanges = changes.map { (file, leftText) ->
       val path = VcsUtil.getFilePath(file)
       Change(SimpleContentRevision(leftText, path, "1"), CurrentContentRevision(path))
     }
     return open(object : DiffViewerVirtualFile("Preview") {
-      override fun createViewer(project: Project) =
-        if (canShowChange) ShowChangePreviewProcessor(processorChanges) else ChangesPreviewProcessor(processorChanges)
+      override fun createViewer(project: Project) = ChangesPreviewProcessor(processorChanges)
     })
   }
 
@@ -599,7 +600,7 @@ class DiffEditorJumpTest : VimSplitWindowTestCase() {
   }
 
   /** A preview that follows the selection in a tree of changes, such as the one of the Commit tool window */
-  private open inner class ChangesPreviewProcessor(changes: List<Change>) :
+  private inner class ChangesPreviewProcessor(changes: List<Change>) :
     TreeHandlerDiffRequestProcessor("IdeaVim", ChangesTreeImpl.Changes(fixture.project, false, false), FakeTreeHandler(changes)) {
     var selectedPath: String
       get() = (handler as FakeTreeHandler).selectedPath
@@ -609,22 +610,6 @@ class DiffEditorJumpTest : VimSplitWindowTestCase() {
 
     init {
       refresh(false)
-    }
-  }
-
-  /**
-   * A preview on a platform that can show a change from outside, 2026.3 and later (IJPL-248190). Like the platform, it
-   * also selects the change in the tree
-   *
-   * Once the platform has the method, this becomes an `override` and the test no longer compiles without it.
-   */
-  private inner class ShowChangePreviewProcessor(changes: List<Change>) : ChangesPreviewProcessor(changes) {
-    @Suppress("unused") // Called by reflection
-    fun showChange(path: FilePath): Boolean {
-      val change = iterateAllChanges().find { it.filePath == path } ?: return false
-      setCurrentChange(change)
-      selectChange(change)
-      return true
     }
   }
 
@@ -804,3 +789,7 @@ class DiffEditorJumpTest : VimSplitWindowTestCase() {
     assertEquals(LogicalPosition(line, column), position)
   }
 }
+
+/** `showChange(FilePath)` is there since 2026.3 (IJPL-248190) */
+private val platformCanShowChange: Boolean =
+  ChangeViewDiffRequestProcessor::class.java.methods.any { it.name == "showChange" }

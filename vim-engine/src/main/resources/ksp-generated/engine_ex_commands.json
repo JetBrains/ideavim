@@ -165,6 +165,9 @@
   "ec[ho]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand"
   },
+  "ene[w]": {
+    "className": "com.maddyhome.idea.vim.vimscript.model.commands.EditNewFileCommand"
+  },
   "exe[cute]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.ExecuteCommand"
   },
@@ -272,6 +275,9 @@
   },
   "n[ext]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.NextFileCommand"
+  },
+  "new": {
+    "className": "com.maddyhome.idea.vim.vimscript.model.commands.NewCommand"
   },
   "nm[ap]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand"
@@ -454,6 +460,9 @@
   },
   "vn[oremap]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand"
+  },
+  "vne[w]": {
+    "className": "com.maddyhome.idea.vim.vimscript.model.commands.VnewCommand"
   },
   "vs[plit]": {
     "className": "com.maddyhome.idea.vim.vimscript.model.commands.SplitCommand"

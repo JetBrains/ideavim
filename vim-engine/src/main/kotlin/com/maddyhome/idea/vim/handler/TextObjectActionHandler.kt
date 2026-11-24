@@ -90,10 +90,24 @@ abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
   ): Boolean {
     if (!editor.inVisualMode) return true
 
-    val range = getRange(editor, caret, context, operatorArguments.count1, operatorArguments.count0) ?: return false
+    val exclusiveSelection = injector.visualMotionGroup.exclusiveSelection
+    val originalOffset = caret.offset
+    val caretAfterSelection = exclusiveSelection &&
+      editor.mode.selectionType == SelectionType.CHARACTER_WISE &&
+      originalOffset > caret.vimSelectionStart
+    if (caretAfterSelection) {
+      caret.moveToOffset(originalOffset - 1)
+    }
 
-    val newstart = if (caret.offset >= caret.vimSelectionStart) range.startOffset else range.endOffsetInclusive
-    val newend = if (caret.offset >= caret.vimSelectionStart) range.endOffsetInclusive else range.startOffset
+    val range = getRange(editor, caret, context, operatorArguments.count1, operatorArguments.count0)
+    if (range == null) {
+      if (caretAfterSelection) caret.moveToOffset(originalOffset)
+      return false
+    }
+
+    val forward = caret.offset >= caret.vimSelectionStart
+    val newstart = if (forward) range.startOffset else range.endOffsetInclusive
+    val newend = if (forward) range.endOffsetInclusive else range.startOffset
 
     /**
      * There are two cases when the selection changes it's origin:
@@ -110,7 +124,11 @@ abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
       injector.visualMotionGroup.toggleVisual(editor, 1, 0, SelectionType.CHARACTER_WISE)
     }
 
-    caret.moveToOffset(newend)
+    if (exclusiveSelection && forward && editor.mode.selectionType == SelectionType.CHARACTER_WISE) {
+      caret.moveToOffset(newend + 1)
+    } else {
+      caret.moveToOffset(newend)
+    }
 
     return true
   }

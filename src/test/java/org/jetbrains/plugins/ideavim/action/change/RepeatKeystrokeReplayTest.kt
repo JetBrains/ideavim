@@ -93,6 +93,28 @@ class RepeatKeystrokeReplayTest : VimTestCase() {
     )
   }
 
+  @TestWithoutNeovim(
+    SkipNeovimReason.SEE_DESCRIPTION,
+    description = "Macro recording is driven through IdeaVim's own key handler"
+  )
+  @Test
+  fun `test dot repeats the last change a macro made with a gi insert by running the macro again`() {
+    // The keys a macro plays are not recorded - `@a` is what `.` has - so there is no `gi` on record to replay as an `i`
+    doTest(
+      "iX<Esc>" + "j0" + "qagiY<Esc>q" + "j0" + "@a" + "j0" + ".",
+      """
+        Lorem ${c}ipsum dolor
+        sit amet consectetur
+        adipiscing elit
+      """.trimIndent(),
+      """
+        Lorem XYY${c}Yipsum dolor
+        sit amet consectetur
+        adipiscing elit
+      """.trimIndent(),
+    )
+  }
+
   @Test
   fun `test dot does not repeat a motion`() {
     // `w` is not a change, so `.` still repeats the `x`

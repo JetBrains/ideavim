@@ -12,6 +12,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
+import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
@@ -125,17 +126,19 @@ class MotionGroup : VimMotionGroupBase() {
   }
 
   override fun moveCaretToCurrentDisplayLineStart(editor: VimEditor, caret: ImmutableVimCaret): Motion {
-    val col = EditorHelper.getVisualColumnAtLeftOfDisplay(editor.ij, caret.getVisualPosition().line)
-    return moveCaretToColumn(editor, caret, col, false)
+    val visualLine = caret.getVisualPosition().line
+    val col = EditorHelper.getVisualColumnAtLeftOfDisplay(editor.ij, visualLine)
+    return AbsoluteOffset(getDisplayLineOffset(editor, visualLine, col, false))
   }
 
   override fun moveCaretToCurrentDisplayLineStartSkipLeading(
     editor: VimEditor,
     caret: ImmutableVimCaret,
   ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
-    val col = EditorHelper.getVisualColumnAtLeftOfDisplay(editor.ij, caret.getVisualPosition().line)
-    val bufferLine = caret.getLine()
-    return editor.getLeadingCharacterOffset(bufferLine, col)
+    val visualLine = caret.getVisualPosition().line
+    val col = EditorHelper.getVisualColumnAtLeftOfDisplay(editor.ij, visualLine)
+    val start = editor.offsetToBufferPosition(getDisplayLineOffset(editor, visualLine, col, false))
+    return editor.getLeadingCharacterOffset(start.line, start.column)
   }
 
   override fun moveCaretToCurrentDisplayLineEnd(
@@ -143,8 +146,20 @@ class MotionGroup : VimMotionGroupBase() {
     caret: ImmutableVimCaret,
     allowEnd: Boolean,
   ): Motion {
-    val col = EditorHelper.getVisualColumnAtRightOfDisplay(editor.ij, caret.getVisualPosition().line)
-    return moveCaretToColumn(editor, caret, col, allowEnd)
+    val visualLine = caret.getVisualPosition().line
+    val col = EditorHelper.getVisualColumnAtRightOfDisplay(editor.ij, visualLine)
+    return AbsoluteOffset(getDisplayLineOffset(editor, visualLine, col, allowEnd))
+  }
+
+  private fun getDisplayLineOffset(editor: VimEditor, visualLine: Int, visualColumn: Int, allowEnd: Boolean): Int {
+    val ijEditor = editor.ij
+    val offset = ijEditor.visualPositionToOffset(VisualPosition(visualLine, visualColumn))
+    val lineStart = ijEditor.visualPositionToOffset(VisualPosition(visualLine, 0))
+    val lineEnd = EditorUtil.getVisualLineEndOffset(ijEditor, visualLine)
+    if (lineEnd > lineStart && ijEditor.softWrapModel.getSoftWrap(lineEnd) != null) {
+      return offset.coerceIn(lineStart, lineEnd - 1)
+    }
+    return editor.normalizeOffset(editor.offsetToBufferPosition(offset).line, offset, allowEnd)
   }
 
   /**

@@ -258,6 +258,41 @@ class VimTextObjUserExtensionTest : VimTestCase() {
   }
 
   @Test
+  fun `select-a works with the cursor on the footer`() {
+    defineBraces()
+    doTest(
+      "daA",
+      "prefix <<inner><caret>> suffix",
+      "prefix <caret> suffix",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `select-a does not act on a pair entirely before the cursor`() {
+    defineBraces()
+    // Regression: the header before the cursor used to be taken even when its footer was also before the cursor,
+    // so the operator acted on text behind the cursor. The pair ahead of the cursor should be selected instead.
+    doTest(
+      "daA",
+      "<<first>> mid<caret>dle <<second>> end",
+      "<<first>> middle <caret> end",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `select-a does nothing when the only pair is before the cursor`() {
+    defineBraces()
+    doTest(
+      "daA",
+      "<<first>> mid<caret>dle",
+      "<<first>> mid<caret>dle",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
   fun `linewise region-type makes the operator delete whole lines`() {
     defineLinewiseDatetime()
     doTest(
