@@ -866,6 +866,20 @@ class VimSurroundExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
+  fun `test delete surround in macro`() {
+    doTest("qqds(qj0@q", "${c}(test1)\n(test2)", "test1\n${c}test2", Mode.NORMAL())
+  }
+
+  @Test
+  fun `test macro recording with d keeps keys unduplicated in register`() {
+    configureByText("${c}Lorem ipsum dolor sit amet")
+    typeText("qqwdwwq")
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    kotlin.test.assertEquals("wdww", injector.registerGroup.getRegister(vimEditor, context, 'q')?.text)
+  }
+
   companion object {
     @JvmStatic
     fun removeWhiteSpaceWithClosingBracketParams() = listOf(

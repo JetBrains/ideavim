@@ -448,15 +448,15 @@ object VimListenerManager {
       }
     }
 
-    fun remove(editor: Editor) {
-      val editorDisposable = editor.removeUserData(editorListenersDisposableKey)
-      if (editorDisposable != null) {
-        Disposer.dispose(editorDisposable)
-      } else if (!EditorHelper.isCommandHistoryWindow(editor)) {
-        // Cmdwin editors (q:, q/, q?) may bypass `add` in some test paths; that's expected.
-        // We definitely do not expect this to happen for any other editor.
-        StrictMode.fail("Editor doesn't have disposable attached. $editor")
-      }
+    /**
+     * Returns false if the editor was never initialised. Whether IdeaVim supports an editor can change during its
+     * lifetime ('ideavimsupport', 'ideaeditor', being moved into a dialog), so callers can't rely on [vimDisabled]
+     * to tell whether [add] was called.
+     */
+    fun remove(editor: Editor): Boolean {
+      val editorDisposable = editor.removeUserData(editorListenersDisposableKey) ?: return false
+      Disposer.dispose(editorDisposable)
+      return true
     }
   }
 
@@ -684,7 +684,7 @@ object VimListenerManager {
       if (vimDisabled(event.editor)) return
       val vimEditor = event.editor.vim
       val isCmdwin = EditorHelper.isCommandHistoryWindow(event.editor)
-      EditorListeners.remove(event.editor)
+      if (!EditorListeners.remove(event.editor)) return
       injector.listenersNotifier.notifyEditorReleased(vimEditor)
       injector.markService.editorReleased(vimEditor)
       if (isCmdwin) {

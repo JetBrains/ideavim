@@ -562,6 +562,10 @@ Contributors:
   [![icon][github]](https://github.com/pppobear)
   &nbsp;
   pppobear
+* [![icon][mail]](mailto:vadimlazuk5@gmail.com)
+  [![icon][github]](https://github.com/Inf1mum)
+  &nbsp;
+  Inf1mum
 
 Contributors with JetBrains IP:
 

@@ -544,4 +544,19 @@ class MacroActionTest : VimTestCase() {
     typeText("@a")
     assertState("Spongebob Squarepants")
   }
+
+  @Test
+  fun `test recording macro keeps typed tabs`() {
+    configureByText("$c")
+    typeText("qa", "i<Tab><Tab>aaaa<Esc>", "q")
+    assertRegister('a', "i^I^Iaaaa^[")
+  }
+
+  @Test
+  fun `test macro stops when searched pattern is not found`() {
+    configureByText("${c}lorem ipsum dolor")
+    enterCommand("""let @a = "/zzz\<CR>daw"""")
+    typeText("@a")
+    assertState("${c}lorem ipsum dolor")
+  }
 }

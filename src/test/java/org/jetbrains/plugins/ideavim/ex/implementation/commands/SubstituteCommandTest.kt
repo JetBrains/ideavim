@@ -1673,4 +1673,42 @@ class SubstituteCommandTest : VimTestCase() {
         ")\n",
     )
   }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test g flag removes only leading spaces anchored to line start`() {
+    configureByText("${c}  a  b\n  c  d\n  e  f\n")
+    enterCommand("%s/^  //g")
+    assertState("a  b\nc  d\n${c}e  f\n")
+  }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test visual line substitute with g flag does not touch the following line`() {
+    configureByText(
+      "\t\t\t${c}makeProperty(\"age\", { b, v -> (b as? Ageable)?.age = v }),\n" +
+        "\t\t\tmakeProperty(\"age\", { b, v -> (b as? Ageable)?.age = v }),\n",
+    )
+    typeText("V", ":'<,'>s/age/a/g<Enter>")
+    assertState(
+      "\t\t\t${c}makeProperty(\"a\", { b, v -> (b as? Ageable)?.a = v }),\n" +
+        "\t\t\tmakeProperty(\"age\", { b, v -> (b as? Ageable)?.age = v }),\n",
+    )
+  }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test lowercase escape in replacement lowercases first letter on each line in visual selection`() {
+    configureByText(
+      "${c}Country: string\n" +
+        "Currency: string\n" +
+        "Symbol: string\n",
+    )
+    typeText("VG", ":'<,'>s/\\([A-Z]\\)/\\l\\1/<Enter>")
+    assertState(
+      "country: string\n" +
+        "currency: string\n" +
+        "${c}symbol: string\n",
+    )
+  }
 }

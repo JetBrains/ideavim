@@ -83,8 +83,8 @@ abstract class VimSplitWindowTestCase : VimTestCase() {
    * Opens a new buffer in a new tab of the current split, and moves the focus to it
    *
    * Vim's `:new {file}` splits the current window and edits the file in the new split, while `:edit {file}` reuses the
-   * current window. IdeaVim doesn't support `:new {file}`, and its `:edit {file}` opens a new tab in the current split -
-   * which is what this function does. The new editor is a new Vim *buffer*, but stays in the same split.
+   * current window. IdeaVim's `:edit {file}` opens a new tab in the current split - which is what this function
+   * does. The new editor is a new Vim *buffer*, but stays in the same split.
    *
    * Note that this overwrites `fixture.editor`!
    *

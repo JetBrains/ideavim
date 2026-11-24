@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.regexp.VimRegex
+import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
 /**
@@ -64,14 +65,20 @@ internal class TextObjUserActionHandler(
    * footer start.
    */
   private fun pairPatternRange(editor: VimEditor, caretOffset: Int): TextRange? {
-    // The header at or before the cursor (so the cursor may sit on the header, the enclosed text, or the footer),
-    // falling back to the next header ahead of the cursor.
     val headers = VimRegex(patterns[0]).findAll(editor)
-    val header = headers.lastOrNull { it.range.startOffset <= caretOffset }
-      ?: headers.firstOrNull { it.range.startOffset >= caretOffset }
-      ?: return null
-    val footer = VimRegex(patterns[1]).findAll(editor)
-      .firstOrNull { it.range.startOffset >= header.range.endOffset }
+    val footers = VimRegex(patterns[1]).findAll(editor)
+    fun footerFor(header: VimMatchResult.Success) =
+      footers.firstOrNull { it.range.startOffset >= header.range.endOffset }
+
+    // Prefer the pair around the cursor: the header at or before the cursor, as long as its footer ends at or after
+    // the cursor (so the cursor may sit on the header, the enclosed text, or the footer). If that pair is entirely
+    // before the cursor, fall back to the next pair ahead of it rather than acting on text behind the cursor.
+    val enclosing = headers.lastOrNull { it.range.startOffset <= caretOffset }
+      ?.let { header -> footerFor(header)?.let { footer -> header to footer } }
+      ?.takeIf { (_, footer) -> footer.range.endOffset > caretOffset }
+    val (header, footer) = enclosing
+      ?: headers.firstOrNull { it.range.startOffset > caretOffset }
+        ?.let { header -> footerFor(header)?.let { footer -> header to footer } }
       ?: return null
 
     return if (isInner) {

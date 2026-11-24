@@ -9,6 +9,7 @@
 <idea-plugin>
   <dependencies>
     <module name="intellij.platform.frontend"/>
+    <module name="intellij.platform.rpc.topics"/>
     <module name="IdeaVIM.ideavim-common"/>
   </dependencies>
 
@@ -371,6 +372,14 @@
         <alias name="https://github.com/bronson/vim-visual-star-search"/>
         <alias name="bronson/vim-visual-star-search"/>
         <alias name="vim-visual-star-search"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.matchup.Matchup" name="matchup">
+      <aliases>
+        <alias name="vim-matchup"/>
+        <alias name="andymass/vim-matchup"/>
+        <alias name="https://github.com/andymass/vim-matchup"/>
       </aliases>
     </vimExtension>
 

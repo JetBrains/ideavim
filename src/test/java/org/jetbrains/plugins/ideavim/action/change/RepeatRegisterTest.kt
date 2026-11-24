@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.action.change
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -34,5 +35,15 @@ class RepeatRegisterTest : VimTestCase() {
       "${c}gamma line three",
     )
     assertEquals("beta line two\n", VimPlugin.getRegister().getRegister('a')?.text)
+  }
+
+  @Test
+  fun `test dot inserts the current small delete register`() {
+    doTest(
+      listOf("ciw//<C-R>-//<Esc>", "w", "."),
+      "${c}foo bar baz",
+      "//foo// //bar/${c}/ baz",
+      Mode.NORMAL(),
+    )
   }
 }

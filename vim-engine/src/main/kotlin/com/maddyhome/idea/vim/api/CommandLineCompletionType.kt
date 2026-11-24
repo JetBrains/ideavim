@@ -23,6 +23,8 @@ object CommandCompletionTypes {
     "read" to CommandLineCompletionType.FILE,
     "split" to CommandLineCompletionType.FILE,
     "vsplit" to CommandLineCompletionType.FILE,
+    "new" to CommandLineCompletionType.FILE,
+    "vnew" to CommandLineCompletionType.FILE,
   )
 
   fun getCompletionType(fullCommandName: String): CommandLineCompletionType {
