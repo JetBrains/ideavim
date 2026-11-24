@@ -9,8 +9,15 @@
 package org.jetbrains.plugins.ideavim.extension.matchup
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.application.impl.NonBlockingReadActionImpl
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.EditorFactory
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.testFramework.PlatformTestUtil
+import com.maddyhome.idea.vim.extension.matchit.BlockPatterns
+import com.maddyhome.idea.vim.extension.matchit.blockPatterns
+import com.maddyhome.idea.vim.extension.matchup.MatchParenRequest
 import com.maddyhome.idea.vim.extension.matchup.matchParenHighlights
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -21,6 +28,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 
 /**
@@ -358,6 +366,35 @@ class MatchupMatchParenTest : VimTestCase() {
     typeText("G")
     waitForMatchParen()
     assertNull(fixture.editor.matchParenHighlights.offscreenLine)
+  }
+
+  @Test
+  fun `test the search is cancelled when the editor is closed while it runs`() {
+    configureRuby(rubyIf)
+    waitForMatchParen()
+    lateinit var patterns: List<BlockPatterns>
+    ApplicationManager.getApplication().invokeAndWait { patterns = blockPatterns(fixture.editor) }
+    val request = MatchParenRequest(
+      caretOffset = 0,
+      isInsert = false,
+      wordPatterns = patterns,
+      surroundPatterns = patterns,
+      isSurround = false,
+      isSingleton = false,
+      searchLines = 1,
+      surroundSearchLines = 1,
+      modificationStamp = fixture.editor.document.modificationStamp,
+    )
+    lateinit var closedEditor: Editor
+    ApplicationManager.getApplication().invokeAndWait {
+      val editorFactory = EditorFactory.getInstance()
+      closedEditor = editorFactory.createEditor(fixture.editor.document, fixture.project)
+      editorFactory.releaseEditor(closedEditor)
+    }
+
+    assertFailsWith<ProcessCanceledException> {
+      ReadAction.run<Throwable> { request.findDelimitersInBackground(closedEditor) }
+    }
   }
 
   private fun configureRuby(content: String) {

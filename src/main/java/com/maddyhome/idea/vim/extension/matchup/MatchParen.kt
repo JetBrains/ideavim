@@ -27,6 +27,7 @@ import com.intellij.openapi.editor.event.VisibleAreaListener
 import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.TextRange
@@ -194,7 +195,7 @@ internal class MatchParen :
     val showsOffscreen = showsOffscreen(editor)
     val generation = highlights.generation
 
-    var action = ReadAction.nonBlocking<List<Delimiter>> { request.findDelimiters(editor) }
+    var action = ReadAction.nonBlocking<List<Delimiter>> { request.findDelimitersInBackground(editor) }
       .expireWhen { editor.isDisposed }
       .coalesceBy(highlights)
       .finishOnUiThread(ModalityState.any()) { delimiters ->
@@ -279,7 +280,7 @@ internal class MatchParen :
 /**
  * What to search for, captured on the EDT so that the background search doesn't read Vim state.
  */
-private class MatchParenRequest(
+internal class MatchParenRequest(
   val caretOffset: Int,
   val isInsert: Boolean,
   val wordPatterns: List<BlockPatterns>,
@@ -291,10 +292,21 @@ private class MatchParenRequest(
   val modificationStamp: Long,
 ) {
   /**
+   * The editor can be closed while the search runs, and then reading its positions throws. The search is cancelled
+   * then, as it is when the editor is closed before the search starts.
+   */
+  fun findDelimitersInBackground(editor: Editor): List<Delimiter> = try {
+    findDelimiters(editor)
+  } catch (e: RuntimeException) {
+    if (e is ProcessCanceledException || !editor.isDisposed) throw e
+    throw ProcessCanceledException(e)
+  }
+
+  /**
    * The delimiters to highlight. In Insert mode the cursor is between two characters, so the word that ends right
    * before it counts as well.
    */
-  fun findDelimiters(editor: Editor): List<Delimiter> {
+  private fun findDelimiters(editor: Editor): List<Delimiter> {
     val textLength = editor.document.textLength
     if (textLength == 0) return emptyList()
     val offsets = listOfNotNull(
