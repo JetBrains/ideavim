@@ -364,6 +364,10 @@ class CommandBuilder private constructor(
   fun buildCommand(): Command {
     val rawCount = calculateCount0Snapshot()
     val command = Command(selectedRegister, rawCount, action!!, argument, action!!.type, action?.flags ?: noneOfEnum())
+    // A motion that is the argument of an operator is never built as its own Command, so its `process` hook would
+    // never run. Actions that derive per-command state in `process` (e.g. the linewise motion type of a counted `%`)
+    // would then keep the value set by a previous, unrelated command. Run the hook for this command as well.
+    (argument as? Argument.Motion)?.motion?.process(command)
     resetAll(keyStrokeTrie)
     return command
   }
