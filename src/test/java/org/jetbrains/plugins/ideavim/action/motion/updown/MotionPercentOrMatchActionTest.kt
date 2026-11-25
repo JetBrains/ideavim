@@ -265,8 +265,32 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
   @Test
-  fun `test deleting with percent motion backward`() {
-    doTest("d%", "(foo bar$c)", c, Mode.NORMAL())
+  fun `test deleting with percent motion backward square brackets`() {
+    doTest("d%", "Foo[Bar$c]", "Foo", Mode.NORMAL())
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
+  @Test
+  fun `test operator percent does not inherit linewise type from counted percent`() {
+    configureByText("Foo[Bar$c]")
+    enterCommand("set nostartofline")
+    typeText("25%")
+    typeText("d%")
+    assertState("Foo")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
+  @Test
+  fun `test operator counted percent deletes linewise`() {
+    configureByText("one$c\ntwo\nthree\nfour\nfive\nsix\nseven\neight\n")
+    typeText("d100%")
+    assertState("")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
+  @Test
+  fun `test deleting with percent motion backward curly braces`() {
+    doTest("d%", "Foo{Bar$c}", "Foo", Mode.NORMAL())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
