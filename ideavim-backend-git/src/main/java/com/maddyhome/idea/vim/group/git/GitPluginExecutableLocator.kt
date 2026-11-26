@@ -20,23 +20,26 @@ import git4idea.config.GitExecutableManager
  * - `IdeaVIM.ideavim-backend-git-legacy` depends on the `Git4Idea` plugin, whose main module
  *   contains [GitExecutableManager] in 2026.1.
  *
- * In newer IDEs both modules load, but only one can resolve [GitExecutableManager] from its own
- * classloader. The other returns null, so [GitCliClient] uses the first locator that answers.
+ * In newer IDEs both modules load, and both may resolve [GitExecutableManager], each through its own
+ * classloader. Only the copy the service was registered with can fetch it; the other gets a
+ * [ClassCastException] from the service lookup and returns null, so [GitCliClient] uses the
+ * first locator that answers.
  */
 internal class GitPluginExecutableLocator : GitExecutableLocator {
 
-  private val gitPluginResolvable: Boolean by lazy {
+  private val gitPluginUsable: Boolean by lazy {
     try {
-      // `initialize = false`: we only need to know the class is reachable from this classloader
-      Class.forName("git4idea.config.GitExecutableManager", false, javaClass.classLoader)
+      GitExecutableManager.getInstance()
       true
-    } catch (_: Throwable) {
+    } catch (_: LinkageError) {
+      false
+    } catch (_: ClassCastException) {
       false
     }
   }
 
   override fun findExecutable(project: Project): String? {
-    if (!gitPluginResolvable) return null
+    if (!gitPluginUsable) return null
     return GitExecutableManager.getInstance().getPathToGit(project)
   }
 }

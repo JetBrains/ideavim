@@ -13,6 +13,8 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.configurations.PathEnvironmentVariableUtil
 import com.intellij.execution.process.CapturingProcessHandler
 import com.intellij.execution.process.ProcessOutput
+import com.intellij.openapi.diagnostic.ControlFlowException
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
@@ -23,11 +25,20 @@ import kotlin.io.path.isExecutable
 
 /**
  * [GitClient] that runs the git executable given by [GitExecutableLocator], falling back to `git` on PATH.
+ * A locator that fails is skipped, so a broken Git plugin integration doesn't break the git commands.
  */
 internal class GitCliClient(private val project: Project) : GitClient {
 
   override val executable: String
-    get() = GitExecutableLocator.EP_NAME.extensionList.firstNotNullOfOrNull { it.findExecutable(project) } ?: GIT
+    get() = GitExecutableLocator.EP_NAME.extensionList.firstNotNullOfOrNull { it.findExecutableOrNull() } ?: GIT
+
+  private fun GitExecutableLocator.findExecutableOrNull(): String? = try {
+    findExecutable(project)
+  } catch (e: Exception) {
+    if (e is ControlFlowException) throw e
+    logger.warn("Git executable locator ${javaClass.name} failed", e)
+    null
+  }
 
   override fun isExecutableFound(): Boolean {
     val git = executable
@@ -72,6 +83,8 @@ internal class GitCliClient(private val project: Project) : GitClient {
 
   private companion object {
     const val GIT = "git"
+
+    val logger = Logger.getInstance(GitCliClient::class.java)
 
     /**
      * A bare name like `git` is looked up on PATH, anything else is a path to the executable.
