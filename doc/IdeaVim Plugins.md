@@ -393,6 +393,69 @@ https://github.com/tommcdo/vim-exchange/blob/master/doc/exchange.txt
 </details>
 
 <details>
+<summary><h2>expand-region: Grow and shrink the selection region by region</h2></summary>
+
+Original plugin: [vim-expand-region](https://github.com/terryma/vim-expand-region).
+
+### Summary:
+Press `+` to select the smallest region around the caret, and press it again to grow the selection to the next
+larger region. Press `_` in Visual mode to shrink the selection back.
+
+The regions come from text objects. The plugin tries every configured text object from the caret position, drops
+the ones that don't contain the caret, and orders the rest by size. For example, with the caret on `world` in
+`print(user.name, "hello world")`, each `+` selects:
+
+1. `world` (`iw`)
+2. `world")` (`iW`)
+3. `hello world` (`i"`)
+4. `user.name, "hello world"` (`ib`)
+5. the paragraph (`ip`)
+
+The default text objects are `iw`, `iW`, `i"`, `i'`, `i]`, `ib`, `iB`, `il`, `ip` and `ie`. `i]`, `ib` and `iB`
+also walk out through nested brackets (`2ib`, `3ib`, ...). `il` and `ie` only take part when the textobj-line and
+textobj-entire extensions are enabled. Text objects from any other extension work as well.
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'terryma/vim-expand-region'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plugin 'terryma/vim-expand-region'</code>
+      <br/>
+      <code>Plug 'https://github.com/terryma/vim-expand-region'</code>
+      <br/>
+      <code>Plug 'vim-expand-region'</code>
+      <br/>
+      <code>set expand-region</code>
+      </details>
+
+To use other keys, map the `<Plug>` mappings. The default `+` and `_` mappings are skipped when you do:
+
+```
+nmap K <Plug>(expand_region_expand)
+xmap K <Plug>(expand_region_expand)
+xmap J <Plug>(expand_region_shrink)
+```
+
+To change the text objects, set `g:expand_region_text_objects` to a dictionary. It replaces the default list.
+A value of `1` means the text object can nest, like brackets do:
+
+```
+let g:expand_region_text_objects = {'iw': 0, 'i"': 0, 'ib': 1, 'iB': 1, 'ii': 0, 'ip': 0}
+```
+
+To end in Select mode instead of Visual mode, add `let g:expand_region_use_select_mode = 1`. This also happens when
+`selectmode` contains `cmd`.
+
+`expand_region#custom_text_objects()` and filetype-specific dictionaries (`g:expand_region_text_objects_{ft}`) are
+not supported.
+
+### Instructions
+
+https://github.com/terryma/vim-expand-region/blob/master/README.md
+
+</details>
+
+<details>
 <summary><h2>fugitive: Search the files tracked by Git and walk the matches</h2></summary>
 
 Original plugin: [vim-fugitive](https://github.com/tpope/vim-fugitive).
