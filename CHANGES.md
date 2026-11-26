@@ -29,9 +29,21 @@ usual beta standards.
 * [VIM-2363](https://youtrack.jetbrains.com/issue/VIM-2363) New `lion` extension emulates [vim-lion](https://github.com/tommcdo/vim-lion). Enable it with `Plug 'tommcdo/vim-lion'`. `glip=` aligns the `=` signs of a paragraph by adding spaces before them, and `gLip:` aligns the text after the `:` signs. Works with any motion and in Visual mode, supports a count, `glip2,` to start at the second comma, `gl{motion}<Space>` to align words and `gl{motion}/` to align to a pattern. See the [documentation](https://github.com/JetBrains/ideavim/blob/master/doc/IdeaVim%20Plugins.md)
 * [VIM-2726](https://youtrack.jetbrains.com/issue/VIM-2726) New `textobj-quote` extension emulates [vim-textobj-quote](https://github.com/preservim/vim-textobj-quote). Enable it with `Plug 'preservim/vim-textobj-quote'`. `iq`/`aq` select the text inside “double” quotes and `iQ`/`aQ` inside ‘single’ quotes, without and with the quotes, e.g. `ciq` or `daQ`. An apostrophe such as in `don’t` isn't taken for a closing quote. The keys and the quote characters can be changed with the `g:textobj#quote#doubleMotion`, `g:textobj#quote#singleMotion`, `g:textobj#quote#doubleDefault` and `g:textobj#quote#singleDefault` variables. `:Educate` turns straight quotes typed in Insert mode into typographic ones in the current buffer, `:NoEducate` and `:ToggleEducate` turn it off or switch it. See the [documentation](https://github.com/JetBrains/ideavim/blob/master/doc/IdeaVim%20Plugins.md)
 * [VIM-4222](https://youtrack.jetbrains.com/issue/VIM-4222) New `matchup` extension emulates [vim-matchup](https://github.com/andymass/vim-matchup). Enable it with `Plug 'andymass/vim-matchup'`. `%` and `g%` jump between the words of a block, such as `if`, `else` and `end`, and land on the end of the word. `[%` and `]%` go to the start and the end of the surrounding block, `z%` goes inside the next one, and `i%`/`a%` select the inside of a block or the whole block, e.g. `di%` or `va%`. The words of the block under the cursor are highlighted, and the line of a match that is off screen is shown in a hint. With `let g:matchup_surround_enabled = 1`, `ds%` deletes the surrounding words and `cs%` replaces them. See the [documentation](https://github.com/JetBrains/ideavim/blob/master/doc/IdeaVim%20Plugins.md)
+* [VIM-3289](https://youtrack.jetbrains.com/issue/VIM-3289) Added the [`:enew`](https://vimhelp.org/editing.txt.html#%3Aenew), [`:new`](https://vimhelp.org/windows.txt.html#%3Anew) and [`:vnew`](https://vimhelp.org/windows.txt.html#%3Avnew) commands. As the IDE has no unnamed buffers, they open a new empty [scratch file](https://www.jetbrains.com/help/idea/scratches.html) in the current window, a horizontal split or a vertical split. With a file name, `:new file` and `:vnew file` split and open that file, like `:split` and `:vsplit`
+* [VIM-485](https://youtrack.jetbrains.com/issue/VIM-485) Added the [`'errorbells'`](https://vimhelp.org/options.txt.html#%27errorbells%27) option. As in Vim, it is off by default, so error messages no longer ring the bell unless `:set errorbells` is used. Errors without a message, such as `k` on the first line, still ring it; `'visualbell'` silences both
 
 ### Fixes:
 
+* [VIM-561](https://youtrack.jetbrains.com/issue/VIM-561) Fixed [`g0`](https://vimhelp.org/motion.txt.html#g0), `g^` and `g$` on a soft-wrapped line jumping to the first screen line of the wrapped line instead of staying on the current screen line
+* [VIM-418](https://youtrack.jetbrains.com/issue/VIM-418) Fixed text objects with [`selection=exclusive`](https://vimhelp.org/options.txt.html#%27selection%27) leaving out the last character, so `va'` dropped the closing quote and `viw` the last letter of the word
+* [VIM-2742](https://youtrack.jetbrains.com/issue/VIM-2742) Fixed `ds(`, `ds[`, `ds{` and `ds<` of the `surround` extension keeping the spaces between the bracket and its content. As in vim-surround, deleting with the opening bracket now trims them, while `ds)` keeps them
+* [VIM-2609](https://youtrack.jetbrains.com/issue/VIM-2609) Fixed `>>` and `<<` adding stray spaces after tabs when the editor's tab size differs from the code style one, e.g. in language injections or with detected indents
+* [VIM-2608](https://youtrack.jetbrains.com/issue/VIM-2608) Fixed Visual block `I` and `c` inserting the text one character too early on following lines that have leading tabs or collapsed folds
+* [VIM-4332](https://youtrack.jetbrains.com/issue/VIM-4332) Fixed dark text on a dark background in the command line and the output panel when a light editor colour scheme is used with a dark IDE theme
+* Fixed `{count}r{char}` leaving the caret on the first replaced character instead of the last one, as in Vim. `3rX` followed by `l.` now continues after the replaced text
+* Fixed `.` after an insert started with [`gi`](https://vimhelp.org/insert.txt.html#gi) inserting at the old insert position again. As in Vim, it now inserts at the caret, like an `i` insert
+* Fixed text objects defined with `textobj-user` as a `[header, footer]` pair selecting a pair that ends before the cursor. With `<<first>> mid|dle <<second>>`, the object now selects `<<second>>` instead of `<<first>>`
+* Fixed `let` silently doing nothing for variables with autoload-style names, such as `let g:textobj#quote#doubleMotion = 'q'`
 * Fixed `%` of the `matchit` extension freezing the IDE for many seconds in files with tens of thousands of lines
 * Fixed `p` sometimes pasting nothing from the `+` register on X11 for text copied in another application, so that only a second `p` worked
 * Fixed text yanked blockwise with `"+y` being pasted characterwise on systems without a PRIMARY selection
@@ -58,7 +70,21 @@ usual beta standards.
 * [2196](https://github.com/JetBrains/ideavim/pull/2196) by [1grzyb1](https://github.com/1grzyb1): VIM-4378 Do not normalize the caret in an editor disposed by the action
 * [2199](https://github.com/JetBrains/ideavim/pull/2199) by [1grzyb1](https://github.com/1grzyb1): VIM-4379 Do not scan all keys on every keystroke
 * [2200](https://github.com/JetBrains/ideavim/pull/2200) by [1grzyb1](https://github.com/1grzyb1): VIM-4370 Don't wait for the backend before the first command in a document
+* [2202](https://github.com/JetBrains/ideavim/pull/2202) by [1grzyb1](https://github.com/1grzyb1): VIM-2363 Add lion extension
+* [2205](https://github.com/JetBrains/ideavim/pull/2205) by [1grzyb1](https://github.com/1grzyb1): VIM-4332 Take command line background from the editor colour scheme
+* [2209](https://github.com/JetBrains/ideavim/pull/2209) by [1grzyb1](https://github.com/1grzyb1): VIM-2726 Add textobj-quote extension
+* [2211](https://github.com/JetBrains/ideavim/pull/2211) by [1grzyb1](https://github.com/1grzyb1): VIM-2608 Place block insert replay at buffer columns
+* [2214](https://github.com/JetBrains/ideavim/pull/2214) by [1grzyb1](https://github.com/1grzyb1): VIM-4259 Put the clipboard back after the backend paste in split mode
+* [2215](https://github.com/JetBrains/ideavim/pull/2215) by [1grzyb1](https://github.com/1grzyb1): VIM-2609 Measure line indent with the code style tab size when shifting
+* [2216](https://github.com/JetBrains/ideavim/pull/2216) by [1grzyb1](https://github.com/1grzyb1): VIM-2742 Trim inner spaces when deleting surround with an opening bracket
+* [2223](https://github.com/JetBrains/ideavim/pull/2223) by [1grzyb1](https://github.com/1grzyb1): VIM-4222 Add the matchup extension
+* [2224](https://github.com/JetBrains/ideavim/pull/2224) by [1grzyb1](https://github.com/1grzyb1): VIM-3289 Add :enew, :new and :vnew backed by scratch files
+* [2227](https://github.com/JetBrains/ideavim/pull/2227) by [1grzyb1](https://github.com/1grzyb1): VIM-418 Put the caret after a text object with selection=exclusive
+* [2228](https://github.com/JetBrains/ideavim/pull/2228) by [1grzyb1](https://github.com/1grzyb1): VIM-561 Move g0, g^ and g$ within the current screen line of a soft-wrapped line
 * [2184](https://github.com/JetBrains/ideavim/pull/2184) by [pppobear](https://github.com/pppobear): Fix(VIM-4375): Avoid opaque background for empty mode widget
+* [2217](https://github.com/JetBrains/ideavim/pull/2217) by [Inf1mum](https://github.com/Inf1mum): Leave the caret on the last replaced character for r with a count
+* [2218](https://github.com/JetBrains/ideavim/pull/2218) by [Inf1mum](https://github.com/Inf1mum): VIM-485 Support 'errorbells' and 'noerrorbells'
+* [2219](https://github.com/JetBrains/ideavim/pull/2219) by [Inf1mum](https://github.com/Inf1mum): Repeat a 'gi' insert like an 'i' insert, at the current caret
 
 ## 2.49.0, 2026-11-18
 
