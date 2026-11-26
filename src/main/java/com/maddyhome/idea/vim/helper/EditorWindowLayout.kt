@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.scroll.WindowLayout
 import com.maddyhome.idea.vim.scroll.WindowView
 import java.awt.Rectangle
+import java.util.TreeSet
 import kotlin.math.max
 import kotlin.math.min
 
@@ -74,8 +75,32 @@ internal class EditorWindowLayout(private val editor: Editor) : WindowLayout {
   fun offsetOf(view: WindowView): Int =
     (viewTop(view) - stickyLinesHeight).coerceIn(0, max(0, maxOffset()))
 
-  /** True if the top of [view] is not hidden under the sticky lines panel */
-  fun isShown(view: WindowView): Boolean = viewTop(view) >= textAreaTop
+  /**
+   * The largest scroll offset that shows the top of [view] below the sticky lines panel, as the panel is at that offset.
+   *
+   * The panel height depends on the offset and isn't monotonic, so we try the offsets that put the view below a panel
+   * of a whole number of rows, and below the panel measured at each of them, which covers a panel whose last line is
+   * sliding out at the end of its scope. The panel is never taller than its line limit, so the last row offset fits.
+   */
+  fun offsetShowing(view: WindowView): Int {
+    val top = viewTop(view)
+    val maxOffset = max(0, maxOffset())
+    val belowPanel = TreeSet<Int>(reverseOrder())
+    for (rows in 0..editor.settings.stickyLinesLimit) {
+      val offset = (top - rows * rowHeight).coerceIn(0, maxOffset)
+      while (belowPanel.isNotEmpty() && belowPanel.first() > offset) {
+        val candidate = belowPanel.pollFirst()!!
+        if (candidate + stickyLinesHeightAt(candidate) <= top) return candidate
+      }
+      val height = stickyLinesHeightAt(offset)
+      if (offset + height <= top) return offset
+      belowPanel += (top - height).coerceIn(0, maxOffset)
+    }
+    return belowPanel.firstOrNull { it + stickyLinesHeightAt(it) <= top } ?: 0
+  }
+
+  /** True if the editor can't scroll further in the [direction] of the sign */
+  fun isAtScrollLimit(direction: Int): Boolean = if (direction > 0) offset >= maxOffset() else offset <= 0
 
   /** The scroll offset that puts the bottom of [line] at the bottom of the text area */
   fun offsetToShowAtBottom(line: Int): Int {
@@ -117,6 +142,10 @@ internal class EditorWindowLayout(private val editor: Editor) : WindowLayout {
 
   // The space between the line and the one above it, or the top of the editor
   private fun gapAbove(line: Int): Int = lineTop(line) - if (line > 0) lineBottom(line - 1) else 0
+
+  private fun stickyLinesHeightAt(offset: Int): Int =
+    if (offset == this.offset) stickyLinesHeight
+    else editor.stickyLinesHeightAt(Rectangle(viewport.x, offset, viewport.width, viewport.height))
 
   private fun maxOffset(): Int {
     val contentHeight = (editor as? EditorEx)?.contentComponent?.preferredSize?.height ?: return Int.MAX_VALUE

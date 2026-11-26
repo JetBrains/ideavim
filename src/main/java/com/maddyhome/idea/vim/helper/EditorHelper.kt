@@ -192,21 +192,15 @@ object EditorHelper {
    * Scrolls the editor to show [view], below the sticky lines panel.
    *
    * The sticky lines panel shows the lines whose scopes start above the top of the screen, so its height changes when we
-   * scroll, and the top of the view can end up under the panel. We measure the panel for the position we scroll to, so
-   * we adjust straight away, rather than on the next keystroke. When [keepBottom] is true, the bottom of the window is what
+   * scroll, and the top of the view can end up under the panel. We measure the panel for the positions we could scroll
+   * to and take the closest one that shows the view. When [keepBottom] is true, the bottom of the window is what
    * matters, and it doesn't move when the panel changes height, so we don't adjust.
    *
    * @return Returns true if the window was moved
    */
   fun scrollToView(editor: Editor, view: WindowView, keepBottom: Boolean = false): Boolean {
-    var scrolled = scrollVertically(editor, EditorWindowLayout(editor).offsetOf(view))
-    if (keepBottom) return scrolled
-    repeat(MAX_STICKY_LINES_ADJUSTMENTS) {
-      val layout = EditorWindowLayout(editor)
-      if (layout.isShown(view) || !scrollVertically(editor, layout.offsetOf(view))) return scrolled
-      scrolled = true
-    }
-    return scrolled
+    val layout = EditorWindowLayout(editor)
+    return scrollVertically(editor, if (keepBottom) layout.offsetOf(view) else layout.offsetShowing(view))
   }
 
   /** Scrolls the editor to show [target], see [VerticalScroll] */
