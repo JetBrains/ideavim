@@ -265,6 +265,12 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
   @Test
+  fun `test deleting with percent motion backward`() {
+    doTest("d%", "(foo bar$c)", c, Mode.NORMAL())
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
+  @Test
   fun `test deleting with percent motion backward square brackets`() {
     doTest("d%", "Foo[Bar$c]", "Foo", Mode.NORMAL())
   }
