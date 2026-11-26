@@ -540,6 +540,14 @@
       </aliases>
     </vimExtension>
 
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.expandregion.VimExpandRegion" name="expand-region">
+      <aliases>
+        <alias name="https://github.com/terryma/vim-expand-region"/>
+        <alias name="terryma/vim-expand-region"/>
+        <alias name="vim-expand-region"/>
+      </aliases>
+    </vimExtension>
+
     <vimExtension implementation="com.maddyhome.idea.vim.extension.highlightedyank.VimHighlightedYank"
                   name="highlightedyank">
       <aliases>
