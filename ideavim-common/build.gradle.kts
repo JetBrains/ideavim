@@ -30,6 +30,10 @@ val ideaBranchNumber = ideaVersion.substringBefore('-').split('.').let { parts -
 // product-info.json doesn't list it, which fails resolution.
 val rpcModuleExists = ideaBranchNumber >= 261
 
+// In 2025.3 its transitive dependencies put a copy of kotlinx.serialization without a version (in ktor.utils) on the
+// classpath, and the serialization compiler plugin fails when that copy comes first
+val rpcTopicsIsSeparateModule = ideaBranchNumber >= 263
+
 repositories {
   maven { url = uri("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2") }
   maven("https://cache-redirector.jetbrains.com/packages.jetbrains.team/maven/p/ij/intellij-dependencies")
@@ -61,7 +65,7 @@ dependencies {
     create(ideaType, ideaVersion) { this.useInstaller = useInstaller }
 
     bundledModule("intellij.spellchecker")
-    bundledModule("intellij.platform.rpc.topics")
+    if (rpcTopicsIsSeparateModule) bundledModule("intellij.platform.rpc.topics")
     if (rpcModuleExists) bundledModule("intellij.platform.rpc")
   }
 }

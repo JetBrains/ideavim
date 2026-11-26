@@ -609,6 +609,7 @@ intellijPlatform {
     // (only bundled IDE plugins are resolved). Suppress "Package 'org.acejump' is not found" so
     // the optional integration in :ideavim-acejump doesn't fail verification.
     externalPrefixes.add("org.acejump")
+    ignoredProblemsFile = layout.projectDirectory.file("plugin-verifier-ignored-problems.txt")
   }
 
   instrumentCode.set(instrumentPluginCode.toBoolean())

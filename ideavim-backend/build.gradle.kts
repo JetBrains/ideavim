@@ -19,6 +19,15 @@ val ideaType: String by project
 val ideaVersion: String by project
 val javaVersion: String by project
 
+val ideaBranchNumber = ideaVersion.substringBefore('-').split('.').let { parts ->
+  val head = parts[0].toIntOrNull() ?: Int.MAX_VALUE // LATEST-EAP-SNAPSHOT
+  val isProductVersion = head > 1000                // 2026.2 rather than 262.8665.258
+  if (isProductVersion) (head % 100) * 10 + (parts.getOrNull(1)?.toIntOrNull() ?: 1) else head
+}
+
+// Older versions don't need it, and in 2025.3 its dependencies break the serialization compiler plugin
+val rpcTopicsIsSeparateModule = ideaBranchNumber >= 263
+
 repositories {
   maven { url = uri("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2") }
   maven("https://cache-redirector.jetbrains.com/packages.jetbrains.team/maven/p/ij/intellij-dependencies")
@@ -46,7 +55,7 @@ dependencies {
     create(ideaType, ideaVersion) { this.useInstaller = useInstaller }
 
     bundledModule("intellij.platform.rpc.backend")
-    bundledModule("intellij.platform.rpc.topics")
+    if (rpcTopicsIsSeparateModule) bundledModule("intellij.platform.rpc.topics")
   }
 }
 
