@@ -292,14 +292,15 @@ internal class MatchParenRequest(
   val modificationStamp: Long,
 ) {
   /**
-   * The editor can be closed while the search runs, and then reading its positions throws. The search is cancelled
-   * then, as it is when the editor is closed before the search starts.
+   * The editor can be closed while the search runs, and then reading its positions throws. Nothing is found then, and
+   * the read action expires before the result reaches the editor. A thrown [ProcessCanceledException] would fail the
+   * read action instead, because its progress isn't cancelled.
    */
   fun findDelimitersInBackground(editor: Editor): List<Delimiter> = try {
     findDelimiters(editor)
   } catch (e: RuntimeException) {
     if (e is ProcessCanceledException || !editor.isDisposed) throw e
-    throw ProcessCanceledException(e)
+    emptyList()
   }
 
   /**

@@ -9,12 +9,13 @@
 package org.jetbrains.plugins.ideavim.extension.matchup
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.application.impl.NonBlockingReadActionImpl
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
-import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.testFramework.PlatformTestUtil
+import com.intellij.util.concurrency.AppExecutorUtil
 import com.maddyhome.idea.vim.extension.matchit.BlockPatterns
 import com.maddyhome.idea.vim.extension.matchit.blockPatterns
 import com.maddyhome.idea.vim.extension.matchup.MatchParenRequest
@@ -28,8 +29,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
+import kotlin.test.fail
 
 /**
  * The highlighted text is marked with « and » in the expected text.
@@ -369,7 +371,7 @@ class MatchupMatchParenTest : VimTestCase() {
   }
 
   @Test
-  fun `test the search is cancelled when the editor is closed while it runs`() {
+  fun `test the search expires when the editor is closed while it runs`() {
     configureRuby(rubyIf)
     waitForMatchParen()
     lateinit var patterns: List<BlockPatterns>
@@ -392,9 +394,14 @@ class MatchupMatchParenTest : VimTestCase() {
       editorFactory.releaseEditor(closedEditor)
     }
 
-    assertFailsWith<ProcessCanceledException> {
-      ReadAction.run<Throwable> { request.findDelimitersInBackground(closedEditor) }
-    }
+    var searched = false
+    val search = ReadAction.nonBlocking<Any> { request.findDelimitersInBackground(closedEditor).also { searched = true } }
+      .expireWhen { searched }
+      .finishOnUiThread(ModalityState.any()) { fail("The result of a search in a closed editor is used") }
+      .submit(AppExecutorUtil.getAppExecutorService())
+    waitForMatchParen()
+
+    assertTrue(search.isCancelled)
   }
 
   private fun configureRuby(content: String) {
