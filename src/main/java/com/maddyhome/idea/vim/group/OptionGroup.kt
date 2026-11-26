@@ -51,6 +51,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.followIdeVirtualSpace
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.NumberOption
@@ -106,6 +107,7 @@ class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup, InternalOptionValueA
     // IDE setting, and this callback can be the only way to reset them.
     // There isn't a similar notification for code style changes, so we can't handle colorcolumn or textwidth
     EditorSettingsExternalizable.getInstance().addPropertyChangeListener({ event ->
+      if (event.propertyName == EditorSettingsExternalizable.PropNames.PROP_IS_VIRTUAL_SPACE) followIdeVirtualSpace()
       namedOverrides[event.propertyName]?.onGlobalIdeaValueChanged(event.propertyName)
       simpleOverrides.forEach { override ->
         override.onGlobalIdeaValueChanged(event.propertyName)

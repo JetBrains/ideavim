@@ -18,6 +18,7 @@ import com.maddyhome.idea.vim.api.moveToMotion
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.helper.isVirtualEditActive
 import com.maddyhome.idea.vim.helper.exitVisualMode
 
 /**
@@ -51,7 +52,7 @@ class VisualExitModeAction : VimActionHandler.ConditionalMulticaret() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     val lineEnd = editor.getLineEndForOffset(caret.offset)
-    if (lineEnd == caret.offset) {
+    if (lineEnd == caret.offset && !editor.isVirtualEditActive()) {
       val position = injector.motion.getHorizontalMotion(editor, caret, -1, false)
       caret.moveToMotion(position)
     }

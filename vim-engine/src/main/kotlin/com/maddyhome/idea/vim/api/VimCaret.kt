@@ -123,6 +123,30 @@ per-caret marks.
     return updatedCaret
   }
 
+  /**
+   * Moves the caret to a [position] past the end of the line, allowed by 'virtualedit'
+   *
+   * The [lineEndOffset] is the offset of the end of that line, used to update the selection.
+   */
+  fun moveToVirtualPosition(lineEndOffset: Int, position: VimVisualPosition): VimCaret {
+    if (!isValid) return this
+    if (editor.inBlockSelection) return moveToOffset(lineEndOffset)
+
+    val oldVisualLine = getVisualPosition().line
+    moveToVisualPosition(position)
+    if (this == editor.primaryCaret()) {
+      injector.scroll.scrollCaretIntoView(editor, position.line != oldVisualLine)
+    }
+
+    return if (editor.inVisualMode || editor.inSelectMode || editor.inCommandLineModeWithVisual) {
+      vimMoveSelectionToCaret(this.vimSelectionStart)
+      editor.findLastVersionOfCaret(this) ?: this
+    } else {
+      editor.exitVisualMode()
+      this
+    }
+  }
+
   fun moveToOffsetNative(offset: Int)
 
   /**
@@ -146,7 +170,9 @@ per-caret marks.
 }
 
 fun VimCaret.moveToMotion(motion: Motion): VimCaret {
-  return if (motion is Motion.AbsoluteOffset) {
+  return if (motion is Motion.VirtualColumn) {
+    this.moveToVirtualPosition(motion.offset, motion.position)
+  } else if (motion is Motion.AbsoluteOffset) {
     this.moveToOffset(motion.offset)
   } else {
     // todo what should we do if it is a error motion?

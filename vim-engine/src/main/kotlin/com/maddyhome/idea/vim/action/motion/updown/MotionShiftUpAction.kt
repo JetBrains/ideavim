@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.moveToMotion
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
@@ -35,7 +36,7 @@ class MotionShiftUpAction : ShiftedArrowKeyHandler(false) {
     val vertical = injector.motion.getVerticalMotionOffset(editor, caret, -cmd.count)
     when (vertical) {
       is Motion.AdjustedOffset -> {
-        caret.moveToOffset(vertical.offset)
+        caret.moveToMotion(vertical)
         caret.vimLastColumn = vertical.intendedColumn
       }
 

@@ -15,11 +15,12 @@ import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
+import com.maddyhome.idea.vim.helper.isVirtualLineEnd
 import com.maddyhome.idea.vim.state.mode.Mode
 
 fun charToNativeSelection(editor: VimEditor, start: Int, end: Int, mode: Mode): Pair<Int, Int> {
   val (nativeStart, nativeEnd) = sort(start, end)
-  val adj = if (isExclusiveSelection() || mode is Mode.SELECT) 0 else 1
+  val adj = if (isExclusiveSelection() || mode is Mode.SELECT || editor.isVirtualLineEnd(nativeEnd, mode)) 0 else 1
   val adjEnd = (nativeEnd + adj).coerceAtMost(editor.fileSize().toInt())
   return nativeStart to adjEnd
 }

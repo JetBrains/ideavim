@@ -297,6 +297,17 @@ interface VimEditor {
 
   fun isTemplateActive(): Boolean
 
+  /**
+   * Allows the caret after the end of a line, for 'virtualedit'
+   */
+  fun enableVirtualSpace() {}
+
+  /**
+   * Gives the editor its own setting for the caret after the end of a line back. Returns false if [enableVirtualSpace]
+   * didn't change it
+   */
+  fun restoreVirtualSpace(): Boolean = false
+
   fun startGuardedBlockChecking()
   fun stopGuardedBlockChecking()
 

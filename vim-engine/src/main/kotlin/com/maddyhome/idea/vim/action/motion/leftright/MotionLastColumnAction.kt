@@ -13,7 +13,6 @@ import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.Argument
@@ -24,6 +23,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.helper.lineEndMotion
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 import java.util.*
 
@@ -48,7 +48,7 @@ abstract class MotionLastColumnBaseAction(private val isMotionForOperator: Boole
     }
 
     val offset = injector.motion.moveCaretToRelativeLineEnd(editor, caret, operatorArguments.count1 - 1, allowPastEnd)
-    return Motion.AdjustedOffset(offset, VimMotionGroupBase.LAST_COLUMN)
+    return editor.lineEndMotion(caret, offset, operatorArguments.count1, isMotionForOperator)
   }
 }
 

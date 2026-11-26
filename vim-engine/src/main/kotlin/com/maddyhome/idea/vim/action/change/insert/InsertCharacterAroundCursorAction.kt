@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
+import com.maddyhome.idea.vim.helper.fillVirtualSpace
 
 @CommandOrMotion(
   keys = ["<C-Y>"],
@@ -85,10 +86,11 @@ private fun insertCharacterAroundCursor(editor: VimEditor, caret: VimCaret, dir:
     val charsSequence = editor.text()
     if (offset < charsSequence.length) {
       val ch = charsSequence[offset]
+      val filledCaret = caret.fillVirtualSpace(0)
       injector.application.runWriteAction {
-        (editor as MutableVimEditor).insertText(caret, caret.offset, ch.toString())
+        (editor as MutableVimEditor).insertText(filledCaret, filledCaret.offset, ch.toString())
       }
-      caret.moveToMotion(injector.motion.getHorizontalMotion(editor, caret, 1, true))
+      filledCaret.moveToMotion(injector.motion.getHorizontalMotion(editor, filledCaret, 1, true))
       res = true
     }
   }

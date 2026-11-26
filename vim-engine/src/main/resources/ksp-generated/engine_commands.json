@@ -913,7 +913,12 @@
   {
     "keys": "<End>",
     "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionEndAction",
-    "modes": "NXSO"
+    "modes": "NXS"
+  },
+  {
+    "keys": "<End>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionEndOpPendingAction",
+    "modes": "O"
   },
   {
     "keys": "<End>",

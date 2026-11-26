@@ -11,5 +11,9 @@ package com.maddyhome.idea.vim.common
 interface ChangesListener {
   fun documentChanged(change: Change)
 
-  class Change(val oldFragment: String, val newFragment: String, val offset: Int)
+  /**
+   * @param virtualSpaceFill The number of characters at the start of [newFragment] that only fill the virtual space
+   *                         between the end of the line and a caret placed after it
+   */
+  class Change(val oldFragment: String, val newFragment: String, val offset: Int, val virtualSpaceFill: Int = 0)
 }

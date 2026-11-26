@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.VimLockLabel
+import com.maddyhome.idea.vim.helper.fillVirtualSpace
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -510,6 +511,11 @@ abstract class VimPutBase : VimPut {
     }
   }
 
+  private fun fillVirtualSpace(caret: VimCaret, data: PutData, text: ProcessedTextData): VimCaret {
+    if (data.visualSelection != null || text.typeInRegister.isLine) return caret
+    return caret.fillVirtualSpace(if (data.insertTextBeforeCaret) 0 else 1)
+  }
+
   @VimLockLabel.SelfSynchronized
   private fun putForCaret(
     editor: VimEditor,
@@ -522,6 +528,7 @@ abstract class VimPutBase : VimPut {
     var updated = caret
     notifyAboutIdeaPut(editor)
     if (data.visualSelection?.typeInEditor?.isLine == true && editor.isOneLineMode()) return updated
+    updated = fillVirtualSpace(updated, data, text)
     val startOffsets = prepareDocumentAndGetStartOffsets(editor, updated, text.typeInRegister, data, additionalData)
 
     startOffsets.forEach { startOffset ->
@@ -583,6 +590,7 @@ abstract class VimPutBase : VimPut {
   ) {
     val visualSelection = data.visualSelection
     val selectionType = visualSelection?.typeInEditor ?: SelectionType.CHARACTER_WISE
+    editor.nativeCarets().forEach { fillVirtualSpace(it, data, text) }
     if (injector.globalOptions().clipboard.contains(OptionConstants.clipboard_ideaput)) {
       val idePasteProvider = getProviderForPasteViaIde(editor, text.typeInRegister, data)
       if (idePasteProvider != null) {

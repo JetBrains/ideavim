@@ -20,6 +20,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.helper.leaveInactiveVirtualSpace
 import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeySource
@@ -295,6 +296,7 @@ class KeyHandler {
       logger.trace("Ready command builder. Execute command.")
       executeCommand(editor, context, injector.vimState, keyState)
       VimRedoBuffer.commandFinished(editor)
+      editor.leaveInactiveVirtualSpace()
     }
 
     // Don't record the keystroke that stops the recording (unmapped this is `q`)

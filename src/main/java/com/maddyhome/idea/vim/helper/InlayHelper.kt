@@ -13,8 +13,10 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.VisualPosition
+import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.util.concurrency.annotations.RequiresEdt
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.vim
 
 /**
  * Move the caret to the given offset, handling inline inlays
@@ -110,7 +112,10 @@ fun Editor.updateCaretsVisualPosition() {
   // By repositioning to the same offset, we will recalculate the expected visual position and put the caret in the
   // right location. Don't open a fold if the caret is inside
   injector.application.runReadAction {
+    // A caret after the line end is left to 'virtualedit', see leaveInactiveVirtualSpace
+    val usesVirtualEdit = this.vim.usesVirtualEdit
     this.vimForEachCaret {
+      if (usesVirtualEdit && EditorUtil.inVirtualSpace(this, it.logicalPosition)) return@vimForEachCaret
       if (!this.foldingModel.isOffsetCollapsed(it.offset)) {
         it.moveToInlayAwareOffset(it.offset)
       }

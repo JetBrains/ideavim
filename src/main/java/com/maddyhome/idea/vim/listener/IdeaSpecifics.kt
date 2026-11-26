@@ -56,10 +56,10 @@ import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
+import com.maddyhome.idea.vim.helper.allowsCaretAtLineEnd
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.hasVisualSelection
-import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.isPossiblyDelegatingToBackend
 import com.maddyhome.idea.vim.helper.vimInitialised
@@ -308,7 +308,7 @@ internal object IdeaSpecifics {
         // IdeaVim deinitializes an editor later than the platform disposes it, so vimInitialised is not enough
         if (editor == null || editor.isDisposed || !editor.vimInitialised) return
         val vimEditor = editor.vim
-        if (vimEditor.isEndAllowed) return
+        if (vimEditor.allowsCaretAtLineEnd()) return
 
         for (caret in editor.caretModel.allCarets) {
           val normalized = vimEditor.normalizeOffset(caret.offset, false)
