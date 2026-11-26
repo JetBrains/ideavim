@@ -133,8 +133,8 @@ However, some differences are inevitable.
 'virtualedit'   've'    Placement of the cursor where there is no actual text
         A comma-separated list of these words:
            block        Allow virtual editing in Visual mode (not supported)
-           insert       Allow virtual editing in Insert mode (not supported)
-           all          Allow virtual editing in all modes (not supported)
+           insert       Allow virtual editing in Insert mode
+           all          Allow virtual editing in all modes, except Visual block mode
            onemore      Allow the cursor to move just past the end of the line
 
 'visualbell'    'vb'    When on, prevents beeping on error

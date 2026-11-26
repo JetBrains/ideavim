@@ -20,6 +20,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
+import com.maddyhome.idea.vim.helper.deleteWordInVirtualSpace
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import java.util.*
@@ -47,6 +48,7 @@ class InsertDeletePreviousWordAction : ChangeEditorActionHandler.ForEachCaret() 
 
 // TODO This behavior should be configured via the `backspace` option
 private fun insertDeletePreviousWord(editor: VimEditor, context: ExecutionContext, caret: VimCaret): Boolean {
+  if (editor.insertMode && caret.deleteWordInVirtualSpace()) return true
   val deleteTo: Int = if (caret.getBufferPosition().column == 0) {
     caret.offset - 1
   } else {

@@ -13,7 +13,6 @@ import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.Argument
@@ -21,16 +20,17 @@ import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
+import com.maddyhome.idea.vim.helper.lineEndMotion
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.state.mode.isInsertionAllowed
 
 @CommandOrMotion(
   keys = ["<End>"],
-  modes = [Mode.NORMAL, Mode.VISUAL, Mode.SELECT, Mode.OP_PENDING],
+  modes = [Mode.NORMAL, Mode.VISUAL, Mode.SELECT],
   description = "Move to the end of the line, [count] - 1 lines downward. In Visual and Select mode, 'keymodel' decides whether the selection is stopped."
 )
-class MotionEndAction : NonShiftedSpecialKeyHandler() {
+open class MotionEndAction(private val isMotionForOperator: Boolean = false) : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
   override fun motion(
@@ -48,6 +48,13 @@ class MotionEndAction : NonShiftedSpecialKeyHandler() {
     }
 
     val offset = injector.motion.moveCaretToRelativeLineEnd(editor, caret, operatorArguments.count1 - 1, allow)
-    return Motion.AdjustedOffset(offset, VimMotionGroupBase.LAST_COLUMN)
+    return editor.lineEndMotion(caret, offset, operatorArguments.count1, isMotionForOperator)
   }
 }
+
+@CommandOrMotion(
+  keys = ["<End>"],
+  modes = [Mode.OP_PENDING],
+  description = "As an operator motion, move to the end of the line, [count] - 1 lines downward."
+)
+class MotionEndOpPendingAction : MotionEndAction(isMotionForOperator = true)

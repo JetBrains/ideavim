@@ -22,6 +22,8 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.IdeActionHandler
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.helper.isVirtualEditActive
+import com.maddyhome.idea.vim.helper.virtualColumns
 import com.maddyhome.idea.vim.undo.VimKeyBasedUndoService
 import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 import java.util.*
@@ -33,6 +35,19 @@ import java.util.*
 )
 internal class VimEditorDelete : IdeActionHandler(IdeActions.ACTION_EDITOR_DELETE) {
   override val type: Command.Type = Command.Type.DELETE
+
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    // After the line end, delete joins the next line without filling the virtual space first
+    if (editor.isVirtualEditActive()) {
+      editor.carets().filter { it.virtualColumns > 0 }.forEach { it.moveToOffset(it.offset) }
+    }
+    return super.execute(editor, context, cmd, operatorArguments)
+  }
 }
 
 @CommandOrMotion(

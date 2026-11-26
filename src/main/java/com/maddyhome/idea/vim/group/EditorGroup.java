@@ -31,6 +31,8 @@ import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.UserDataManager;
+import com.maddyhome.idea.vim.helper.VirtualEditKt;
+import com.maddyhome.idea.vim.helper.VirtualSpaceHelper;
 import com.maddyhome.idea.vim.newapi.IjVimDocument;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import org.jdom.Element;
@@ -217,6 +219,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     ((VimKeyGroupBase)VimPlugin.getKey()).registerRequiredShortcutKeys(editor);
 
     initLineNumbers(ijEditor);
+    VirtualEditKt.updateVirtualSpace(editor);
 
     // Listen for changes to the font size, so we can hide the ex text field/output panel
     if (ijEditor instanceof EditorEx editorEx) {
@@ -232,6 +235,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   public void editorDeinit(@NotNull VimEditor editor) {
     final Editor ijEditor = ((IjVimEditor)editor).getEditor();
     deinitLineNumbers(ijEditor);
+    VirtualSpaceHelper.restoreVirtualSpace(ijEditor);
     UserDataManager.unInitializeEditor(ijEditor);
     ((VimKeyGroupBase)VimPlugin.getKey()).unregisterShortcutKeys(editor);
     CaretVisualAttributesHelperKt.removeCaretsVisualAttributes(ijEditor);

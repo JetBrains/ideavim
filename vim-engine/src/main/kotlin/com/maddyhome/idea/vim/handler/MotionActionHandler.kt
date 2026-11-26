@@ -256,7 +256,11 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     // In Fleet the caret is immutable, so we get a new version of the caret in order to update it
     // The whole caret movement system should be actually rewritten to restrict the iteration with carets at any moment
     //   of time. In this way we would have a better integration with Fleet.
-    val caretAfterMove = caret.moveToOffset(normalisedOffset)
+    val caretAfterMove = if (offset is Motion.VirtualColumn) {
+      caret.moveToVirtualPosition(offset.offset, offset.position)
+    } else {
+      caret.moveToOffset(normalisedOffset)
+    }
 
     // We've moved the caret, so reset the intended column. Visual block movement can replace the primary caret when
     // moving the selection up, so make sure we've got a valid caret
@@ -283,7 +287,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     }
 
     // TODO: This should be normalised by the action
-    if (!editor.isEndAllowed) {
+    if (!editor.isEndAllowed && offset !is Motion.VirtualColumn) {
       resultOffset = editor.normalizeOffset(resultOffset, false)
     }
 

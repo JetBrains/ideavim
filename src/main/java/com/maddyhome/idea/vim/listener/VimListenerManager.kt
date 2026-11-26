@@ -111,12 +111,13 @@ import com.maddyhome.idea.vim.helper.CmdwinKeys
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.GuicursorChangeListener
 import com.maddyhome.idea.vim.helper.StrictMode
+import com.maddyhome.idea.vim.helper.VirtualSpaceUpdater
+import com.maddyhome.idea.vim.helper.allowsCaretAtLineEnd
 import com.maddyhome.idea.vim.helper.clearCurrentSearchMatchHighlight
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.forceBarCursor
 import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.resetVimLastColumn
@@ -226,6 +227,7 @@ object VimListenerManager {
     injector.listenersNotifier.myEditorListeners.add(ShowCmdWidgetUpdater())
 
     injector.listenersNotifier.modeChangeListeners.add(IjVimRedrawService.RedrawListener)
+    injector.listenersNotifier.modeChangeListeners.add(VirtualSpaceUpdater)
   }
 
   fun turnOff() {
@@ -254,6 +256,7 @@ object VimListenerManager {
         NumberChangeListener
       )
       optionGroup.addEffectiveOptionValueChangeListener(Options.scrolloff, ScrollOptionsChangeListener)
+      optionGroup.addEffectiveOptionValueChangeListener(Options.virtualedit, VirtualSpaceUpdater)
       optionGroup.addGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
       optionGroup.addGlobalOptionChangeListener(Options.showmode, modeWidgetOptionListener)
       optionGroup.addGlobalOptionChangeListener(Options.showmode, macroWidgetOptionListener)
@@ -314,6 +317,7 @@ object VimListenerManager {
         NumberChangeListener
       )
       optionGroup.removeEffectiveOptionValueChangeListener(Options.scrolloff, ScrollOptionsChangeListener)
+      optionGroup.removeEffectiveOptionValueChangeListener(Options.virtualedit, VirtualSpaceUpdater)
       optionGroup.removeGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showmode, modeWidgetOptionListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showmode, macroWidgetOptionListener)
@@ -1092,7 +1096,7 @@ object VimListenerManager {
         1 -> {
           // If you click after the line, the caret is placed by IJ after the last symbol.
           // This is not allowed in some vim modes, so we move the caret over the last symbol.
-          if (!editor.vim.isEndAllowed(predictedMode)) {
+          if (!editor.vim.allowsCaretAtLineEnd(predictedMode)) {
             @Suppress("ideavimRunForEachCaret")
             editor.caretModel.runForEachCaret { caret ->
               val lineEnd = IjVimEditor(editor).getLineEndForOffset(caret.offset)

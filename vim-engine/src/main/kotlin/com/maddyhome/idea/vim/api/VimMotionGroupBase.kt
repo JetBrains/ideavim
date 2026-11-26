@@ -24,6 +24,8 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.handler.toAdjustedMotionOrError
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.helper.isVirtualEditActive
+import com.maddyhome.idea.vim.helper.isVirtualLineEnd
 import com.maddyhome.idea.vim.mark.Jump
 import com.maddyhome.idea.vim.mark.JumpSource
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -77,6 +79,13 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     val newPos = VimVisualPosition(line, intendedColumn + additionalVisualColumns, false)
     val offset = editor.visualPositionToOffset(newPos)
     val bufferLine = editor.offsetToBufferPosition(offset).line
+    if (editor.isVirtualEditActive()) {
+      val lineEndOffset = editor.getLineEndOffset(bufferLine)
+      val lineEnd = editor.offsetToVisualPosition(lineEndOffset)
+      if (lineEnd.line == line && newPos.column >= lineEnd.column) {
+        return Motion.VirtualColumn(lineEndOffset, newPos, intendedColumn)
+      }
+    }
     val normalisedOffset = editor.normalizeOffset(bufferLine, offset, editor.isEndAllowed)
     val finalColumn = editor.offsetToVisualPosition(normalisedOffset).column
     return if (intendedColumn != finalColumn) {
@@ -133,6 +142,10 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     allowPastEnd: Boolean,
     allowWrap: Boolean,
   ): Motion {
+    if (editor.isVirtualEditActive()) {
+      getVirtualHorizontalMotion(editor, caret, count)?.let { return it }
+    }
+
     val text = editor.text()
     val oldOffset = caret.offset
     var current = oldOffset
@@ -154,6 +167,38 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     }
 
     return offset.toMotionOrError()
+  }
+
+  /**
+   * Returns the horizontal motion that ends past the end of the line, or null if it ends inside the text
+   */
+  private fun getVirtualHorizontalMotion(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion? {
+    val text = editor.text()
+    val lineEndOffset = editor.getLineEndForOffset(caret.offset)
+    val lineEnd = editor.offsetToVisualPosition(lineEndOffset)
+    val column = if (caret.offset == lineEndOffset) caret.getVisualPosition().column else lineEnd.column
+
+    if (count > 0) {
+      var current = caret.offset
+      var remaining = count
+      while (remaining > 0 && current < lineEndOffset) {
+        current = Graphemes.next(text, current) ?: break
+        remaining--
+      }
+      if (current < lineEndOffset) return null
+      return Motion.VirtualColumn(lineEndOffset, VimVisualPosition(lineEnd.line, column + remaining, false))
+    }
+
+    if (column <= lineEnd.column) return null
+    val newColumn = column + count
+    if (newColumn >= lineEnd.column) {
+      return Motion.VirtualColumn(lineEndOffset, VimVisualPosition(lineEnd.line, newColumn, false))
+    }
+    var current = lineEndOffset
+    repeat(lineEnd.column - newColumn) {
+      current = Graphemes.prev(text, current) ?: return@repeat
+    }
+    return editor.normalizeOffset(caret.getLine(), current, false).toMotionOrError()
   }
 
   override fun moveCaretToRelativeLineStartSkipLeading(
@@ -520,9 +565,9 @@ abstract class VimMotionGroupBase : VimMotionGroup {
         // If inclusive, add the last character to the range. A forced motion modifier (o_v) can override the type.
         if (argument.getEffectiveMotionType() === MotionType.INCLUSIVE) {
           if (start > end) {
-            if (start < editor.fileSize()) start++
+            if (start < editor.fileSize() && !editor.isVirtualLineEnd(start)) start++
           } else {
-            if (end < editor.fileSize()) end++
+            if (end < editor.fileSize() && !editor.isVirtualLineEnd(end)) end++
           }
         }
       }
@@ -649,6 +694,12 @@ abstract class VimMotionGroupBase : VimMotionGroup {
 
   override fun moveCaretToColumn(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowEnd: Boolean): Motion {
     val line = caret.getLine()
+    if (editor.isVirtualEditActive() && count > editor.lineLength(line)) {
+      val lineEndOffset = editor.getLineEndOffset(line)
+      val lineEnd = editor.offsetToVisualPosition(lineEndOffset)
+      val column = lineEnd.column + count - editor.lineLength(line)
+      return Motion.VirtualColumn(lineEndOffset, VimVisualPosition(lineEnd.line, column, false))
+    }
     val column = editor.normalizeColumn(line, count, allowEnd)
     val offset = editor.bufferPositionToOffset(BufferPosition(line, column, false))
     return if (column != count) {

@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
+import com.maddyhome.idea.vim.helper.fillVirtualSpace
 import com.maddyhome.idea.vim.state.KeyHandlerState
 
 @CommandOrMotion(
@@ -63,7 +64,8 @@ private val logger = vimLogger<ChangeCharacterAction>()
  * @param ch     The character to change to
  * @return true if able to change count characters, false if not
  */
-private fun changeCharacter(editor: VimEditor, caret: VimCaret, count: Int, ch: Char): Boolean {
+private fun changeCharacter(editor: VimEditor, vimCaret: VimCaret, count: Int, ch: Char): Boolean {
+  val caret = vimCaret.fillVirtualSpace(count)
   val col = caret.getBufferPosition().column
   // TODO: Is this correct? Should we really use only current caret? We have a caret as an argument
   val len = editor.lineLength(editor.currentCaret().getBufferPosition().line)

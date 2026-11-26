@@ -32,6 +32,9 @@ import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import com.maddyhome.idea.vim.helper.NumberType
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
+import com.maddyhome.idea.vim.helper.fillVirtualSpace
+import com.maddyhome.idea.vim.helper.isInVirtualSpace
+import com.maddyhome.idea.vim.helper.isVirtualEditActive
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
 import com.maddyhome.idea.vim.key.AbbreviationContext
 import com.maddyhome.idea.vim.key.findAndResolveAbbreviation
@@ -138,6 +141,11 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     operatorArguments: OperatorArguments,
   ): Boolean {
     val endOffset = injector.motion.getHorizontalMotion(editor, caret, count, true)
+    if (endOffset is Motion.VirtualColumn && endOffset.offset == caret.offset) {
+      // The characters are all in virtual space, there's nothing to delete
+      if (count < 0) caret.moveToMotion(endOffset)
+      return true
+    }
     if (endOffset is AbsoluteOffset) {
       val range = TextRange(caret.offset, endOffset.offset)
       // If the deletion reaches the end of the line, remember it so that returning to Insert mode after a `<C-O>`
@@ -154,7 +162,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         caret,
       )
       val pos = min(caret.offset, endOffset.offset)
-      val norm = editor.normalizeOffset(editor.offsetToBufferPosition(pos).line, pos, isChange)
+      val allowEnd = isChange || editor.isVirtualEditActive()
+      val norm = editor.normalizeOffset(editor.offsetToBufferPosition(pos).line, pos, allowEnd)
       val newCaret = if (norm != pos ||
         editor.offsetToVisualPosition(norm) !==
         injector.engineEditorHelper.inlayAwareOffsetToVisualPosition(editor, norm)
@@ -169,7 +178,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       val offset = editor.normalizeOffset(
         newCaret.getBufferPosition().line,
         newCaret.offset,
-        isChange,
+        allowEnd,
       )
       newCaret.moveToOffset(offset)
       return res
@@ -265,7 +274,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   }
 
   override fun insertText(editor: VimEditor, caret: VimCaret, str: String): VimCaret {
-    return insertText(editor, caret, caret.offset, str)
+    val filledCaret = caret.fillVirtualSpace(0)
+    return insertText(editor, filledCaret, filledCaret.offset, str)
   }
 
   open fun insertText(editor: VimEditor, caret: VimCaret, start: BufferPosition, str: String) {
@@ -426,10 +436,22 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         followWithoutRecording(change)
         return
       }
-      if (undoLastRecordedText(change)) return
 
-      updateRecordedTexts(change)
-      record(change)
+      // The fill isn't typed, and a repeated insert fills the virtual space at its own caret
+      val fill = change.virtualSpaceFill
+      if (fill > 0) {
+        followWithoutRecording(ChangesListener.Change("", change.newFragment.substring(0, fill), change.offset))
+        if (fill == change.newFragment.length) return
+      }
+      val typedChange = if (fill > 0) {
+        ChangesListener.Change("", change.newFragment.substring(fill), change.offset + fill)
+      } else {
+        change
+      }
+      if (undoLastRecordedText(typedChange)) return
+
+      updateRecordedTexts(typedChange)
+      record(typedChange)
     }
 
     private fun isRepeatBufferFull() = repeatCharsCount > MAX_REPEAT_CHARS_COUNT
@@ -1019,6 +1041,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     editor.mode = Mode.NORMAL(editor.mode)
 
     editor.forEachCaret { caret ->
+      if (caret.isInVirtualSpace) return@forEachCaret
       val normalized = editor.normalizeOffset(caret.offset, allowEnd = false)
       if (normalized != caret.offset) {
         caret.moveToOffset(normalized)
@@ -1042,6 +1065,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     count: Int,
     operatorArguments: OperatorArguments,
   ): Boolean {
+    if (count == 1 && caret.isInVirtualSpace) return true
     val initialOffset = caret.offset
     val offset = injector.motion.moveCaretToRelativeLineEnd(editor, caret, count - 1, true)
     val lineStart = injector.motion.moveCaretToCurrentLineStart(editor, caret)
@@ -1412,6 +1436,10 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     count: Int,
     operatorArguments: OperatorArguments,
   ): Boolean {
+    if (count == 1 && caret.isInVirtualSpace) {
+      editor.vimChangeActionSwitchMode = Mode.INSERT
+      return true
+    }
     val res = deleteEndOfLine(editor, context, caret, count, operatorArguments)
     if (res) {
       caret.moveToOffset(injector.motion.moveCaretToCurrentLineEnd(editor, caret))
@@ -1433,6 +1461,10 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     caret: VimCaret,
     operatorArguments: OperatorArguments,
   ): Boolean {
+    if (caret.isInVirtualSpace) {
+      editor.vimChangeActionSwitchMode = Mode.INSERT
+      return true
+    }
     val count = operatorArguments.count1
     // TODO  is it correct to use primary caret? There is a caret as an argument
     val len = editor.lineLength(editor.primaryCaret().getBufferPosition().line)
@@ -1664,6 +1696,10 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       true,
       operatorArguments.copy(count0 = count0),
     ) ?: return false
+    if (!first.isMultiple && first.startOffset == first.endOffset && caret.isInVirtualSpace) {
+      editor.vimChangeActionSwitchMode = Mode.INSERT
+      return true
+    }
     return changeRange(
       editor,
       caret,
@@ -2376,6 +2412,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   override fun changeCaseToggleCharacter(editor: VimEditor, caret: VimCaret, count: Int): Boolean {
     val allowWrap = injector.options(editor).whichwrap.contains("~")
+    if (caret.isInVirtualSpace && !allowWrap) return true
     var motion = injector.motion.getHorizontalMotion(editor, caret, count, true, allowWrap)
     if (motion is Motion.Error) return false
     changeCase(editor, caret, caret.offset, (motion as AbsoluteOffset).offset, VimChangeGroup.ChangeCaseType.TOGGLE)
@@ -2386,7 +2423,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       false,
       allowWrap
     ) // same but without allow end because we can change till end, but can't move caret there
-    if (motion is AbsoluteOffset) {
+    if (motion is Motion.VirtualColumn) {
+      caret.moveToMotion(motion)
+    } else if (motion is AbsoluteOffset) {
       caret.moveToOffset(editor.normalizeOffset(motion.offset, false))
     }
     return true

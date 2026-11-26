@@ -51,12 +51,14 @@ import com.maddyhome.idea.vim.common.VimEditorReplaceMask
 import com.maddyhome.idea.vim.group.visual.vimSetSystemBlockSelectionSilently
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StrictMode
+import com.maddyhome.idea.vim.helper.enableVirtualSpace
 import com.maddyhome.idea.vim.helper.exitInsertMode
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.inExMode
 import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.helper.replaceMask
+import com.maddyhome.idea.vim.helper.restoreVirtualSpace
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimLastSelectionType
 import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
@@ -475,6 +477,10 @@ open class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase() {
   override fun isTemplateActive(): Boolean {
     return editor.isTemplateActive()
   }
+
+  override fun enableVirtualSpace() = enableVirtualSpace(editor)
+
+  override fun restoreVirtualSpace(): Boolean = restoreVirtualSpace(editor)
 
   override fun hasUnsavedChanges(): Boolean {
     return EditorHelper.hasUnsavedChanges(this.editor)

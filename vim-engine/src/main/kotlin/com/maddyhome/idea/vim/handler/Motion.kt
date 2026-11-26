@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.handler
 
+import com.maddyhome.idea.vim.api.VimVisualPosition
+
 /**
  * [Error] and [NoMotion] both do not move the caret. However, in case of macros, [Error] stops the macro execution.
  */
@@ -28,7 +30,17 @@ sealed class Motion {
    * @param intendedColumn  The index of the intended location of the caret, as counted in columns from the start of the
    *                        buffer line, including the column width of all virtual text.
    */
-  class AdjustedOffset(offset: Int, val intendedColumn: Int) : AbsoluteOffset(offset)
+  open class AdjustedOffset(offset: Int, val intendedColumn: Int) : AbsoluteOffset(offset)
+
+  /**
+   * Represents a motion to a column past the end of the line, allowed by 'virtualedit'.
+   *
+   * @param lineEndOffset The offset of the end of the line, used by operators and everything that needs a real offset.
+   * @param position      The visual position of the caret, with a column that can be past the end of the line.
+   * @param intendedColumn The column kept for subsequent vertical motions, see [AdjustedOffset].
+   */
+  class VirtualColumn(lineEndOffset: Int, val position: VimVisualPosition, intendedColumn: Int = position.column) :
+    AdjustedOffset(lineEndOffset, intendedColumn)
 }
 
 fun Int.toMotion(): Motion.AbsoluteOffset {
