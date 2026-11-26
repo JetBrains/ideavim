@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.scroll.ScrollTarget
 import com.maddyhome.idea.vim.scroll.VerticalScroll
 import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.sign
 
 internal class ScrollGroup : VimScrollGroup {
   override fun scrollCaretIntoView(editor: VimEditor) {
@@ -127,10 +128,26 @@ internal class ScrollGroup : VimScrollGroup {
   override fun scrollLines(editor: VimEditor, lines: Int): Boolean {
     assert(lines != 0) { "lines cannot be 0" }
     val ijEditor = editor.ij
-    val layout = EditorWindowLayout(ijEditor)
-    EditorHelper.scrollToView(ijEditor, VerticalScroll.scrollLines(layout, layout.view, lines))
+    EditorHelper.scrollVertically(ijEditor, offsetToScrollLines(EditorWindowLayout(ijEditor), lines))
     MotionGroup.moveCaretToView(ijEditor)
     return true
+  }
+
+  // The sticky lines panel can hide the line we scroll to wherever we put it, e.g. when the panel grows by a row as we
+  // scroll a row, so we scroll more lines until the window moves, or there is nothing left to scroll
+  private fun offsetToScrollLines(layout: EditorWindowLayout, lines: Int): Int {
+    val direction = lines.sign
+    if (layout.isAtScrollLimit(direction)) return layout.offset
+    var count = lines
+    var previous = layout.view
+    while (true) {
+      val view = VerticalScroll.scrollLines(layout, layout.view, count)
+      if (view == previous) return layout.offset
+      val offset = layout.offsetShowing(view)
+      if ((offset - layout.offset).sign == direction) return offset
+      previous = view
+      count += direction
+    }
   }
 
   override fun scrollCurrentLineToDisplayTop(editor: VimEditor, rawCount: Int, start: Boolean): Boolean {
