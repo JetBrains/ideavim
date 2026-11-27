@@ -10,11 +10,13 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.ModeChangeListener
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.options.EffectiveOptionValueChangeListener
 import com.maddyhome.idea.vim.state.mode.Mode
 
@@ -36,8 +38,14 @@ internal object VirtualSpaceUpdater : ModeChangeListener, EffectiveOptionValueCh
   override fun modeChanged(editor: VimEditor, oldMode: Mode) = editor.updateVirtualSpace()
 
   override fun onEffectiveValueChanged(editor: VimEditor) {
-    editor.updateVirtualSpace()
-    editor.leaveInactiveVirtualSpace()
+    val application = ApplicationManager.getApplication()
+    if (application.isDispatchThread) {
+      editor.updateVirtualSpace()
+      editor.leaveInactiveVirtualSpace()
+    } else {
+      // Options can be set from a plugin outside the EDT
+      application.invokeLater({ onEffectiveValueChanged(editor) }, { editor.ij.isDisposed })
+    }
   }
 }
 
