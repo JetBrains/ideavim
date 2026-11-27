@@ -17,7 +17,10 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.fileEditor.impl.EditorComposite;
 import com.intellij.openapi.fileEditor.impl.EditorTabbedContainer;
 import com.intellij.openapi.fileEditor.impl.EditorWindow;
+import com.intellij.openapi.fileEditor.impl.EditorWindowHolder;
+import com.intellij.openapi.fileEditor.impl.EditorsSplitters;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Splitter;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindowType;
@@ -33,18 +36,25 @@ import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.options.OptionAccessScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 import static com.maddyhome.idea.vim.helper.UiHelper.requestFocus;
 
 public class WindowGroup extends WindowGroupBase {
+  private static final Comparator<Component> LEFT_TO_RIGHT_THEN_TOP_TO_BOTTOM =
+    Comparator.comparingInt((Component component) -> screenLocation(component).x)
+      .thenComparingInt(component -> screenLocation(component).y);
+
   private static @NotNull List<EditorWindow> findWindowsInRow(@NotNull Caret caret,
                                                               @NotNull List<EditorWindow> windows,
                                                               final boolean vertical) {
@@ -281,35 +291,68 @@ public class WindowGroup extends WindowGroupBase {
 
   @Override
   public void selectNextWindow(@NotNull ExecutionContext context) {
-    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
-    final EditorWindow current = fileEditorManager.getCurrentWindow();
-    if (current != null) {
-      EditorWindow nextWindow = fileEditorManager.getNextWindow(current);
-      if (nextWindow != null) {
-        nextWindow.setAsCurrentWindow(true);
-      }
-    }
+    moveFromCurrentWindow(context, 1);
   }
 
   @Override
   public void selectPreviousWindow(@NotNull ExecutionContext context) {
-    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
-    final EditorWindow current = fileEditorManager.getCurrentWindow();
-    if (current != null) {
-      EditorWindow prevWindow = fileEditorManager.getPrevWindow(current);
-      if (prevWindow != null) {
-        prevWindow.setAsCurrentWindow(true);
-      }
-    }
+    moveFromCurrentWindow(context, -1);
   }
 
   @Override
-  public void selectWindow(@NotNull ExecutionContext context, int index) {
-    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
-    final EditorWindow[] windows = fileEditorManager.getWindows();
-    if (index - 1 < windows.length) {
-      windows[index - 1].setAsCurrentWindow(true);
+  public void selectWindow(@NotNull ExecutionContext context, int number) {
+    var windows = allWindowsInScreenOrder(getFileEditorManager((DataContext)context.getContext()));
+    if (windows.isEmpty()) return;
+
+    var lastNumber = windows.size();
+    windows.get(Math.min(number, lastNumber) - 1).setAsCurrentWindow(true);
+  }
+
+  private static void moveFromCurrentWindow(@NotNull ExecutionContext context, int steps) {
+    var fileEditorManager = getFileEditorManager((DataContext)context.getContext());
+    var windows = allWindowsInScreenOrder(fileEditorManager);
+    var currentIndex = windows.indexOf(fileEditorManager.getCurrentWindow());
+    if (currentIndex == -1) return;
+
+    var targetIndex = Math.floorMod(currentIndex + steps, windows.size());
+    windows.get(targetIndex).setAsCurrentWindow(true);
+  }
+
+  @VisibleForTesting
+  public static @NotNull List<EditorWindow> allWindowsInScreenOrder(@NotNull FileEditorManagerEx fileEditorManager) {
+    return editorAreasMainWindowFirst(fileEditorManager)
+      .flatMap(WindowGroup::windowsTopLeftToBottomRight)
+      .toList();
+  }
+
+  private static @NotNull Stream<EditorsSplitters> editorAreasMainWindowFirst(@NotNull FileEditorManagerEx manager) {
+    var mainWindowArea = manager.getComponent();
+    Comparator<EditorsSplitters> mainWindowFirst = Comparator.comparing(area -> area != mainWindowArea);
+    return Arrays.stream(manager.getWindows())
+      .map(EditorWindow::getOwner)
+      .distinct()
+      .sorted(mainWindowFirst.thenComparing(LEFT_TO_RIGHT_THEN_TOP_TO_BOTTOM));
+  }
+
+  private static @NotNull Point screenLocation(@NotNull Component component) {
+    var location = new Point();
+    SwingUtilities.convertPointToScreen(location, component);
+    return location;
+  }
+
+  private static @NotNull Stream<EditorWindow> windowsTopLeftToBottomRight(@Nullable Component component) {
+    if (component instanceof EditorWindowHolder holder) {
+      return Stream.of(holder.getEditorWindow());
     }
+    if (component instanceof Splitter splitter) {
+      return Stream.of(splitter.getFirstComponent(), splitter.getSecondComponent())
+        .flatMap(WindowGroup::windowsTopLeftToBottomRight);
+    }
+    if (component instanceof Container container) {
+      return Arrays.stream(container.getComponents())
+        .flatMap(WindowGroup::windowsTopLeftToBottomRight);
+    }
+    return Stream.empty();
   }
 
   @Override
