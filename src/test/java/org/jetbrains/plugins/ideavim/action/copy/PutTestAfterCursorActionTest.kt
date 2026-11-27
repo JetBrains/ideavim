@@ -23,12 +23,33 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.jupiter.api.Test
 import java.awt.datatransfer.Transferable
 
 class PutTestAfterCursorActionTest : VimTestCase() {
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.FOLDING, "Neovim doesn't support arbitrary folds")
+  fun `test put after folded region keeps fold collapsed`() {
+    val before = """
+      [${c}folded line
+      second folded line]
+      target
+    """.trimIndent()
+    val after = """
+      folded line
+      second folded line
+      ${c}folded line
+      target
+    """.trimIndent()
+
+    configureAndFold(before, "")
+    performTest("yyp", after, Mode.NORMAL())
+  }
+
   @Test
   fun `test platform handlers are called`() {
     injector.globalOptions().clipboard.prependValue(OptionConstants.clipboard_ideaput)
