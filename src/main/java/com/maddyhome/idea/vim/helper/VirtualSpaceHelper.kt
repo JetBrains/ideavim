@@ -15,8 +15,8 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ModeChangeListener
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.options.EffectiveOptionValueChangeListener
 import com.maddyhome.idea.vim.state.mode.Mode
 
@@ -43,8 +43,8 @@ internal object VirtualSpaceUpdater : ModeChangeListener, EffectiveOptionValueCh
       editor.updateVirtualSpace()
       editor.leaveInactiveVirtualSpace()
     } else {
-      // Options can be set from a plugin outside the EDT
-      application.invokeLater({ onEffectiveValueChanged(editor) }, { editor.ij.isDisposed })
+      // Options can be set from a plugin outside the EDT. The editor isn't kept in the queue, it may be closed by then
+      application.invokeLater { injector.editorGroup.getEditors().forEach(::onEffectiveValueChanged) }
     }
   }
 }
