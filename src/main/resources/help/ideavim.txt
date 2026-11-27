@@ -501,6 +501,9 @@ $                       As an operator motion, move to the end of the line,
                         downward. In Visual and Select mode, 'keymodel'
                         decides whether the selection is stopped.
 
+<End>                   As an operator motion, move to the end of the line,
+                        [count] - 1 lines downward.
+
                                                                       *<Home>*
 <Home>                  Move to the first character of the line. In Visual and
                         Select mode, 'keymodel' decides whether the selection
