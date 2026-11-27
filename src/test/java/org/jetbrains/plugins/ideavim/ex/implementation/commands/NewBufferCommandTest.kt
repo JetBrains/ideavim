@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.intellij.ide.scratch.ScratchUtil
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.vfs.VirtualFile
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.model.commands.EditNewFileCommand
@@ -19,6 +20,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.VnewCommand
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimSplitWindowTestCase
+import org.jetbrains.plugins.ideavim.waitUntil
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -77,6 +79,7 @@ class NewBufferCommandTest : VimSplitWindowTestCase() {
     val original = currentFile()
 
     enterCommand("vnew")
+    waitForSplitEditor()
 
     assertEquals(2, fileEditorManager.windows.size)
     val file = currentFile()
@@ -89,9 +92,22 @@ class NewBufferCommandTest : VimSplitWindowTestCase() {
     configureByText("lorem ipsum")
 
     enterCommand("new")
+    waitForSplitEditor()
 
     assertEquals(2, fileEditorManager.windows.size)
     assertTrue(ScratchUtil.isScratch(currentFile()))
+  }
+
+  // The split opens its file asynchronously. An editor created after tearDown closed the files is never disposed
+  private fun waitForSplitEditor() {
+    val opened = waitUntil {
+      var editor: FileEditor? = null
+      ApplicationManager.getApplication().invokeAndWait {
+        editor = fileEditorManager.currentWindow?.selectedComposite?.selectedEditor
+      }
+      editor != null
+    }
+    assertTrue(opened, "Timed out waiting for the split to open its editor")
   }
 
   private fun currentText(): String {
