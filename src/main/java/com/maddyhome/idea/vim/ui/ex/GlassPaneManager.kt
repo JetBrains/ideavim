@@ -79,7 +79,7 @@ internal abstract class GlassPaneManager {
       toolWindowListenerConnection?.disconnect()
       toolWindowListenerConnection = null
 
-      cursorHandlerDisposable?.dispose()
+      cursorHandlerDisposable?.let(Disposer::dispose)
       cursorHandlerDisposable = null
     }
     glassPane = null
