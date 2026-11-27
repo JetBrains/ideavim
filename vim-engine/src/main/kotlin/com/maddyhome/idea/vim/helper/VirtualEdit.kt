@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.moveToMotion
 import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.handler.Motion
@@ -101,13 +102,21 @@ fun VimCaret.fillVirtualSpace(columnsAfterCaret: Int): VimCaret {
  * Backspacing in virtual space only moves the caret back, there's no text to delete. `.` doesn't repeat the key: the
  * repeated insert has virtual space of its own, if any. `.` replays the keys once for all carets, the primary caret
  * decides.
+ *
+ * Moves the carets back here when all of them are in virtual space: the platform's backspace runs on the backend in
+ * split mode, where the carets can't be after the line end. Returns false if the platform has to backspace.
  */
-fun VimEditor.dropBackspaceInVirtualSpaceFromRedo() {
+fun VimEditor.backspaceInVirtualSpace(): Boolean {
   if (primaryCaret().virtualColumns > 0) VimRedoBuffer.dropLastKey()
+  if (carets().any { it.virtualColumns == 0 }) return false
+  for (caret in carets()) {
+    caret.moveToMotion(injector.motion.getHorizontalMotion(this, caret, -1, allowPastEnd = true, allowWrap = false))
+  }
+  return true
 }
 
 /**
- * Deleting a word in virtual space only moves the caret to the line end, see [dropBackspaceInVirtualSpaceFromRedo].
+ * Deleting a word in virtual space only moves the caret to the line end, see [backspaceInVirtualSpace].
  * Returns false if the caret is not after the line end.
  */
 fun VimCaret.deleteWordInVirtualSpace(): Boolean {

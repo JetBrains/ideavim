@@ -206,6 +206,21 @@ abstract class IdeaVimStarterTestBase {
     waitForNoModalProgress()
   }
 
+  /** Sends key presses to the active editor, see [typeVim] */
+  protected fun typeKeys(keys: RemoteKeyboard.() -> Unit) {
+    driver.withContext {
+      requestFocusFromIde(singleProject())
+      ideFrame {
+        codeEditor().apply {
+          waitFound()
+          component.requestFocus()
+          keyboard(keys)
+        }
+      }
+    }
+    waitForNoModalProgress()
+  }
+
   /** Types vim keys followed by Escape, see [typeVim] */
   protected fun typeVimAndEscape(keys: String) {
     driver.withContext {
