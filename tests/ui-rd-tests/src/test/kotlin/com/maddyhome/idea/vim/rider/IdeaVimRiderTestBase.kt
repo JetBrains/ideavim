@@ -303,6 +303,11 @@ abstract class IdeaVimRiderTestBase {
     withEditor { keyboard { pressing(KeyEvent.VK_CONTROL) { key(keyCode) } } }
   }
 
+  /** Presses [keyCode] without modifiers in the editor */
+  protected fun key(keyCode: Int) {
+    withEditor { keyboard { key(keyCode) } }
+  }
+
   protected fun enter() {
     withEditor { keyboard { enter() } }
   }
@@ -319,6 +324,20 @@ abstract class IdeaVimRiderTestBase {
   }
 
   protected fun caretOffset(): Int = onEdt { getCaretModel().getOffset() }
+
+  /** Logical column of the caret, which can be after the line end in virtual space */
+  protected fun caretColumn(): Int = onEdt { getCaretModel().getLogicalPosition().getColumn() }
+
+  /** Virtual space setting, caret offset and logical column of the backend's editors, for diagnostics */
+  protected fun backendEditorStates(): List<String> = driver.withContext(OnDispatcher.EDT) {
+    utility(BackendEditorFactoryUtil::class).getInstance().getAllEditors().map { editor ->
+      val caret = editor.getCaretModel()
+      "${editor.getDocument().getText().lineSequence().first()}| virtualSpace=${editor.getSettings().isVirtualSpace()} " +
+        "offset=${caret.getOffset()} column=${caret.getLogicalPosition().getColumn()}"
+    }
+  }
+
+  protected fun isVirtualSpace(): Boolean = onEdt { driver.cast(this, SettingsEditorRef::class).getSettings().isVirtualSpace() }
 
   /** The vertical scroll offset and the height of the sticky lines panel, in pixels */
   protected fun verticalScroll(): Pair<Int, Int> = onEdt {
@@ -496,6 +515,54 @@ interface SelectionModelRef {
 interface ScrollEditorRef {
   fun getScrollingModel(): ScrollingModelRef
   fun getStickyLinesPanelHeight(): Int
+}
+
+@Remote("com.intellij.openapi.editor.Editor")
+interface SettingsEditorRef {
+  fun getSettings(): EditorSettingsRef
+}
+
+@Remote("com.intellij.openapi.editor.EditorSettings")
+interface EditorSettingsRef {
+  fun isVirtualSpace(): Boolean
+}
+
+@Remote("com.intellij.openapi.editor.EditorFactory", rdTarget = RdTarget.BACKEND)
+interface BackendEditorFactoryUtil {
+  fun getInstance(): BackendEditorFactoryRef
+}
+
+@Remote("com.intellij.openapi.editor.EditorFactory", rdTarget = RdTarget.BACKEND)
+interface BackendEditorFactoryRef {
+  fun getAllEditors(): Array<BackendEditorRef>
+}
+
+@Remote("com.intellij.openapi.editor.Editor", rdTarget = RdTarget.BACKEND)
+interface BackendEditorRef {
+  fun getDocument(): BackendDocumentRef
+  fun getSettings(): BackendEditorSettingsStateRef
+  fun getCaretModel(): BackendCaretModelRef
+}
+
+@Remote("com.intellij.openapi.editor.Document", rdTarget = RdTarget.BACKEND)
+interface BackendDocumentRef {
+  fun getText(): String
+}
+
+@Remote("com.intellij.openapi.editor.EditorSettings", rdTarget = RdTarget.BACKEND)
+interface BackendEditorSettingsStateRef {
+  fun isVirtualSpace(): Boolean
+}
+
+@Remote("com.intellij.openapi.editor.CaretModel", rdTarget = RdTarget.BACKEND)
+interface BackendCaretModelRef {
+  fun getOffset(): Int
+  fun getLogicalPosition(): BackendLogicalPositionRef
+}
+
+@Remote("com.intellij.openapi.editor.LogicalPosition", rdTarget = RdTarget.BACKEND)
+interface BackendLogicalPositionRef {
+  fun getColumn(): Int
 }
 
 @Remote("com.intellij.openapi.editor.ScrollingModel")

@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.dropBackspaceInVirtualSpaceFromRedo
+import com.maddyhome.idea.vim.helper.backspaceInVirtualSpace
 
 @CommandOrMotion(
   keys = ["<C-H>", "<BS>"],
@@ -33,9 +33,7 @@ internal class InsertBackspaceAction : VimActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.insertMode) {
-      // The platform's backspace moves a caret after the line end back by a column, without changing the text
-      editor.dropBackspaceInVirtualSpaceFromRedo()
-      injector.changeGroup.processBackspace(editor, context)
+      if (!editor.backspaceInVirtualSpace()) injector.changeGroup.processBackspace(editor, context)
     } else {
       replaceModeBackspaceAtCarets(editor)
     }

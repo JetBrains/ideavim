@@ -32,6 +32,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.format.FormatRemoteApi
 import com.maddyhome.idea.vim.helper.CodeWrapper
 import com.maddyhome.idea.vim.helper.CommentLeaderParser
+import com.maddyhome.idea.vim.helper.fillVirtualSpace
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.ide.ChatInputProvider
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper
@@ -102,6 +103,8 @@ class ChangeGroup : VimChangeGroupBase() {
     CommandProcessor.getInstance().executeCommand(
       editor.project, {
         ApplicationManager.getApplication().runWriteAction {
+          // The typed handler runs on the backend in split mode, where the carets can't be after the line end
+          vimEditor.forEachCaret { it.fillVirtualSpace(0) }
           action(KeyHandlerKeeper.getInstance().originalHandler)
         }
       }, "", doc,
