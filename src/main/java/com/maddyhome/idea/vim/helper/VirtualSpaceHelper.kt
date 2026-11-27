@@ -42,8 +42,12 @@ internal object VirtualSpaceUpdater : ModeChangeListener, EffectiveOptionValueCh
     if (application.isDispatchThread) {
       editor.updateVirtualSpace()
       editor.leaveInactiveVirtualSpace()
+    } else if (!application.isReadAccessAllowed) {
+      // Options can be set from a plugin outside the EDT
+      application.invokeAndWait { onEffectiveValueChanged(editor) }
     } else {
-      // Options can be set from a plugin outside the EDT. The editor isn't kept in the queue, it may be closed by then
+      // Waiting for the EDT while holding the read lock can deadlock. The editor isn't kept in the queue, it may be
+      // closed by then
       application.invokeLater { injector.editorGroup.getEditors().forEach(::onEffectiveValueChanged) }
     }
   }
