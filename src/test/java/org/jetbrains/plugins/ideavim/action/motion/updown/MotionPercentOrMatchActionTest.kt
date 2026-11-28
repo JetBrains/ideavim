@@ -441,4 +441,28 @@ $c("("")")
     typeText("%")
     assertState("""('^abc/(?P<user_id>\d+$c)/$',)""")
   }
+
+  @Test
+  @TestFor(issues = ["VIM-4030"])
+  fun `test percent match brackets in kotlin raw string`() {
+    configureByTextX("test.kt", "val json = \"\"\"${c}{\"}\"\"\"")
+    typeText("%")
+    assertState("val json = \"\"\"{\"${c}}\"\"\"")
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-4030"])
+  fun `test percent match brackets in kotlin raw string backwards`() {
+    configureByTextX("test.kt", "val json = \"\"\"{\"${c}}\"\"\"")
+    typeText("%")
+    assertState("val json = \"\"\"${c}{\"}\"\"\"")
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-4030"])
+  fun `test percent match brackets in kotlin raw string with quoted keys`() {
+    configureByTextX("test.kt", "val json = \"\"\"${c}{\"key\":\"value\"}\"\"\"")
+    typeText("%")
+    assertState("val json = \"\"\"{\"key\":\"value\"${c}}\"\"\"")
+  }
 }
