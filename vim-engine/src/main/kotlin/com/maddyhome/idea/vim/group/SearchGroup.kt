@@ -585,6 +585,15 @@ private fun quotesChanges(chars: CharSequence, startIndex: Int) = sequence {
 
   while (nextQuoteIndex != null) {
     val quotes = chars[nextQuoteIndex]
+    // Adjacent same quote characters (e.g., the `"""` delimiters of a raw string or an empty `""` string) are not
+    // the delimiters of a simple quoted string. Skip the whole run, so quotes inside the run or right after it
+    // don't pair up with unrelated quotes on the line (VIM-4030)
+    if (nextQuoteIndex + 1 < eolIndex && chars[nextQuoteIndex + 1] == quotes) {
+      var runEnd = nextQuoteIndex + 1
+      while (runEnd < eolIndex && chars[runEnd] == quotes) runEnd++
+      nextQuoteIndex = chars.indexOfAnyOrNull(charArrayOf('"', '\''), runEnd, eolIndex, escaped = false)
+      continue
+    }
     when (quotes) {
       '"' -> {
         if (!isInSingleQuotes) {
